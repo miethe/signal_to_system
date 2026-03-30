@@ -1,0 +1,200 @@
+[[deployed]]
+artifact_name = "claude-code"
+artifact_type = "skill"
+from_collection = "default"
+deployed_at = "2026-03-20T00:23:22.172565"
+artifact_path = "skills/claude-code"
+content_hash = "8e21ab21c9fa8727c966ea2b0b1983e2b38a85fe91e8019e95b617d0a39ff4f8"
+local_modifications = false
+version_lineage = [
+    "8e21ab21c9fa8727c966ea2b0b1983e2b38a85fe91e8019e95b617d0a39ff4f8",
+]
+merge_base_snapshot = "8e21ab21c9fa8727c966ea2b0b1983e2b38a85fe91e8019e95b617d0a39ff4f8"
+deployment_profile_id = "claude_code"
+platform = "claude_code"
+profile_root_dir = ".claude"
+collection_sha = "8e21ab21c9fa8727c966ea2b0b1983e2b38a85fe91e8019e95b617d0a39ff4f8"
+
+[[deployed]]
+artifact_name = "skill-creator"
+artifact_type = "skill"
+from_collection = "default"
+deployed_at = "2026-03-20T00:23:28.414812"
+artifact_path = "skills/skill-creator"
+content_hash = "0edd1e8dea0355800822b2f2ee775c9643f1f34e17c34497c3aafb4ce7df2869"
+local_modifications = false
+version_lineage = [
+    "0edd1e8dea0355800822b2f2ee775c9643f1f34e17c34497c3aafb4ce7df2869",
+]
+merge_base_snapshot = "0edd1e8dea0355800822b2f2ee775c9643f1f34e17c34497c3aafb4ce7df2869"
+deployment_profile_id = "claude_code"
+platform = "claude_code"
+profile_root_dir = ".claude"
+collection_sha = "0edd1e8dea0355800822b2f2ee775c9643f1f34e17c34497c3aafb4ce7df2869"
+
+[[deployed]]
+artifact_name = "skill-builder"
+artifact_type = "skill"
+from_collection = "default"
+deployed_at = "2026-03-20T00:23:33.893337"
+artifact_path = "skills/skill-builder"
+content_hash = "c9ce514881b6f195d8f9b422e5743dbc710087daf4f1175356a7519e29451976"
+local_modifications = false
+version_lineage = [
+    "c9ce514881b6f195d8f9b422e5743dbc710087daf4f1175356a7519e29451976",
+]
+merge_base_snapshot = "c9ce514881b6f195d8f9b422e5743dbc710087daf4f1175356a7519e29451976"
+deployment_profile_id = "claude_code"
+platform = "claude_code"
+profile_root_dir = ".claude"
+collection_sha = "c9ce514881b6f195d8f9b422e5743dbc710087daf4f1175356a7519e29451976"
+
+[[deployed]]
+artifact_name = "docs-seeker"
+artifact_type = "skill"
+from_collection = "default"
+deployed_at = "2026-03-20T00:24:09.696105"
+artifact_path = "skills/docs-seeker"
+content_hash = "5e38639352bff7ee2a83669f60c439c371241d3f01efcd81c89d7c3f44de7bb2"
+local_modifications = false
+version_lineage = [
+    "5e38639352bff7ee2a83669f60c439c371241d3f01efcd81c89d7c3f44de7bb2",
+]
+merge_base_snapshot = "5e38639352bff7ee2a83669f60c439c371241d3f01efcd81c89d7c3f44de7bb2"
+deployment_profile_id = "claude_code"
+platform = "claude_code"
+profile_root_dir = ".claude"
+collection_sha = "5e38639352bff7ee2a83669f60c439c371241d3f01efcd81c89d7c3f44de7bb2"
+
+[[deployed]]
+artifact_name = "frontend-design"
+artifact_type = "skill"
+from_collection = "default"
+deployed_at = "2026-03-20T00:24:17.331830"
+artifact_path = "skills/frontend-design"
+content_hash = "71797025467cdafd90f3827de529163565c7e935f1613d3a648629c36e143e95"
+local_modifications = false
+version_lineage = [
+    "71797025467cdafd90f3827de529163565c7e935f1613d3a648629c36e143e95",
+]
+merge_base_snapshot = "71797025467cdafd90f3827de529163565c7e935f1613d3a648629c36e143e95"
+deployment_profile_id = "claude_code"
+platform = "claude_code"
+profile_root_dir = ".claude"
+collection_sha = "71797025467cdafd90f3827de529163565c7e935f1613d3a648629c36e143e95"
+
+[[deployed]]
+artifact_name = "aesthetic"
+artifact_type = "skill"
+from_collection = "default"
+deployed_at = "2026-03-20T00:24:22.729386"
+artifact_path = "skills/aesthetic"
+content_hash = "615241a9b73651094ccfe99f1a3b32ff54f1ba8b90063ec5a6ac3375ddabe36e"
+local_modifications = false
+version_lineage = [
+    "615241a9b73651094ccfe99f1a3b32ff54f1ba8b90063ec5a6ac3375ddabe36e",
+]
+merge_base_snapshot = "615241a9b73651094ccfe99f1a3b32ff54f1ba8b90063ec5a6ac3375ddabe36e"
+deployment_profile_id = "claude_code"
+platform = "claude_code"
+profile_root_dir = ".claude"
+collection_sha = "615241a9b73651094ccfe99f1a3b32ff54f1ba8b90063ec5a6ac3375ddabe36e"
+
+[[deployed]]
+artifact_name = "tailwind-utility-styling"
+artifact_type = "skill"
+from_collection = "default"
+deployed_at = "2026-03-20T00:24:29.405204"
+artifact_path = "skills/tailwind-utility-styling"
+content_hash = "b59ff17a7c72a5d9e4a9d861c66f220d69c130f82f449195fddfe3f76b5d7000"
+local_modifications = false
+version_lineage = [
+    "b59ff17a7c72a5d9e4a9d861c66f220d69c130f82f449195fddfe3f76b5d7000",
+]
+merge_base_snapshot = "b59ff17a7c72a5d9e4a9d861c66f220d69c130f82f449195fddfe3f76b5d7000"
+deployment_profile_id = "claude_code"
+platform = "claude_code"
+profile_root_dir = ".claude"
+collection_sha = "b59ff17a7c72a5d9e4a9d861c66f220d69c130f82f449195fddfe3f76b5d7000"
+
+[[deployed]]
+artifact_name = "technical-writer"
+artifact_type = "agent"
+from_collection = "default"
+deployed_at = "2026-03-20T00:24:37.094325"
+artifact_path = "agents/technical-writer.md"
+content_hash = "c1cd9ec30155d2ec59f5cb74a21d4569e743435b779e36e45acbef9a479d6357"
+local_modifications = false
+version_lineage = [
+    "c1cd9ec30155d2ec59f5cb74a21d4569e743435b779e36e45acbef9a479d6357",
+]
+merge_base_snapshot = "c1cd9ec30155d2ec59f5cb74a21d4569e743435b779e36e45acbef9a479d6357"
+deployment_profile_id = "claude_code"
+platform = "claude_code"
+profile_root_dir = ".claude"
+collection_sha = "c1cd9ec30155d2ec59f5cb74a21d4569e743435b779e36e45acbef9a479d6357"
+
+[[deployed]]
+artifact_name = "documentation-expert"
+artifact_type = "agent"
+from_collection = "default"
+deployed_at = "2026-03-20T00:24:43.758971"
+artifact_path = "agents/documentation-expert.md"
+content_hash = "8573927b3d64ee52b7fd4f8a3283cde64d36dc338b949e75d62d40fce5bfc3fa"
+local_modifications = false
+version_lineage = [
+    "8573927b3d64ee52b7fd4f8a3283cde64d36dc338b949e75d62d40fce5bfc3fa",
+]
+merge_base_snapshot = "8573927b3d64ee52b7fd4f8a3283cde64d36dc338b949e75d62d40fce5bfc3fa"
+deployment_profile_id = "claude_code"
+platform = "claude_code"
+profile_root_dir = ".claude"
+collection_sha = "8573927b3d64ee52b7fd4f8a3283cde64d36dc338b949e75d62d40fce5bfc3fa"
+
+[[deployed]]
+artifact_name = "content-curator"
+artifact_type = "agent"
+from_collection = "default"
+deployed_at = "2026-03-20T00:24:49.476653"
+artifact_path = "agents/content-curator.md"
+content_hash = "71fcaa5a22397018d2db8f38d36248a308e1d16c5a202fb00be8ae7d402d2ba2"
+local_modifications = false
+version_lineage = [
+    "71fcaa5a22397018d2db8f38d36248a308e1d16c5a202fb00be8ae7d402d2ba2",
+]
+merge_base_snapshot = "71fcaa5a22397018d2db8f38d36248a308e1d16c5a202fb00be8ae7d402d2ba2"
+deployment_profile_id = "claude_code"
+platform = "claude_code"
+profile_root_dir = ".claude"
+collection_sha = "71fcaa5a22397018d2db8f38d36248a308e1d16c5a202fb00be8ae7d402d2ba2"
+
+[[deployed]]
+artifact_name = "frontend-architect"
+artifact_type = "agent"
+from_collection = "default"
+deployed_at = "2026-03-20T00:24:55.510985"
+artifact_path = "agents/frontend-architect.md"
+content_hash = "0b47fc0374cf7e60bf6b32de8d12d2512c66f3ddf050ce6e743f067a37d98feb"
+local_modifications = false
+version_lineage = [
+    "0b47fc0374cf7e60bf6b32de8d12d2512c66f3ddf050ce6e743f067a37d98feb",
+]
+merge_base_snapshot = "0b47fc0374cf7e60bf6b32de8d12d2512c66f3ddf050ce6e743f067a37d98feb"
+deployment_profile_id = "claude_code"
+platform = "claude_code"
+profile_root_dir = ".claude"
+collection_sha = "0b47fc0374cf7e60bf6b32de8d12d2512c66f3ddf050ce6e743f067a37d98feb"
+
+[[deployed]]
+artifact_name = "changelog-generator"
+artifact_type = "agent"
+from_collection = "default"
+deployed_at = "2026-03-20T00:25:01.050875"
+artifact_path = "agents/changelog-generator.md"
+content_hash = "11c6c7b2da49b3ca8c7c9397146e86a0d1d325f1a44a17d4a93d2868be8d063a"
+local_modifications = false
+merge_base_snapshot = "11c6c7b2da49b3ca8c7c9397146e86a0d1d325f1a44a17d4a93d2868be8d063a"
+deployment_profile_id = "claude_code"
+platform = "claude_code"
+profile_root_dir = ".claude"
+collection_sha = "11c6c7b2da49b3ca8c7c9397146e86a0d1d325f1a44a17d4a93d2868be8d063a"

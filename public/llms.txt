@@ -1,0 +1,25 @@
+# Signal to System
+## About
+A technical publication by Nick Miethe covering AI agents, agentic SDLC, architecture, platform engineering, and technical leadership.
+
+## Content Structure
+- /essays/ - Long-form essays and field notes
+- /series/ - Multi-post series on major themes
+- /projects/ - Portfolio artifacts and projects
+- /tags/ - Tag-based content discovery
+- /topics/ - Topic hub pages
+
+## Key Topics
+- AI Agents and Agentic SDLC
+- Technical Leadership and CTO Patterns
+- Architecture and Platform Engineering
+- Agent-Ready Repository Design
+- Context Engineering
+
+## Feeds
+- RSS: /rss.xml
+- Sitemap: /sitemap-index.xml
+- Search Index: /search.json
+
+## Author
+Nick Miethe - Technical Executive, Architect, Builder

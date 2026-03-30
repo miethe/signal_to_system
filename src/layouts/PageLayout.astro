@@ -1,0 +1,78 @@
+---
+/**
+ * PageLayout — for static/prose pages (About, Start Here, Portfolio, Other Sites).
+ * Provides a centered, constrained content column with an optional page header.
+ */
+
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  title?: string;
+  description?: string;
+  ogImage?: string;
+  canonicalUrl?: string;
+  pageTitle?: string;
+  pageSubtitle?: string;
+  /**
+   * Controls the maximum width of the content area.
+   * @default 'prose' — 65ch, ideal for long-form reading
+   */
+  width?: 'prose' | 'narrow' | 'normal' | 'wide' | 'full';
+  class?: string;
+}
+
+const {
+  title,
+  description,
+  ogImage,
+  canonicalUrl,
+  pageTitle,
+  pageSubtitle,
+  width = 'prose',
+  class: className,
+} = Astro.props;
+
+const widthClass: Record<string, string> = {
+  prose: 'max-w-3xl',
+  narrow: 'max-w-2xl',
+  normal: 'max-w-4xl',
+  wide: 'max-w-5xl',
+  full: 'max-w-none',
+};
+---
+
+<BaseLayout {title} {description} {ogImage} {canonicalUrl}>
+  <div class:list={['mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20', widthClass[width] || widthClass.prose]}>
+    {
+      (pageTitle || pageSubtitle) && (
+        <header class="mb-12 border-b border-[var(--border-subtle)] pb-10">
+          {pageTitle && (
+            <h1 class="text-4xl font-bold tracking-tight text-[var(--text-primary)] sm:text-5xl">
+              {pageTitle}
+            </h1>
+          )}
+          {pageSubtitle && (
+            <p class="mt-4 text-xl leading-relaxed text-[var(--text-tertiary)]">{pageSubtitle}</p>
+          )}
+        </header>
+      )
+    }
+
+    <div
+      class:list={[
+        'prose prose-slate dark:prose-invert max-w-none',
+        'prose-headings:font-bold prose-headings:tracking-tight',
+        'prose-p:leading-relaxed',
+        'prose-a:text-[var(--accent)] prose-a:no-underline hover:prose-a:text-[var(--accent-hover)] hover:prose-a:underline',
+        'prose-strong:text-[var(--text-primary)]',
+        'prose-code:rounded prose-code:bg-[var(--code-bg)] prose-code:px-1.5 prose-code:py-0.5 prose-code:text-sm prose-code:text-[var(--code-text)]',
+        'prose-pre:border prose-pre:border-[var(--code-border)] prose-pre:bg-[var(--code-bg-block)]',
+        'prose-blockquote:border-l-[var(--accent)] prose-blockquote:text-[var(--text-tertiary)]',
+        'prose-hr:border-[var(--border-subtle)]',
+        className,
+      ]}
+    >
+      <slot />
+    </div>
+  </div>
+</BaseLayout>

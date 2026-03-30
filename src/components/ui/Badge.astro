@@ -1,0 +1,50 @@
+---
+/**
+ * Badge — small pill/label component.
+ *
+ * Props:
+ *   variant  — controls colour palette
+ *   text     — label text
+ *   href     — if provided, renders as an <a> tag
+ */
+
+interface Props {
+  variant?: "default" | "category" | "status" | "type";
+  text: string;
+  href?: string;
+  class?: string;
+}
+
+const {
+  variant = "default",
+  text,
+  href,
+  class: className = "",
+} = Astro.props;
+
+const base =
+  "inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium transition-colors";
+
+const variants: Record<string, string> = {
+  default:
+    "bg-[var(--bg-muted)] text-[var(--text-secondary)]",
+  category:
+    "bg-[var(--accent-subtle)] text-[var(--accent-text)]",
+  status:
+    "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400",
+  type:
+    "bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-400",
+};
+
+const cls = [base, variants[variant] ?? variants.default, className].join(" ");
+---
+
+{
+  href ? (
+    <a href={href} class={cls + " hover:opacity-80"}>
+      {text}
+    </a>
+  ) : (
+    <span class={cls}>{text}</span>
+  )
+}

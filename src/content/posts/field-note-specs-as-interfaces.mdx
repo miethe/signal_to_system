@@ -1,0 +1,46 @@
+---
+title: "Specs as Interfaces: What Changes When Agents Read Your Requirements"
+excerpt: "When your spec is consumed by an agent, clarity becomes a functional requirement, not just good practice."
+date: 2026-03-12
+readTime: "5 min"
+contentType: field-note
+category: "Agentic SDLC"
+tags: ["agent-ready repos", "artifact-first", "delivery systems"]
+status: published
+---
+
+A software specification written for a human engineer can get away with ambiguity. The human brings domain knowledge, asks clarifying questions, infers intent from organizational context, and escalates edge cases before they become bugs. The spec is a starting point for a conversation. The actual requirements live partly in the document and partly in the heads of the people involved.
+
+This model breaks the moment an agent is the primary consumer of the spec.
+
+An agent does not ask clarifying questions by default. It does not infer organizational context. It does not escalate edge cases — it resolves them, silently, with its own judgment. When the spec says "handle errors gracefully," the agent will implement something that handles errors. Whether that implementation matches what the author had in mind is entirely determined by how precisely the spec communicates intent.
+
+**When an agent reads your spec, clarity stops being a quality-of-life improvement and becomes a functional requirement.**
+
+This is not an argument against using agents. It is an argument for taking specification seriously as a first-class engineering discipline — which most organizations have not done.
+
+## What Changes, Concretely
+
+A few properties that move from nice-to-have to required when agents enter the delivery chain:
+
+**Explicit acceptance criteria.** "The feature should work correctly" is not an acceptance criterion. "Given a user with verified=false, a POST to /confirm-email with a valid token must set verified=true and return 200" is an acceptance criterion. The difference is that the latter can be tested automatically. Agents operate in a loop — generate, test, revise. If the acceptance criteria cannot be tested, the loop has no exit condition.
+
+**Defined scope boundaries.** Human engineers negotiate scope implicitly throughout implementation. They recognize that a seemingly small change has large surface area and they flag it. Agents do not negotiate scope — they interpret it from the spec. A spec that does not explicitly state what is out of scope will produce implementations that wander into adjacent territory, sometimes in ways that are not immediately obvious.
+
+**Terminology consistency.** If the spec uses "user," "account," and "member" interchangeably, a human reader will probably resolve the ambiguity from context. An agent will treat them as potentially distinct entities and may generate code that reflects that distinction — or will pick one interpretation and apply it consistently, which may not be correct. Glossaries and terminology sections in specs are not pedantic overhead. They are disambiguation infrastructure.
+
+**Explicit constraints.** The things that must not change — existing API contracts, performance budgets, security requirements, backwards compatibility guarantees — need to be stated in the spec, not assumed from organizational knowledge. The agent has no organizational knowledge. Its constraints are its spec.
+
+## The Forcing Function
+
+Here is what I have observed in teams that have gone through this transition: writing specs precise enough for an agent to execute them is genuinely hard, and the difficulty reveals real gaps in how the work was understood.
+
+The requirement that seemed clear enough for a ticket turns out to have three unresolved ambiguities. The acceptance criteria that seemed obvious turns out to require a decision about error handling that nobody had made. The constraint that was implicit turns out to have never been formally articulated.
+
+The spec does not become unclear when you write it for an agent. It was already unclear. The agent just cannot paper over the unclear parts the way humans can.
+
+This is an argument for treating agentic workflows as a forcing function for specification discipline — not as a source of failure, but as a diagnostic that surfaces the implicit uncertainty in how your organization understands and communicates requirements.
+
+The upside: once you have learned to write specs that an agent can execute, you have also learned to write specs that a new engineer can execute, that are reviewable, that are testable, and that document intent in a way that survives beyond the people who were in the room when the decision was made. The spec becomes a durable artifact rather than a temporary communication medium.
+
+That is the real return on the investment. The agent is the forcing function. The artifact is the output.

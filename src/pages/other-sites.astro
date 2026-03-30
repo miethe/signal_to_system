@@ -1,0 +1,77 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import SiteLinkCard from '../components/cards/SiteLinkCard.astro';
+import { externalSites } from '../data/external-sites';
+
+// Sort: featured first, then alphabetical
+const sorted = [...externalSites].sort((a, b) => {
+  if (a.featured && !b.featured) return -1;
+  if (!a.featured && b.featured) return 1;
+  return a.title.localeCompare(b.title);
+});
+
+const featured = sorted.filter((s) => s.featured);
+const rest = sorted.filter((s) => !s.featured);
+
+// Group by type for the full list
+const typeOrder = ['blog', 'project', 'publication', 'tool', 'profile'];
+const byType = typeOrder
+  .map((type) => ({ type, sites: rest.filter((s) => s.type === type) }))
+  .filter(({ sites }) => sites.length > 0);
+---
+
+<PageLayout
+  title="Other Sites"
+  pageTitle="Other Sites"
+  pageSubtitle="Other places I publish, build, and maintain a presence."
+  description="Links to Nick Miethe's other sites, projects, and profiles across the web."
+>
+  <div class="space-y-12">
+
+    <!-- Featured -->
+    {featured.length > 0 && (
+      <section>
+        <h2 class="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-5">Featured</h2>
+        <div class="not-prose grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {featured.map((site) => (
+            <SiteLinkCard
+              title={site.title}
+              url={site.url}
+              description={site.description}
+              type={site.type}
+              featured={true}
+            />
+          ))}
+        </div>
+      </section>
+    )}
+
+    <!-- By type -->
+    {byType.map(({ type, sites }) => (
+      <section>
+        <h2 class="text-sm font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 mb-4 capitalize">
+          {type === 'blog' ? 'Blogs' : type === 'profile' ? 'Profiles' : `${type}s`}
+        </h2>
+        <div class="not-prose grid grid-cols-1 gap-4 sm:grid-cols-2">
+          {sites.map((site) => (
+            <SiteLinkCard
+              title={site.title}
+              url={site.url}
+              description={site.description}
+              type={site.type}
+              featured={false}
+            />
+          ))}
+        </div>
+      </section>
+    ))}
+
+    <!-- Note -->
+    <div class="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/40 p-5 not-prose">
+      <p class="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
+        Some of these sites are works in progress or archived. Signal to System is the primary home for new writing. The legacy blog at MeatyBytes is being selectively migrated and updated here.
+      </p>
+    </div>
+
+  </div>
+</PageLayout>

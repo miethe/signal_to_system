@@ -1,0 +1,61 @@
+---
+/**
+ * RelatedContent — "Related Reading" section displayed at the end of a post.
+ *
+ * Props:
+ *   posts — array of { title, slug, category?, excerpt? }
+ *   title — optional section heading (defaults to "Related Reading")
+ */
+
+interface RelatedPost {
+  title: string;
+  slug: string;
+  category?: string;
+  excerpt?: string;
+}
+
+interface Props {
+  posts: RelatedPost[];
+  title?: string;
+}
+
+const { posts, title = "Related Reading" } = Astro.props;
+
+if (posts.length === 0) return;
+---
+
+<section class="mt-12 border-t border-[var(--border-subtle)] pt-10" aria-labelledby="related-heading">
+  <h2
+    id="related-heading"
+    class="mb-6 text-lg font-semibold text-[var(--text-primary)]"
+  >
+    {title}
+  </h2>
+
+  <ul class="grid gap-4 sm:grid-cols-2 list-none p-0 m-0">
+    {
+      posts.map((post) => (
+        <li>
+          <a
+            href={`/essays/${post.slug}/`}
+            class="group flex flex-col rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-5 transition-all hover:border-[var(--accent)]/50 hover:shadow-sm"
+          >
+            {post.category && (
+              <span class="mb-2 text-xs font-medium text-[var(--accent)]">
+                {post.category}
+              </span>
+            )}
+            <span class="font-medium text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors leading-snug">
+              {post.title}
+            </span>
+            {post.excerpt && (
+              <span class="mt-1.5 text-sm text-[var(--text-tertiary)] line-clamp-2 leading-relaxed">
+                {post.excerpt}
+              </span>
+            )}
+          </a>
+        </li>
+      ))
+    }
+  </ul>
+</section>

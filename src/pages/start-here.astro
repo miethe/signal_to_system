@@ -1,0 +1,209 @@
+---
+import { getCollection } from 'astro:content';
+import PageLayout from '../layouts/PageLayout.astro';
+import EssayCard from '../components/cards/EssayCard.astro';
+import SeriesCard from '../components/cards/SeriesCard.astro';
+import Button from '../components/ui/Button.astro';
+import { TOPIC_HUBS } from '../data/taxonomy';
+
+// ---------------------------------------------------------------------------
+// Data
+// ---------------------------------------------------------------------------
+
+const allPosts = await getCollection('posts');
+const allSeries = await getCollection('series');
+
+const published = allPosts
+  .filter((p) => p.data.status !== 'draft')
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+const flagship = published.filter((p) => p.data.featured).slice(0, 4);
+const activeSeries = allSeries.filter((s) => s.data.status === 'active').slice(0, 3);
+
+// Post counts for series
+const seriesPostCounts = new Map<string, number>();
+for (const post of published) {
+  if (post.data.series) {
+    seriesPostCounts.set(post.data.series, (seriesPostCounts.get(post.data.series) ?? 0) + 1);
+  }
+}
+
+// Reading path: curated starter set keyed by reader type
+const readerPaths = [
+  {
+    type: 'Engineering Leader / CTO',
+    description: "You're responsible for the technical direction of an organization and want to understand what the agent era means for how you build, structure, and lead.",
+    topics: ['technical-leadership', 'cto', 'agentic-sdlc'],
+    firstEssay: flagship[0],
+  },
+  {
+    type: 'Architect',
+    description: 'You design systems at scale and want principled frameworks for AI integration, agentic repo design, and context engineering.',
+    topics: ['architecture', 'ai-agents', 'agentic-sdlc'],
+    firstEssay: flagship[0],
+  },
+  {
+    type: 'Platform Engineer',
+    description: "You build the platforms that teams ship on, and you're asking how agentic tooling changes the IDP landscape.",
+    topics: ['platform-engineering', 'agentic-sdlc', 'architecture'],
+    firstEssay: flagship[0],
+  },
+];
+---
+
+<PageLayout
+  title="Start Here"
+  pageTitle="Start Here"
+  pageSubtitle="A guided introduction to Signal to System."
+  description="New to Signal to System? This is your guided entry point — curated reading paths, flagship essays, and active series for every type of reader."
+  width="wide"
+>
+  <div class="space-y-14">
+
+    <!-- What this site is -->
+    <section>
+      <h2>What is Signal to System?</h2>
+      <p>
+        Signal to System is a technical publication by Nick Miethe, focused on the intersection of AI agents, agentic software delivery, architecture, platform engineering, and technical leadership. Each piece is written for practitioners with real stakes in these systems — not spectators.
+      </p>
+      <p>
+        The name reflects a core belief: signal always precedes system. Understanding the underlying pattern — the signal — is what allows you to build systems that are durable, comprehensible, and fit for purpose. This publication tries to surface the signal.
+      </p>
+    </section>
+
+    <hr />
+
+    <!-- Guided paths -->
+    <section>
+      <h2>Where to Start — by Reader Type</h2>
+      <p>Different readers come with different stakes. Pick the path closest to yours:</p>
+
+      <div class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 not-prose">
+        {readerPaths.map((path) => (
+          <div class="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6">
+            <h3 class="font-semibold text-zinc-900 dark:text-zinc-100 mb-2">{path.type}</h3>
+            <p class="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed mb-4">{path.description}</p>
+            <div class="flex flex-wrap gap-1.5 mb-4">
+              {path.topics.map((topicSlug) => {
+                const hub = TOPIC_HUBS.find((h) => h.slug === topicSlug);
+                if (!hub) return null;
+                return (
+                  <a
+                    href={`/topics/${topicSlug}/`}
+                    class="rounded-full bg-zinc-100 dark:bg-zinc-800 px-2.5 py-0.5 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-indigo-100 hover:text-indigo-700 dark:hover:bg-indigo-900/40 dark:hover:text-indigo-300 transition-colors"
+                  >
+                    {hub.label}
+                  </a>
+                );
+              })}
+            </div>
+            <a
+              href="/essays/"
+              class="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors"
+            >
+              Browse essays →
+            </a>
+          </div>
+        ))}
+      </div>
+    </section>
+
+    <hr />
+
+    <!-- Flagship essays -->
+    {flagship.length > 0 && (
+      <section>
+        <h2>Flagship Essays</h2>
+        <p>These are the pieces that best represent what this publication is trying to do — and where most readers should begin.</p>
+
+        <div class="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 not-prose">
+          {flagship.map((post) => (
+            <EssayCard
+              title={post.data.title}
+              excerpt={post.data.excerpt}
+              date={post.data.date}
+              readTime={post.data.readTime}
+              category={post.data.category}
+              tags={post.data.tags}
+              slug={post.id}
+              contentType={post.data.contentType}
+              featured={true}
+            />
+          ))}
+        </div>
+      </section>
+    )}
+
+    <hr />
+
+    <!-- Active series -->
+    {activeSeries.length > 0 && (
+      <section>
+        <h2>Active Series</h2>
+        <p>Multi-part series for going deep on a topic. Each is designed to build a complete, interconnected picture across several essays.</p>
+
+        <div class="mt-6 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 not-prose">
+          {activeSeries.map((s) => (
+            <SeriesCard
+              title={s.data.title}
+              excerpt={s.data.excerpt}
+              status={s.data.status}
+              slug={s.id}
+              postCount={seriesPostCounts.get(s.id) ?? 0}
+              featured={s.data.featured ?? false}
+            />
+          ))}
+        </div>
+      </section>
+    )}
+
+    <hr />
+
+    <!-- Topics -->
+    <section>
+      <h2>Key Topics</h2>
+      <p>Browse by the seven coverage domains:</p>
+
+      <ul class="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2 not-prose">
+        {TOPIC_HUBS.map((hub) => (
+          <li>
+            <a
+              href={`/topics/${hub.slug}/`}
+              class="flex items-start gap-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 hover:border-indigo-300 dark:hover:border-indigo-700 transition-all duration-150 group"
+            >
+              <div class="flex-1 min-w-0">
+                <p class="font-medium text-zinc-900 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                  {hub.label}
+                </p>
+                <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 leading-relaxed line-clamp-2">
+                  {hub.description}
+                </p>
+              </div>
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mt-1 shrink-0 text-zinc-400 group-hover:text-indigo-500 transition-colors" aria-hidden="true">
+                <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+              </svg>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <hr />
+
+    <!-- How to follow -->
+    <section>
+      <h2>How to Follow Along</h2>
+      <p>The best way to stay up to date is via RSS — subscribe to the feed and get new essays as they're published. If RSS isn't your thing, you can also follow on Twitter / X or LinkedIn.</p>
+      <div class="mt-4 flex flex-wrap gap-3 not-prose">
+        <Button href="/rss.xml" variant="secondary" size="md">
+          <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/>
+          </svg>
+          RSS Feed
+        </Button>
+        <Button href="/essays/" variant="ghost" size="md">Browse all essays</Button>
+      </div>
+    </section>
+
+  </div>
+</PageLayout>

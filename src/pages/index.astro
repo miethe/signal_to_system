@@ -1,0 +1,384 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import EssayCard from '../components/cards/EssayCard.astro';
+import ProjectCard from '../components/cards/ProjectCard.astro';
+import SeriesCard from '../components/cards/SeriesCard.astro';
+import Button from '../components/ui/Button.astro';
+import InteractiveNetwork from '../components/interactive/InteractiveNetwork';
+import { site } from '../data/site';
+import { TOPIC_HUBS } from '../data/taxonomy';
+
+// ---------------------------------------------------------------------------
+// Data
+// ---------------------------------------------------------------------------
+
+const allPosts = await getCollection('posts');
+const allProjects = await getCollection('projects');
+const allSeries = await getCollection('series');
+
+const publishedPosts = allPosts
+  .filter((p) => p.data.status !== 'draft')
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+const featuredPosts = publishedPosts.filter((p) => p.data.featured).slice(0, 3);
+const recentPosts = featuredPosts.length < 3
+  ? publishedPosts.slice(0, 3)
+  : featuredPosts;
+
+const activeSeries = allSeries
+  .filter((s) => s.data.status === 'active' || s.data.featured)
+  .slice(0, 3);
+
+const featuredProjects = allProjects.filter((p) => p.data.featured).slice(0, 3);
+
+// Compute post count per series for SeriesCard
+const seriesPostCounts = new Map<string, number>();
+for (const post of publishedPosts) {
+  if (post.data.series) {
+    seriesPostCounts.set(post.data.series, (seriesPostCounts.get(post.data.series) ?? 0) + 1);
+  }
+}
+
+// Topic hub icons (inline SVG paths keyed by slug)
+const topicIcons: Record<string, string> = {
+  'ai-agents': 'M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8zm1-11v2h2v2h-2v2h-2v-2H9v-2h2V9z',
+  'agentic-sdlc': 'M4 4h16v2H4zm0 4h10v2H4zm0 4h16v2H4zm0 4h10v2H4z',
+  'technical-leadership': 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm14 10v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75',
+  'cto': 'M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5',
+  'architecture': 'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z',
+  'platform-engineering': 'M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM12 15a2 2 0 1 1 0-4 2 2 0 0 1 0 4z',
+  'projects': 'M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2zM14 2v6h6',
+};
+
+const topicColors: Record<string, string> = {
+  'ai-agents': 'from-indigo-500/20 to-violet-500/10 border-indigo-500/30 hover:border-indigo-400/60',
+  'agentic-sdlc': 'from-violet-500/20 to-purple-500/10 border-violet-500/30 hover:border-violet-400/60',
+  'technical-leadership': 'from-sky-500/20 to-cyan-500/10 border-sky-500/30 hover:border-sky-400/60',
+  'cto': 'from-amber-500/20 to-orange-500/10 border-amber-500/30 hover:border-amber-400/60',
+  'architecture': 'from-emerald-500/20 to-teal-500/10 border-emerald-500/30 hover:border-emerald-400/60',
+  'platform-engineering': 'from-rose-500/20 to-pink-500/10 border-rose-500/30 hover:border-rose-400/60',
+  'projects': 'from-zinc-500/20 to-slate-500/10 border-zinc-500/30 hover:border-zinc-400/60',
+};
+
+const topicIconColors: Record<string, string> = {
+  'ai-agents': 'text-indigo-400',
+  'agentic-sdlc': 'text-violet-400',
+  'technical-leadership': 'text-sky-400',
+  'cto': 'text-amber-400',
+  'architecture': 'text-emerald-400',
+  'platform-engineering': 'text-rose-400',
+  'projects': 'text-zinc-400',
+};
+---
+
+<BaseLayout
+  title={undefined}
+  description={site.description}
+>
+  <!-- =========================================================
+       HERO
+       ========================================================= -->
+  <section class="relative overflow-hidden border-b border-[var(--border-subtle)] bg-slate-950 dark:bg-slate-950">
+    <!-- Network visualization background -->
+    <div class="absolute inset-0 z-0 opacity-60" aria-hidden="true">
+      <InteractiveNetwork className="w-full h-full" client:idle />
+    </div>
+
+    <!-- Radial gradient overlay for readability -->
+    <div class="absolute inset-0 z-10 bg-gradient-to-b from-slate-950/30 via-slate-950/70 to-slate-950" aria-hidden="true" />
+
+    <!-- Content (hero is always light-on-dark regardless of theme) -->
+    <div class="relative z-20 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pt-28 pb-24 sm:pt-36 sm:pb-32">
+      <!-- Eyebrow -->
+      <p class="mb-4 inline-flex items-center gap-2 rounded-full border border-indigo-500/30 bg-indigo-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-indigo-400">
+        <span class="h-1.5 w-1.5 rounded-full bg-indigo-400 animate-pulse" aria-hidden="true" />
+        Technical Publication
+      </p>
+
+      <h1 class="text-5xl font-bold tracking-tight text-zinc-50 sm:text-6xl lg:text-7xl mb-6 max-w-3xl leading-none">
+        Signal to
+        <span class="bg-gradient-to-r from-indigo-400 via-violet-400 to-sky-400 bg-clip-text text-transparent"> System</span>
+      </h1>
+
+      <p class="text-xl text-zinc-300 max-w-2xl leading-relaxed mb-4">
+        {site.subtitle}
+      </p>
+      <p class="text-base text-zinc-400 max-w-xl leading-relaxed mb-10">
+        Long-form essays and practical frameworks for technical executives, architects, and builders navigating the agent-era shift in software delivery.
+      </p>
+
+      <div class="flex flex-wrap gap-4">
+        <Button href="/essays/" variant="primary" size="lg">
+          Read the Essays
+        </Button>
+        <Button href="/start-here/" variant="secondary" size="lg">
+          Start Here
+        </Button>
+        <Button href="/rss.xml" variant="ghost" size="lg">
+          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/>
+          </svg>
+          RSS Feed
+        </Button>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       POSITIONING / SIGNAL STATEMENT
+       ========================================================= -->
+  <section class="bg-[var(--bg-base)] border-b border-[var(--border-subtle)]">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16">
+      <dl class="grid grid-cols-1 gap-8 sm:grid-cols-3">
+        {[
+          {
+            label: 'Depth over volume',
+            value: 'Long-form',
+            desc: 'Essays that earn their word count. No hot takes, no summaries of summaries.',
+          },
+          {
+            label: 'Real systems experience',
+            value: 'Practitioner-first',
+            desc: 'Written from the seat of someone who has shipped systems, led organizations, and built alongside AI.',
+          },
+          {
+            label: 'Architecture through leadership',
+            value: 'Full-stack thinking',
+            desc: 'From agent context engineering to org design to platform strategy — the full technical executive stack.',
+          },
+        ].map(({ label, value, desc }) => (
+          <div class="border-l-2 border-indigo-500/40 pl-6">
+            <dt class="text-xs font-semibold uppercase tracking-widest text-[var(--text-tertiary)] mb-1">{label}</dt>
+            <dd class="text-2xl font-bold text-[var(--text-primary)] mb-2">{value}</dd>
+            <p class="text-sm text-[var(--text-secondary)] leading-relaxed">{desc}</p>
+          </div>
+        ))}
+      </dl>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       FEATURED ESSAYS
+       ========================================================= -->
+  {recentPosts.length > 0 && (
+    <section class="bg-[var(--bg-base)] border-b border-[var(--border-subtle)]">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-20">
+        <div class="flex items-end justify-between mb-10">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-widest text-[var(--accent)] mb-2">Featured</p>
+            <h2 class="text-3xl font-bold tracking-tight text-[var(--text-primary)]">Essential Reading</h2>
+          </div>
+          <a
+            href="/essays/"
+            class="hidden sm:inline-flex items-center gap-1.5 text-sm font-medium text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors"
+          >
+            All essays
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+            </svg>
+          </a>
+        </div>
+
+        <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          {recentPosts.map((post, i) => (
+            <EssayCard
+              title={post.data.title}
+              excerpt={post.data.excerpt}
+              date={post.data.date}
+              readTime={post.data.readTime}
+              category={post.data.category}
+              tags={post.data.tags}
+              slug={post.id}
+              contentType={post.data.contentType}
+              featured={i === 0}
+            />
+          ))}
+        </div>
+
+        <div class="mt-8 sm:hidden">
+          <Button href="/essays/" variant="secondary" size="md">View all essays</Button>
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- =========================================================
+       ACTIVE SERIES
+       ========================================================= -->
+  {activeSeries.length > 0 && (
+    <section class="bg-[var(--bg-subtle)] border-b border-[var(--border-subtle)]">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-20">
+        <div class="flex items-end justify-between mb-10">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-widest text-violet-500 dark:text-violet-400 mb-2">Ongoing</p>
+            <h2 class="text-3xl font-bold tracking-tight text-[var(--text-primary)]">Active Series</h2>
+          </div>
+          <a
+            href="/series/"
+            class="hidden sm:inline-flex items-center gap-1.5 text-sm font-medium text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors"
+          >
+            All series
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+            </svg>
+          </a>
+        </div>
+
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {activeSeries.map((s) => (
+            <SeriesCard
+              title={s.data.title}
+              excerpt={s.data.excerpt}
+              status={s.data.status}
+              slug={s.id}
+              postCount={seriesPostCounts.get(s.id) ?? 0}
+              featured={s.data.featured ?? false}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- =========================================================
+       TOPIC HUBS
+       ========================================================= -->
+  <section class="bg-[var(--bg-base)] border-b border-[var(--border-subtle)]">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-20">
+      <div class="mb-10">
+        <p class="text-xs font-semibold uppercase tracking-widest text-emerald-500 dark:text-emerald-400 mb-2">Explore by topic</p>
+        <h2 class="text-3xl font-bold tracking-tight text-[var(--text-primary)]">Coverage Areas</h2>
+        <p class="mt-2 text-[var(--text-secondary)] max-w-xl">
+          Seven interconnected domains — from AI agent architecture to platform engineering to the CTO role.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {TOPIC_HUBS.map((hub) => (
+          <a
+            href={`/topics/${hub.slug}/`}
+            class={[
+              'group flex flex-col gap-3 rounded-xl border bg-gradient-to-br p-5 transition-all duration-200',
+              topicColors[hub.slug] ?? 'from-slate-100 to-slate-50 border-slate-200 hover:border-slate-400 dark:from-zinc-800/40 dark:to-zinc-800/20 dark:border-zinc-700/40 dark:hover:border-zinc-600/60',
+            ].join(' ')}
+          >
+            <div class={`w-8 h-8 ${topicIconColors[hub.slug] ?? 'text-[var(--text-tertiary)]'}`} aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <path d={topicIcons[hub.slug] ?? 'M12 2L2 7l10 5 10-5-10-5z'} />
+              </svg>
+            </div>
+
+            <div>
+              <h3 class="font-semibold text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors leading-snug mb-1">
+                {hub.label}
+              </h3>
+              <p class="text-xs text-[var(--text-tertiary)] leading-relaxed line-clamp-3">
+                {hub.description}
+              </p>
+            </div>
+
+            <span class="mt-auto inline-flex items-center gap-1 text-xs font-medium text-[var(--text-disabled)] group-hover:text-[var(--text-secondary)] transition-colors">
+              Explore
+              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+              </svg>
+            </span>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       FEATURED PROJECTS
+       ========================================================= -->
+  {featuredProjects.length > 0 && (
+    <section class="bg-[var(--bg-subtle)] border-b border-[var(--border-subtle)]">
+      <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-20">
+        <div class="flex items-end justify-between mb-10">
+          <div>
+            <p class="text-xs font-semibold uppercase tracking-widest text-sky-500 dark:text-sky-400 mb-2">Builds & artifacts</p>
+            <h2 class="text-3xl font-bold tracking-tight text-[var(--text-primary)]">Featured Projects</h2>
+          </div>
+          <a
+            href="/projects/"
+            class="hidden sm:inline-flex items-center gap-1.5 text-sm font-medium text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors"
+          >
+            All projects
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+            </svg>
+          </a>
+        </div>
+
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {featuredProjects.map((p) => (
+            <ProjectCard
+              title={p.data.title}
+              excerpt={p.data.excerpt}
+              date={p.data.date}
+              type={p.data.type}
+              tags={p.data.tags}
+              slug={p.id}
+              featured={p.data.featured ?? false}
+              visibility={p.data.visibility}
+            />
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  <!-- =========================================================
+       AUTHOR BIO
+       ========================================================= -->
+  <section class="bg-[var(--bg-base)]">
+    <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-20">
+      <div class="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-subtle)] p-8 sm:p-12 lg:flex lg:items-center lg:gap-12">
+        <!-- Avatar initials -->
+        <div class="mb-8 lg:mb-0 lg:shrink-0">
+          <div class="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-2xl font-bold text-white">
+            NM
+          </div>
+        </div>
+
+        <!-- Bio -->
+        <div class="flex-1">
+          <p class="text-xs font-semibold uppercase tracking-widest text-[var(--text-tertiary)] mb-2">The author</p>
+          <h2 class="text-2xl font-bold text-[var(--text-primary)] mb-3">{site.author.name}</h2>
+          <p class="text-[var(--text-secondary)] leading-relaxed mb-6 max-w-2xl">
+            Technical executive and architect with deep experience across AI systems, platform engineering, and enterprise software delivery. Former Red Hat solutions architect. Writing at the intersection of agentic AI, system design, and the organizational challenges of building great software.
+          </p>
+          <div class="flex flex-wrap gap-3">
+            <Button href="/about/" variant="secondary" size="sm">Full bio</Button>
+            <a
+              href={site.author.social.github}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors"
+            >
+              GitHub
+            </a>
+            <a
+              href={site.author.social.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors"
+            >
+              LinkedIn
+            </a>
+            <a
+              href={site.author.social.twitter}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors"
+            >
+              Twitter / X
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

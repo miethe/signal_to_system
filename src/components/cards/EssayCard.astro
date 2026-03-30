@@ -1,0 +1,123 @@
+---
+/**
+ * EssayCard — card for essays and field notes in listing pages.
+ *
+ * Props:
+ *   title        — post title
+ *   excerpt      — short description / lede
+ *   date         — publication date
+ *   readTime     — e.g. "7 min read"
+ *   category     — category string
+ *   tags         — string[]
+ *   slug         — URL slug (links to /essays/[slug]/)
+ *   contentType  — "essay" | "field-note"
+ *   featured     — larger featured variant
+ */
+
+import Badge from "../ui/Badge.astro";
+import MetadataRow from "../ui/MetadataRow.astro";
+
+interface Props {
+  title: string;
+  excerpt: string;
+  date: string | Date;
+  readTime?: string;
+  category?: string;
+  tags?: string[];
+  slug: string;
+  contentType?: "essay" | "field-note";
+  featured?: boolean;
+}
+
+const {
+  title,
+  excerpt,
+  date,
+  readTime,
+  category,
+  tags = [],
+  slug,
+  contentType = "essay",
+  featured = false,
+} = Astro.props;
+
+const href = `/essays/${slug}/`;
+const isFieldNote = contentType === "field-note";
+---
+
+<article
+  class={[
+    "group relative flex flex-col rounded-xl border transition-all duration-200",
+    "bg-[var(--bg-surface)]",
+    "border-[var(--border-subtle)]",
+    "hover:border-[var(--accent)] hover:border-opacity-50",
+    "hover:shadow-md",
+    featured ? "p-8 md:p-10" : "p-6",
+  ].join(" ")}
+>
+  <!-- Featured accent bar -->
+  {
+    featured && (
+      <div class="absolute inset-x-0 top-0 h-1 rounded-t-xl bg-gradient-to-r from-indigo-500 to-violet-500" />
+    )
+  }
+
+  <!-- Header -->
+  <header class="mb-3 flex flex-wrap items-center gap-2">
+    {category && <Badge variant="category" text={category} />}
+    {
+      isFieldNote && (
+        <Badge
+          variant="default"
+          text="Field Note"
+          class="border border-amber-300 bg-amber-50 text-amber-700 dark:border-amber-700 dark:bg-amber-950/30 dark:text-amber-400"
+        />
+      )
+    }
+    {featured && <Badge variant="default" text="Featured" class="bg-indigo-50 text-indigo-600 dark:bg-indigo-950/40 dark:text-indigo-400" />}
+  </header>
+
+  <!-- Title -->
+  <h2
+    class={[
+      "font-semibold leading-snug text-[var(--text-primary)]",
+      "group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors",
+      featured ? "text-2xl md:text-3xl mb-3" : "text-lg mb-2",
+    ].join(" ")}
+  >
+    <a href={href} class="before:absolute before:inset-0 before:rounded-xl">
+      {title}
+    </a>
+  </h2>
+
+  <!-- Excerpt -->
+  <p
+    class={[
+      "text-[var(--text-secondary)] leading-relaxed flex-1",
+      featured ? "text-base mb-5" : "text-sm mb-4",
+    ].join(" ")}
+  >
+    {excerpt}
+  </p>
+
+  <!-- Tags -->
+  {
+    tags.length > 0 && (
+      <div class="mb-4 flex flex-wrap gap-1.5">
+        {tags.slice(0, featured ? 6 : 4).map((tag) => (
+          <a
+            href={`/tags/${tag.toLowerCase().replace(/\s+/g, "-")}/`}
+            class="relative z-10 rounded-md bg-[var(--bg-muted)] px-2 py-0.5 text-xs text-[var(--text-secondary)] hover:bg-[var(--accent-subtle)] hover:text-[var(--accent-text)] transition-colors"
+          >
+            {tag}
+          </a>
+        ))}
+      </div>
+    )
+  }
+
+  <!-- Footer metadata -->
+  <footer class="mt-auto">
+    <MetadataRow date={date} readTime={readTime} category={undefined} />
+  </footer>
+</article>

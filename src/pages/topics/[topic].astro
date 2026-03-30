@@ -1,0 +1,158 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EssayCard from '../../components/cards/EssayCard.astro';
+import { TOPIC_HUBS, type TopicHub } from '../../data/taxonomy';
+
+export async function getStaticPaths() {
+  const allPosts = await getCollection('posts');
+
+  return TOPIC_HUBS.map((hub) => {
+    // Match posts whose category matches the hub label (case-insensitive)
+    const posts = allPosts
+      .filter(
+        (p) =>
+          p.data.status !== 'draft' &&
+          p.data.category.toLowerCase() === hub.label.toLowerCase(),
+      )
+      .sort((a, b) => {
+        // Featured first, then by date
+        if (a.data.featured && !b.data.featured) return -1;
+        if (!a.data.featured && b.data.featured) return 1;
+        return b.data.date.getTime() - a.data.date.getTime();
+      });
+
+    return {
+      params: { topic: hub.slug },
+      props: { hub, posts },
+    };
+  });
+}
+
+const { hub, posts } = Astro.props as { hub: TopicHub; posts: Awaited<ReturnType<typeof getCollection<'posts'>>> };
+
+const totalCount = posts.length;
+const featured = posts.filter((p) => p.data.featured);
+const rest = posts.filter((p) => !p.data.featured);
+
+// Topic accent color mapping
+const accentColors: Record<string, { pill: string; border: string }> = {
+  'ai-agents':           { pill: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300',     border: 'border-indigo-500/30' },
+  'agentic-sdlc':        { pill: 'bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300',     border: 'border-violet-500/30' },
+  'technical-leadership':{ pill: 'bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300',                 border: 'border-sky-500/30' },
+  'cto':                 { pill: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',         border: 'border-amber-500/30' },
+  'architecture':        { pill: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300', border: 'border-emerald-500/30' },
+  'platform-engineering':{ pill: 'bg-rose-100 text-rose-700 dark:bg-rose-900/40 dark:text-rose-300',             border: 'border-rose-500/30' },
+  'projects':            { pill: 'bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300',                border: 'border-zinc-500/30' },
+};
+
+const accent = accentColors[hub.slug] ?? accentColors['ai-agents'];
+---
+
+<BaseLayout
+  title={hub.label}
+  description={hub.description}
+>
+  <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+    <!-- Breadcrumb -->
+    <nav class="mb-8 flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400" aria-label="Breadcrumb">
+      <a href="/" class="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">Home</a>
+      <span aria-hidden="true">/</span>
+      <span class="text-zinc-900 dark:text-zinc-100">Topics</span>
+      <span aria-hidden="true">/</span>
+      <span class="text-zinc-900 dark:text-zinc-100">{hub.label}</span>
+    </nav>
+
+    <!-- Page header -->
+    <header class="mb-12 border-b border-zinc-200 dark:border-zinc-800 pb-10">
+      <div class="mb-4">
+        <span class:list={['inline-block rounded-full px-3 py-1 text-xs font-semibold', accent.pill]}>
+          {hub.label}
+        </span>
+      </div>
+      <h1 class="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl mb-4">
+        {hub.label}
+      </h1>
+      <p class="text-xl text-zinc-600 dark:text-zinc-400 max-w-2xl leading-relaxed mb-3">
+        {hub.description}
+      </p>
+      <p class="text-zinc-500 dark:text-zinc-400 text-sm">
+        {totalCount} {totalCount === 1 ? 'essay' : 'essays'}
+      </p>
+    </header>
+
+    {totalCount === 0 ? (
+      <div class="rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 p-16 text-center">
+        <p class="text-zinc-500 dark:text-zinc-400 text-lg">No essays published yet in this topic.</p>
+        <a href="/essays/" class="mt-4 inline-block text-sm text-indigo-600 dark:text-indigo-400 hover:underline">Browse all essays</a>
+      </div>
+    ) : (
+      <div class="space-y-14">
+        <!-- Featured posts -->
+        {featured.length > 0 && (
+          <section>
+            <h2 class="text-xs font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 mb-6">
+              Essential reading
+            </h2>
+            <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+              {featured.map((post) => (
+                <EssayCard
+                  title={post.data.title}
+                  excerpt={post.data.excerpt}
+                  date={post.data.date}
+                  readTime={post.data.readTime}
+                  category={post.data.category}
+                  tags={post.data.tags}
+                  slug={post.id}
+                  contentType={post.data.contentType}
+                  featured={true}
+                />
+              ))}
+            </div>
+          </section>
+        )}
+
+        <!-- All other posts -->
+        {rest.length > 0 && (
+          <section>
+            {featured.length > 0 && (
+              <h2 class="text-xs font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 mb-6">
+                More in {hub.label}
+              </h2>
+            )}
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {rest.map((post) => (
+                <EssayCard
+                  title={post.data.title}
+                  excerpt={post.data.excerpt}
+                  date={post.data.date}
+                  readTime={post.data.readTime}
+                  category={post.data.category}
+                  tags={post.data.tags}
+                  slug={post.id}
+                  contentType={post.data.contentType}
+                  featured={false}
+                />
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
+    )}
+
+    <!-- Topic navigation -->
+    <nav class="mt-16 border-t border-zinc-200 dark:border-zinc-800 pt-10" aria-label="Other topics">
+      <p class="text-xs font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 mb-4">Other topics</p>
+      <div class="flex flex-wrap gap-2">
+        {TOPIC_HUBS.filter((h) => h.slug !== hub.slug).map((h) => (
+          <a
+            href={`/topics/${h.slug}/`}
+            class="rounded-full border border-zinc-300 dark:border-zinc-700 px-3 py-1 text-sm text-zinc-600 dark:text-zinc-400 hover:border-zinc-500 dark:hover:border-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors"
+          >
+            {h.label}
+          </a>
+        ))}
+      </div>
+    </nav>
+  </div>
+</BaseLayout>

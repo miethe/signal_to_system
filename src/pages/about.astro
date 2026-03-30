@@ -1,0 +1,130 @@
+---
+import PageLayout from '../layouts/PageLayout.astro';
+import { site } from '../data/site';
+import { TOPIC_HUBS } from '../data/taxonomy';
+---
+
+<PageLayout
+  title="About"
+  pageTitle="About"
+  pageSubtitle="The person behind the publication."
+  description="About Nick Miethe — technical executive, architect, and builder writing about AI agents, agentic SDLC, and modern software delivery."
+>
+  <div class="space-y-10">
+
+    <!-- Bio section -->
+    <section class="flex flex-col sm:flex-row gap-8 items-start">
+      <div class="shrink-0">
+        <div class="flex h-24 w-24 items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-600 text-3xl font-bold text-white">
+          NM
+        </div>
+      </div>
+      <div>
+        <h2 class="text-2xl font-bold text-zinc-900 dark:text-zinc-50 mb-2">{site.author.name}</h2>
+        <p class="text-zinc-500 dark:text-zinc-400 text-sm mb-4">Technical Executive · Architect · Builder</p>
+        <div class="flex flex-wrap gap-2">
+          <a
+            href={site.author.social.github}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 px-3 py-1.5 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+          >
+            GitHub
+          </a>
+          <a
+            href={site.author.social.linkedin}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 px-3 py-1.5 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+          >
+            LinkedIn
+          </a>
+          <a
+            href={site.author.social.twitter}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 px-3 py-1.5 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+          >
+            Twitter / X
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <hr />
+
+    <!-- Professional background -->
+    <section>
+      <h2>Professional Background</h2>
+      <p>
+        I'm a technical executive and architect with extensive experience in AI systems, platform engineering, enterprise software delivery, and the organizational challenges that come with building great software at scale. My career has spanned consulting, architecture, and leadership roles, most recently as a Solutions Architect at Red Hat, where I worked across enterprise Kubernetes, OpenShift, and cloud-native infrastructure patterns.
+      </p>
+      <p>
+        Before that, I've been a practitioner in the trenches — designing systems, leading engineering teams, and advising organizations navigating structural transformation. That mix of hands-on building and organizational leadership shapes how I think and write.
+      </p>
+      <p>
+        Today, I'm particularly focused on the emergence of AI agents as genuine actors in software delivery systems. Not AI as a productivity tool — AI as a structural force that changes the constraints, architecture, and organizational design of engineering organizations.
+      </p>
+    </section>
+
+    <!-- Areas of focus -->
+    <section>
+      <h2>Areas of Focus</h2>
+      <p>My thinking covers seven interconnected domains — each relevant to the technical executive, architect, or senior practitioner:</p>
+
+      <ul>
+        {TOPIC_HUBS.map((hub) => (
+          <li>
+            <strong>
+              <a href={`/topics/${hub.slug}/`}>{hub.label}</a>
+            </strong>
+            {' '}— {hub.description}
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <!-- What to expect -->
+    <section>
+      <h2>What to Expect from This Publication</h2>
+      <p>
+        Signal to System is a technical publication, not a blog. The distinction matters:
+      </p>
+
+      <ul>
+        <li>
+          <strong>Long-form over short-form.</strong> I write essays, not listicles. Each piece is designed to develop an argument with enough depth to actually change how you think or build, not just confirm what you already knew.
+        </li>
+        <li>
+          <strong>Practitioner-first.</strong> Everything here emerges from real systems experience — not academic research summaries, not think-pieces divorced from implementation. I'll show my work.
+        </li>
+        <li>
+          <strong>Both the what and the why.</strong> Technical decisions are strategic decisions. I try to surface the organizational, architectural, and epistemic factors that make certain approaches work — not just the mechanics.
+        </li>
+        <li>
+          <strong>Honest about uncertainty.</strong> Where I'm uncertain, I'll say so. Where there's legitimate disagreement, I'll try to represent it fairly before arguing a position.
+        </li>
+        <li>
+          <strong>Structured reading paths.</strong> Because topics connect, I organize content into series and link related pieces. You can follow a thread end-to-end, or graze across topics.
+        </li>
+      </ul>
+    </section>
+
+    <!-- Speaking / consulting -->
+    <section>
+      <h2>Speaking, Consulting, and Collaboration</h2>
+      <p>
+        I occasionally advise organizations on technical strategy, AI agent adoption, and platform engineering. If you're working on something interesting at the intersection of AI systems and software delivery — or if you want to discuss a piece you read here — you can reach me on <a href={site.author.social.linkedin}>LinkedIn</a> or <a href={site.author.social.twitter}>Twitter / X</a>.
+      </p>
+    </section>
+
+    <!-- Site disclaimer -->
+    <section>
+      <h2>Disclaimer</h2>
+      <p class="text-sm">
+        {site.defaultDisclaimer}
+      </p>
+    </section>
+
+  </div>
+</PageLayout>

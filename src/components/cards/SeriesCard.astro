@@ -1,0 +1,168 @@
+---
+/**
+ * SeriesCard — card for series listing page.
+ *
+ * Props:
+ *   title     — series title
+ *   excerpt   — description
+ *   status    — "active" | "planned" | "complete"
+ *   slug      — links to /series/[slug]/
+ *   postCount — number of posts in the series
+ *   featured  — featured variant
+ */
+
+import Badge from "../ui/Badge.astro";
+
+interface Props {
+  title: string;
+  excerpt: string;
+  status?: "active" | "planned" | "complete";
+  slug: string;
+  postCount?: number;
+  featured?: boolean;
+}
+
+const {
+  title,
+  excerpt,
+  status = "active",
+  slug,
+  postCount,
+  featured = false,
+} = Astro.props;
+
+const href = `/series/${slug}/`;
+
+const statusConfig: Record<string, { label: string; cls: string }> = {
+  active: {
+    label: "Active",
+    cls: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400",
+  },
+  planned: {
+    label: "Planned",
+    cls: "bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400",
+  },
+  complete: {
+    label: "Complete",
+    cls: "bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-400",
+  },
+};
+
+const sc = statusConfig[status] ?? statusConfig.active;
+---
+
+<article
+  class={[
+    "group relative flex flex-col rounded-xl border transition-all duration-200",
+    "bg-[var(--bg-surface)]",
+    "border-[var(--border-subtle)]",
+    "hover:border-violet-400/50 dark:hover:border-violet-700",
+    "hover:shadow-md",
+    featured ? "p-8 md:p-10" : "p-6",
+  ].join(" ")}
+>
+  <!-- Featured accent -->
+  {
+    featured && (
+      <div class="absolute inset-x-0 top-0 h-1 rounded-t-xl bg-gradient-to-r from-violet-500 to-purple-500" />
+    )
+  }
+
+  <!-- Header -->
+  <header class="mb-3 flex flex-wrap items-center gap-2">
+    <!-- Status badge -->
+    <span
+      class={`inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium ${sc.cls}`}
+    >
+      <!-- status dot -->
+      <span
+        class={[
+          "h-1.5 w-1.5 rounded-full",
+          status === "active"
+            ? "bg-emerald-500"
+            : status === "planned"
+              ? "bg-amber-500"
+              : "bg-sky-500",
+        ].join(" ")}
+        aria-hidden="true"
+      />
+      {sc.label}
+    </span>
+
+    <!-- Post count -->
+    {
+      postCount !== undefined && (
+        <span class="inline-flex items-center gap-1 text-xs text-[var(--text-tertiary)]">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="13"
+            height="13"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
+            <polyline points="14 2 14 8 20 8" />
+          </svg>
+          {postCount} {postCount === 1 ? "post" : "posts"}
+        </span>
+      )
+    }
+
+    {
+      featured && (
+        <Badge
+          variant="default"
+          text="Featured"
+          class="bg-violet-50 text-violet-600 dark:bg-violet-950/40 dark:text-violet-400"
+        />
+      )
+    }
+  </header>
+
+  <!-- Title -->
+  <h2
+    class={[
+      "font-semibold leading-snug text-[var(--text-primary)]",
+      "group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors",
+      featured ? "text-2xl md:text-3xl mb-3" : "text-lg mb-2",
+    ].join(" ")}
+  >
+    <a href={href} class="before:absolute before:inset-0 before:rounded-xl">
+      {title}
+    </a>
+  </h2>
+
+  <!-- Excerpt -->
+  <p class="flex-1 text-sm leading-relaxed text-[var(--text-secondary)]">
+    {excerpt}
+  </p>
+
+  <!-- Footer CTA -->
+  <footer class="mt-5">
+    <span
+      class="inline-flex items-center gap-1 text-sm font-medium text-violet-600 dark:text-violet-400 group-hover:gap-2 transition-all"
+    >
+      View series
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M5 12h14" />
+        <path d="m12 5 7 7-7 7" />
+      </svg>
+    </span>
+  </footer>
+</article>

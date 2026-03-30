@@ -1,0 +1,132 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SeriesCard from '../../components/cards/SeriesCard.astro';
+
+// ---------------------------------------------------------------------------
+// Data
+// ---------------------------------------------------------------------------
+
+const allSeries = await getCollection('series');
+const allPosts = await getCollection('posts');
+
+// Compute post count per series
+const seriesPostCounts = new Map<string, number>();
+for (const post of allPosts) {
+  if (post.data.status !== 'draft' && post.data.series) {
+    seriesPostCounts.set(post.data.series, (seriesPostCounts.get(post.data.series) ?? 0) + 1);
+  }
+}
+
+// Sort: active first, featured second, then alphabetical
+const sortedSeries = [...allSeries].sort((a, b) => {
+  const statusOrder = { active: 0, planned: 1, complete: 2 };
+  const sa = statusOrder[a.data.status] ?? 3;
+  const sb = statusOrder[b.data.status] ?? 3;
+  if (sa !== sb) return sa - sb;
+  if (a.data.featured && !b.data.featured) return -1;
+  if (!a.data.featured && b.data.featured) return 1;
+  return a.data.title.localeCompare(b.data.title);
+});
+
+const activeSeries = sortedSeries.filter((s) => s.data.status === 'active');
+const plannedSeries = sortedSeries.filter((s) => s.data.status === 'planned');
+const completeSeries = sortedSeries.filter((s) => s.data.status === 'complete');
+---
+
+<BaseLayout
+  title="Series"
+  description="Multi-part essay series on AI agents, agentic SDLC, architecture, and technical leadership."
+>
+  <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+    <!-- Page header -->
+    <header class="mb-12 border-b border-zinc-200 dark:border-zinc-800 pb-10">
+      <h1 class="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl mb-4">
+        Series
+      </h1>
+      <p class="text-xl text-zinc-600 dark:text-zinc-400 max-w-2xl leading-relaxed">
+        Structured multi-part explorations of complex topics. Each series builds a complete picture across several interconnected essays.
+      </p>
+    </header>
+
+    <div class="space-y-16">
+      <!-- Active -->
+      {activeSeries.length > 0 && (
+        <section>
+          <div class="flex items-center gap-3 mb-6">
+            <span class="h-2 w-2 rounded-full bg-emerald-500" aria-hidden="true" />
+            <h2 class="text-sm font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
+              Active — {activeSeries.length}
+            </h2>
+          </div>
+          <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {activeSeries.map((s) => (
+              <SeriesCard
+                title={s.data.title}
+                excerpt={s.data.excerpt}
+                status={s.data.status}
+                slug={s.id}
+                postCount={seriesPostCounts.get(s.id) ?? 0}
+                featured={s.data.featured ?? false}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
+      <!-- Complete -->
+      {completeSeries.length > 0 && (
+        <section>
+          <div class="flex items-center gap-3 mb-6">
+            <span class="h-2 w-2 rounded-full bg-sky-500" aria-hidden="true" />
+            <h2 class="text-sm font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
+              Complete — {completeSeries.length}
+            </h2>
+          </div>
+          <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {completeSeries.map((s) => (
+              <SeriesCard
+                title={s.data.title}
+                excerpt={s.data.excerpt}
+                status={s.data.status}
+                slug={s.id}
+                postCount={seriesPostCounts.get(s.id) ?? 0}
+                featured={s.data.featured ?? false}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
+      <!-- Planned -->
+      {plannedSeries.length > 0 && (
+        <section>
+          <div class="flex items-center gap-3 mb-6">
+            <span class="h-2 w-2 rounded-full bg-amber-500" aria-hidden="true" />
+            <h2 class="text-sm font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
+              Planned — {plannedSeries.length}
+            </h2>
+          </div>
+          <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {plannedSeries.map((s) => (
+              <SeriesCard
+                title={s.data.title}
+                excerpt={s.data.excerpt}
+                status={s.data.status}
+                slug={s.id}
+                postCount={seriesPostCounts.get(s.id) ?? 0}
+                featured={s.data.featured ?? false}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {sortedSeries.length === 0 && (
+        <div class="rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 p-16 text-center">
+          <p class="text-zinc-500 dark:text-zinc-400 text-lg">No series published yet. Check back soon.</p>
+        </div>
+      )}
+    </div>
+  </div>
+</BaseLayout>

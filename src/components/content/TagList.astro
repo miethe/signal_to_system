@@ -1,0 +1,47 @@
+---
+/**
+ * TagList — renders an array of tags as linked or plain pills.
+ *
+ * Props:
+ *   tags   — string[]
+ *   linked — if true (default), each tag links to /tags/[slug]/
+ */
+
+interface Props {
+  tags: string[];
+  linked?: boolean;
+  class?: string;
+}
+
+const { tags, linked = true, class: className = "" } = Astro.props;
+
+function toSlug(tag: string): string {
+  return tag.toLowerCase().replace(/\s+/g, "-");
+}
+---
+
+{
+  tags.length > 0 && (
+    <ul
+      class={`flex flex-wrap gap-2 list-none p-0 m-0 ${className}`}
+      aria-label="Tags"
+    >
+      {tags.map((tag) => (
+        <li>
+          {linked ? (
+            <a
+              href={`/tags/${toSlug(tag)}/`}
+              class="inline-flex items-center rounded-full bg-[var(--bg-muted)] px-3 py-1 text-xs font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--accent-subtle)] hover:text-[var(--accent-text)]"
+            >
+              {tag}
+            </a>
+          ) : (
+            <span class="inline-flex items-center rounded-full bg-[var(--bg-muted)] px-3 py-1 text-xs font-medium text-[var(--text-secondary)]">
+              {tag}
+            </span>
+          )}
+        </li>
+      ))}
+    </ul>
+  )
+}

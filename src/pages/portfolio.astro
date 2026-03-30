@@ -1,0 +1,130 @@
+---
+import { getCollection } from 'astro:content';
+import PageLayout from '../layouts/PageLayout.astro';
+import ProjectCard from '../components/cards/ProjectCard.astro';
+import { portfolioItems } from '../data/portfolio';
+import type { PortfolioItem } from '../data/portfolio';
+
+// ---------------------------------------------------------------------------
+// Content collection projects (featured)
+// ---------------------------------------------------------------------------
+
+const allProjects = await getCollection('projects');
+const featuredContentProjects = allProjects
+  .filter((p) => p.data.featured)
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+// Grouped portfolio items by category
+const categories = [...new Set(portfolioItems.map((i) => i.category))];
+
+// Status label and colors
+const statusConfig: Record<string, { label: string; cls: string; dot: string }> = {
+  active: {
+    label: 'Active',
+    cls: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400',
+    dot: 'bg-emerald-500',
+  },
+  planned: {
+    label: 'Planned',
+    cls: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400',
+    dot: 'bg-amber-500',
+  },
+  archived: {
+    label: 'Archived',
+    cls: 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400',
+    dot: 'bg-zinc-400',
+  },
+};
+---
+
+<PageLayout
+  title="Portfolio"
+  pageTitle="Portfolio"
+  pageSubtitle="A summary of significant technical work — active projects, artifacts, and past builds."
+  description="Nick Miethe's portfolio — component libraries, frameworks, reference implementations, and technical artifacts."
+  width="wide"
+>
+  <div class="space-y-16">
+
+    <!-- Featured content projects -->
+    {featuredContentProjects.length > 0 && (
+      <section>
+        <h2 class="text-2xl font-bold text-zinc-900 dark:text-zinc-50 mb-2">Featured Projects</h2>
+        <p class="text-zinc-600 dark:text-zinc-400 mb-6">Projects with full write-ups in the content library.</p>
+        <div class="not-prose grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {featuredContentProjects.map((project) => (
+            <ProjectCard
+              title={project.data.title}
+              excerpt={project.data.excerpt}
+              date={project.data.date}
+              type={project.data.type}
+              tags={project.data.tags}
+              slug={project.id}
+              featured={true}
+              visibility={project.data.visibility}
+            />
+          ))}
+        </div>
+      </section>
+    )}
+
+    <hr />
+
+    <!-- Portfolio data items by category -->
+    {categories.map((category) => {
+      const items = portfolioItems.filter((i) => i.category === category);
+      return (
+        <section>
+          <h2 class="text-2xl font-bold text-zinc-900 dark:text-zinc-50 mb-6">{category}</h2>
+          <div class="space-y-5 not-prose">
+            {items.map((item: PortfolioItem) => {
+              const sc = statusConfig[item.status] ?? statusConfig.active;
+              return (
+                <div class:list={[
+                  'rounded-xl border p-6 transition-all duration-200',
+                  'bg-white dark:bg-zinc-900',
+                  'border-zinc-200 dark:border-zinc-800',
+                  item.featured ? 'border-l-4 border-l-indigo-500 dark:border-l-indigo-500' : '',
+                ]}>
+                  <!-- Header -->
+                  <div class="flex flex-wrap items-start justify-between gap-4 mb-3">
+                    <h3 class="text-lg font-semibold text-zinc-900 dark:text-zinc-50">{item.title}</h3>
+                    <span class:list={['inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-medium shrink-0', sc.cls]}>
+                      <span class:list={['h-1.5 w-1.5 rounded-full', sc.dot]} aria-hidden="true" />
+                      {sc.label}
+                    </span>
+                  </div>
+
+                  <!-- Description -->
+                  <p class="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed mb-4">{item.description}</p>
+
+                  <!-- Links -->
+                  {item.links.length > 0 && (
+                    <div class="flex flex-wrap gap-2">
+                      {item.links.map((link) => (
+                        <a
+                          href={link.href}
+                          target={link.href.startsWith('http') ? '_blank' : undefined}
+                          rel={link.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                          class="inline-flex items-center gap-1.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800 px-3 py-1.5 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors"
+                        >
+                          {link.label}
+                          {link.href.startsWith('http') && (
+                            <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                              <path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                            </svg>
+                          )}
+                        </a>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      );
+    })}
+
+  </div>
+</PageLayout>

@@ -1,0 +1,132 @@
+---
+/**
+ * ProjectCard — card for project listings.
+ *
+ * Props:
+ *   title       — project name
+ *   excerpt     — short description
+ *   date        — publication / last-updated date
+ *   type        — project type label (e.g. "Open Source", "Prototype")
+ *   tags        — string[]
+ *   slug        — links to /projects/[slug]/
+ *   featured    — featured variant
+ *   visibility  — "full" | "summary-only"
+ */
+
+import Badge from "../ui/Badge.astro";
+import MetadataRow from "../ui/MetadataRow.astro";
+
+interface Props {
+  title: string;
+  excerpt: string;
+  date: string | Date;
+  type?: string;
+  tags?: string[];
+  slug: string;
+  featured?: boolean;
+  visibility?: "full" | "summary-only";
+}
+
+const {
+  title,
+  excerpt,
+  date,
+  type,
+  tags = [],
+  slug,
+  featured = false,
+  visibility = "full",
+} = Astro.props;
+
+const href = `/projects/${slug}/`;
+const summaryOnly = visibility === "summary-only";
+---
+
+<article
+  class={[
+    "group relative flex flex-col rounded-xl border transition-all duration-200",
+    "bg-[var(--bg-surface)]",
+    "border-[var(--border-subtle)]",
+    "hover:border-sky-400/50 dark:hover:border-sky-700",
+    "hover:shadow-md",
+    featured ? "p-8 md:p-10" : "p-6",
+  ].join(" ")}
+>
+  <!-- Featured accent bar -->
+  {
+    featured && (
+      <div class="absolute inset-x-0 top-0 h-1 rounded-t-xl bg-gradient-to-r from-sky-500 to-cyan-500" />
+    )
+  }
+
+  <!-- Header badges -->
+  <header class="mb-3 flex flex-wrap items-center gap-2">
+    {type && <Badge variant="type" text={type} />}
+    {featured && <Badge variant="default" text="Featured" class="bg-sky-50 text-sky-600 dark:bg-sky-950/40 dark:text-sky-400" />}
+    {
+      summaryOnly && (
+        <span
+          class="inline-flex items-center gap-1 rounded-full border border-[var(--border)] bg-[var(--bg-subtle)] px-2.5 py-0.5 text-xs text-[var(--text-tertiary)]"
+          title="Full content not publicly available"
+        >
+          <!-- lock icon -->
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width="11"
+            height="11"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
+            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+          </svg>
+          Summary only
+        </span>
+      )
+    }
+  </header>
+
+  <!-- Title -->
+  <h2
+    class={[
+      "font-semibold leading-snug text-[var(--text-primary)]",
+      "group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors",
+      featured ? "text-2xl md:text-3xl mb-3" : "text-lg mb-2",
+    ].join(" ")}
+  >
+    <a href={href} class="before:absolute before:inset-0 before:rounded-xl">
+      {title}
+    </a>
+  </h2>
+
+  <!-- Excerpt -->
+  <p class="mb-4 flex-1 text-sm leading-relaxed text-[var(--text-secondary)]">
+    {excerpt}
+  </p>
+
+  <!-- Tags -->
+  {
+    tags.length > 0 && (
+      <div class="mb-4 flex flex-wrap gap-1.5">
+        {tags.slice(0, 5).map((tag) => (
+          <a
+            href={`/tags/${tag.toLowerCase().replace(/\s+/g, "-")}/`}
+            class="relative z-10 rounded-md bg-[var(--bg-muted)] px-2 py-0.5 text-xs text-[var(--text-secondary)] hover:bg-sky-100 hover:text-sky-700 dark:hover:bg-sky-900/40 dark:hover:text-sky-300 transition-colors"
+          >
+            {tag}
+          </a>
+        ))}
+      </div>
+    )
+  }
+
+  <!-- Footer -->
+  <footer class="mt-auto">
+    <MetadataRow date={date} />
+  </footer>
+</article>

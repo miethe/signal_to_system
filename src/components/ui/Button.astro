@@ -1,0 +1,60 @@
+---
+/**
+ * Button — renders as <a> when href is provided, otherwise <button>.
+ *
+ * Props:
+ *   variant  — visual style
+ *   size     — sm | md | lg
+ *   href     — optional link target
+ */
+
+interface Props {
+  variant?: "primary" | "secondary" | "ghost";
+  size?: "sm" | "md" | "lg";
+  href?: string;
+  type?: "button" | "submit" | "reset";
+  class?: string;
+  [key: string]: unknown;
+}
+
+const {
+  variant = "primary",
+  size = "md",
+  href,
+  type = "button",
+  class: className = "",
+  ...rest
+} = Astro.props;
+
+const base =
+  "inline-flex items-center justify-center gap-2 font-medium rounded-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none";
+
+const variants: Record<string, string> = {
+  primary:
+    "bg-indigo-600 text-white hover:bg-indigo-700 focus-visible:ring-indigo-500 dark:bg-indigo-500 dark:hover:bg-indigo-400",
+  secondary:
+    "bg-zinc-100 text-zinc-800 hover:bg-zinc-200 focus-visible:ring-zinc-400 dark:bg-zinc-800 dark:text-zinc-100 dark:hover:bg-zinc-700",
+  ghost:
+    "bg-transparent text-zinc-700 hover:bg-zinc-100 focus-visible:ring-zinc-400 dark:text-zinc-300 dark:hover:bg-zinc-800",
+};
+
+const sizes: Record<string, string> = {
+  sm: "text-xs px-3 py-1.5",
+  md: "text-sm px-4 py-2",
+  lg: "text-base px-6 py-3",
+};
+
+const cls = [base, variants[variant] ?? variants.primary, sizes[size] ?? sizes.md, className].join(" ");
+---
+
+{
+  href ? (
+    <a href={href} class={cls} {...rest}>
+      <slot />
+    </a>
+  ) : (
+    <button type={type} class={cls} {...rest}>
+      <slot />
+    </button>
+  )
+}

@@ -1,0 +1,146 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EssayCard from '../../components/cards/EssayCard.astro';
+import Badge from '../../components/ui/Badge.astro';
+import { CATEGORIES } from '../../data/taxonomy';
+
+// ---------------------------------------------------------------------------
+// Data
+// ---------------------------------------------------------------------------
+
+const allPosts = await getCollection('posts');
+
+const published = allPosts
+  .filter((p) => p.data.status !== 'draft')
+  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+// Optional category filter from query param
+const url = new URL(Astro.request.url);
+const categoryParam = url.searchParams.get('category') ?? '';
+
+const filtered = categoryParam
+  ? published.filter((p) => p.data.category.toLowerCase() === categoryParam.toLowerCase())
+  : published;
+
+// Count per category
+const categoryCounts = new Map<string, number>();
+for (const post of published) {
+  categoryCounts.set(post.data.category, (categoryCounts.get(post.data.category) ?? 0) + 1);
+}
+
+const totalCount = filtered.length;
+const essays = filtered.filter((p) => p.data.contentType === 'essay');
+const fieldNotes = filtered.filter((p) => p.data.contentType === 'field-note');
+---
+
+<BaseLayout
+  title="Essays"
+  description="Long-form essays on AI agents, agentic SDLC, architecture, platform engineering, and technical leadership."
+>
+  <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+    <!-- Page header -->
+    <header class="mb-12 border-b border-zinc-200 dark:border-zinc-800 pb-10">
+      <h1 class="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl mb-4">
+        Essays
+      </h1>
+      <p class="text-xl text-zinc-600 dark:text-zinc-400 max-w-2xl leading-relaxed">
+        Long-form writing on the systems, decisions, and architectures that shape modern software. {totalCount} published{categoryParam ? ` in ${categoryParam}` : ''}.
+      </p>
+    </header>
+
+    <!-- Category filter -->
+    <nav class="mb-10 flex flex-wrap gap-2" aria-label="Filter by category">
+      <a
+        href="/essays/"
+        class:list={[
+          'inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium transition-colors',
+          !categoryParam
+            ? 'bg-indigo-600 text-white dark:bg-indigo-500'
+            : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700',
+        ]}
+      >
+        All
+        <span class="text-xs opacity-70">({published.length})</span>
+      </a>
+      {CATEGORIES.map((cat) => {
+        const count = categoryCounts.get(cat) ?? 0;
+        if (count === 0) return null;
+        const isActive = categoryParam.toLowerCase() === cat.toLowerCase();
+        return (
+          <a
+            href={`/essays/?category=${encodeURIComponent(cat)}`}
+            class:list={[
+              'inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium transition-colors',
+              isActive
+                ? 'bg-indigo-600 text-white dark:bg-indigo-500'
+                : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700',
+            ]}
+          >
+            {cat}
+            <span class="text-xs opacity-70">({count})</span>
+          </a>
+        );
+      })}
+    </nav>
+
+    {filtered.length === 0 ? (
+      <div class="rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 p-16 text-center">
+        <p class="text-zinc-500 dark:text-zinc-400 text-lg">No essays found{categoryParam ? ` for "${categoryParam}"` : ''}.</p>
+        <a href="/essays/" class="mt-4 inline-block text-sm text-indigo-600 dark:text-indigo-400 hover:underline">Clear filter</a>
+      </div>
+    ) : (
+      <div class="space-y-16">
+        <!-- Essays -->
+        {essays.length > 0 && (
+          <section>
+            {fieldNotes.length > 0 && (
+              <h2 class="text-sm font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 mb-6">
+                Essays — {essays.length}
+              </h2>
+            )}
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {essays.map((post) => (
+                <EssayCard
+                  title={post.data.title}
+                  excerpt={post.data.excerpt}
+                  date={post.data.date}
+                  readTime={post.data.readTime}
+                  category={post.data.category}
+                  tags={post.data.tags}
+                  slug={post.id}
+                  contentType={post.data.contentType}
+                  featured={post.data.featured ?? false}
+                />
+              ))}
+            </div>
+          </section>
+        )}
+
+        <!-- Field Notes -->
+        {fieldNotes.length > 0 && (
+          <section>
+            <h2 class="text-sm font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 mb-6">
+              Field Notes — {fieldNotes.length}
+            </h2>
+            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {fieldNotes.map((post) => (
+                <EssayCard
+                  title={post.data.title}
+                  excerpt={post.data.excerpt}
+                  date={post.data.date}
+                  readTime={post.data.readTime}
+                  category={post.data.category}
+                  tags={post.data.tags}
+                  slug={post.id}
+                  contentType={post.data.contentType}
+                  featured={false}
+                />
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
+    )}
+  </div>
+</BaseLayout>

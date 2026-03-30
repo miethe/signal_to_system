@@ -1,0 +1,850 @@
+@import "tailwindcss";
+
+/* ============================================================
+   THEME TOKENS
+   Tailwind v4 custom properties via @theme
+   ============================================================ */
+
+@theme {
+  /* --- Font Families --- */
+  --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+
+  /* --- Spacing scale extensions --- */
+  --spacing-18: 4.5rem;
+  --spacing-22: 5.5rem;
+  --spacing-prose: 72ch;
+
+  /* --- Border radius --- */
+  --radius-xs: 0.125rem;
+  --radius-sm: 0.25rem;
+  --radius-md: 0.375rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+  --radius-pill: 9999px;
+
+  /* --- Brand color scales (light-mode defaults) --- */
+  /* Backgrounds */
+  --color-bg-base: #ffffff;
+  --color-bg-subtle: #f8fafc;
+  --color-bg-muted: #f1f5f9;
+  --color-bg-surface: #ffffff;
+  --color-bg-overlay: rgba(15, 23, 42, 0.6);
+
+  /* Borders */
+  --color-border-subtle: #e2e8f0;
+  --color-border-default: #cbd5e1;
+  --color-border-strong: #94a3b8;
+
+  /* Text */
+  --color-text-primary: #0f172a;
+  --color-text-secondary: #334155;
+  --color-text-tertiary: #64748b;
+  --color-text-disabled: #94a3b8;
+  --color-text-inverse: #f8fafc;
+
+  /* Accent — indigo/blue family */
+  --color-accent-50: #eef2ff;
+  --color-accent-100: #e0e7ff;
+  --color-accent-200: #c7d2fe;
+  --color-accent-300: #a5b4fc;
+  --color-accent-400: #818cf8;
+  --color-accent-500: #6366f1;
+  --color-accent-600: #4f46e5;
+  --color-accent-700: #4338ca;
+  --color-accent-800: #3730a3;
+  --color-accent-900: #312e81;
+
+  /* Semantic accent aliases */
+  --color-accent: #4f46e5;
+  --color-accent-hover: #4338ca;
+  --color-accent-subtle: #eef2ff;
+  --color-accent-muted: #e0e7ff;
+
+  /* Neutrals for dark backgrounds */
+  --color-slate-900: #0f172a;
+  --color-slate-850: #111827;
+  --color-slate-800: #1e293b;
+  --color-slate-700: #334155;
+  --color-slate-600: #475569;
+  --color-slate-500: #64748b;
+  --color-slate-400: #94a3b8;
+  --color-slate-300: #cbd5e1;
+  --color-slate-200: #e2e8f0;
+  --color-slate-100: #f1f5f9;
+  --color-slate-50: #f8fafc;
+
+  /* Code block */
+  --color-code-bg: #1e293b;
+  --color-code-bg-inline: #f1f5f9;
+  --color-code-text: #e2e8f0;
+  --color-code-border: #334155;
+}
+
+/* ============================================================
+   COLOR-SCHEME CUSTOM PROPERTIES
+   :root = light mode,  .dark = dark mode
+   ============================================================ */
+
+:root {
+  color-scheme: light;
+
+  --bg-base:       #ffffff;
+  --bg-subtle:     #f8fafc;
+  --bg-muted:      #f1f5f9;
+  --bg-surface:    #ffffff;
+
+  --border-subtle: #e2e8f0;
+  --border:        #cbd5e1;
+  --border-strong: #94a3b8;
+
+  --text-primary:   #0f172a;
+  --text-secondary: #334155;
+  --text-tertiary:  #64748b;
+  --text-disabled:  #94a3b8;
+  --text-inverse:   #f8fafc;
+
+  --accent:         #4f46e5;
+  --accent-hover:   #4338ca;
+  --accent-subtle:  #eef2ff;
+  --accent-muted:   #e0e7ff;
+  --accent-text:    #3730a3;
+
+  --code-bg:        #f1f5f9;
+  --code-bg-block:  #1e293b;
+  --code-text:      #0f172a;
+  --code-text-block:#e2e8f0;
+  --code-border:    #cbd5e1;
+
+  --shadow-sm:  0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow:     0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md:  0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg:  0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+.dark {
+  color-scheme: dark;
+
+  --bg-base:       #0f172a;
+  --bg-subtle:     #111827;
+  --bg-muted:      #1e293b;
+  --bg-surface:    #1e293b;
+
+  --border-subtle: #1e293b;
+  --border:        #334155;
+  --border-strong: #475569;
+
+  --text-primary:   #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-tertiary:  #94a3b8;
+  --text-disabled:  #475569;
+  --text-inverse:   #0f172a;
+
+  --accent:         #818cf8;
+  --accent-hover:   #a5b4fc;
+  --accent-subtle:  #1e1b4b;
+  --accent-muted:   #312e81;
+  --accent-text:    #a5b4fc;
+
+  --code-bg:        #0f172a;
+  --code-bg-block:  #0d1117;
+  --code-text:      #e2e8f0;
+  --code-text-block:#e2e8f0;
+  --code-border:    #334155;
+
+  --shadow-sm:  0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow:     0 1px 3px 0 rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.3);
+  --shadow-md:  0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+  --shadow-lg:  0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+}
+
+/* ============================================================
+   BASE STYLES
+   ============================================================ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+  tab-size: 2;
+}
+
+body {
+  background-color: var(--bg-base);
+  color: var(--text-primary);
+  min-height: 100dvh;
+  transition:
+    background-color 200ms ease,
+    color 200ms ease;
+}
+
+/* Smooth color transitions for interactive elements */
+a,
+button,
+input,
+textarea,
+select,
+[role="button"] {
+  transition:
+    color 150ms ease,
+    background-color 150ms ease,
+    border-color 150ms ease,
+    box-shadow 150ms ease,
+    opacity 150ms ease;
+}
+
+/* --- Scrollbar (dark mode) --- */
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    scrollbar-color: #334155 #0f172a;
+    scrollbar-width: thin;
+  }
+}
+
+.dark {
+  scrollbar-color: #334155 #0f172a;
+  scrollbar-width: thin;
+}
+
+.dark ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.dark ::-webkit-scrollbar-track {
+  background: #0f172a;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 4px;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+
+/* --- Typography base --- */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+h1 { font-size: 2.25rem; }
+h2 { font-size: 1.75rem; }
+h3 { font-size: 1.375rem; }
+h4 { font-size: 1.125rem; }
+h5 { font-size: 1rem; }
+h6 { font-size: 0.875rem; }
+
+p {
+  color: var(--text-secondary);
+  margin-top: 0;
+  margin-bottom: 1.25rem;
+}
+
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2rem 0;
+}
+
+/* --- Inline code --- */
+:not(pre) > code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  background-color: var(--code-bg);
+  color: var(--code-text);
+  padding: 0.125em 0.375em;
+  border-radius: 0.25rem;
+  border: 1px solid var(--code-border);
+}
+
+/* --- Code blocks --- */
+pre {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.7;
+  background-color: var(--code-bg-block);
+  color: var(--code-text-block);
+  padding: 1.25rem 1.5rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  border: 1px solid var(--code-border);
+  tab-size: 2;
+}
+
+pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: inherit;
+  color: inherit;
+  border-radius: 0;
+}
+
+/* --- Focus states (accessibility) --- */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 0.25rem;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ============================================================
+   PROSE — .prose-custom
+   Used for article/essay body content
+   ============================================================ */
+
+.prose-custom {
+  max-width: 72ch;
+  font-size: 1.0625rem;
+  line-height: 1.75;
+  color: var(--text-secondary);
+}
+
+/* --- Headings --- */
+.prose-custom h1,
+.prose-custom h2,
+.prose-custom h3,
+.prose-custom h4,
+.prose-custom h5,
+.prose-custom h6 {
+  color: var(--text-primary);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  scroll-margin-top: 5rem;
+}
+
+.prose-custom h1 {
+  font-size: 2rem;
+  line-height: 1.2;
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.prose-custom h2 {
+  font-size: 1.5rem;
+  line-height: 1.3;
+  margin-top: 2.5rem;
+  margin-bottom: 0.875rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.prose-custom h3 {
+  font-size: 1.25rem;
+  line-height: 1.35;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+.prose-custom h4 {
+  font-size: 1.0625rem;
+  line-height: 1.4;
+  margin-top: 1.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.prose-custom h5,
+.prose-custom h6 {
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary);
+}
+
+/* Heading anchor links */
+.prose-custom h2 a,
+.prose-custom h3 a,
+.prose-custom h4 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.prose-custom h2 a:hover,
+.prose-custom h3 a:hover,
+.prose-custom h4 a:hover {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+/* --- Paragraphs --- */
+.prose-custom p {
+  margin-top: 0;
+  margin-bottom: 1.25rem;
+  color: var(--text-secondary);
+}
+
+.prose-custom > p:first-child {
+  font-size: 1.125rem;
+  color: var(--text-primary);
+}
+
+/* --- Links --- */
+.prose-custom a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  font-weight: 500;
+  transition: color 150ms ease;
+}
+
+.prose-custom a:hover {
+  color: var(--accent-hover);
+  text-decoration-thickness: 2px;
+}
+
+/* --- Lists --- */
+.prose-custom ul,
+.prose-custom ol {
+  margin-top: 0;
+  margin-bottom: 1.25rem;
+  padding-left: 1.5rem;
+  color: var(--text-secondary);
+}
+
+.prose-custom ul {
+  list-style-type: disc;
+}
+
+.prose-custom ol {
+  list-style-type: decimal;
+}
+
+.prose-custom li {
+  margin-bottom: 0.375rem;
+  padding-left: 0.25rem;
+}
+
+.prose-custom li::marker {
+  color: var(--accent);
+}
+
+.prose-custom li > ul,
+.prose-custom li > ol {
+  margin-top: 0.375rem;
+  margin-bottom: 0.375rem;
+}
+
+/* --- Blockquotes --- */
+.prose-custom blockquote {
+  margin: 1.75rem 0;
+  padding: 1rem 1.5rem;
+  border-left: 3px solid var(--accent);
+  background-color: var(--accent-subtle);
+  border-radius: 0 0.375rem 0.375rem 0;
+  font-style: italic;
+  color: var(--text-primary);
+}
+
+.prose-custom blockquote p {
+  margin-bottom: 0;
+  color: inherit;
+}
+
+.prose-custom blockquote cite {
+  display: block;
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  font-style: normal;
+  color: var(--text-tertiary);
+}
+
+/* --- Inline code --- */
+.prose-custom :not(pre) > code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  background-color: var(--code-bg);
+  color: var(--code-text);
+  padding: 0.125em 0.375em;
+  border-radius: 0.25rem;
+  border: 1px solid var(--code-border);
+  word-break: break-all;
+}
+
+/* --- Code blocks --- */
+.prose-custom pre {
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.7;
+  background-color: var(--code-bg-block);
+  color: var(--code-text-block);
+  padding: 1.25rem 1.5rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  border: 1px solid var(--code-border);
+  tab-size: 2;
+}
+
+.prose-custom pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: inherit;
+  color: inherit;
+  border-radius: 0;
+  word-break: normal;
+}
+
+/* --- Tables --- */
+.prose-custom table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+  margin: 1.75rem 0;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border);
+}
+
+.prose-custom thead {
+  background-color: var(--bg-muted);
+}
+
+.prose-custom thead th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary);
+  border-bottom: 1px solid var(--border);
+}
+
+.prose-custom tbody tr {
+  border-bottom: 1px solid var(--border-subtle);
+  transition: background-color 100ms ease;
+}
+
+.prose-custom tbody tr:last-child {
+  border-bottom: none;
+}
+
+.prose-custom tbody tr:hover {
+  background-color: var(--bg-subtle);
+}
+
+.prose-custom tbody td {
+  padding: 0.75rem 1rem;
+  color: var(--text-secondary);
+  vertical-align: top;
+}
+
+/* --- Horizontal rules --- */
+.prose-custom hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2.5rem 0;
+}
+
+/* --- Images in prose --- */
+.prose-custom img {
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-subtle);
+  margin: 2rem auto;
+  box-shadow: var(--shadow-md);
+}
+
+.prose-custom figure {
+  margin: 2rem 0;
+}
+
+.prose-custom figcaption {
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--text-tertiary);
+  margin-top: 0.75rem;
+  font-style: italic;
+}
+
+/* --- Strong & em --- */
+.prose-custom strong {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.prose-custom em {
+  color: var(--text-primary);
+}
+
+/* --- Keyboard / mark --- */
+.prose-custom kbd {
+  font-family: var(--font-mono);
+  font-size: 0.8125em;
+  background-color: var(--bg-muted);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-bottom-width: 2px;
+  border-radius: 0.25rem;
+  padding: 0.125em 0.375em;
+}
+
+.prose-custom mark {
+  background-color: #fef08a;
+  color: #1c1917;
+  padding: 0.0625em 0.25em;
+  border-radius: 0.125rem;
+}
+
+.dark .prose-custom mark {
+  background-color: #713f12;
+  color: #fef9c3;
+}
+
+/* --- Callout / aside pattern --- */
+.prose-custom aside,
+.prose-custom .callout {
+  background-color: var(--accent-subtle);
+  border: 1px solid var(--accent-muted);
+  border-radius: 0.5rem;
+  padding: 1rem 1.25rem;
+  margin: 1.75rem 0;
+  font-size: 0.9375rem;
+}
+
+.prose-custom aside p:last-child,
+.prose-custom .callout p:last-child {
+  margin-bottom: 0;
+}
+
+/* ============================================================
+   UTILITY CLASSES
+   ============================================================ */
+
+/* Text color utilities using CSS vars */
+.text-primary   { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-tertiary  { color: var(--text-tertiary); }
+.text-accent    { color: var(--accent); }
+
+/* Background utilities */
+.bg-base    { background-color: var(--bg-base); }
+.bg-subtle  { background-color: var(--bg-subtle); }
+.bg-muted   { background-color: var(--bg-muted); }
+.bg-surface { background-color: var(--bg-surface); }
+
+/* Border utilities */
+.border-subtle { border-color: var(--border-subtle); }
+.border-default { border-color: var(--border); }
+
+/* Surface card */
+.surface {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.surface-elevated {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow-md);
+}
+
+/* Tag / badge */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 0.25rem 0.625rem;
+  border-radius: 9999px;
+  background-color: var(--accent-subtle);
+  color: var(--accent-text);
+  border: 1px solid var(--accent-muted);
+  text-decoration: none;
+  transition: background-color 150ms ease, border-color 150ms ease;
+}
+
+.tag:hover {
+  background-color: var(--accent-muted);
+  text-decoration: none;
+}
+
+/* Focus ring utility */
+.focus-ring:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 0.25rem;
+}
+
+/* Skip-to-content link (accessibility) */
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 1rem;
+  z-index: 9999;
+  padding: 0.5rem 1rem;
+  background-color: var(--accent);
+  color: var(--text-inverse);
+  font-weight: 600;
+  border-radius: 0 0 0.375rem 0.375rem;
+  text-decoration: none;
+  transition: top 200ms ease;
+}
+
+.skip-link:focus {
+  top: 0;
+}
+
+/* Reading progress / prose container */
+.prose-container {
+  width: 100%;
+  max-width: 72ch;
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+}
+
+/* Truncate text to N lines */
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ============================================================
+   PERFORMANCE LITE MODE
+   Disable all transitions and animations when user has opted in
+   to reduced-motion or toggled lite mode.
+   ============================================================ */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.perf-lite *,
+.perf-lite *::before,
+.perf-lite *::after {
+  animation-duration: 0.01ms !important;
+  transition-duration: 0.01ms !important;
+}
+
+/* ============================================================
+   CALLOUT VARIANTS (used from MDX shortcodes)
+   ============================================================ */
+
+.callout-warning {
+  background-color: rgb(245 158 11 / 0.05);
+  border-color: rgb(245 158 11 / 0.3);
+  color: #fcd34d;
+}
+
+.callout-info {
+  background-color: rgb(14 165 233 / 0.05);
+  border-color: rgb(14 165 233 / 0.3);
+  color: #7dd3fc;
+}
+
+.callout-success {
+  background-color: rgb(16 185 129 / 0.05);
+  border-color: rgb(16 185 129 / 0.3);
+  color: #6ee7b7;
+}
+
+.callout-danger {
+  background-color: rgb(239 68 68 / 0.05);
+  border-color: rgb(239 68 68 / 0.3);
+  color: #fca5a5;
+}
+
+/* ============================================================
+   ANIMATED UNDERLINE (nav links)
+   ============================================================ */
+
+.nav-underline {
+  position: relative;
+}
+
+.nav-underline::after {
+  content: "";
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--accent);
+  transition: width 0.2s ease;
+}
+
+.nav-underline:hover::after,
+.nav-underline[aria-current="page"]::after {
+  width: 100%;
+}
+
+/* ============================================================
+   SELECTION COLOR
+   ============================================================ */
+
+::selection {
+  background-color: var(--accent-muted);
+  color: var(--text-primary);
+}
+
+.dark ::selection {
+  background-color: #312e81;
+  color: #e0e7ff;
+}

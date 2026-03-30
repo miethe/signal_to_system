@@ -1,0 +1,108 @@
+---
+/**
+ * SiteLinkCard — external link card for the Other Sites page.
+ *
+ * Props:
+ *   title       — site name
+ *   url         — external URL
+ *   description — short description
+ *   type        — ExternalSiteType
+ *   featured    — featured styling
+ */
+
+import Badge from "../ui/Badge.astro";
+
+interface Props {
+  title: string;
+  url: string;
+  description: string;
+  type?: string;
+  featured?: boolean;
+}
+
+const { title, url, description, type, featured = false } = Astro.props;
+
+// Derive a readable hostname for display
+let displayHost = "";
+try {
+  displayHost = new URL(url).hostname.replace(/^www\./, "");
+} catch {
+  displayHost = url;
+}
+---
+
+<a
+  href={url}
+  target="_blank"
+  rel="noopener noreferrer"
+  class={[
+    "group relative flex flex-col rounded-xl border transition-all duration-200",
+    "bg-[var(--bg-surface)]",
+    "border-[var(--border-subtle)]",
+    "hover:border-teal-400/50 dark:hover:border-teal-700",
+    "hover:shadow-md",
+    featured ? "p-8 md:p-10" : "p-6",
+  ].join(" ")}
+  aria-label={`Visit ${title} (opens in new tab)`}
+>
+  <!-- Featured accent -->
+  {
+    featured && (
+      <div class="absolute inset-x-0 top-0 h-1 rounded-t-xl bg-gradient-to-r from-teal-500 to-emerald-500" />
+    )
+  }
+
+  <!-- Header -->
+  <header class="mb-3 flex flex-wrap items-center justify-between gap-2">
+    <div class="flex flex-wrap items-center gap-2">
+      {type && <Badge variant="type" text={type} />}
+      {
+        featured && (
+          <Badge
+            variant="default"
+            text="Featured"
+            class="bg-teal-50 text-teal-600 dark:bg-teal-950/40 dark:text-teal-400"
+          />
+        )
+      }
+    </div>
+
+    <!-- External link icon -->
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      class="shrink-0 text-zinc-400 group-hover:text-teal-500 transition-colors"
+      aria-hidden="true"
+    >
+      <path d="M15 3h6v6" />
+      <path d="M10 14 21 3" />
+      <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+    </svg>
+  </header>
+
+  <!-- Title -->
+  <h2
+    class={[
+      "font-semibold leading-snug text-[var(--text-primary)]",
+      "group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors",
+      featured ? "text-2xl md:text-3xl mb-2" : "text-lg mb-1",
+    ].join(" ")}
+  >
+    {title}
+  </h2>
+
+  <!-- Host -->
+  <p class="mb-3 text-xs text-[var(--text-tertiary)]">{displayHost}</p>
+
+  <!-- Description -->
+  <p class="flex-1 text-sm leading-relaxed text-[var(--text-secondary)]">
+    {description}
+  </p>
+</a>

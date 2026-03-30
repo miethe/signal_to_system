@@ -1,0 +1,235 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import { generateJsonLd, buildCanonicalUrl } from '../lib/seo';
+import { formatDate, formatDateISO } from '../lib/utils';
+import { site } from '../data/site';
+
+interface Props {
+  frontmatter: {
+    title: string;
+    excerpt?: string;
+    description?: string;
+    date: Date | string;
+    updatedDate?: Date | string;
+    readTime?: number;
+    category?: string;
+    tags?: string[];
+    ogImage?: string;
+    whyItMatters?: string;
+    leaderTakeaway?: string;
+    series?: string;
+    seriesPart?: number;
+    draft?: boolean;
+  };
+  // Optional: inject prev/next series posts from the page
+  prevPost?: { title: string; slug: string };
+  nextPost?: { title: string; slug: string };
+}
+
+const { frontmatter, prevPost, nextPost } = Astro.props;
+
+const {
+  title,
+  excerpt,
+  description,
+  date,
+  updatedDate,
+  readTime,
+  category,
+  tags = [],
+  ogImage,
+  whyItMatters,
+  leaderTakeaway,
+  series,
+  seriesPart,
+} = frontmatter;
+
+const pageDescription = description || excerpt || site.description;
+const canonicalUrl = buildCanonicalUrl(Astro.url.pathname);
+const publishedISO = formatDateISO(date);
+const updatedISO = updatedDate ? formatDateISO(updatedDate) : undefined;
+
+const jsonLd = generateJsonLd('article', {
+  title,
+  description: pageDescription,
+  url: canonicalUrl,
+  image: ogImage,
+  datePublished: publishedISO,
+  dateModified: updatedISO,
+  tags,
+});
+---
+
+<BaseLayout
+  title={title}
+  description={pageDescription}
+  ogImage={ogImage}
+  canonicalUrl={canonicalUrl}
+  jsonLd={jsonLd}
+>
+  <article class="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
+    <!-- Article header -->
+    <header class="mb-10 space-y-4 border-b border-[var(--border-subtle)] pb-8">
+      {
+        series && (
+          <div class="flex items-center gap-2 text-sm font-medium text-[var(--accent)]">
+            <span class="uppercase tracking-widest">Series</span>
+            <span class="text-[var(--text-disabled)]">/</span>
+            <span>{series}</span>
+            {seriesPart && <span class="text-[var(--text-disabled)]">Part {seriesPart}</span>}
+          </div>
+        )
+      }
+
+      {
+        category && (
+          <div>
+            <span class="inline-block rounded-sm bg-indigo-600/20 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-widest text-[var(--accent)] ring-1 ring-indigo-500/30">
+              {category}
+            </span>
+          </div>
+        )
+      }
+
+      <h1 class="text-3xl font-bold leading-tight tracking-tight text-[var(--text-primary)] sm:text-4xl">
+        {title}
+      </h1>
+
+      {
+        excerpt && (
+          <p class="text-lg leading-relaxed text-[var(--text-tertiary)]">{excerpt}</p>
+        )
+      }
+
+      <!-- Meta row -->
+      <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-[var(--text-disabled)]">
+        <time datetime={publishedISO} class="text-[var(--text-tertiary)]">
+          {formatDate(date)}
+        </time>
+        {
+          updatedDate && (
+            <>
+              <span aria-hidden="true">&middot;</span>
+              <span>
+                Updated{' '}
+                <time datetime={updatedISO}>{formatDate(updatedDate)}</time>
+              </span>
+            </>
+          )
+        }
+        {
+          readTime && (
+            <>
+              <span aria-hidden="true">&middot;</span>
+              <span>{readTime} min read</span>
+            </>
+          )
+        }
+      </div>
+
+      <!-- Tags -->
+      {
+        tags.length > 0 && (
+          <div class="flex flex-wrap gap-2 pt-1">
+            {tags.map((tag) => (
+              <a
+                href={`/tags/${tag}`}
+                class="rounded-full bg-[var(--bg-muted)] px-3 py-0.5 text-xs font-medium text-[var(--text-tertiary)] transition-colors hover:bg-[var(--bg-surface)] hover:text-[var(--text-secondary)]"
+              >
+                #{tag}
+              </a>
+            ))}
+          </div>
+        )
+      }
+    </header>
+
+    <!-- Callout: Why It Matters (executive signal) -->
+    {
+      whyItMatters && (
+        <aside class="mb-8 rounded-lg border border-amber-500/30 bg-amber-500/5 p-5">
+          <p class="mb-1.5 text-xs font-bold uppercase tracking-widest text-amber-400">
+            Why It Matters
+          </p>
+          <p class="text-sm leading-relaxed text-[var(--text-secondary)]">{whyItMatters}</p>
+        </aside>
+      )
+    }
+
+    <!-- Callout: Leader Takeaway -->
+    {
+      leaderTakeaway && (
+        <aside class="mb-8 rounded-lg border border-sky-500/30 bg-sky-500/5 p-5">
+          <p class="mb-1.5 text-xs font-bold uppercase tracking-widest text-sky-400">
+            Leader Takeaway
+          </p>
+          <p class="text-sm leading-relaxed text-[var(--text-secondary)]">{leaderTakeaway}</p>
+        </aside>
+      )
+    }
+
+    <!-- Article body -->
+    <div class="prose prose-slate dark:prose-invert max-w-none prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-[var(--text-primary)] prose-p:text-[var(--text-secondary)] prose-p:leading-relaxed prose-a:text-[var(--accent)] prose-a:no-underline hover:prose-a:text-[var(--accent-hover)] hover:prose-a:underline prose-strong:text-[var(--text-primary)] prose-code:rounded prose-code:bg-[var(--code-bg)] prose-code:px-1.5 prose-code:py-0.5 prose-code:text-sm prose-code:text-[var(--code-text)] prose-pre:border prose-pre:border-[var(--code-border)] prose-pre:bg-[var(--code-bg-block)] prose-blockquote:border-l-[var(--accent)] prose-blockquote:text-[var(--text-tertiary)] prose-hr:border-[var(--border-subtle)]">
+      <slot />
+    </div>
+
+    <!-- Article footer: series nav + tags recap -->
+    <footer class="mt-12 space-y-8 border-t border-[var(--border-subtle)] pt-8">
+      <!-- Series navigation -->
+      {
+        (prevPost || nextPost) && (
+          <nav aria-label="Series navigation" class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            {prevPost ? (
+              <a
+                href={`/posts/${prevPost.slug}`}
+                class="group flex flex-col gap-1 rounded-lg border border-[var(--border-subtle)] p-4 transition-colors hover:border-indigo-500/50 hover:bg-[var(--bg-subtle)]"
+              >
+                <span class="text-xs font-medium uppercase tracking-widest text-[var(--text-disabled)] transition-colors group-hover:text-[var(--accent)]">
+                  &larr; Previous
+                </span>
+                <span class="text-sm font-medium text-[var(--text-secondary)] transition-colors group-hover:text-[var(--text-primary)]">
+                  {prevPost.title}
+                </span>
+              </a>
+            ) : (
+              <div />
+            )}
+            {nextPost && (
+              <a
+                href={`/posts/${nextPost.slug}`}
+                class="group flex flex-col items-end gap-1 rounded-lg border border-[var(--border-subtle)] p-4 transition-colors hover:border-indigo-500/50 hover:bg-[var(--bg-subtle)]"
+              >
+                <span class="text-xs font-medium uppercase tracking-widest text-[var(--text-disabled)] transition-colors group-hover:text-[var(--accent)]">
+                  Next &rarr;
+                </span>
+                <span class="text-sm font-medium text-[var(--text-secondary)] transition-colors group-hover:text-[var(--text-primary)]">
+                  {nextPost.title}
+                </span>
+              </a>
+            )}
+          </nav>
+        )
+      }
+
+      <!-- Back links -->
+      <div class="flex flex-wrap items-center gap-4 text-sm">
+        <a
+          href="/essays"
+          class="text-[var(--accent)] transition-colors hover:text-[var(--accent-hover)]"
+        >
+          &larr; All Essays
+        </a>
+        {
+          category && (
+            <a
+              href={`/categories/${category.toLowerCase()}`}
+              class="text-[var(--text-disabled)] transition-colors hover:text-[var(--text-secondary)]"
+            >
+              More in {category}
+            </a>
+          )
+        }
+      </div>
+    </footer>
+  </article>
+</BaseLayout>

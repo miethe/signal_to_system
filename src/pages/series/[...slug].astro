@@ -1,0 +1,44 @@
+---
+import { getCollection } from 'astro:content';
+import SeriesLayout from '../../layouts/SeriesLayout.astro';
+
+export async function getStaticPaths() {
+  const allSeries = await getCollection('series');
+  const allPosts = await getCollection('posts');
+
+  return allSeries.map((seriesEntry) => {
+    // Find all published posts belonging to this series
+    const seriesPosts = allPosts
+      .filter(
+        (post) =>
+          post.data.status !== 'draft' &&
+          post.data.series === seriesEntry.id,
+      )
+      .sort((a, b) => (a.data.seriesOrder ?? 999) - (b.data.seriesOrder ?? 999));
+
+    return {
+      params: { slug: seriesEntry.id },
+      props: { seriesEntry, seriesPosts },
+    };
+  });
+}
+
+const { seriesEntry, seriesPosts } = Astro.props;
+---
+
+<SeriesLayout
+  frontmatter={{
+    title: seriesEntry.data.title,
+    excerpt: seriesEntry.data.excerpt,
+    status: seriesEntry.data.status,
+    ogImage: seriesEntry.data.heroImage,
+  }}
+  posts={seriesPosts.map((p) => ({
+    slug: p.id,
+    title: p.data.title,
+    excerpt: p.data.excerpt,
+    date: p.data.date,
+    readTime: p.data.readTime ? parseInt(p.data.readTime) : undefined,
+    part: p.data.seriesOrder,
+  }))}
+/>
