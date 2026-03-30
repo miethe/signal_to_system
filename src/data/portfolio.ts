@@ -34,7 +34,7 @@ export const portfolioItems: PortfolioItem[] = [
     status: "active",
     links: [
       { label: "GitHub", href: "https://github.com/miethe/signal-to-system" },
-      { label: "Live Site", href: "https://signaltosystem.com" },
+      { label: "Live Site", href: "https://nickmiethe.com" },
     ],
     category: "Projects",
     featured: true,

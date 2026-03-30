@@ -18,8 +18,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      ASTRO_SITE: https://miethe.github.io
-      ASTRO_BASE: /signal_to_system
+      ASTRO_SITE: https://nickmiethe.com
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4

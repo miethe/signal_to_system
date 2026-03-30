@@ -3,7 +3,7 @@ export const site = {
   subtitle: "Architecture, Agents, and Execution for the Technical Executive",
   description:
     "A technical publication at the intersection of AI agents, agentic SDLC, architecture, platform engineering, and technical leadership.",
-  siteUrl: "https://signaltosystem.com",
+  siteUrl: "https://nickmiethe.com",
 
   author: {
     name: "Nick Miethe",

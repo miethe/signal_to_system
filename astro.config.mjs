@@ -7,8 +7,7 @@ import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
 export default defineConfig({
-  site: process.env.ASTRO_SITE || 'https://miethe.github.io',
-  base: process.env.ASTRO_BASE || '/signal_to_system',
+  site: 'https://nickmiethe.com',
   trailingSlash: 'ignore',
   integrations: [react(), mdx(), sitemap()],
   vite: {
