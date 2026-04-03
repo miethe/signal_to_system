@@ -118,23 +118,6 @@ profile_root_dir = ".claude"
 collection_sha = "b59ff17a7c72a5d9e4a9d861c66f220d69c130f82f449195fddfe3f76b5d7000"
 
 [[deployed]]
-artifact_name = "technical-writer"
-artifact_type = "agent"
-from_collection = "default"
-deployed_at = "2026-03-20T00:24:37.094325"
-artifact_path = "agents/technical-writer.md"
-content_hash = "c1cd9ec30155d2ec59f5cb74a21d4569e743435b779e36e45acbef9a479d6357"
-local_modifications = false
-version_lineage = [
-    "c1cd9ec30155d2ec59f5cb74a21d4569e743435b779e36e45acbef9a479d6357",
-]
-merge_base_snapshot = "c1cd9ec30155d2ec59f5cb74a21d4569e743435b779e36e45acbef9a479d6357"
-deployment_profile_id = "claude_code"
-platform = "claude_code"
-profile_root_dir = ".claude"
-collection_sha = "c1cd9ec30155d2ec59f5cb74a21d4569e743435b779e36e45acbef9a479d6357"
-
-[[deployed]]
 artifact_name = "documentation-expert"
 artifact_type = "agent"
 from_collection = "default"
@@ -150,23 +133,6 @@ deployment_profile_id = "claude_code"
 platform = "claude_code"
 profile_root_dir = ".claude"
 collection_sha = "8573927b3d64ee52b7fd4f8a3283cde64d36dc338b949e75d62d40fce5bfc3fa"
-
-[[deployed]]
-artifact_name = "content-curator"
-artifact_type = "agent"
-from_collection = "default"
-deployed_at = "2026-03-20T00:24:49.476653"
-artifact_path = "agents/content-curator.md"
-content_hash = "71fcaa5a22397018d2db8f38d36248a308e1d16c5a202fb00be8ae7d402d2ba2"
-local_modifications = false
-version_lineage = [
-    "71fcaa5a22397018d2db8f38d36248a308e1d16c5a202fb00be8ae7d402d2ba2",
-]
-merge_base_snapshot = "71fcaa5a22397018d2db8f38d36248a308e1d16c5a202fb00be8ae7d402d2ba2"
-deployment_profile_id = "claude_code"
-platform = "claude_code"
-profile_root_dir = ".claude"
-collection_sha = "71fcaa5a22397018d2db8f38d36248a308e1d16c5a202fb00be8ae7d402d2ba2"
 
 [[deployed]]
 artifact_name = "frontend-architect"
@@ -193,8 +159,178 @@ deployed_at = "2026-03-20T00:25:01.050875"
 artifact_path = "agents/changelog-generator.md"
 content_hash = "11c6c7b2da49b3ca8c7c9397146e86a0d1d325f1a44a17d4a93d2868be8d063a"
 local_modifications = false
+version_lineage = [
+    "11c6c7b2da49b3ca8c7c9397146e86a0d1d325f1a44a17d4a93d2868be8d063a",
+]
 merge_base_snapshot = "11c6c7b2da49b3ca8c7c9397146e86a0d1d325f1a44a17d4a93d2868be8d063a"
 deployment_profile_id = "claude_code"
 platform = "claude_code"
 profile_root_dir = ".claude"
 collection_sha = "11c6c7b2da49b3ca8c7c9397146e86a0d1d325f1a44a17d4a93d2868be8d063a"
+
+[[deployed]]
+artifact_name = "gemini-cli"
+artifact_type = "skill"
+from_collection = "default"
+deployed_at = "2026-04-03T15:17:15.315130"
+artifact_path = "skills/gemini-cli"
+content_hash = "d27f5852f5573a976895aff728c2154c789435cfd5dd7d330bf517a319ee4c4a"
+local_modifications = false
+version_lineage = [
+    "d27f5852f5573a976895aff728c2154c789435cfd5dd7d330bf517a319ee4c4a",
+]
+merge_base_snapshot = "d27f5852f5573a976895aff728c2154c789435cfd5dd7d330bf517a319ee4c4a"
+deployment_profile_id = "claude_code"
+platform = "claude_code"
+profile_root_dir = ".claude"
+collection_sha = "d27f5852f5573a976895aff728c2154c789435cfd5dd7d330bf517a319ee4c4a"
+
+[[deployed]]
+artifact_name = "notebooklm-skill"
+artifact_type = "skill"
+from_collection = "default"
+deployed_at = "2026-04-03T15:17:27.288493"
+artifact_path = "skills/notebooklm-skill"
+content_hash = "e3f5f6489f2857a86da15b19527e0eea37257da15f54487bab528e64e4f70f63"
+local_modifications = false
+version_lineage = [
+    "e3f5f6489f2857a86da15b19527e0eea37257da15f54487bab528e64e4f70f63",
+]
+merge_base_snapshot = "e3f5f6489f2857a86da15b19527e0eea37257da15f54487bab528e64e4f70f63"
+deployment_profile_id = "claude_code"
+platform = "claude_code"
+profile_root_dir = ".claude"
+collection_sha = "e3f5f6489f2857a86da15b19527e0eea37257da15f54487bab528e64e4f70f63"
+
+[[deployed]]
+artifact_name = "gemini-orchestrator"
+artifact_type = "agent"
+from_collection = "default"
+deployed_at = "2026-04-03T15:17:52.242997"
+artifact_path = "agents/gemini-orchestrator.md"
+content_hash = "ab626801f8011325173b66ffb1a0182fa3261d515788851b5c60416a809dd2a1"
+local_modifications = false
+version_lineage = [
+    "ab626801f8011325173b66ffb1a0182fa3261d515788851b5c60416a809dd2a1",
+]
+merge_base_snapshot = "ab626801f8011325173b66ffb1a0182fa3261d515788851b5c60416a809dd2a1"
+deployment_profile_id = "claude_code"
+platform = "claude_code"
+profile_root_dir = ".claude"
+collection_sha = "ab626801f8011325173b66ffb1a0182fa3261d515788851b5c60416a809dd2a1"
+
+[[deployed]]
+artifact_name = "nano-banana-pro"
+artifact_type = "skill"
+from_collection = "default"
+deployed_at = "2026-04-03T15:18:00.813943"
+artifact_path = "skills/nano-banana-pro"
+content_hash = "9bae3a55758cbe7ca937077a6e90ee55ab0b0883fe99c698a5ecc0e7fecbc791"
+local_modifications = false
+version_lineage = [
+    "9bae3a55758cbe7ca937077a6e90ee55ab0b0883fe99c698a5ecc0e7fecbc791",
+]
+merge_base_snapshot = "9bae3a55758cbe7ca937077a6e90ee55ab0b0883fe99c698a5ecc0e7fecbc791"
+deployment_profile_id = "claude_code"
+platform = "claude_code"
+profile_root_dir = ".claude"
+collection_sha = "9bae3a55758cbe7ca937077a6e90ee55ab0b0883fe99c698a5ecc0e7fecbc791"
+
+[[deployed]]
+artifact_name = "nano-banana"
+artifact_type = "skill"
+from_collection = "default"
+deployed_at = "2026-04-03T15:19:25.905608"
+artifact_path = "skills/nano-banana"
+content_hash = "52227e4869035e53d9abef6017eb289196207a8eb9d341949eaf8e3d500cc562"
+local_modifications = false
+version_lineage = [
+    "52227e4869035e53d9abef6017eb289196207a8eb9d341949eaf8e3d500cc562",
+]
+merge_base_snapshot = "52227e4869035e53d9abef6017eb289196207a8eb9d341949eaf8e3d500cc562"
+deployment_profile_id = "claude_code"
+platform = "claude_code"
+profile_root_dir = ".claude"
+collection_sha = "52227e4869035e53d9abef6017eb289196207a8eb9d341949eaf8e3d500cc562"
+
+[[deployed]]
+artifact_name = "documentation-writer"
+artifact_type = "agent"
+from_collection = "default"
+deployed_at = "2026-04-03T15:20:24.055848"
+artifact_path = "agents/documentation-writer.md"
+content_hash = "0cec42da93ca463bb3b556534f1de606520e62d88a062a0c42662505fb92e8de"
+local_modifications = false
+version_lineage = [
+    "0cec42da93ca463bb3b556534f1de606520e62d88a062a0c42662505fb92e8de",
+]
+merge_base_snapshot = "0cec42da93ca463bb3b556534f1de606520e62d88a062a0c42662505fb92e8de"
+deployment_profile_id = "claude_code"
+platform = "claude_code"
+profile_root_dir = ".claude"
+collection_sha = "0cec42da93ca463bb3b556534f1de606520e62d88a062a0c42662505fb92e8de"
+
+[[deployed]]
+artifact_name = "technical-writer"
+artifact_type = "agent"
+from_collection = "default"
+deployed_at = "2026-04-03T15:20:49.155412"
+artifact_path = "agents/technical-writer.md"
+content_hash = "c1cd9ec30155d2ec59f5cb74a21d4569e743435b779e36e45acbef9a479d6357"
+local_modifications = false
+version_lineage = [
+    "c1cd9ec30155d2ec59f5cb74a21d4569e743435b779e36e45acbef9a479d6357",
+]
+merge_base_snapshot = "c1cd9ec30155d2ec59f5cb74a21d4569e743435b779e36e45acbef9a479d6357"
+deployment_profile_id = "claude_code"
+platform = "claude_code"
+profile_root_dir = ".claude"
+collection_sha = "c1cd9ec30155d2ec59f5cb74a21d4569e743435b779e36e45acbef9a479d6357"
+
+[[deployed]]
+artifact_name = "content-curator"
+artifact_type = "agent"
+from_collection = "default"
+deployed_at = "2026-04-03T15:24:44.190366"
+artifact_path = "agents/content-curator.md"
+content_hash = "71fcaa5a22397018d2db8f38d36248a308e1d16c5a202fb00be8ae7d402d2ba2"
+local_modifications = false
+version_lineage = [
+    "71fcaa5a22397018d2db8f38d36248a308e1d16c5a202fb00be8ae7d402d2ba2",
+]
+merge_base_snapshot = "71fcaa5a22397018d2db8f38d36248a308e1d16c5a202fb00be8ae7d402d2ba2"
+deployment_profile_id = "claude_code"
+platform = "claude_code"
+profile_root_dir = ".claude"
+collection_sha = "71fcaa5a22397018d2db8f38d36248a308e1d16c5a202fb00be8ae7d402d2ba2"
+
+[[deployed]]
+artifact_name = "se-technical-writer"
+artifact_type = "agent"
+from_collection = "default"
+deployed_at = "2026-04-03T15:25:46.405447"
+artifact_path = "agents/se-technical-writer.md"
+content_hash = "17ef5ef76006c41c54d29051fbd139c81277330d71b87cd17caef1e8e8e73cc1"
+local_modifications = false
+version_lineage = [
+    "17ef5ef76006c41c54d29051fbd139c81277330d71b87cd17caef1e8e8e73cc1",
+]
+merge_base_snapshot = "17ef5ef76006c41c54d29051fbd139c81277330d71b87cd17caef1e8e8e73cc1"
+deployment_profile_id = "claude_code"
+platform = "claude_code"
+profile_root_dir = ".claude"
+collection_sha = "17ef5ef76006c41c54d29051fbd139c81277330d71b87cd17caef1e8e8e73cc1"
+
+[[deployed]]
+artifact_name = "content-research-writer"
+artifact_type = "skill"
+from_collection = "default"
+deployed_at = "2026-04-03T15:27:58.094574"
+artifact_path = "skills/content-research-writer"
+content_hash = "de7e9085e875a651f209c826d1a5e7dd5f2436fb38fe565ef76b54492c1a0c22"
+local_modifications = false
+merge_base_snapshot = "de7e9085e875a651f209c826d1a5e7dd5f2436fb38fe565ef76b54492c1a0c22"
+deployment_profile_id = "claude_code"
+platform = "claude_code"
+profile_root_dir = ".claude"
+collection_sha = "de7e9085e875a651f209c826d1a5e7dd5f2436fb38fe565ef76b54492c1a0c22"
