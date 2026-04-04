@@ -8,6 +8,17 @@ Static-first technical blog focused on AI agents, agentic SDLC, technical leader
 
 **Not** a generic blog or portfolio — this is a technical publication for the agentic era, authored by a practicing technical executive / builder.
 
+## Two Modes of Work
+
+This repo serves two workflows. Use nested CLAUDE.md files for context:
+
+1. **Site development** (Astro, React, Tailwind) — see `src/CLAUDE.md`
+2. **Content authoring** (blog posts, series, editorial) — see `docs/CLAUDE.md` and `src/content/CLAUDE.md`
+
+External directories provide research and drafting context:
+- `Blogs/` (PKM) — drafts, series materials, reviews, voice guidance
+- `MeatyBrain/` (PKM root) — research vault, Workflow OS, Agentic SDLC notes
+
 ## Tech Stack
 
 | Technology | Purpose |
@@ -17,7 +28,6 @@ Static-first technical blog focused on AI agents, agentic SDLC, technical leader
 | **Tailwind CSS v4** | Styling (`@import "tailwindcss"`, `@theme` blocks) |
 | **MDX** | Content authoring with embedded components |
 | **Nanostores** | Cross-island state (theme, performance mode) |
-| **Lucide React** | Icon library |
 | **Zod** | Content schema validation (via Astro collections) |
 | **TypeScript** | Strict mode throughout |
 
@@ -34,109 +44,19 @@ Static-first technical blog focused on AI agents, agentic SDLC, technical leader
 | `npm run preview` | Preview production build |
 | `npm run check` | Run Astro type checking |
 
-## Architecture
+## Content Collections (Quick Reference)
 
-### Content Collections (Astro Content Layer API)
+Canonical schema: `src/content.config.ts` (NOT `src/content/config.ts`).
 
-Collections are defined in `src/content.config.ts` (NOT `src/content/config.ts` — Astro 6 requires the file at `src/content.config.ts`). A copy exists at `src/content/config.ts` for reference but the canonical location is the root-level one.
+Three collections: **posts** (essays/field notes), **projects** (portfolio artifacts), **series** (multi-post sequences). All in `src/content/` as `.mdx`.
 
-Three collections:
-- **posts** (`src/content/posts/`) — essays and field notes (`.mdx`)
-- **projects** (`src/content/projects/`) — portfolio artifacts (`.mdx`)
-- **series** (`src/content/series/`) — multi-post sequences (`.mdx`)
-
-Content API usage:
-```ts
-import { getCollection, render } from 'astro:content';
-const posts = await getCollection('posts');
-const { Content } = await render(entry);
-// entry.id = slug derived from filename
-// entry.data = validated frontmatter
-```
-
-### Directory Structure
-
-```
-src/
-  components/
-    global/       # Navigation, Footer, ThemeToggle, ModeToggle, SearchBox
-    interactive/  # React islands: InteractiveNetwork, AgenticDiagram, etc.
-    content/      # Callout, TagList, RelatedContent, ReadingPathNav
-    cards/        # EssayCard, ProjectCard, SeriesCard, SiteLinkCard
-    ui/           # Badge, Button, MetadataRow
-  content/        # MDX content files (posts/, projects/, series/)
-  data/           # Site config, taxonomy, external-sites, portfolio
-    site.ts       # Central config: title, nav, social, disclaimer
-    taxonomy.ts   # Categories, tag registry, topic hubs
-  layouts/        # BaseLayout, PostLayout, ProjectLayout, SeriesLayout, PageLayout
-  lib/            # Helpers: content.ts, seo.ts, tags.ts, search.ts, reading-paths.ts
-  pages/          # Astro routes
-  store/          # Nanostores: themeStore.ts, performanceStore.ts (re-export)
-  styles/         # global.css (Tailwind v4)
-```
-
-### Data Flow
-
-- **Site config** lives in `src/data/site.ts` — titles, nav, social links, disclaimer
-- **Taxonomy** in `src/data/taxonomy.ts` — 7 categories, ~30 curated tags, topic hubs
-- **External sites** in `src/data/external-sites.ts` — for Other Sites page
-- **Portfolio items** in `src/data/portfolio.ts` — for Portfolio page
-
-### State Management
-
-Uses Nanostores for cross-island state:
-- `$theme` — `'light' | 'dark'`, persisted to localStorage
-- `$performanceMode` — `'rich' | 'lite'`, persisted to localStorage
-- Theme is initialized via inline script in BaseLayout to prevent flash
-
-### Interactive Islands
-
-React components in `src/components/interactive/` are mounted with `client:idle` or `client:visible`. All must:
-- Honor `$performanceMode` (provide static fallback in lite mode)
-- Not block core content comprehension
-- Degrade gracefully without hydration
-
-## Content Authoring
-
-### Adding a Post
-
-Create `src/content/posts/my-slug.mdx` with required frontmatter:
-
-```yaml
----
-title: "Post Title"
-excerpt: "One-line description"
-date: 2026-03-20
-readTime: "8 min"
-contentType: essay  # or field-note
-category: "Agentic SDLC"  # one of 7 categories
-tags: ["agent-ready repos", "context engineering"]  # 3-6 from registry
-status: published  # draft | published | evergreen
----
-```
-
-Optional: `series`, `seriesOrder`, `featured`, `whyItMatters`, `leaderTakeaway`, `relatedSlugs`
-
-### Categories (fixed set)
-
-AI Agents, Agentic SDLC, Technical Leadership, CTO, Architecture, Platform Engineering, Projects
-
-### Tags
-
-Controlled registry in `src/data/taxonomy.ts`. Prefer 3-6 per post. Only use tags that recur.
-
-## Tailwind v4 Notes
-
-- Uses `@import "tailwindcss"` (not `@tailwind` directives)
-- Custom design tokens defined via `@theme { }` blocks in `global.css`
-- Dark mode via `.dark` class on `<html>`
-- Standard utility classes (`bg-slate-900`, `text-white`, etc.) still work
+For full content authoring guidance, see `src/content/CLAUDE.md`.
 
 ## Deployment
 
 - **GitHub Pages** via `.github/workflows/deploy.yml`
 - Triggers on push to `main` or manual dispatch
-- Site URL: `https://signaltosystem.com` (configurable in `astro.config.mjs`)
+- Site URL: `https://signaltosystem.com`
 - CI checks on PRs via `.github/workflows/ci.yml`
 
 ## Key Files
@@ -149,12 +69,36 @@ Controlled registry in `src/data/taxonomy.ts`. Prefer 3-6 per post. Only use tag
 | `src/data/taxonomy.ts` | Categories, tags, topic hubs |
 | `src/layouts/BaseLayout.astro` | HTML shell, meta, theme init, nav, footer |
 | `src/styles/global.css` | Tailwind v4 theme, prose styles, utilities |
-| `src/store/themeStore.ts` | Theme and performance mode state |
 | `public/llms.txt` | Machine-readable site guidance |
 | `AGENTS.md` | Machine-readable repo guidance |
 
+## Context Files (Progressive Disclosure)
+
+Read these only when relevant to the task at hand:
+
+| File | When to Read |
+|------|-------------|
+| `.claude/context/key-context/agent-teams-patterns.md` | Delegating to multiple agents or designing agent workflows |
+| `.claude/context/key-context/context-loading-playbook.md` | Optimizing what context to load for agent sessions |
+| `.claude/context/key-context/layered-context-governance.md` | Working with multi-tier context strategy |
+| `.claude/context/extracted/agent-delegation-patterns.md` | Choosing between Agent tool patterns |
+| `.claude/context/extracted/layered-context-model.md` | Understanding context layering theory |
+| `.claude/context/development-tracking-playbook.md` | Tracking multi-phase development work |
+| `.claude/specs/claude-fundamentals-spec.md` | Generic Claude Code patterns and best practices |
+| `.claude/specs/multi-model-usage-spec.md` | Multi-model orchestration (Gemini, Codex, etc.) |
+| `.claude/specs/doc-policy-spec.md` | Documentation creation rules and anti-patterns |
+
 ## Known Issues
 
-- `z` from `astro:content` shows as deprecated in editor — this is a Tailwind/Astro tooling conflict, builds fine
+- `z` from `astro:content` shows as deprecated in editor — Tailwind/Astro tooling conflict, builds fine
 - `astro.config.mjs` may show a Vite plugin type mismatch — cosmetic, does not affect build
 - `astro:content` module resolution errors in editor are expected — types generate at build time (`npm run build` or `astro sync`)
+
+## Available Skills
+
+When writing blog content, use these skills:
+- `/voice-writer` — draft or edit in Nick's authentic voice (reads `My Voice.md`)
+- `/humanizer` — reduce AI-detectable patterns in a draft
+- `/blog-drafter` — full blog drafting workflow from spec to MDX
+
+Other useful skills: `/notebooklm` (source-grounded research), `/gemini-cli` (second opinions, web search), `/nano-banana` (generate diagrams/images), `/content-research-writer` (research + writing)

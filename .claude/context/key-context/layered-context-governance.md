@@ -31,7 +31,6 @@ Defines the ratified context model and budget guardrails.
 - Required checks:
   - No dead links from entry `CLAUDE.md` files.
   - No references to missing rule files.
-  - API claims in key-context validated against `skillmeat/api/openapi.json`.
 
 ## Change Policy
 
