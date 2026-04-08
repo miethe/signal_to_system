@@ -42,27 +42,11 @@ That's the paradox, and it's not a tooling problem.
 
 Before I diagnose the structural issue, a clarification on what AI coding tools actually deliver right now. The productivity tiers below describe **current state**: what you get without governance, without structured context injection, without the framework this series proposes. Think of them as a map of where the problems concentrate when teams adopt tools without adapting the system around them.
 
-**High-confidence gains (2-5x+ on the specific task):**
-
-- Boilerplate generation and scaffolding
-- Test case generation (especially for well-specified interfaces)
-- Documentation drafting
-- Code translation between similar languages/frameworks
-- Regex, SQL, and other "write once, verify once" artifacts
-
-**Moderate gains (meaningful but not transformative):**
-
-- Bug investigation with good error context
-- Refactoring within well-typed codebases
-- API integration with standard patterns
-
-**Negligible-to-negative net impact without process changes:**
-
-- Greenfield architecture decisions
-- Cross-service integration work
-- Anything requiring shared context the agent doesn't have
-- Performance-sensitive code where "plausible" isn't "correct"
-- Security-critical paths
+| Impact tier | Where it lands | Typical tasks |
+| --- | --- | --- |
+| **High-confidence gains** (2–5x+ on the specific task) | Clear spec, small blast radius | Boilerplate and scaffolding; test generation for well-specified interfaces; documentation drafting; code translation between similar languages/frameworks; regex, SQL, and other "write once, verify once" artifacts |
+| **Moderate gains** (meaningful but not transformative) | Context is recoverable, but not free | Bug investigation with good error context; refactoring within well-typed codebases; API integration with standard patterns |
+| **Negligible-to-negative net impact** (without process changes) | Implicit context dominates; "plausible" isn't "correct" | Greenfield architecture decisions; cross-service integration work; anything requiring shared context the agent doesn't have; performance-sensitive code; security-critical paths |
 
 AI tools compress *execution* time on tasks where the specification is clear and the blast radius is small. The higher you go in abstraction, from "write this function" to "design this system" to "coordinate this release," the less the tools help, and the more the surrounding governance matters.
 

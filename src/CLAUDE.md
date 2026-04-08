@@ -47,6 +47,9 @@ React components in `components/interactive/` mount with `client:idle` or `clien
 - Uses `@import "tailwindcss"` (not `@tailwind` directives)
 - Custom design tokens via `@theme { }` blocks in `styles/global.css`
 - Dark mode via `.dark` class on `<html>`
+- **`@tailwindcss/typography` is NOT installed.** Do not use `prose`, `prose-slate`, `prose-invert`, or `prose-headings:*` / `prose-p:*` modifier classes — they compile to nothing and leave content unstyled (no heading margins, broken tables, etc.).
+- Long-form article/MDX body content must use the `.prose-custom` class defined in `styles/global.css`. All MDX-rendering layouts (`PostLayout`, `ProjectLayout`, `SeriesLayout`, `PageLayout`) wrap `<slot />` in `<div class="prose-custom max-w-none">`. Preserve that pattern when creating new layouts.
+- To extend prose styles (new element, new variant), edit the `.prose-custom` block in `styles/global.css` rather than reaching for `prose-*` utility modifiers.
 
 ## Content API
 

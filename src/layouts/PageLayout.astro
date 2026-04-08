@@ -58,20 +58,7 @@ const widthClass: Record<string, string> = {
       )
     }
 
-    <div
-      class:list={[
-        'prose prose-slate dark:prose-invert max-w-none',
-        'prose-headings:font-bold prose-headings:tracking-tight',
-        'prose-p:leading-relaxed',
-        'prose-a:text-[var(--accent)] prose-a:no-underline hover:prose-a:text-[var(--accent-hover)] hover:prose-a:underline',
-        'prose-strong:text-[var(--text-primary)]',
-        'prose-code:rounded prose-code:bg-[var(--code-bg)] prose-code:px-1.5 prose-code:py-0.5 prose-code:text-sm prose-code:text-[var(--code-text)]',
-        'prose-pre:border prose-pre:border-[var(--code-border)] prose-pre:bg-[var(--code-bg-block)]',
-        'prose-blockquote:border-l-[var(--accent)] prose-blockquote:text-[var(--text-tertiary)]',
-        'prose-hr:border-[var(--border-subtle)]',
-        className,
-      ]}
-    >
+    <div class:list={['prose-custom max-w-none', className]}>
       <slot />
     </div>
   </div>

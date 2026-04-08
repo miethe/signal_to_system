@@ -48,6 +48,18 @@ Required: `title`, `excerpt`, `date`, `type`, `tags`, `visibility`
 Required: `title`, `excerpt`, `status`
 - Status: active, planned, complete
 
+## Formatting Conventions
+
+Posts are rendered through `.prose-custom` (defined in `src/styles/global.css`). Keep these in mind when drafting MDX:
+
+- **Use real markdown tables for comparative data.** If you catch yourself writing three consecutive `**Bold label:**` blocks each followed by a bullet list, collapse them into a `| col | col |` table — `.prose-custom` has proper `thead`/`tbody` styling, and tables survive mobile widths better than stacked bold-lists.
+- **Heading spacing is automatic.** `h2` gets a top margin and a subtle bottom border; `h3` gets a smaller top margin. Don't add blank `<br />` tags or extra horizontal rules to force separation.
+- **Paragraph spacing is automatic.** One blank line between paragraphs is correct. Don't wrap prose in `<div>` tags — that strips the prose styles.
+- **Callouts** use the `<Callout type="info|why-it-matters|leader-takeaway|warning|success|danger" title="...">` component (imported from `../../components/content/Callout`). Prefer callouts over blockquotes for "key insight" framing; reserve blockquotes for actual quoted material or single-line thesis statements.
+- **Inline definitions** use `<dfn>**Term**</dfn>` for first mentions of coined terminology (e.g. `<dfn>**Cognitive Debt**</dfn>`).
+- **Footnotes** use the standard `[^key]` / `[^key]: ...` syntax — rendered at the bottom of the post automatically.
+- **Do NOT use `prose-*` Tailwind modifier classes in MDX.** The `@tailwindcss/typography` plugin is not installed; those classes are no-ops. All styling happens via `.prose-custom` at the layout level.
+
 ## Editorial Workflow
 
 For drafting workflow, voice guidance, and research integration, see `docs/CLAUDE.md`.
