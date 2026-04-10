@@ -40,11 +40,11 @@ const completeSeries = sortedSeries.filter((s) => s.data.status === 'complete');
 >
   <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
     <!-- Page header -->
-    <header class="mb-12 border-b border-zinc-200 dark:border-zinc-800 pb-10">
-      <h1 class="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl mb-4">
+    <header class="mb-16 pb-8">
+      <h1 class="font-serif text-5xl font-bold tracking-tight text-[var(--text-primary)] sm:text-6xl mb-6">
         Series
       </h1>
-      <p class="text-xl text-zinc-600 dark:text-zinc-400 max-w-2xl leading-relaxed">
+      <p class="text-xl text-[var(--text-secondary)] max-w-2xl leading-relaxed">
         Structured multi-part explorations of complex topics. Each series builds a complete picture across several interconnected essays.
       </p>
     </header>
@@ -55,7 +55,7 @@ const completeSeries = sortedSeries.filter((s) => s.data.status === 'complete');
         <section>
           <div class="flex items-center gap-3 mb-6">
             <span class="h-2 w-2 rounded-full bg-emerald-500" aria-hidden="true" />
-            <h2 class="text-sm font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
+            <h2 class="font-mono text-xs font-bold uppercase tracking-widest text-[var(--text-disabled)]">
               Active — {activeSeries.length}
             </h2>
           </div>
@@ -79,7 +79,7 @@ const completeSeries = sortedSeries.filter((s) => s.data.status === 'complete');
         <section>
           <div class="flex items-center gap-3 mb-6">
             <span class="h-2 w-2 rounded-full bg-sky-500" aria-hidden="true" />
-            <h2 class="text-sm font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
+            <h2 class="font-mono text-xs font-bold uppercase tracking-widest text-[var(--text-disabled)]">
               Complete — {completeSeries.length}
             </h2>
           </div>
@@ -103,7 +103,7 @@ const completeSeries = sortedSeries.filter((s) => s.data.status === 'complete');
         <section>
           <div class="flex items-center gap-3 mb-6">
             <span class="h-2 w-2 rounded-full bg-amber-500" aria-hidden="true" />
-            <h2 class="text-sm font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
+            <h2 class="font-mono text-xs font-bold uppercase tracking-widest text-[var(--text-disabled)]">
               Planned — {plannedSeries.length}
             </h2>
           </div>

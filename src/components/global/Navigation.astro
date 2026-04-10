@@ -7,7 +7,7 @@ import SearchBox from './SearchBox';
 
 <header
   id="site-header"
-  class="sticky top-0 z-50 w-full border-b border-[var(--border-subtle)] bg-[var(--bg-base)]/80 backdrop-blur-md backdrop-saturate-150 transition-shadow"
+  class="sticky top-0 z-50 w-full bg-[var(--bg-surface)]/80 backdrop-blur-[20px] backdrop-saturate-150 transition-shadow"
 >
   <nav
     class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8"
@@ -19,16 +19,13 @@ import SearchBox from './SearchBox';
       class="group flex items-center gap-2.5 text-[var(--text-primary)] no-underline transition-opacity hover:opacity-80"
       aria-label={site.title}
     >
-      <!-- Monogram mark -->
-      <span
-        class="flex h-8 w-8 items-center justify-center rounded-md bg-indigo-600 text-sm font-black tracking-tighter text-white"
-        aria-hidden="true"
-      >
-        S2S
-      </span>
-      <span class="hidden text-base font-bold tracking-tight sm:block">
-        Signal <span class="text-indigo-400">to</span> System
-      </span>
+      <img
+        src="/assets/s2s.svg"
+        alt="Signal to System Logo"
+        class="h-8 w-auto object-contain origin-left scale-[1.5]"
+        style="height: 32px; width: auto;"
+        loading="eager"
+      />
     </a>
 
     <!-- Desktop nav links -->
@@ -94,7 +91,7 @@ import SearchBox from './SearchBox';
   <!-- Mobile menu -->
   <div
     id="mobile-menu"
-    class="hidden border-t border-[var(--border-subtle)] bg-[var(--bg-base)] px-4 pb-4 pt-2 lg:hidden"
+    class="hidden bg-[var(--bg-surface)] px-4 pb-4 pt-2 lg:hidden"
     role="navigation"
     aria-label="Mobile navigation"
   >
@@ -144,7 +141,7 @@ import SearchBox from './SearchBox';
   const header = document.getElementById('site-header');
   const observer = new IntersectionObserver(
     ([entry]) => {
-      header?.classList.toggle('shadow-lg', !entry.isIntersecting);
+      header?.classList.toggle('shadow-ambient', !entry.isIntersecting);
     },
     { rootMargin: '-1px 0px 0px 0px', threshold: 0 }
   );

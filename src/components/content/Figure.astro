@@ -1,0 +1,48 @@
+---
+/**
+ * Figure — editorial "engineering plate" treatment for illustrations.
+ *
+ * Renders a warm-paper plate with corner tick marks, suitable for
+ * schematic / blueprint-style figures. The plate stays light in both
+ * themes on purpose: in dark mode it reads as a luminous drawing card
+ * floating on the navy page.
+ *
+ * Variants:
+ *   - default: inline article figure with mono "Fig · NN" label + caption
+ *   - hero:    frontispiece plate (no caption, larger padding)
+ */
+interface Props {
+  src: string;
+  alt: string;
+  caption?: string;
+  number?: string;
+  variant?: 'default' | 'hero';
+}
+
+const { src, alt, caption, number, variant = 'default' } = Astro.props;
+const isHero = variant === 'hero';
+const showCaption = !isHero && (number || caption);
+---
+
+<figure class:list={['figure-plate', isHero && 'figure-plate--hero']}>
+  <span class="figure-plate__corner figure-plate__corner--tl" aria-hidden="true"></span>
+  <span class="figure-plate__corner figure-plate__corner--tr" aria-hidden="true"></span>
+  <span class="figure-plate__corner figure-plate__corner--bl" aria-hidden="true"></span>
+  <span class="figure-plate__corner figure-plate__corner--br" aria-hidden="true"></span>
+
+  <div class="figure-plate__frame">
+    <img
+      src={src}
+      alt={alt}
+      loading={isHero ? 'eager' : 'lazy'}
+      decoding="async"
+    />
+  </div>
+
+  {showCaption && (
+    <figcaption class="figure-plate__caption">
+      {number && <span class="figure-plate__label">Fig · {number}</span>}
+      {caption && <span class="figure-plate__text">{caption}</span>}
+    </figcaption>
+  )}
+</figure>

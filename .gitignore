@@ -17,6 +17,7 @@ node_modules/
 .idea/
 *.swp
 *.swo
+*.code-workspace
 
 # OS
 .DS_Store

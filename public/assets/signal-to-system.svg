@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 2000 1120" width="2000" height="1120" font-family="Helvetica Neue, Helvetica, Arial, sans-serif">
+  <!-- Transparent background -->
+
+  <!-- SIGNAL -->
+  <text x="1000" y="280" text-anchor="middle" font-size="270" font-weight="300" fill="#5B6B7A" letter-spacing="6">SIGNAL</text>
+
+  <!-- TO -->
+  <text x="640" y="600" text-anchor="middle" font-size="220" font-weight="300" fill="#5B6B7A" letter-spacing="6">TO</text>
+
+  <!-- ====== ARROW GRAPHIC ====== -->
+  <g transform="translate(830,400) scale(1.15)" stroke="#5B6B7A" fill="#5B6B7A">
+
+    <!-- ===== Thin trace layer (left side) ===== -->
+    <g stroke-width="5" fill="none">
+      <!-- Upper dot terminal -->
+      <line x1="10" y1="30" x2="560" y2="30"/>
+      <!-- Lower dot trace: right, up, left -->
+      <path d="M40 110 H180 V70 H140"/>
+      <!-- Middle stepped trace to the merge -->
+      <path d="M180 110 H300 V90 H380 V110 H470"/>
+    </g>
+    <!-- Dot terminals (filled) -->
+    <circle cx="0" cy="30" r="9" stroke="none"/>
+    <circle cx="30" cy="110" r="9" stroke="none"/>
+    <!-- Thin arrow heads (left-pointing) -->
+    <polygon points="95,30 120,18 120,42" stroke="none"/>
+    <polygon points="145,70 170,58 170,82" stroke="none"/>
+
+    <!-- ===== Three concentric L-shaped outlined tubes (right side) =====
+         Each tube is drawn as a closed outline path so the stroke forms the tube walls.
+         Lane spacing = 22px. Tubes enter horizontally, turn 90° down, and end in an arrow head.
+    -->
+    <g fill="none" stroke="#5B6B7A" stroke-width="5" stroke-linejoin="miter" stroke-linecap="butt">
+
+      <!-- Tube A (innermost, shortest): lane 1 -->
+      <!-- Horizontal run: y 120..138 ; Vertical run: x 560..578 ; arrow tip at y=235 -->
+      <path d="M300 120
+               H578
+               V210
+               L595 210
+               L569 250
+               L543 210
+               L560 210
+               V138
+               H300
+               Z"/>
+
+      <!-- Tube B (middle): lane 2, offset outward by 22px -->
+      <path d="M360 98
+               H600
+               V232
+               L617 232
+               L591 272
+               L565 232
+               L582 232
+               V116
+               H360
+               Z"/>
+
+      <!-- Tube C (outermost, tallest — comes from the very top trace y=30): lane 3 -->
+      <path d="M420 20
+               H622
+               V254
+               L639 254
+               L613 294
+               L587 254
+               L604 254
+               V38
+               H420
+               Z"/>
+    </g>
+  </g>
+
+  <!-- SYSTEM -->
+  <text x="1000" y="900" text-anchor="middle" font-size="300" font-weight="900" fill="#2F4858" letter-spacing="6">SYSTEM</text>
+
+  <!-- Tagline -->
+  <text x="1000" y="1020" text-anchor="middle" font-size="62" font-weight="400" fill="#2F4858" letter-spacing="2">A Technical Journal for the Agentic Era</text>
+</svg>

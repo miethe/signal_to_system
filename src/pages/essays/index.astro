@@ -40,11 +40,11 @@ const fieldNotes = filtered.filter((p) => p.data.contentType === 'field-note');
 >
   <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
     <!-- Page header -->
-    <header class="mb-12 border-b border-zinc-200 dark:border-zinc-800 pb-10">
-      <h1 class="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl mb-4">
+    <header class="mb-16 pb-8">
+      <h1 class="font-serif text-5xl font-bold tracking-tight text-[var(--text-primary)] sm:text-6xl mb-6">
         Essays
       </h1>
-      <p class="text-xl text-zinc-600 dark:text-zinc-400 max-w-2xl leading-relaxed">
+      <p class="text-xl text-[var(--text-secondary)] max-w-2xl leading-relaxed">
         Long-form writing on the systems, decisions, and architectures that shape modern software. {totalCount} published{categoryParam ? ` in ${categoryParam}` : ''}.
       </p>
     </header>
@@ -95,7 +95,7 @@ const fieldNotes = filtered.filter((p) => p.data.contentType === 'field-note');
         {essays.length > 0 && (
           <section>
             {fieldNotes.length > 0 && (
-              <h2 class="text-sm font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 mb-6">
+              <h2 class="font-mono text-xs font-bold uppercase tracking-widest text-[var(--text-disabled)] mb-8">
                 Essays — {essays.length}
               </h2>
             )}
@@ -120,7 +120,7 @@ const fieldNotes = filtered.filter((p) => p.data.contentType === 'field-note');
         <!-- Field Notes -->
         {fieldNotes.length > 0 && (
           <section>
-            <h2 class="text-sm font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 mb-6">
+            <h2 class="font-mono text-xs font-bold uppercase tracking-widest text-[var(--text-disabled)] mb-8">
               Field Notes — {fieldNotes.length}
             </h2>
             <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">

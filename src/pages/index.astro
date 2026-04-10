@@ -79,32 +79,32 @@ const topicIconColors: Record<string, string> = {
   <!-- =========================================================
        HERO
        ========================================================= -->
-  <section class="relative overflow-hidden border-b border-[var(--border-subtle)] bg-slate-950 dark:bg-slate-950">
+  <section class="relative overflow-hidden bg-[var(--bg-base)]">
     <!-- Network visualization background -->
     <div class="absolute inset-0 z-0 opacity-60" aria-hidden="true">
       <InteractiveNetwork className="w-full h-full" client:idle />
     </div>
 
     <!-- Radial gradient overlay for readability -->
-    <div class="absolute inset-0 z-10 bg-gradient-to-b from-slate-950/30 via-slate-950/70 to-slate-950" aria-hidden="true" />
+    <div class="absolute inset-0 z-10 bg-gradient-to-b from-[var(--bg-base)]/30 via-[var(--bg-base)]/70 to-[var(--bg-base)]" aria-hidden="true" />
 
     <!-- Content (hero is always light-on-dark regardless of theme) -->
-    <div class="relative z-20 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pt-28 pb-24 sm:pt-36 sm:pb-32">
+    <div class="relative z-20 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pt-28 pb-24 sm:pt-40 sm:pb-36">
       <!-- Eyebrow -->
-      <p class="mb-4 inline-flex items-center gap-2 rounded-full border border-indigo-500/30 bg-indigo-500/10 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-indigo-400">
-        <span class="h-1.5 w-1.5 rounded-full bg-indigo-400 animate-pulse" aria-hidden="true" />
+      <p class="font-mono mb-6 inline-flex items-center gap-2 rounded-full border border-[var(--border-subtle)] bg-[var(--accent-subtle)] px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[var(--accent-text)]">
+        <span class="h-1.5 w-1.5 rounded-full bg-[var(--accent)] animate-pulse" aria-hidden="true" />
         Technical Publication
       </p>
 
-      <h1 class="text-5xl font-bold tracking-tight text-zinc-50 sm:text-6xl lg:text-7xl mb-6 max-w-3xl leading-none">
+      <h1 class="font-serif text-5xl font-bold tracking-tight text-[var(--text-primary)] sm:text-7xl lg:text-[5rem] mb-8 max-w-4xl leading-[1.05]">
         Signal to
-        <span class="bg-gradient-to-r from-indigo-400 via-violet-400 to-sky-400 bg-clip-text text-transparent"> System</span>
+        <span class="italic text-[var(--accent)]"> System</span>
       </h1>
 
-      <p class="text-xl text-zinc-300 max-w-2xl leading-relaxed mb-4">
+      <p class="text-xl text-[var(--text-secondary)] max-w-2xl leading-relaxed mb-4">
         {site.subtitle}
       </p>
-      <p class="text-base text-zinc-400 max-w-xl leading-relaxed mb-10">
+      <p class="text-base text-[var(--text-tertiary)] max-w-xl leading-relaxed mb-12">
         Long-form essays and practical frameworks for technical executives, architects, and builders navigating the agent-era shift in software delivery.
       </p>
 
@@ -128,7 +128,7 @@ const topicIconColors: Record<string, string> = {
   <!-- =========================================================
        POSITIONING / SIGNAL STATEMENT
        ========================================================= -->
-  <section class="bg-[var(--bg-base)] border-b border-[var(--border-subtle)]">
+  <section class="bg-[var(--bg-base)] pb-8 pt-12">
     <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16">
       <dl class="grid grid-cols-1 gap-8 sm:grid-cols-3">
         {[
@@ -148,8 +148,8 @@ const topicIconColors: Record<string, string> = {
             desc: 'From agent context engineering to org design to platform strategy — the full technical executive stack.',
           },
         ].map(({ label, value, desc }) => (
-          <div class="border-l-2 border-indigo-500/40 pl-6">
-            <dt class="text-xs font-semibold uppercase tracking-widest text-[var(--text-tertiary)] mb-1">{label}</dt>
+          <div class="border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 rounded-2xl shadow-sm transition-all hover:border-[var(--accent)] hover:shadow-ambient">
+            <dt class="font-mono text-[11px] font-bold uppercase tracking-widest text-[var(--accent)] mb-2">{label}</dt>
             <dd class="text-2xl font-bold text-[var(--text-primary)] mb-2">{value}</dd>
             <p class="text-sm text-[var(--text-secondary)] leading-relaxed">{desc}</p>
           </div>
@@ -159,134 +159,145 @@ const topicIconColors: Record<string, string> = {
   </section>
 
   <!-- =========================================================
-       FEATURED ESSAYS
-       ========================================================= -->
-  {recentPosts.length > 0 && (
-    <section class="bg-[var(--bg-base)] border-b border-[var(--border-subtle)]">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-20">
-        <div class="flex items-end justify-between mb-10">
-          <div>
-            <p class="text-xs font-semibold uppercase tracking-widest text-[var(--accent)] mb-2">Featured</p>
-            <h2 class="text-3xl font-bold tracking-tight text-[var(--text-primary)]">Essential Reading</h2>
-          </div>
-          <a
-            href="/essays/"
-            class="hidden sm:inline-flex items-center gap-1.5 text-sm font-medium text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors"
-          >
-            All essays
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
-            </svg>
-          </a>
-        </div>
-
-        <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
-          {recentPosts.map((post, i) => (
-            <EssayCard
-              title={post.data.title}
-              excerpt={post.data.excerpt}
-              date={post.data.date}
-              readTime={post.data.readTime}
-              category={post.data.category}
-              tags={post.data.tags}
-              slug={post.id}
-              contentType={post.data.contentType}
-              featured={i === 0}
-            />
-          ))}
-        </div>
-
-        <div class="mt-8 sm:hidden">
-          <Button href="/essays/" variant="secondary" size="md">View all essays</Button>
-        </div>
-      </div>
-    </section>
-  )}
-
-  <!-- =========================================================
-       ACTIVE SERIES
+       FEATURED SERIES
        ========================================================= -->
   {activeSeries.length > 0 && (
-    <section class="bg-[var(--bg-subtle)] border-b border-[var(--border-subtle)]">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-20">
-        <div class="flex items-end justify-between mb-10">
+    <section class="bg-[var(--bg-subtle)] py-24">
+      <div class="max-w-7xl mx-auto px-8 lg:px-12">
+        <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
           <div>
-            <p class="text-xs font-semibold uppercase tracking-widest text-violet-500 dark:text-violet-400 mb-2">Ongoing</p>
-            <h2 class="text-3xl font-bold tracking-tight text-[var(--text-primary)]">Active Series</h2>
+            <h2 class="text-4xl font-serif text-[var(--text-primary)] mb-4">Featured Series</h2>
+            <div class="h-1 w-24 bg-[var(--accent)]"></div>
           </div>
-          <a
-            href="/series/"
-            class="hidden sm:inline-flex items-center gap-1.5 text-sm font-medium text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors"
-          >
-            All series
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
-            </svg>
+          <a class="font-mono text-sm uppercase tracking-widest text-[var(--accent)] hover:text-[var(--text-primary)] transition-colors flex items-center gap-2" href="/series/">
+            View All Series <span class="material-symbols-outlined text-sm">arrow_forward</span>
           </a>
         </div>
-
-        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {activeSeries.map((s) => (
-            <SeriesCard
-              title={s.data.title}
-              excerpt={s.data.excerpt}
-              status={s.data.status}
-              slug={s.id}
-              postCount={seriesPostCounts.get(s.id) ?? 0}
-              featured={s.data.featured ?? false}
-            />
-          ))}
-        </div>
+        
+        <a href={`/series/${activeSeries[0].id}/`} class="block relative group overflow-hidden rounded-xl bg-[var(--bg-surface)] shadow-ambient border-none">
+          <div class="grid grid-cols-1 lg:grid-cols-2">
+            <div class="p-10 sm:p-12 flex flex-col justify-center relative overflow-hidden">
+              <div class="absolute top-0 left-0 w-1 h-full bg-[var(--accent)]"></div>
+              <div class="font-mono text-xs tracking-tighter text-[var(--accent)] mb-4 uppercase">Volume 01 / Deep Dive</div>
+              <h3 class="text-4xl sm:text-5xl font-serif text-[var(--text-primary)] mb-6 leading-tight group-hover:text-[var(--accent)] transition-colors">{activeSeries[0].data.title}</h3>
+              <p class="text-[var(--text-secondary)] font-sans text-lg leading-relaxed mb-8">
+                  {activeSeries[0].data.excerpt}
+              </p>
+              <div class="flex items-center gap-6">
+                  <span class="text-sm font-mono text-[var(--text-tertiary)]">{seriesPostCounts.get(activeSeries[0].id) ?? 0} Part Series</span>
+              </div>
+            </div>
+            
+            <div class="relative min-h-[400px] bg-gradient-to-tr from-[var(--bg-base)] via-[var(--bg-subtle)] to-[var(--accent-muted)]">
+                <!-- Abstract graphical fallback -->
+                <div class="absolute inset-0 opacity-20">
+                    <div class="h-full w-full bg-[linear-gradient(to_right,var(--bg-surface)_1px,transparent_1px),linear-gradient(to_bottom,var(--bg-surface)_1px,transparent_1px)] bg-[size:40px_40px]"></div>
+                </div>
+                <div class="absolute inset-0 bg-gradient-to-r from-[var(--bg-surface)] via-transparent to-transparent"></div>
+            </div>
+          </div>
+        </a>
       </div>
     </section>
   )}
 
   <!-- =========================================================
-       TOPIC HUBS
+       CORE CONTENT PILLARS
        ========================================================= -->
-  <section class="bg-[var(--bg-base)] border-b border-[var(--border-subtle)]">
-    <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-20">
-      <div class="mb-10">
-        <p class="text-xs font-semibold uppercase tracking-widest text-emerald-500 dark:text-emerald-400 mb-2">Explore by topic</p>
-        <h2 class="text-3xl font-bold tracking-tight text-[var(--text-primary)]">Coverage Areas</h2>
-        <p class="mt-2 text-[var(--text-secondary)] max-w-xl">
-          Seven interconnected domains — from AI agent architecture to platform engineering to the CTO role.
-        </p>
+  <section class="py-24 bg-[var(--bg-base)]">
+    <div class="max-w-7xl mx-auto px-8 lg:px-12">
+      <div class="mb-16">
+        <h2 class="text-sm font-mono uppercase tracking-[0.3em] text-[var(--text-tertiary)] mb-2">The Architecture</h2>
+        <h3 class="text-4xl font-serif text-[var(--text-primary)]">Core Content Pillars</h3>
       </div>
-
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {TOPIC_HUBS.map((hub) => (
-          <a
-            href={`/topics/${hub.slug}/`}
-            class={[
-              'group flex flex-col gap-3 rounded-xl border bg-gradient-to-br p-5 transition-all duration-200',
-              topicColors[hub.slug] ?? 'from-slate-100 to-slate-50 border-slate-200 hover:border-slate-400 dark:from-zinc-800/40 dark:to-zinc-800/20 dark:border-zinc-700/40 dark:hover:border-zinc-600/60',
-            ].join(' ')}
-          >
-            <div class={`w-8 h-8 ${topicIconColors[hub.slug] ?? 'text-[var(--text-tertiary)]'}`} aria-hidden="true">
-              <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-                <path d={topicIcons[hub.slug] ?? 'M12 2L2 7l10 5 10-5-10-5z'} />
-              </svg>
-            </div>
-
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {TOPIC_HUBS.slice(0, 3).map((hub, i) => (
+          <a href={`/topics/${hub.slug}/`} class={`group p-8 rounded-xl transition-all flex flex-col justify-between border-none ${i === 0 ? 'md:col-span-2 lg:col-span-2 bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)] aspect-video md:aspect-auto' : 'bg-[var(--bg-subtle)] hover:bg-[var(--bg-surface)]'}`}>
             <div>
-              <h3 class="font-semibold text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors leading-snug mb-1">
-                {hub.label}
-              </h3>
-              <p class="text-xs text-[var(--text-tertiary)] leading-relaxed line-clamp-3">
-                {hub.description}
-              </p>
+              <span class={`material-symbols-outlined text-4xl mb-6 ${topicIconColors[hub.slug] ?? 'text-[var(--accent)]'}`}>
+                  {i === 0 ? 'smart_toy' : i === 1 ? 'groups' : 'architecture'}
+              </span>
+              <h4 class="text-2xl font-serif text-[var(--text-primary)] mb-4">{hub.label}</h4>
+              <p class="text-[var(--text-secondary)] font-sans text-sm leading-relaxed">{hub.description}</p>
             </div>
-
-            <span class="mt-auto inline-flex items-center gap-1 text-xs font-medium text-[var(--text-disabled)] group-hover:text-[var(--text-secondary)] transition-colors">
-              Explore
-              <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
-              </svg>
-            </span>
+            <div class={`mt-8 font-mono text-xs uppercase tracking-widest flex items-center gap-2 ${topicIconColors[hub.slug] ?? 'text-[var(--accent)]'}`}>
+                Explore <span class="material-symbols-outlined text-xs">north_east</span>
+            </div>
           </a>
         ))}
+        
+        <!-- Pillar 4 (Special Bottom) -->
+        <div class="md:col-span-3 lg:col-span-4 p-8 rounded-xl bg-[var(--bg-base)] border border-[var(--border-subtle)] flex flex-col md:flex-row items-center justify-between gap-8 hover:border-[var(--accent)] transition-colors">
+            <div class="flex items-center gap-6">
+                <span class="material-symbols-outlined text-5xl text-[var(--text-tertiary)] opacity-50">terminal</span>
+                <div>
+                    <h4 class="text-2xl font-serif text-[var(--text-primary)] mb-1">Side Projects & Lab</h4>
+                    <p class="text-[var(--text-secondary)] font-sans text-sm">Where theory meets the metal. Open source tools and experiments from the builder's desk.</p>
+                </div>
+            </div>
+            <a href="/projects/" class="whitespace-nowrap px-6 py-3 bg-[var(--bg-surface)] text-[var(--text-primary)] font-mono text-xs uppercase tracking-widest rounded-md hover:bg-[var(--accent-subtle)] hover:text-[#000] focus:ring focus:ring-[var(--accent)] focus:outline-none transition-all">
+                Browse the Lab
+            </a>
+        </div>
       </div>
+    </div>
+  </section>
+
+  <!-- =========================================================
+       LATEST ESSAYS
+       ========================================================= -->
+  <section class="py-24 bg-[var(--bg-surface)]">
+    <div class="max-w-7xl mx-auto px-8 lg:px-12">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-16">
+            <div class="lg:col-span-4">
+                <div class="sticky top-32">
+                    <h2 class="text-4xl sm:text-5xl font-serif text-[var(--text-primary)] mb-8">Latest <br/><span class="text-[var(--accent)] italic">Essays</span></h2>
+                    <p class="text-[var(--text-secondary)] font-sans mb-8 leading-relaxed">
+                        Regular transmissions on the intersection of management, engineering, and systems thinking.
+                    </p>
+                    <div class="flex flex-col gap-4">
+                        <div class="flex items-center gap-3 text-[var(--text-tertiary)]">
+                            <span class="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"></span>
+                            <span class="font-mono text-xs uppercase tracking-widest">Deep Dives & Frameworks</span>
+                        </div>
+                         <div class="flex items-center gap-3 text-[var(--text-tertiary)]">
+                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                            <span class="font-mono text-xs uppercase tracking-widest">Field Notes</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="lg:col-span-8">
+                <div class="flex flex-col">
+                    {publishedPosts.slice(0, 5).map((post, i) => (
+                        <article class="group relative py-8 border-b border-[var(--border-subtle)] last:border-0 hover:bg-[var(--bg-subtle)] -mx-6 px-6 rounded-xl transition-colors">
+                            <div class="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 mb-4">
+                                <div class="flex gap-4 items-center">
+                                    <span class="font-mono text-[10px] text-[var(--text-tertiary)] uppercase tracking-tight">
+                                        {post.data.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                    </span>
+                                    <div class="h-px w-8 bg-[var(--border-subtle)]"></div>
+                                    <span class="px-2 py-0.5 rounded bg-[var(--accent-subtle)] text-[var(--accent)] text-[10px] font-mono uppercase tracking-widest">
+                                        {post.data.category}
+                                    </span>
+                                </div>
+                                <span class="font-mono text-[10px] text-[var(--text-tertiary)] uppercase tracking-widest">{post.data.readTime}</span>
+                            </div>
+                            <h3 class="text-3xl font-serif text-[var(--text-primary)] mb-4 group-hover:text-[var(--accent)] transition-colors">
+                                <a href={`/essays/${post.id}/`} class="focus:outline-none">
+                                    <span class="absolute inset-0" aria-hidden="true"></span>
+                                    {post.data.title}
+                                </a>
+                            </h3>
+                            <p class="text-[var(--text-secondary)] font-sans mb-6 max-w-2xl leading-relaxed">{post.data.excerpt}</p>
+                            <span class="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-[var(--text-primary)] group-hover:underline underline-offset-4 pointer-events-none">Read Full Transmission <span class="material-symbols-outlined text-sm">arrow_outward</span></span>
+                        </article>
+                    ))}
+                </div>
+            </div>
+        </div>
     </div>
   </section>
 
@@ -294,12 +305,12 @@ const topicIconColors: Record<string, string> = {
        FEATURED PROJECTS
        ========================================================= -->
   {featuredProjects.length > 0 && (
-    <section class="bg-[var(--bg-subtle)] border-b border-[var(--border-subtle)]">
+    <section class="bg-[var(--bg-subtle)]">
       <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-20">
         <div class="flex items-end justify-between mb-10">
           <div>
-            <p class="text-xs font-semibold uppercase tracking-widest text-sky-500 dark:text-sky-400 mb-2">Builds & artifacts</p>
-            <h2 class="text-3xl font-bold tracking-tight text-[var(--text-primary)]">Featured Projects</h2>
+            <p class="font-mono text-xs font-bold uppercase tracking-widest text-[var(--accent)] mb-2">Builds & artifacts</p>
+            <h2 class="font-serif text-4xl font-bold tracking-tight text-[var(--text-primary)]">Featured Projects</h2>
           </div>
           <a
             href="/projects/"
@@ -335,11 +346,11 @@ const topicIconColors: Record<string, string> = {
        ========================================================= -->
   <section class="bg-[var(--bg-base)]">
     <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-20">
-      <div class="rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-subtle)] p-8 sm:p-12 lg:flex lg:items-center lg:gap-12">
+      <div class="rounded-3xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-8 sm:p-12 lg:flex lg:items-center lg:gap-12 shadow-ambient">
         <!-- Avatar initials -->
         <div class="mb-8 lg:mb-0 lg:shrink-0">
-          <div class="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-2xl font-bold text-white">
-            NM
+          <div class="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-2xl font-bold text-white overflow-hidden">
+            <img src="/assets/1M.png" alt={site.author.name} class="h-full w-full object-cover" />
           </div>
         </div>
 

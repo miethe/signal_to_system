@@ -16,11 +16,13 @@ status: published
 series: "governed-agentic-sdlc"
 seriesOrder: 1
 featured: true
+heroImage: "/assets/posts/governed-agentic-sdlc-01/hero-02-missing-layer.jpeg"
 whyItMatters: "Most organizations are adopting AI agents at the task level without any infrastructure for managing them at the system level. The result is productivity theater: fast locally, broken at scale."
 leaderTakeaway: "The bottleneck in agentic development is not the model. It's the absence of Platform Engineering for cognitive infrastructure. Context, memory, and observability need to be treated as first-class deployment concerns."
 draftNotes: "Post 1 of 5 in the Governed Agentic SDLC series. Voice, humanizer, and formatting pass complete (2026-04-07). Citations integrated, final review revisions applied, second humanizer pass complete (2026-04-08). Second humanizing pass with Skillmeat anecdotes (CLAUDE.md explosion, FastAPI 204 bug, DiffViewer silent burn) and ChatGPT humanizing-review integration (2026-04-08). Final Opus voice pass on top: de-smoothed remaining LLM-polish phrases, sharpened ADLC and What's Next transitions, tightened Shadow AI closer and DiffViewer anecdote opener (2026-04-08)."
 ---
 import Callout from '../../components/content/Callout';
+import Figure from '../../components/content/Figure.astro';
 
 ## The Gains Are Real. So Why Isn't Delivery?
 
@@ -67,6 +69,13 @@ There are four failure modes I keep seeing. Each one looks like a tooling proble
 <Callout type="info" title="The Four Failure Modes">
 These patterns recur across teams regardless of which AI tools they use. The failure is structural, not technological.
 </Callout>
+
+<Figure
+  src="/assets/posts/governed-agentic-sdlc-01/diagram-four-failures.jpeg"
+  alt="Four icons in a grid representing the four failure modes: an overflowing funnel, a book dissolving into fragments, a signature line trailing off, and a figure stepping through a doorway."
+  number="01"
+  caption="The four failure modes of ungoverned AI adoption — volume trap, context collapse, accountability gap, shadow AI."
+/>
 
 ### 1. The Volume Trap
 
@@ -120,6 +129,13 @@ We are now in the middle of a third transition:
 
 > From distributed infrastructure to distributed intelligence.
 
+<Figure
+  src="/assets/posts/governed-agentic-sdlc-01/diagram-transitions.jpeg"
+  alt="Four-stage horizontal progression of architectural eras: a solid monolithic cube, a cluster of distributed service cubes, a layered platform of distributed infrastructure, and a cloud of networked autonomous agent nodes."
+  number="02"
+  caption="Three infrastructure transitions: monolith, distributed services, distributed infrastructure — and now distributed intelligence."
+/>
+
 It took me embarrassingly long to see the pattern for what it was. Multiple agents, running in parallel, making decisions and generating artifacts across a codebase simultaneously — and we're all racking our brains trying to govern it with tooling designed for the second transition (assuming the company even made it that far). IBM and Arthur AI have started calling this emerging model the <dfn>**Agent Development Lifecycle (ADLC)**</dfn> — the premise being that developing *with* agents requires different processes than developing *for* AI features.[^adlc] I agree with the diagnosis. What this series offers is the operator's version of the same shift: less framework branding, more of the specific patterns that have held up under real workloads.
 
 <Callout type="why-it-matters" title="The Infrastructure Gap">
@@ -137,6 +153,13 @@ Each of these assumptions degrades when AI tools enter the picture:
 - **Release gates** break when the velocity of merged code outpaces the ability to assess cumulative risk. Each individual change looked fine; the aggregate introduced a subtle regression nobody caught.
 
 Gate-based governance is *reactive*: it inspects artifacts after they're produced. That worked when production was slow enough for inspection to keep up. It doesn't work when an agent can produce in an afternoon what used to take a sprint.
+
+<Figure
+  src="/assets/posts/governed-agentic-sdlc-01/hero-03-swarm-gate.jpeg"
+  alt="A swarm of small agent nodes connected by circuit traces flows past a single bureaucratic gate-shaped checkpoint, with artifacts slipping around and through the gate in multiple directions."
+  number="03"
+  caption="Agent swarms outrun a single inspection gate. Reactive governance was sized for human-pace production."
+/>
 
 What's needed isn't more or faster gates. It's governance that's *proactive*, embedded into the generation process itself, constraining what gets generated rather than scrambling to inspect what was generated.
 
