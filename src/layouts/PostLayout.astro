@@ -1,5 +1,6 @@
 ---
 import BaseLayout from './BaseLayout.astro';
+import Figure from '../components/content/Figure.astro';
 import { generateJsonLd, buildCanonicalUrl } from '../lib/seo';
 import { formatDate, formatDateISO } from '../lib/utils';
 import { site } from '../data/site';
@@ -15,6 +16,8 @@ interface Props {
     category?: string;
     tags?: string[];
     ogImage?: string;
+    heroImage?: string;
+    heroAlt?: string;
     whyItMatters?: string;
     leaderTakeaway?: string;
     series?: string;
@@ -38,6 +41,8 @@ const {
   category,
   tags = [],
   ogImage,
+  heroImage,
+  heroAlt,
   whyItMatters,
   leaderTakeaway,
   series,
@@ -69,10 +74,10 @@ const jsonLd = generateJsonLd('article', {
 >
   <article class="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
     <!-- Article header -->
-    <header class="mb-10 space-y-4 border-b border-[var(--border-subtle)] pb-8">
+    <header class="mb-16 space-y-6 pb-4">
       {
         series && (
-          <div class="flex items-center gap-2 text-sm font-medium text-[var(--accent)]">
+          <div class="flex items-center gap-2 text-xs font-mono font-medium text-[var(--accent)]">
             <span class="uppercase tracking-widest">Series</span>
             <span class="text-[var(--text-disabled)]">/</span>
             <span>{series}</span>
@@ -84,14 +89,14 @@ const jsonLd = generateJsonLd('article', {
       {
         category && (
           <div>
-            <span class="inline-block rounded-sm bg-indigo-600/20 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-widest text-[var(--accent)] ring-1 ring-indigo-500/30">
+            <span class="font-mono inline-block rounded-full bg-[var(--accent-subtle)] px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[var(--accent-text)] ring-1 ring-inset ring-[var(--border-subtle)]">
               {category}
             </span>
           </div>
         )
       }
 
-      <h1 class="text-3xl font-bold leading-tight tracking-tight text-[var(--text-primary)] sm:text-4xl">
+      <h1 class="font-serif text-4xl font-bold leading-[1.1] tracking-tight text-[var(--text-primary)] sm:text-5xl lg:text-7xl">
         {title}
       </h1>
 
@@ -102,7 +107,7 @@ const jsonLd = generateJsonLd('article', {
       }
 
       <!-- Meta row -->
-      <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-[var(--text-disabled)]">
+      <div class="font-mono flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-[var(--text-disabled)]">
         <time datetime={publishedISO} class="text-[var(--text-tertiary)]">
           {formatDate(date)}
         </time>
@@ -144,11 +149,22 @@ const jsonLd = generateJsonLd('article', {
       }
     </header>
 
+    <!-- Hero illustration (engineering plate) -->
+    {
+      heroImage && (
+        <Figure
+          src={heroImage}
+          alt={heroAlt || `Hero illustration for ${title}`}
+          variant="hero"
+        />
+      )
+    }
+
     <!-- Callout: Why It Matters (executive signal) -->
     {
       whyItMatters && (
-        <aside class="mb-8 rounded-lg border border-amber-500/30 bg-amber-500/5 p-5">
-          <p class="mb-1.5 text-xs font-bold uppercase tracking-widest text-amber-400">
+        <aside class="mb-8 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-subtle)] p-6 shadow-sm">
+          <p class="font-mono mb-2 text-xs font-bold uppercase tracking-widest text-[var(--accent)]">
             Why It Matters
           </p>
           <p class="text-sm leading-relaxed text-[var(--text-secondary)]">{whyItMatters}</p>
@@ -159,8 +175,8 @@ const jsonLd = generateJsonLd('article', {
     <!-- Callout: Leader Takeaway -->
     {
       leaderTakeaway && (
-        <aside class="mb-8 rounded-lg border border-sky-500/30 bg-sky-500/5 p-5">
-          <p class="mb-1.5 text-xs font-bold uppercase tracking-widest text-sky-400">
+        <aside class="mb-8 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-subtle)] p-6 shadow-sm">
+          <p class="font-mono mb-2 text-xs font-bold uppercase tracking-widest text-[var(--text-primary)]">
             Leader Takeaway
           </p>
           <p class="text-sm leading-relaxed text-[var(--text-secondary)]">{leaderTakeaway}</p>
@@ -181,7 +197,7 @@ const jsonLd = generateJsonLd('article', {
           <nav aria-label="Series navigation" class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {prevPost ? (
               <a
-                href={`/posts/${prevPost.slug}`}
+                href={`/essays/${prevPost.slug}/`}
                 class="group flex flex-col gap-1 rounded-lg border border-[var(--border-subtle)] p-4 transition-colors hover:border-indigo-500/50 hover:bg-[var(--bg-subtle)]"
               >
                 <span class="text-xs font-medium uppercase tracking-widest text-[var(--text-disabled)] transition-colors group-hover:text-[var(--accent)]">
@@ -196,7 +212,7 @@ const jsonLd = generateJsonLd('article', {
             )}
             {nextPost && (
               <a
-                href={`/posts/${nextPost.slug}`}
+                href={`/essays/${nextPost.slug}/`}
                 class="group flex flex-col items-end gap-1 rounded-lg border border-[var(--border-subtle)] p-4 transition-colors hover:border-indigo-500/50 hover:bg-[var(--bg-subtle)]"
               >
                 <span class="text-xs font-medium uppercase tracking-widest text-[var(--text-disabled)] transition-colors group-hover:text-[var(--accent)]">

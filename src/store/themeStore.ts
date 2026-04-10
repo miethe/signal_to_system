@@ -27,8 +27,7 @@ export const $performanceMode = atom<PerformanceMode>("rich");
 
 /**
  * Read persisted preferences and system dark-mode preference, then set the
- * atoms accordingly. Call this once on the client side (e.g. in a layout
- * component's onMount or a <script> tag).
+ * atoms accordingly. Called automatically on first client-side import.
  */
 export function initTheme(): void {
   if (typeof window === "undefined") return;
@@ -102,4 +101,13 @@ function applyThemeClass(theme: Theme): void {
 
 function applyPerfClass(mode: PerformanceMode): void {
   document.documentElement.classList.toggle("perf-lite", mode === "lite");
+}
+
+// ---------------------------------------------------------------------------
+// Auto-initialise on client-side import so the store matches the DOM state
+// set by the inline <script> in BaseLayout.
+// ---------------------------------------------------------------------------
+
+if (typeof window !== "undefined") {
+  initTheme();
 }

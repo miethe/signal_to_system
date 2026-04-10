@@ -34,7 +34,7 @@ export function generateSearchIndex(
     .map((p) => ({
       title: p.data.title,
       excerpt: p.data.excerpt,
-      url: `/posts/${p.id}`,
+      url: `/essays/${p.id}/`,
       category: p.data.category,
       tags: p.data.tags ?? [],
       type: "post",

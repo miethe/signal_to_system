@@ -77,15 +77,15 @@ const sortedPosts = [...posts].sort((a, b) => {
 >
   <div class="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
     <!-- Series header -->
-    <header class="mb-12 space-y-5 border-b border-[var(--border-subtle)] pb-10">
-      <div class="flex items-center gap-3">
+    <header class="mb-16 space-y-6 pb-6">
+      <div class="font-mono flex items-center gap-3">
         <span class="text-xs font-semibold uppercase tracking-widest text-[var(--text-disabled)]">
           Series
         </span>
         <span class="text-[var(--border)]">/</span>
         <span
           class:list={[
-            'inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-xs font-semibold',
+            'inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-widest border border-[var(--border-subtle)]',
             sc.classes,
           ]}
         >
@@ -94,7 +94,7 @@ const sortedPosts = [...posts].sort((a, b) => {
         </span>
       </div>
 
-      <h1 class="text-3xl font-bold leading-tight tracking-tight text-[var(--text-primary)] sm:text-4xl lg:text-5xl">
+      <h1 class="font-serif text-4xl font-bold leading-[1.1] tracking-tight text-[var(--text-primary)] sm:text-5xl lg:text-6xl">
         {title}
       </h1>
 
@@ -104,7 +104,7 @@ const sortedPosts = [...posts].sort((a, b) => {
         )
       }
 
-      <div class="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-[var(--text-disabled)]">
+      <div class="font-mono flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-[var(--text-disabled)]">
         {
           date && (
             <time datetime={formatDateISO(date)}>{formatDate(date)}</time>
@@ -140,7 +140,7 @@ const sortedPosts = [...posts].sort((a, b) => {
 
     <!-- Ordered post list -->
     <section>
-      <h2 class="mb-6 text-xs font-bold uppercase tracking-widest text-[var(--text-disabled)]">
+      <h2 class="font-mono mb-8 text-xs font-bold uppercase tracking-widest text-[var(--text-disabled)]">
         All Entries
       </h2>
 
@@ -149,8 +149,8 @@ const sortedPosts = [...posts].sort((a, b) => {
           sortedPosts.map((post, index) => (
             <li>
               <a
-                href={`/posts/${post.slug}`}
-                class="group flex items-start gap-5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-subtle)] p-5 transition-all duration-150 hover:border-indigo-500/40 hover:bg-[var(--bg-muted)]"
+                href={`/essays/${post.slug}/`}
+                class="group relative flex items-start gap-5 rounded-2xl bg-[var(--bg-surface)] p-6 transition-all duration-300 hover:z-10 hover:shadow-[var(--shadow-ambient)] hover:bg-[var(--bg-subtle)] border border-[var(--border-subtle)]"
               >
                 <!-- Part number -->
                 <span class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--bg-subtle)] text-sm font-bold text-[var(--text-disabled)] transition-colors group-hover:border-indigo-500/60 group-hover:text-[var(--accent)]">
@@ -167,7 +167,7 @@ const sortedPosts = [...posts].sort((a, b) => {
                       {post.excerpt}
                     </p>
                   )}
-                  <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-[var(--text-disabled)]">
+                  <div class="font-mono mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] uppercase tracking-wider text-[var(--text-disabled)]">
                     {post.date && (
                       <time datetime={formatDateISO(post.date)}>
                         {formatDate(post.date)}
