@@ -36,7 +36,7 @@ The skill adapts to the input provided. Each entry point corresponds to a phase 
   - Key claims with sources (research, experience, analysis)
   - Related posts in Signal to System
   - Series information
-- Save spec to `docs/specs/[post-slug]-spec.md`
+- Save spec to PKM: `MeatyBrain/Blogs/<Series>/<Post>/[post-slug]-spec.md`
 - Proceed to Phase 4
 
 ### Phase 4: Drafting (Spec → MDX Draft)
@@ -54,7 +54,7 @@ The skill adapts to the input provided. Each entry point corresponds to a phase 
   - Use `/gemini-cli` for web search or external validation
   - Flag gaps; do not invent claims
 - **Draft MDX**:
-  - Write to `docs/drafts/[post-slug]-draft.mdx`
+  - Write to PKM: `MeatyBrain/Blogs/<Series>/<Post>/drafts/[post-slug]-draft.mdx`
   - Include complete frontmatter (see `references/frontmatter-schema.md`)
   - Follow voice spec and structural patterns from published posts
   - Structure: problem/misconception → definition → practical why → decision components → recommendations with rationale → caveats → practical takeaway
@@ -113,16 +113,45 @@ The skill adapts to the input provided. Each entry point corresponds to a phase 
   - Check links and references are valid
   - Verify code examples are tested
 - **Move to publication**:
-  - Copy finalized MDX from `docs/drafts/` to `src/content/posts/[post-slug].mdx`
+  - Copy finalized MDX from PKM `drafts/` to `src/content/posts/[post-slug].mdx`
+  - Also copy finalized MDX to PKM `final/` directory (see PKM Folder Structure)
   - Verify move was successful
+- **Generate social summary**:
+  - Create `social-summary.md` in the PKM `final/` directory alongside the published MDX
+  - Format: YAML frontmatter (`post`, `series`, `platform`, `created`) + two sections:
+    - **LinkedIn Post** (200-350 words): Hook with core insight, evidence highlights, key concepts, series context (if first post or new series, announce the series), forward pointer, link to post, 3-5 hashtags
+    - **Key Quotes for Pull**: 2-4 standalone quotable lines from the post for social snippets or comment replies
+  - Voice: match Nick's direct, practitioner tone — no marketing, no hype. Grounded in data and lived experience.
+  - Delegate writing to a subagent with full context from the post
 - **Optional polish**: Offer `/humanizer` for final pass reducing AI-detectable patterns
+
+## PKM Folder Structure
+
+Each post in `MeatyBrain/Blogs/<Series>/<Post N>/` follows this layout:
+
+```
+Post N/
+├── drafts/                  # Working drafts, intermediate revisions
+├── notes/                   # Research notes, review feedback, editorial notes, sources
+├── final/                   # Published MDX, social summary
+│   ├── <post-slug>.mdx
+│   └── social-summary.md
+└── Post N Outline.md        # Spec/outline stays at root level
+```
+
+**Conventions**:
+- Series-level docs (`Blog Series.md`, `Detailed Series Outline.md`, `Post N Outline.md`) stay at their respective root level
+- `drafts/` holds iterative draft files (e.g., `<slug>-draft-v1.mdx`, `<slug>-draft-v2.mdx`)
+- `notes/` holds research, review feedback, humanizer notes, sources — anything informing the draft
+- `final/` holds the publication-ready MDX and the social summary
+- When reorganizing an existing post folder, move files into the appropriate subdirectory; do not delete or rename content files
 
 ## Key Rules
 
 1. **Never freewheel** — draft from spec + research + voice doc. Flag gaps rather than inventing claims.
 2. **Structure over ornament** — clarity and practical payoff beat "sounding nice." Thesis clarity beats ornamentation.
 3. **Voice calibration is mandatory** — read voice spec and at least one published post before drafting Phase 4 content. Do not approximate Nick's voice.
-4. **Blog repo is source of truth** — all working files in `/Users/miethe/dev/homelab/development/signal_to_system/docs/` and `src/content/posts/`. No content split across environments.
+4. **PKM is the working space; blog repo is the published artifact** — specs, drafts, research notes, and review feedback live in the PKM vault (`MeatyBrain/Blogs/<Series>/<Post>/`). Only final, publication-ready MDX gets copied to `src/content/posts/`. Do NOT save working files to `docs/specs/` or `docs/drafts/` in the blog repo.
 5. **Research grounding** — use `/notebooklm` for source-grounded answers. Use `/gemini-cli` for web search. Prefer primary sources and lived experience.
 6. **Series awareness** — check if post belongs to a series. If so, read series materials from PKM and maintain continuity with earlier posts. Load series brief from `references/series-*.md`.
 7. **Taxonomy compliance** — respect the 7 fixed categories and tag registry. Do not invent new categories or tags. Escalate to user if post does not fit.
@@ -160,7 +189,7 @@ The skill adapts to the input provided. Each entry point corresponds to a phase 
 - Section outline is 3-6 levels deep
 - Key claims are sourced (research, experience, analysis)
 - Series information noted (if applicable)
-- Spec saved to `docs/specs/`
+- Spec saved to PKM series directory
 
 **Phase 4 (Drafting)**
 - Voice spec was read in full
@@ -172,7 +201,7 @@ The skill adapts to the input provided. Each entry point corresponds to a phase 
 - Caveats and trade-offs stated clearly
 - Tone and register match published posts
 - Frontmatter is complete and uses valid taxonomy values
-- Draft saved to `docs/drafts/`
+- Draft saved to PKM series directory (`drafts/` subfolder)
 
 **Phase 5 (Review)**
 - Entire draft was read before feedback produced
@@ -188,6 +217,9 @@ The skill adapts to the input provided. Each entry point corresponds to a phase 
 - Code blocks have language identifiers
 - All claims are factual or sourced
 - Final MDX moved to `src/content/posts/`
+- Final MDX copied to PKM `final/` directory
+- Social summary generated in PKM `final/social-summary.md`
+- PKM post folder organized per convention (drafts/, notes/, final/)
 
 ---
 

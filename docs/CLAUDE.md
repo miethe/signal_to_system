@@ -16,8 +16,8 @@ The writing should read like a technical executive who still builds: direct, tec
 |------|---------|
 | `claude-cowork-agent.md` | Full editorial agent definition and workflow rules |
 | `templates/post-planning.md` | Post spec template — use before drafting essays |
-| `drafts/` | In-progress drafts before publishing to `src/content/posts/` |
-| `specs/` | Post specs and research briefs |
+
+> **Note:** Specs, drafts, and research notes live in the PKM vault (`MeatyBrain/Blogs/<Series>/<Post>/`), not in `docs/`. Only the post-planning template and editorial agent definition live here. The `docs/drafts/` and `docs/specs/` directories exist for legacy reasons but should not be used for new content.
 
 ## Voice & Style
 
@@ -32,8 +32,8 @@ Full workflow defined in `Blogs/Blog Content Workflow.md` (PKM). Summary:
 
 1. **Topic sourcing** — Perplexity for signals, Obsidian for ideas, NotebookLM for grounding
 2. **Research & synthesis** — ChatGPT for deep research memos, Gemini for notebook synthesis, NotebookLM for source Q&A
-3. **Post design** — Choose angle/structure, create post spec in `docs/specs/` or `docs/templates/`
-4. **Drafting** — Claude Code (you) drafts in-repo from spec + context pack + voice doc
+3. **Post design** — Choose angle/structure, create post spec in PKM `Blogs/<Series>/<Post>/`
+4. **Drafting** — Claude Code (you) drafts in PKM from spec + context pack + voice doc
 5. **Review** — ChatGPT adversarial review, Claude Code implements revisions
 6. **Publication prep** — Finalize frontmatter, internal links, SEO, move to `src/content/posts/`
 
