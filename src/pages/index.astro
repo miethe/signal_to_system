@@ -188,11 +188,14 @@ const topicIconColors: Record<string, string> = {
               </div>
             </div>
             
-            <div class="relative min-h-[400px] bg-gradient-to-tr from-[var(--bg-base)] via-[var(--bg-subtle)] to-[var(--accent-muted)]">
-                <!-- Abstract graphical fallback -->
-                <div class="absolute inset-0 opacity-20">
-                    <div class="h-full w-full bg-[linear-gradient(to_right,var(--bg-surface)_1px,transparent_1px),linear-gradient(to_bottom,var(--bg-surface)_1px,transparent_1px)] bg-[size:40px_40px]"></div>
-                </div>
+            <div class="relative min-h-[400px] bg-[var(--bg-base)] overflow-hidden">
+                {activeSeries[0].data.heroImage ? (
+                  <img src={activeSeries[0].data.heroImage} alt={activeSeries[0].data.title} class="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" />
+                ) : (
+                  <div class="absolute inset-0 opacity-20 bg-gradient-to-tr from-[var(--bg-base)] via-[var(--bg-subtle)] to-[var(--accent-muted)]">
+                      <div class="h-full w-full bg-[linear-gradient(to_right,var(--bg-surface)_1px,transparent_1px),linear-gradient(to_bottom,var(--bg-surface)_1px,transparent_1px)] bg-[size:40px_40px]"></div>
+                  </div>
+                )}
                 <div class="absolute inset-0 bg-gradient-to-r from-[var(--bg-surface)] via-transparent to-transparent"></div>
             </div>
           </div>
