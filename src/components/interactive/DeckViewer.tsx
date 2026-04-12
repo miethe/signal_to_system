@@ -92,12 +92,14 @@ export default function DeckViewer({ slides, title, className = "" }: DeckViewer
         <div className="border-t border-zinc-100 dark:border-zinc-800">
           <button
             onClick={() => setShowNotes((v) => !v)}
+            aria-expanded={showNotes}
+            aria-controls="speaker-notes"
             className="w-full px-4 py-2 text-left text-xs text-zinc-500 hover:text-zinc-700 dark:text-zinc-500 dark:hover:text-zinc-300 transition-colors"
           >
             {showNotes ? "Hide" : "Show"} speaker notes
           </button>
           {showNotes && (
-            <div className="border-t border-zinc-100 bg-zinc-50 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-800/50">
+            <div id="speaker-notes" className="border-t border-zinc-100 bg-zinc-50 px-4 py-3 dark:border-zinc-800 dark:bg-zinc-800/50">
               <p className="text-xs italic text-zinc-600 dark:text-zinc-400">{slide.notes}</p>
             </div>
           )}
