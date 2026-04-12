@@ -56,8 +56,8 @@ const fieldNotes = filtered.filter((p) => p.data.contentType === 'field-note');
         class:list={[
           'inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium transition-colors',
           !categoryParam
-            ? 'bg-indigo-600 text-white dark:bg-indigo-500'
-            : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700',
+            ? 'bg-[var(--accent)] text-white dark:text-[var(--text-inverse)]'
+            : 'bg-[var(--bg-muted)] text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-primary)]',
         ]}
       >
         All
@@ -73,8 +73,8 @@ const fieldNotes = filtered.filter((p) => p.data.contentType === 'field-note');
             class:list={[
               'inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium transition-colors',
               isActive
-                ? 'bg-indigo-600 text-white dark:bg-indigo-500'
-                : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-300 dark:hover:bg-zinc-700',
+                ? 'bg-[var(--accent)] text-white dark:text-[var(--text-inverse)]'
+                : 'bg-[var(--bg-muted)] text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-primary)]',
             ]}
           >
             {cat}
@@ -85,9 +85,9 @@ const fieldNotes = filtered.filter((p) => p.data.contentType === 'field-note');
     </nav>
 
     {filtered.length === 0 ? (
-      <div class="rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 p-16 text-center">
-        <p class="text-zinc-500 dark:text-zinc-400 text-lg">No essays found{categoryParam ? ` for "${categoryParam}"` : ''}.</p>
-        <a href="/essays/" class="mt-4 inline-block text-sm text-indigo-600 dark:text-indigo-400 hover:underline">Clear filter</a>
+      <div class="rounded-xl border border-dashed border-[var(--border)] p-16 text-center">
+        <p class="text-[var(--text-secondary)] text-lg">No essays found{categoryParam ? ` for "${categoryParam}"` : ''}.</p>
+        <a href="/essays/" class="mt-4 inline-block text-sm text-[var(--accent)] hover:underline">Clear filter</a>
       </div>
     ) : (
       <div class="space-y-16">

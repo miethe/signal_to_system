@@ -80,9 +80,9 @@ const readerPaths = [
 
       <div class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 not-prose">
         {readerPaths.map((path) => (
-          <div class="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6">
-            <h3 class="font-semibold text-zinc-900 dark:text-zinc-100 mb-2">{path.type}</h3>
-            <p class="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed mb-4">{path.description}</p>
+          <div class="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6">
+            <h3 class="font-semibold text-[var(--text-primary)] mb-2">{path.type}</h3>
+            <p class="text-sm text-[var(--text-secondary)] leading-relaxed mb-4">{path.description}</p>
             <div class="flex flex-wrap gap-1.5 mb-4">
               {path.topics.map((topicSlug) => {
                 const hub = TOPIC_HUBS.find((h) => h.slug === topicSlug);
@@ -90,7 +90,7 @@ const readerPaths = [
                 return (
                   <a
                     href={`/topics/${topicSlug}/`}
-                    class="rounded-full bg-zinc-100 dark:bg-zinc-800 px-2.5 py-0.5 text-xs font-medium text-zinc-700 dark:text-zinc-300 hover:bg-indigo-100 hover:text-indigo-700 dark:hover:bg-indigo-900/40 dark:hover:text-indigo-300 transition-colors"
+                    class="rounded-full bg-[var(--bg-muted)] px-2.5 py-0.5 text-xs font-medium text-[var(--text-secondary)] hover:bg-[var(--accent-subtle)] hover:text-[var(--accent-text)] transition-colors"
                   >
                     {hub.label}
                   </a>
@@ -99,7 +99,7 @@ const readerPaths = [
             </div>
             <a
               href="/essays/"
-              class="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors"
+              class="text-sm font-medium text-[var(--accent)] hover:text-[var(--accent-hover)] transition-colors"
             >
               Browse essays →
             </a>
@@ -169,17 +169,17 @@ const readerPaths = [
           <li>
             <a
               href={`/topics/${hub.slug}/`}
-              class="flex items-start gap-3 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-4 hover:border-indigo-300 dark:hover:border-indigo-700 transition-all duration-150 group"
+              class="flex items-start gap-3 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-4 hover:border-[var(--accent)]/50 transition-all duration-150 group"
             >
               <div class="flex-1 min-w-0">
-                <p class="font-medium text-zinc-900 dark:text-zinc-100 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
+                <p class="font-medium text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors">
                   {hub.label}
                 </p>
-                <p class="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 leading-relaxed line-clamp-2">
+                <p class="text-xs text-[var(--text-tertiary)] mt-0.5 leading-relaxed line-clamp-2">
                   {hub.description}
                 </p>
               </div>
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mt-1 shrink-0 text-zinc-400 group-hover:text-indigo-500 transition-colors" aria-hidden="true">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mt-1 shrink-0 text-[var(--text-disabled)] group-hover:text-[var(--accent)] transition-colors" aria-hidden="true">
                 <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
               </svg>
             </a>

@@ -22,7 +22,7 @@ export const site = {
     { label: "Series", href: "/series" },
     { label: "Projects", href: "/projects" },
     { label: "Portfolio", href: "/portfolio" },
-    { label: "Other Sites", href: "/sites" },
+    { label: "Other Sites", href: "/other-sites" },
     { label: "About", href: "/about" },
   ],
 

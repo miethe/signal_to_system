@@ -72,6 +72,14 @@ const jsonLd = generateJsonLd('article', {
   canonicalUrl={canonicalUrl}
   jsonLd={jsonLd}
 >
+  <!-- Reading progress bar -->
+  <div
+    id="reading-progress"
+    class="fixed top-0 left-0 z-[60] h-[3px] bg-[var(--accent)] transition-none"
+    style="width: 0%;"
+    aria-hidden="true"
+  ></div>
+
   <article class="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
     <!-- Article header -->
     <header class="mb-16 space-y-6 pb-4">
@@ -248,4 +256,60 @@ const jsonLd = generateJsonLd('article', {
       </div>
     </footer>
   </article>
+
+  <!-- Scroll to top button -->
+  <button
+    id="scroll-to-top"
+    type="button"
+    aria-label="Scroll to top"
+    class="fixed bottom-8 right-8 z-50 flex h-10 w-10 items-center justify-center rounded-full bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-[var(--text-tertiary)] shadow-md opacity-0 translate-y-4 pointer-events-none transition-all duration-300 hover:bg-[var(--accent-subtle)] hover:text-[var(--accent)] hover:border-[var(--accent)]/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+  >
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="m18 15-6-6-6 6"/>
+    </svg>
+  </button>
+
+  <script>
+    // Reading progress bar
+    const progressBar = document.getElementById('reading-progress');
+    const articleEl = document.querySelector('article');
+    const scrollToTopBtn = document.getElementById('scroll-to-top');
+    const isLite = document.documentElement.classList.contains('perf-lite');
+
+    if (progressBar && articleEl && !isLite) {
+      const updateProgress = () => {
+        const rect = articleEl.getBoundingClientRect();
+        const articleTop = rect.top + window.scrollY;
+        const articleHeight = rect.height;
+        const scrolled = window.scrollY - articleTop;
+        const progress = Math.min(Math.max(scrolled / (articleHeight - window.innerHeight), 0), 1);
+        progressBar.style.width = `${progress * 100}%`;
+      };
+
+      window.addEventListener('scroll', updateProgress, { passive: true });
+      updateProgress();
+    } else if (progressBar && isLite) {
+      progressBar.style.display = 'none';
+    }
+
+    // Scroll to top button
+    if (scrollToTopBtn) {
+      const toggleButton = () => {
+        const show = window.scrollY > window.innerHeight * 0.5;
+        scrollToTopBtn.classList.toggle('opacity-0', !show);
+        scrollToTopBtn.classList.toggle('translate-y-4', !show);
+        scrollToTopBtn.classList.toggle('pointer-events-none', !show);
+        scrollToTopBtn.classList.toggle('opacity-100', show);
+        scrollToTopBtn.classList.toggle('translate-y-0', show);
+        scrollToTopBtn.classList.toggle('pointer-events-auto', show);
+      };
+
+      window.addEventListener('scroll', toggleButton, { passive: true });
+      toggleButton();
+
+      scrollToTopBtn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
+  </script>
 </BaseLayout>

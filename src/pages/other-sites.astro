@@ -31,7 +31,7 @@ const byType = typeOrder
     <!-- Featured -->
     {featured.length > 0 && (
       <section>
-        <h2 class="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-5">Featured</h2>
+        <h2 class="text-lg font-semibold text-[var(--text-primary)] mb-5">Featured</h2>
         <div class="not-prose grid grid-cols-1 gap-4 sm:grid-cols-2">
           {featured.map((site) => (
             <SiteLinkCard
@@ -49,7 +49,7 @@ const byType = typeOrder
     <!-- By type -->
     {byType.map(({ type, sites }) => (
       <section>
-        <h2 class="text-sm font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 mb-4 capitalize">
+        <h2 class="text-sm font-semibold uppercase tracking-widest text-[var(--text-tertiary)] mb-4 capitalize">
           {type === 'blog' ? 'Blogs' : type === 'profile' ? 'Profiles' : `${type}s`}
         </h2>
         <div class="not-prose grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -67,8 +67,8 @@ const byType = typeOrder
     ))}
 
     <!-- Note -->
-    <div class="rounded-xl border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800/40 p-5 not-prose">
-      <p class="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
+    <div class="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-subtle)] p-5 not-prose">
+      <p class="text-sm text-[var(--text-secondary)] leading-relaxed">
         Some of these sites are works in progress or archived. Signal to System is the primary home for new writing. The legacy blog at MeatyBytes is being selectively migrated and updated here.
       </p>
     </div>
