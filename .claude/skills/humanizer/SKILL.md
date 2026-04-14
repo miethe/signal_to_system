@@ -59,7 +59,8 @@ Examples:
 - Mix very short sentences (3-5 words) with longer, complex ones (25+ words)
 - Alternate sentence structures: vary between simple, compound, complex, and compound-complex
 - Start sentences with different elements: adverbs, questions, dependent clauses, prepositional phrases
-- Use parenthetical asides and em-dashes for authentic flow (Nick's voice already supports this)
+- Use parenthetical asides for authentic flow (Nick's voice already supports this)
+- **Do NOT use emdashes (—)** for asides or interruptions; replace with parentheses, colons, semicolons, or commas (emdashes are a strong AI-writing tell)
 - Include occasional sentence fragments where natural
 
 Examples:
@@ -115,7 +116,7 @@ Examples:
 Examples:
 - Instead of "Game-changing approach..." → "Actually useful approach..."
 - Instead of "In today's world..." → "Right now, what I'm seeing is..."
-- Add self-correction: "The key metric — or really, the one that matters most — is..."
+- Add self-correction: "The key metric (or really, the one that matters most) is..."
 
 ## Critical Constraints
 
@@ -142,6 +143,7 @@ established voice, do not make it.
    - Sound formulaic or mechanically structured
    - Lack conversational flow or natural qualification
    - Contain reduction-list phrases used excessively
+   - Use emdashes (—) for asides, qualifiers, or interruptions
 
 4. **Apply humanization selectively** — Do NOT rewrite everything. Target:
    - Sentence-level word choice and structure variation
@@ -166,6 +168,7 @@ Before delivering output, verify:
 - [ ] All practical payoff (clarify, compare, caution, guide) remains intact
 - [ ] Changes improve readability without introducing errors
 - [ ] Reduction-list phrases are removed or used intentionally (rarely)
+- [ ] No emdashes (—); all asides use parentheses, colons, semicolons, or commas
 - [ ] Sentence variation and conversational flow have improved
 - [ ] Frontmatter is complete and untouched
 - [ ] Output is valid MDX
