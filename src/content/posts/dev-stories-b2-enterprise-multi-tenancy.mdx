@@ -1,0 +1,207 @@
+---
+title: "One Codebase, Two Editions: How Clean Abstractions Unlocked SkillMeat's Enterprise Tier"
+excerpt: "A repository pattern refactor completed months before multi-tenancy was on the roadmap became the architectural seam that made enterprise storage, RBAC, and governance purely additive work."
+date: 2026-04-10
+readTime: "9 min"
+contentType: field-note
+category: "Projects"
+tags:
+  - "abstraction"
+  - "architecture-decision-records"
+  - "governance"
+  - "human-ai-workflow"
+  - "delivery-systems"
+status: published
+series: "I Let Claude Build My App"
+heroImage: "/assets/posts/dev-stories-b2-enterprise-multi-tenancy/diagram-three-invariants.png"
+whyItMatters: "This pattern replaces the 'fork the backend' approach often used for enterprise builds. One codebase, two data paths, toggled via DI; all 23 endpoints work correctly on day one without router rewrites."
+leaderTakeaway: "Clean abstractions aren't premature if they define your system's extension surface. With the right seams in place, AI agents can parallelize migrations that would otherwise take a full backend team months."
+relatedSlugs: ["governed-agentic-sdlc-01-productivity-paradox"]
+---
+import Callout from '../../components/content/Callout';
+import Figure from '../../components/content/Figure.astro';
+
+## The Constraint
+
+SkillMeat started as a local-first, single-tenant desktop companion: filesystem-backed, SQLite cache, zero configuration. That model worked cleanly when it was just me. As my personal collections scaled, I started hitting the ceiling of the existing architecture, and around the same time I was watching enterprises try (and mostly fail) to adopt AI agents at scale. The platform I'd been building for myself was the one they needed.
+
+The usual play at this point is to fork the codebase: `skillmeat-oss/` (local) and `skillmeat-enterprise/` (multi-tenant), loosely kept in sync via painful manual merges. Features developed on one side don't automatically flow to the other. You end up maintaining two codebases, two test suites, two sets of bugs, and a merge process that everyone quietly dreads. I went back and forth on this decision for a couple weeks with my various AI agents, weighing the pros and cons.
+
+SkillMeat took a different bet:
+
+> **One codebase. One git history. One set of routers. Two data paths, toggled via dependency injection and a startup config.**
+
+<Figure
+  src="/assets/posts/dev-stories-b2-enterprise-multi-tenancy/diagram-fork-vs-single.png"
+  alt="Side-by-side comparison. Left: two separate repositories, skillmeat-oss and skillmeat-enterprise, joined by messy manual-merge arrows labeled drift and duplicate bugs. Right: a single skillmeat repository with shared routers and repository interfaces forking at a DI toggle into a local SQLite implementation and an enterprise PostgreSQL implementation."
+  number="01"
+  caption="The rejected approach (fork) versus the chosen approach (single codebase, two data paths toggled by DI)."
+/>
+
+Here is why that worked, what it cost, and what it means for teams facing the same transition.
+
+## The Architectural Prerequisite
+
+This entire approach was only possible because of work that happened months earlier, tracked in CCDash as `repo-pattern-refactor-v1` (flagship doc: "From Router-Coupled Storage to Repository-First Architecture") plus two follow-on closure features (`repo-pattern-gap-closure-v1` and `repo-pattern-final-cleanup-v1`). 75 completed tasks, all done before multi-tenancy was on the roadmap. The refactor defined 13 abstract repository interfaces and moved all persistence logic behind them. While I was doing it, it felt like boilerplate. It wasn't. It was the architectural seam that made the enterprise transition non-destructive.
+
+The bet was simple: if storage details live behind interfaces rather than leaking into routers, swapping implementations becomes a matter of dependency injection, not a rewrite. The repo-pattern refactor locked in that contract. Everything that followed was additive.
+
+<Callout type="info" title="Dev Stories B3">
+The repository pattern refactor itself (why it was designed that way, what it unlocked) is worth its own post. This one builds on it as a prerequisite.
+</Callout>
+
+## The Three Invariants
+
+The dual-edition architecture works because of three hard constraints, all enforced from the ground up. If any one of them gets soft, the whole approach collapses into conditional logic buried in routers (I learned this first-hand during some early, lax enterprise feature work).
+
+**Invariant 1: The interface is complete.** The 13 abstract repositories define every data access path. Routers never reach around the abstraction directly to the filesystem or database. There's no escape hatch. The refactor made this enforced policy, not a convention.
+
+**Invariant 2: The DTOs are backend-agnostic.** Data transfer objects (44 of them) define what routers talk about (`ArtifactDTO`, `CollectionDTO`, and so on) without reference to how they're stored. A router creating an artifact asks the repository for an `ArtifactDTO`; it doesn't care whether that DTO came from a TOML file or a PostgreSQL row.
+
+**Invariant 3: RequestContext is the authorization plug.** Every repository method signature includes a `RequestContext` parameter (user ID, tenant ID, scopes, auth provider). In local mode, context is mostly ignored; there's only one "user," the local developer. In enterprise mode, context is validated on every call. Routers never see this distinction. They just pass context through.
+
+<Figure
+  src="/assets/posts/dev-stories-b2-enterprise-multi-tenancy/diagram-three-invariants.png"
+  alt="Five-band layered architecture. From top: the HTTP router layer with 23 endpoints, a RequestContext pill carrying user_id, tenant_id, scopes, and auth_provider, a DTO band of backend-agnostic data transfer objects, a highlighted band of 13 abstract repository interfaces, and a split implementation band showing a local SQLite path and an enterprise PostgreSQL path connected through a get_artifact_repo DI switch."
+  number="02"
+  caption="The three invariants in one picture. The highlighted interface band is the architectural seam. It was locked before any implementation started."
+/>
+
+With these three constraints locked in, the dependency injection pattern becomes straightforward:
+
+```python
+# skillmeat/api/dependencies.py (simplified)
+async def get_artifact_repo() -> IArtifactRepository:
+    if EDITION == "local":
+        return LocalArtifactRepository(fs_session, db_session)
+    else:
+        return EnterpriseArtifactRepository(db_session)
+
+# Every router injects this dependency
+@router.get("/artifacts/{artifact_id}")
+async def get_artifact(
+    artifact_id: str,
+    repo: Annotated[IArtifactRepository, Depends(get_artifact_repo)],
+    context: Annotated[RequestContext, Depends(require_auth())],
+):
+    return repo.get_artifact(artifact_id, context)
+```
+
+Change `EDITION` to `"enterprise"` on startup, and all 23 endpoints resolve to enterprise implementations automatically. No recompilation, no conditional logic in routers, no stubs, no 501 responses.
+
+## Key Decisions
+
+### UUID Primary Keys, Not Integer IDs
+
+Enterprise deployments run on PostgreSQL at scale. UUIDs let me partition by tenant ID without later reindexing (a prerequisite for sharding). Local mode uses string IDs (`"my-skill"`, `"canvas-design@v2"`) because they're human-readable and don't require UUID generation in CLI workflows.
+
+Routers handle both: `str(artifact.id)` in local mode, `artifact.id.hex` in enterprise. The DTOs hide the divergence completely.
+
+**Trade-off**: Minimal. The abstraction handles it. Routers don't see it.
+
+### Dual SQLAlchemy Styles (1.x vs 2.x)
+
+This decision is controversial, so it deserves explanation. Local repositories use SQLAlchemy 1.x query style (`session.query()`). Enterprise repositories use 2.x style (`select()` + `execute()`).
+
+```python
+# Local: SQLAlchemy 1.x
+artifact = self.session.query(LocalArtifactModel) \
+    .filter_by(artifact_id=artifact_id) \
+    .first()
+
+# Enterprise: SQLAlchemy 2.x
+stmt = select(EnterpriseArtifactModel) \
+    .where(EnterpriseArtifactModel.id == artifact_id) \
+    .where(EnterpriseArtifactModel.tenant_id == context.tenant_id)
+artifact = self.session.execute(stmt).scalar_one_or_none()
+```
+
+Unifying them would create the worst of both worlds: code overcomplicated for SQLite and suboptimal for PostgreSQL. Local mode runs single-threaded, single-process SQLite; the 1.x style is appropriate and performs fine there. Enterprise mode runs connection-pooled PostgreSQL across multiple instances; the 2.x style is more composable for building tenant-scoped queries and maps better to async patterns.
+
+**Trade-off**: Real. Developers need to know two SQLAlchemy styles, and that's cognitive load I don't pretend away. I pay it anyway because the separation lets each side get properly optimized, and the abstraction hides the difference from routers. Plus, the developers are AI Agents anyway!
+
+### Tenant Isolation: Application-Layer First, RLS Layered On Top
+
+Enterprise needs multi-tenant isolation. I shipped it in two passes, in that order.
+
+Pass one was application-layer. Middleware sets a `ContextVar` with the tenant ID, and every repository method runs through `_apply_tenant_filter()` before it touches the database. `TenantContext` is referenced on every path, and CI enforcement catches accidental leaks. That got me isolation on day one of enterprise mode, without blocking on a schema migration project.
+
+Pass two was PostgreSQL Row-Level Security. Wave 3 of the enterprise parity work put RLS policies on every enterprise table: core, identity, deployment, context, workflow, bundle, marketplace, and federation. A `TenantContextDep` middleware sets the Postgres session variable that the policies key off, so the database itself now refuses cross-tenant reads and writes. RLS is the enforcement layer; the application-layer filter is defense in depth on top of it.
+
+<Figure
+  src="/assets/posts/dev-stories-b2-enterprise-multi-tenancy/diagram-tenant-isolation.png"
+  alt="A request flows left to right through four gates: middleware that sets TenantContext and the Postgres session variable, an application-layer _apply_tenant_filter call shipped in Layer 1, PostgreSQL Row-Level Security policies shipped in Layer 2 / Wave 3, and finally tenant-scoped data in a database with separate bands for Tenant A, B, and C. A bracket spans the two enforcement gates, labeled defense in depth."
+  number="03"
+  caption="Two enforcement layers, shipped in order. Application-layer first for Day 1 isolation, RLS second as database-enforced defense in depth."
+/>
+
+**Trade-off**: Two layers is more surface than one. The payoff is that the ship-fast call in pass one didn't lock me out of pass two. The interface contract held (`RequestContext` was already threaded through every repository method), so RLS was a schema and policy project, not a rearchitecture. If I'd put RLS first, enterprise mode would have shipped much later. If I'd stopped at the application layer, the database would still be trusting the application to get filtering right on every code path forever. Do both, in order.
+
+I had considered going back and refactoring to remove layer 1, but was convinced to keep it for defense-in-depth. App-layer filtering catches bugs RLS can't (missed `SET app.tenant_id`, superuser connections, raw SQL bypasses), and RLS catches bugs the app layer can't (forgotten `_apply_tenant_filter` on a new repo method). The main tradeoff is duplicate enforcement cost at code-review time, but CI already guards that.
+
+## How Agents Made This Possible at Scale
+
+The scope of this work (246 tracked tasks across 7 concurrent pull requests with non-trivial dependencies; 230 done, 16 still open on the governance sync piece) is the kind of thing I'd normally expect to take a small backend team a couple of months if they ran it serially. CCDash logs 70 sessions and roughly 47.5 active execution hours over an 18-day concentrated window (March 23 through April 10, 2026), with significant portions running concurrently rather than serially.
+
+The pattern that made this feasible: **interface-first design with role-based agent delegation and file-ownership batching.**
+
+Specialized agents executed the migration in parallel, with the model mix tilting Opus-heavy because the seven PRs included a lot of architectural decision-making (CCDash logs 35 Opus sessions, 20 Sonnet, 15 Haiku across the effort, so Opus was roughly half):
+
+- **python-backend-engineer**: about 69% of tasks (170 of 246). Repository implementations, router migrations, concrete enterprise methods. The implementation backbone.
+- **data-layer-expert**: SQLAlchemy schema design, migration validation, write-through consistency tests.
+- **backend-architect**: Repository interface design, DI wiring strategy, multi-edition decision-making.
+- **documentation-writer** (14 tasks): ADRs, parity matrices, the "Router-Coupled to Repository-First" flagship doc, and the per-PR retrospectives.
+- **openapi-expert**: OpenAPI contract verification, response schema alignment, parity diff generation.
+- **task-completion-validator**: Smoke tests, integration validation, tenant isolation enforcement. Worth noting: this agent earned its spot primarily on the prerequisite refactor (10 of its 14 tracked tasks live in the repo-pattern features), not the migration PRs themselves.
+
+Before any implementation started, the 13 abstract interfaces were locked in. All 5 agents could then implement independently, knowing the contract wouldn't change under them. That's not incidental; it's the only coordination primitive that makes large-scale parallel agent work coherent. Without the locked interface, each agent is guessing about what the others expect.
+
+The 15 routers migrated in Phase 1 became 15 independent tasks across 5 agents, one router per agent, no overlap. Zero merge conflicts. The DI seam meant router tests could swap implementations without touching router code. Routers were migrated in parallel with enterprise implementation, not sequentially after it.
+
+<Figure
+  src="/assets/posts/dev-stories-b2-enterprise-multi-tenancy/diagram-parallel-agents.png"
+  alt="Three-column flow. Left: a single locked rectangle labeled 13 abstract repository interfaces, tagged as the repo-pattern-refactor-v1 prerequisite completed before multi-tenancy was on the roadmap. Middle: five parallel swim lanes, one per agent role, with overlapping task rectangles across an 18-day window from March 23 to April 10, 2026, labeled 47.5 active hours and zero merge conflicts. Right: stacked result cards — 23 endpoints working Day 1, 154 repository methods, 134 parametrized tests, 7 concurrent PRs."
+  number="04"
+  caption="Interface-first design is what lets agents parallelize. Contract locked in Column 1, file-ownership batched execution in Column 2, day-one working system in Column 3."
+/>
+
+The cleanest forensic evidence of the parallel-execution claim sits in the Router Migration features. Router Migration v1 and v2 each ran 8 Opus sessions inside a roughly 24-hour window (March 29 through 30), covering 56 tasks between them. That's the "five agents in parallel" pattern materializing in the CCDash trace as overlapping session lineage, not as a marketing claim.
+
+<Callout type="why-it-matters" title="What the Session Trace Actually Shows">
+The shape of the work is itself the evidence that orchestration overhead stayed manageable. 70 sessions and ~47.5 active execution hours compressed into an 18-day window, with the two Router Migration features overlapping inside a single 24-hour span, is not what serial coordination looks like. Parallel agent execution is feasible when the interface is locked first and file ownership is batched cleanly; the session density on these PRs is what that feasibility looks like in telemetry.
+</Callout>
+
+## Results
+
+**Coverage metrics:**
+- 23 HTTP endpoints, all working on day one
+- 13 abstract repository interfaces, 100% coverage
+- 154 repository methods total (89 shared between editions, 65 enterprise-only)
+- 8 core enterprise tables + 18 derived tables
+- 134 parametrized tests running in both modes
+- 42 end-to-end smoke scenarios, all passing
+
+**Timeline:**
+- 12 weeks of concurrent initiatives, not sequential
+- 7 concurrent pull requests with complex dependencies
+- 246 tracked tasks across those PRs (230 done, 16 still open)
+- 70 sessions and ~47.5 active execution hours, concentrated into an 18-day window (March 23 through April 10, 2026)
+- Zero merge conflicts (file-ownership batching)
+
+One honest qualifier: Phases 1 through 3 landed. Phase 4 (the sync-engine overhaul under the new 3-tier governance model, tracked as `enterprise-governance-3-tier`) is the piece still open as of this writing. Nine sessions and roughly 12 hours of architectural design have gone into it; the implementation closure is the remaining work.
+
+The teams I've watched attempt this transition either fork the codebase or disappear into a multi-month rewrite. SkillMeat shipped feature parity without bifurcation.
+
+## The Bigger Picture
+
+One architectural decision (the repository pattern refactor) unlocked an entire product tier without code duplication or rewrite risk. The generalizable point isn't about repository patterns. It's about abstractions as an investment in your system's extension surface.
+
+Clean abstractions feel expensive when you first build them. They add interfaces, they add indirection, and they ask you to write code for use cases you don't have yet. Until, that is, you actually need the abstraction's job: defining the boundary between layers clearly enough that one side can change without breaking the other. Once you have that boundary, you can swap implementations independently, test both in parallel, ship without forking, and delegate to multiple agents without coordination hazards.
+
+As I argued in [SDLC Post 1](/essays/governed-agentic-sdlc-01-productivity-paradox), infrastructure is what lets productivity gains compound. This post is the evidence: with the right seams in place, AI agents turned a project that would otherwise occupy an entire backend team into a 12-week parallel execution with zero conflicts. The seams were the infrastructure. Not the agents. The seams.
+
+The next prerequisite story (the repository pattern refactor that made all of this possible) is coming in Dev Stories B3.
+
+---
+
+*This is a field note from the "I Let Claude Build My App" series, grounding the Governed Agentic SDLC claims with evidence from real ship dates, real metrics, and real trade-offs.*
