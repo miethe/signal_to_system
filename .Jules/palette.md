@@ -1,0 +1,3 @@
+## 2025-02-23 - Active Navigation Links Missing aria-current
+**Learning:** In component-based frameworks like Astro, global navigation components often map over a static list of routes. While this is efficient, it frequently leads to the omission of the `aria-current="page"` attribute for the active link because the component doesn't inherently track the current route without explicit logic. Sighted users might see an active state (if styled), but screen reader users get no indication of their current location within the nav.
+**Action:** Always extract the current path (e.g., `Astro.url.pathname`) in global navigation components and apply `aria-current="page"` along with visual active states when mapping over navigation links.
