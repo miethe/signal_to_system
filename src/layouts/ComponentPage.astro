@@ -1,0 +1,114 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+import { buildCanonicalUrl } from "../lib/seo";
+import { site } from "../data/site";
+
+interface Props {
+  title: string;
+  description: string;
+  category: string;
+  status: "stable" | "beta" | "experimental" | "deprecated";
+  since: string;
+  seoTitle?: string;
+  seoDescription?: string;
+}
+
+const { title, description, category, status, since, seoTitle, seoDescription } =
+  Astro.props;
+
+const canonicalUrl = buildCanonicalUrl(Astro.url.pathname);
+
+const statusBadge: Record<Props["status"], { label: string; tone: string }> = {
+  stable: {
+    label: "Stable",
+    tone: "bg-emerald-500/10 text-emerald-400 ring-emerald-500/20",
+  },
+  beta: {
+    label: "Beta",
+    tone: "bg-sky-500/10 text-sky-400 ring-sky-500/20",
+  },
+  experimental: {
+    label: "Experimental",
+    tone: "bg-amber-500/10 text-amber-400 ring-amber-500/20",
+  },
+  deprecated: {
+    label: "Deprecated",
+    tone: "bg-rose-500/10 text-rose-400 ring-rose-500/20",
+  },
+};
+
+const badge = statusBadge[status];
+
+const categoryLabel: Record<string, string> = {
+  primitives: "Primitives",
+  "content-viewer": "Content Viewer",
+  diff: "Diff",
+  editor: "Editor",
+  display: "Display",
+  "bulk-actions": "Bulk Actions",
+  filters: "Filters",
+  pickers: "Pickers",
+  utils: "Utils",
+};
+---
+
+<BaseLayout
+  title={seoTitle ?? title}
+  description={seoDescription ?? description}
+  canonicalUrl={canonicalUrl}
+>
+  <article class="mx-auto max-w-4xl px-4 py-12 sm:px-6 lg:px-8">
+    <header
+      class="mb-10 space-y-4 border-b border-[var(--border-subtle)] pb-8"
+    >
+      <div class="flex flex-wrap items-center gap-3 text-xs">
+        <a
+          href="/portfolio/ui/"
+          class="font-semibold uppercase tracking-widest text-[var(--accent)] hover:text-[var(--accent-hover)]"
+        >
+          Components
+        </a>
+        <span class="text-[var(--text-disabled)]">/</span>
+        <span
+          class="rounded-sm bg-[var(--bg-muted)] px-2.5 py-0.5 font-semibold uppercase tracking-widest text-[var(--text-secondary)]"
+        >
+          {categoryLabel[category] ?? category}
+        </span>
+        <span
+          class:list={[
+            "inline-flex items-center gap-1.5 rounded-full px-2.5 py-0.5 font-semibold ring-1",
+            badge.tone,
+          ]}
+        >
+          {badge.label}
+        </span>
+        <span class="text-[var(--text-disabled)]">
+          since <span class="font-mono">{since}</span>
+        </span>
+      </div>
+
+      <h1
+        class="text-3xl font-bold leading-tight tracking-tight text-[var(--text-primary)] sm:text-4xl"
+      >
+        {title}
+      </h1>
+
+      <p class="text-lg leading-relaxed text-[var(--text-tertiary)]">
+        {description}
+      </p>
+    </header>
+
+    <div class="prose-custom max-w-none">
+      <slot />
+    </div>
+
+    <footer class="mt-12 border-t border-[var(--border-subtle)] pt-8">
+      <a
+        href="/portfolio/ui/"
+        class="text-sm text-[var(--accent)] transition-colors hover:text-[var(--accent-hover)]"
+      >
+        &larr; All Components
+      </a>
+    </footer>
+  </article>
+</BaseLayout>

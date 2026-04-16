@@ -1,0 +1,27 @@
+---
+import { getCollection, render } from "astro:content";
+import ComponentPage from "../../../layouts/ComponentPage.astro";
+
+export async function getStaticPaths() {
+  const entries = await getCollection("ui");
+  return entries.map((entry) => ({
+    params: { slug: entry.id },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+---
+
+<ComponentPage
+  title={entry.data.title}
+  description={entry.data.description}
+  category={entry.data.category}
+  status={entry.data.status}
+  since={entry.data.since}
+  seoTitle={entry.data.seoTitle}
+  seoDescription={entry.data.seoDescription}
+>
+  <Content />
+</ComponentPage>

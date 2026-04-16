@@ -1,0 +1,57 @@
+---
+interface Props {
+  href: string;
+  title: string;
+  description: string;
+  status: "stable" | "beta" | "experimental" | "deprecated";
+  since?: string;
+}
+
+const { href, title, description, status, since } = Astro.props;
+
+const statusTone: Record<Props["status"], string> = {
+  stable: "bg-emerald-500/10 text-emerald-400 ring-emerald-500/20",
+  beta: "bg-sky-500/10 text-sky-400 ring-sky-500/20",
+  experimental: "bg-amber-500/10 text-amber-400 ring-amber-500/20",
+  deprecated: "bg-rose-500/10 text-rose-400 ring-rose-500/20",
+};
+const statusLabel: Record<Props["status"], string> = {
+  stable: "Stable",
+  beta: "Beta",
+  experimental: "Experimental",
+  deprecated: "Deprecated",
+};
+---
+
+<a
+  href={href}
+  class="group flex h-full flex-col justify-between rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-5 transition hover:-translate-y-0.5 hover:border-[var(--accent)] hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--accent)]"
+>
+  <div class="space-y-2">
+    <div class="flex items-center justify-between gap-3">
+      <h3
+        class="text-base font-semibold tracking-tight text-[var(--text-primary)] group-hover:text-[var(--accent)]"
+      >
+        {title}
+      </h3>
+      <span
+        class:list={[
+          "inline-flex shrink-0 items-center rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide ring-1",
+          statusTone[status],
+        ]}
+      >
+        {statusLabel[status]}
+      </span>
+    </div>
+    <p class="text-sm leading-relaxed text-[var(--text-tertiary)]">
+      {description}
+    </p>
+  </div>
+  {
+    since && (
+      <div class="mt-4 text-xs text-[var(--text-disabled)]">
+        since <span class="font-mono">{since}</span>
+      </div>
+    )
+  }
+</a>

@@ -1,0 +1,110 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../../layouts/BaseLayout.astro";
+import ComponentCard from "../../../components/ui-showcase/ComponentCard.astro";
+
+const entries = await getCollection("ui");
+
+const categoryLabel: Record<string, string> = {
+  primitives: "Primitives",
+  "content-viewer": "Content Viewer",
+  diff: "Diff",
+  editor: "Editor",
+  display: "Display",
+  "bulk-actions": "Bulk Actions",
+  filters: "Filters",
+  pickers: "Pickers",
+  utils: "Utils",
+};
+
+const categoryOrder = [
+  "primitives",
+  "display",
+  "content-viewer",
+  "diff",
+  "editor",
+  "bulk-actions",
+  "filters",
+  "pickers",
+  "utils",
+];
+
+const grouped = entries.reduce<Record<string, typeof entries>>((acc, entry) => {
+  const key = entry.data.category;
+  (acc[key] ??= []).push(entry);
+  return acc;
+}, {});
+
+for (const key of Object.keys(grouped)) {
+  grouped[key].sort((a, b) => a.data.title.localeCompare(b.data.title));
+}
+
+const orderedCategories = categoryOrder.filter((key) => grouped[key]?.length);
+---
+
+<BaseLayout
+  title="@miethe/ui Component Showcase"
+  description="Live demos, prop references, and usage patterns for the @miethe/ui React component library."
+>
+  <main class="mx-auto max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
+    <header class="mb-12 space-y-4 border-b border-[var(--border-subtle)] pb-8">
+      <p
+        class="text-xs font-semibold uppercase tracking-widest text-[var(--accent)]"
+      >
+        Portfolio / Component Showcase
+      </p>
+      <h1
+        class="text-3xl font-bold tracking-tight text-[var(--text-primary)] sm:text-4xl"
+      >
+        @miethe/ui
+      </h1>
+      <p
+        class="max-w-2xl text-lg leading-relaxed text-[var(--text-tertiary)]"
+      >
+        A growing catalog of React components extracted from SkillMeat. Each
+        entry documents the component with a live demo, prop reference, and
+        accessibility notes. Use these patterns as a reference implementation
+        when wiring similar surfaces in your own work.
+      </p>
+      <p class="text-sm text-[var(--text-disabled)]">
+        {entries.length}
+        {entries.length === 1 ? "component" : "components"} documented.
+      </p>
+    </header>
+
+    {
+      entries.length === 0 ? (
+        <p class="rounded-lg border border-dashed border-[var(--border)] bg-[var(--bg-subtle)] p-8 text-center text-sm text-[var(--text-tertiary)]">
+          Component catalog is being authored. Check back soon.
+        </p>
+      ) : (
+        <div class="space-y-12">
+          {orderedCategories.map((categoryKey) => {
+            const items = grouped[categoryKey];
+            return (
+              <section aria-labelledby={`cat-${categoryKey}`} class="space-y-4">
+                <h2
+                  id={`cat-${categoryKey}`}
+                  class="text-lg font-semibold tracking-tight text-[var(--text-secondary)]"
+                >
+                  {categoryLabel[categoryKey] ?? categoryKey}
+                </h2>
+                <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {items.map((entry) => (
+                    <ComponentCard
+                      href={`/portfolio/ui/${entry.id}/`}
+                      title={entry.data.title}
+                      description={entry.data.description}
+                      status={entry.data.status}
+                      since={entry.data.since}
+                    />
+                  ))}
+                </div>
+              </section>
+            );
+          })}
+        </div>
+      )
+    }
+  </main>
+</BaseLayout>
