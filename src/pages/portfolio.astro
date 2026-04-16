@@ -51,6 +51,37 @@ const statusConfig: Record<string, { label: string; cls: string; dot: string }> 
 >
   <div class="space-y-16">
 
+    <!-- @miethe/ui Component Showcase -->
+    <section>
+      <a
+        href="/portfolio/ui/"
+        class="not-prose group flex flex-col gap-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 transition hover:-translate-y-0.5 hover:border-[var(--accent)] hover:shadow-md sm:flex-row sm:items-center sm:justify-between"
+      >
+        <div class="space-y-2">
+          <div class="flex items-center gap-3">
+            <span class="inline-flex items-center rounded-sm bg-indigo-600/20 px-2.5 py-0.5 text-xs font-semibold uppercase tracking-widest text-[var(--accent)] ring-1 ring-indigo-500/30">
+              Component Library
+            </span>
+            <span class="text-xs text-[var(--text-disabled)]">/portfolio/ui/</span>
+          </div>
+          <h2 class="text-xl font-bold text-[var(--text-primary)] group-hover:text-[var(--accent)]">
+            @miethe/ui Component Showcase
+          </h2>
+          <p class="max-w-2xl text-sm leading-relaxed text-[var(--text-secondary)]">
+            Live demos, prop references, and accessibility notes for the React
+            component library extracted from SkillMeat. File trees, diff viewers,
+            a CodeMirror markdown editor, and more — all with dark-mode parity.
+          </p>
+        </div>
+        <span class="inline-flex items-center gap-2 text-sm font-medium text-[var(--accent)] group-hover:text-[var(--accent-hover)]">
+          Browse components
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+          </svg>
+        </span>
+      </a>
+    </section>
+
     <!-- Featured content projects -->
     {featuredContentProjects.length > 0 && (
       <section>
