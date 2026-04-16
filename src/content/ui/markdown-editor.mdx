@@ -1,0 +1,74 @@
+---
+title: "MarkdownEditor"
+description: "CodeMirror 6 markdown editor with syntax highlighting, light/dark theming, and read-only mode."
+category: "editor"
+status: "stable"
+since: "0.2.0"
+tags: ["editor", "codemirror", "markdown"]
+seoDescription: "MarkdownEditor component from @miethe/ui: a CodeMirror 6 markdown editor with system-aware theming."
+---
+
+import ComponentDemo from "../../components/ui-showcase/ComponentDemo.astro";
+import CodeBlock from "../../components/ui-showcase/CodeBlock.astro";
+import PropTable from "../../components/ui-showcase/PropTable.astro";
+import propsData from "../../data/ui/markdown-editor.json";
+import { MarkdownEditorDemo } from "../../components/ui-showcase/demos/MarkdownEditorDemo.tsx";
+
+## Overview
+
+`MarkdownEditor` is a thin wrapper around CodeMirror 6 tuned for markdown
+authoring. It ships with sensible defaults — markdown syntax highlighting,
+standard keymaps, a system-aware theme — and keeps its surface area small
+(four props) so it composes cleanly with your own toolbar, preview pane, or
+split-view layout.
+
+## Installation
+
+<CodeBlock lang="bash" code={`npm install @miethe/ui`} />
+
+## Usage
+
+The demo uses `client:only="react"` so CodeMirror only loads in the browser.
+This keeps the static build fast and defers the CodeMirror bundle until the
+user actually scrolls the demo into view.
+
+<ComponentDemo title="Edit and watch the counter update" description="CodeMirror bundle loads lazily in the browser.">
+  <MarkdownEditorDemo client:only="react" />
+</ComponentDemo>
+
+<CodeBlock
+  lang="tsx"
+  code={`import { useState } from "react";
+import { MarkdownEditor } from "@miethe/ui/editor";
+
+export function Example() {
+  const [value, setValue] = useState("# Hello");
+  return (
+    <MarkdownEditor
+      initialContent="# Hello"
+      onChange={setValue}
+    />
+  );
+}`}
+/>
+
+## Props
+
+<PropTable caption="MarkdownEditor props" rows={propsData} />
+
+## Accessibility
+
+- Wraps CodeMirror's textarea-backed editor, which supports standard
+  screen-reader navigation and selection announcements.
+- Theme follows the system color scheme; combine with your app's `.dark`
+  class to drive dark mode explicitly.
+- `readOnly` disables editing while preserving caret navigation, so screen
+  readers can still read the document.
+
+## Notes
+
+- The editor is **uncontrolled** — changing `initialContent` after mount does
+  not replace the buffer. Keep the canonical value in your own state via
+  `onChange`.
+- Lazy-load this component via `client:visible` in Astro or a dynamic import
+  in other frameworks to keep CodeMirror out of the initial JS payload.

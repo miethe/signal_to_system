@@ -1,0 +1,77 @@
+---
+title: "Tabs"
+description: "Radix-powered Tabs primitive with keyboard navigation, horizontal/vertical orientation, and automatic or manual activation modes."
+category: "primitives"
+status: "stable"
+since: "0.2.0"
+tags: ["tabs", "navigation", "radix"]
+seoDescription: "Tabs component from @miethe/ui: Radix Tabs primitive wrapped with shadcn-compatible styling."
+---
+
+import ComponentDemo from "../../components/ui-showcase/ComponentDemo.astro";
+import CodeBlock from "../../components/ui-showcase/CodeBlock.astro";
+import PropTable from "../../components/ui-showcase/PropTable.astro";
+import propsData from "../../data/ui/tabs.json";
+import { TabsDemo } from "../../components/ui-showcase/demos/TabsDemo.tsx";
+
+## Overview
+
+`Tabs` is a thin composition layer over Radix UI's Tabs primitive. It
+exports the four pieces you need — `Tabs`, `TabsList`, `TabsTrigger`,
+`TabsContent` — with shadcn-compatible styling wired in. Because it's
+Radix underneath, keyboard support, focus management, and WAI-ARIA
+semantics come for free.
+
+## Installation
+
+<CodeBlock lang="bash" code={`npm install @miethe/ui`} />
+
+## Usage
+
+<ComponentDemo title="Three-tab switcher">
+  <TabsDemo client:only="react" />
+</ComponentDemo>
+
+<CodeBlock
+  lang="tsx"
+  code={`import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+} from "@miethe/ui/primitives";
+
+export function Example() {
+  return (
+    <Tabs defaultValue="overview">
+      <TabsList>
+        <TabsTrigger value="overview">Overview</TabsTrigger>
+        <TabsTrigger value="api">API</TabsTrigger>
+      </TabsList>
+      <TabsContent value="overview">Overview content.</TabsContent>
+      <TabsContent value="api">API content.</TabsContent>
+    </Tabs>
+  );
+}`}
+/>
+
+## Props (Tabs)
+
+<PropTable caption="Tabs root props (Radix-compatible)" rows={propsData} />
+
+## Accessibility
+
+- Arrow keys move focus between triggers; Home/End jump to the first/last.
+- `activationMode="manual"` is the right choice when tab panels are heavy
+  or fetch remote data — focus moves without activating until the user
+  presses Enter/Space.
+- Each `TabsTrigger` / `TabsContent` pair must share a unique `value`
+  string; Radix wires aria-controls and aria-labelledby accordingly.
+
+## Notes
+
+- Use `orientation="vertical"` when rendering a sidebar-style tab list;
+  remember to update the visual layout to match.
+- For deeply nested surfaces (tabs inside modals inside tabs), give the
+  inner tabs an explicit `defaultValue` to avoid ambiguity with the outer
+  Radix context.

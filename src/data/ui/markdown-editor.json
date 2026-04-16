@@ -1,0 +1,26 @@
+[
+  {
+    "name": "initialContent",
+    "type": "string",
+    "required": true,
+    "description": "Initial markdown content. The editor is uncontrolled — subsequent prop changes do not replace the buffer."
+  },
+  {
+    "name": "onChange",
+    "type": "(content: string) => void",
+    "required": true,
+    "description": "Called with the full markdown buffer on every edit. Debounce at the call site if you plan to persist per keystroke."
+  },
+  {
+    "name": "readOnly",
+    "type": "boolean",
+    "default": "false",
+    "description": "Disable editing while preserving syntax highlighting and theme."
+  },
+  {
+    "name": "className",
+    "type": "string",
+    "default": "undefined",
+    "description": "Additional classes forwarded to the outer CodeMirror container."
+  }
+]

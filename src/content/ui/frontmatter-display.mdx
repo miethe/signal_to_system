@@ -1,0 +1,68 @@
+---
+title: "FrontmatterDisplay"
+description: "Collapsible key-value viewer for parsed YAML frontmatter, with native rendering for arrays and single-level nested objects."
+category: "display"
+status: "stable"
+since: "0.2.0"
+tags: ["frontmatter", "metadata", "collapsible"]
+seoDescription: "FrontmatterDisplay component from @miethe/ui: collapsible, readable rendering of parsed YAML frontmatter."
+---
+
+import ComponentDemo from "../../components/ui-showcase/ComponentDemo.astro";
+import CodeBlock from "../../components/ui-showcase/CodeBlock.astro";
+import PropTable from "../../components/ui-showcase/PropTable.astro";
+import propsData from "../../data/ui/frontmatter-display.json";
+import { FrontmatterDisplayDemo } from "../../components/ui-showcase/demos/FrontmatterDisplayDemo.tsx";
+
+## Overview
+
+`FrontmatterDisplay` renders parsed YAML frontmatter as collapsible key-value
+rows. It handles the three shapes you actually see in practice: scalars,
+arrays (rendered comma-separated), and one level of nested objects (rendered
+as indented sub-rows). Anything deeper collapses to the raw JSON string — if
+you need arbitrarily deep rendering, pair this with your own recursive
+component.
+
+## Installation
+
+<CodeBlock lang="bash" code={`npm install @miethe/ui`} />
+
+## Usage
+
+<ComponentDemo title="Blog-post frontmatter preview">
+  <FrontmatterDisplayDemo client:only="react" />
+</ComponentDemo>
+
+<CodeBlock
+  lang="tsx"
+  code={`import { FrontmatterDisplay } from "@miethe/ui/display";
+
+const frontmatter = {
+  title: "My Post",
+  tags: ["react", "typescript"],
+  author: { name: "Nick", email: "me@example.com" },
+};
+
+export function Example() {
+  return <FrontmatterDisplay frontmatter={frontmatter} />;
+}`}
+/>
+
+## Props
+
+<PropTable caption="FrontmatterDisplay props" rows={propsData} />
+
+## Accessibility
+
+- The expand/collapse control is a `<button>` with an `aria-expanded` state
+  so assistive tech announces the open/closed state correctly.
+- Key-value rows use a description list internally, preserving semantic
+  associations between keys and values.
+
+## Notes
+
+- The component does **not** parse YAML — pass an already-parsed object.
+  Reach for `parseFrontmatter` from `@miethe/ui/utils` for a lightweight
+  parser if you don't already have one.
+- `defaultCollapsed` only seeds the initial state; the user can always toggle
+  at runtime.

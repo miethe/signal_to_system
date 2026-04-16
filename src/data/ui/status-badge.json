@@ -1,0 +1,20 @@
+[
+  {
+    "name": "status",
+    "type": "string",
+    "required": true,
+    "description": "Lifecycle status string (e.g. 'draft', 'published', 'deprecated'). Also used as the badge label."
+  },
+  {
+    "name": "statusColorMap",
+    "type": "Record<string, BadgeVariant>",
+    "default": "{}",
+    "description": "Optional override map from status value to Badge variant ('default' | 'secondary' | 'destructive' | 'outline'). Merged on top of the built-in defaults; unknown statuses fall back to 'outline'."
+  },
+  {
+    "name": "className",
+    "type": "string",
+    "default": "undefined",
+    "description": "Additional classes forwarded to the underlying Badge."
+  }
+]

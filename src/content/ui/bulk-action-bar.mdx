@@ -1,0 +1,83 @@
+---
+title: "BulkActionBar"
+description: "Floating, viewport-anchored toolbar for applying bulk actions to a selection, with async action support and per-action loading state."
+category: "bulk-actions"
+status: "stable"
+since: "0.2.0"
+tags: ["bulk-actions", "toolbar", "selection"]
+seoDescription: "BulkActionBar component from @miethe/ui: floating selection toolbar with async actions and accessible announcements."
+---
+
+import ComponentDemo from "../../components/ui-showcase/ComponentDemo.astro";
+import CodeBlock from "../../components/ui-showcase/CodeBlock.astro";
+import PropTable from "../../components/ui-showcase/PropTable.astro";
+import propsData from "../../data/ui/bulk-action-bar.json";
+import { BulkActionBarDemo } from "../../components/ui-showcase/demos/BulkActionBarDemo.tsx";
+
+## Overview
+
+`BulkActionBar` is a floating toolbar that slides into view at the bottom of
+the viewport whenever the user has one or more items selected. It is fully
+props-driven — you own selection state — and handles per-action loading
+spinners automatically for any `onClick` that returns a Promise.
+
+## Installation
+
+<CodeBlock lang="bash" code={`npm install @miethe/ui`} />
+
+## Usage
+
+<ComponentDemo title="Select list items to reveal the bar" variant="subtle">
+  <BulkActionBarDemo client:only="react" />
+</ComponentDemo>
+
+<CodeBlock
+  lang="tsx"
+  code={`import { useState } from "react";
+import { BulkActionBar, type BulkAction } from "@miethe/ui/bulk-actions";
+
+export function Example() {
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+
+  const actions: BulkAction[] = [
+    {
+      id: "publish",
+      label: "Publish",
+      variant: "default",
+      onClick: async () => {
+        await publishAll(Array.from(selected));
+        setSelected(new Set());
+      },
+    },
+  ];
+
+  return (
+    <BulkActionBar
+      selectedCount={selected.size}
+      hasSelection={selected.size > 0}
+      actions={actions}
+      onClearSelection={() => setSelected(new Set())}
+    />
+  );
+}`}
+/>
+
+## Props
+
+<PropTable caption="BulkActionBar props" rows={propsData} />
+
+## Accessibility
+
+- The bar is a `role="toolbar"` with an aria-label describing the current
+  selection count.
+- `aria-hidden` toggles with visibility so the bar is skipped by assistive
+  tech when empty.
+- An `aria-live` region announces selection count changes; each action
+  button exposes an explicit `aria-label`.
+
+## Notes
+
+- Promises returned from `onClick` drive a per-action spinner and disable
+  other actions for the duration — no need to track loading state yourself.
+- The `destructive` variant is appropriate for irreversible actions; pair
+  with a confirmation dialog in production flows.

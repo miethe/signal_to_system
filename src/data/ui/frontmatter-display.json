@@ -1,0 +1,20 @@
+[
+  {
+    "name": "frontmatter",
+    "type": "Record<string, unknown>",
+    "required": true,
+    "description": "Parsed YAML object. Scalars render as strings, arrays render comma-separated, and one level of nested object is rendered as indented key-value rows."
+  },
+  {
+    "name": "defaultCollapsed",
+    "type": "boolean",
+    "default": "false",
+    "description": "Start the panel collapsed. The user can always toggle via the expand/collapse control."
+  },
+  {
+    "name": "className",
+    "type": "string",
+    "default": "undefined",
+    "description": "Additional classes forwarded to the outer container."
+  }
+]

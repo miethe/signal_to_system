@@ -1,0 +1,38 @@
+[
+  {
+    "name": "defaultValue",
+    "type": "string",
+    "default": "undefined",
+    "description": "Uncontrolled initial active tab value. Use when you don't need to drive the active tab from parent state."
+  },
+  {
+    "name": "value",
+    "type": "string",
+    "default": "undefined",
+    "description": "Controlled active tab value. Pair with onValueChange for fully controlled usage."
+  },
+  {
+    "name": "onValueChange",
+    "type": "(value: string) => void",
+    "default": "undefined",
+    "description": "Called whenever the active tab changes. Required for controlled mode."
+  },
+  {
+    "name": "orientation",
+    "type": "\"horizontal\" | \"vertical\"",
+    "default": "\"horizontal\"",
+    "description": "Keyboard navigation axis for the TabsList. Use 'vertical' for sidebars."
+  },
+  {
+    "name": "activationMode",
+    "type": "\"automatic\" | \"manual\"",
+    "default": "\"automatic\"",
+    "description": "When 'automatic', focus activates a tab. When 'manual', focus moves without activation (user must press Enter/Space)."
+  },
+  {
+    "name": "children",
+    "type": "React.ReactNode",
+    "required": true,
+    "description": "Compose TabsList/TabsTrigger/TabsContent children. Each TabsTrigger and TabsContent must share a unique value string."
+  }
+]

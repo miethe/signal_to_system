@@ -1,0 +1,74 @@
+[
+  {
+    "name": "files",
+    "type": "FileDiff[]",
+    "required": true,
+    "description": "Array of file diffs. Each entry carries file_path, status (added/modified/deleted/unchanged), and optional unified_diff text for modified files."
+  },
+  {
+    "name": "leftLabel",
+    "type": "string",
+    "default": "\"Before\"",
+    "description": "Label rendered above the left (before) panel. Ignored when tierContext is provided."
+  },
+  {
+    "name": "rightLabel",
+    "type": "string",
+    "default": "\"After\"",
+    "description": "Label rendered above the right (after) panel. Ignored when tierContext is provided."
+  },
+  {
+    "name": "onClose",
+    "type": "() => void",
+    "default": "undefined",
+    "description": "Invoked when the user dismisses the diff viewer. Hides the close affordance when not provided."
+  },
+  {
+    "name": "showResolutionActions",
+    "type": "boolean",
+    "default": "false",
+    "description": "Render the keep-local / keep-remote / merge buttons for sync-conflict resolution flows."
+  },
+  {
+    "name": "onResolve",
+    "type": "(resolution: ResolutionType) => void",
+    "default": "undefined",
+    "description": "Resolution callback. Called with 'keep_local', 'keep_remote', or 'merge'."
+  },
+  {
+    "name": "localLabel",
+    "type": "string",
+    "default": "\"Local (Project)\"",
+    "description": "Custom label for the keep-local action button."
+  },
+  {
+    "name": "remoteLabel",
+    "type": "string",
+    "default": "\"Remote (Collection)\"",
+    "description": "Custom label for the keep-remote action button."
+  },
+  {
+    "name": "previewMode",
+    "type": "boolean",
+    "default": "false",
+    "description": "Show a preview-mode UI layer before applying a resolution."
+  },
+  {
+    "name": "isResolving",
+    "type": "boolean",
+    "default": "false",
+    "description": "Disable resolution buttons and show in-flight UI while a resolution is being applied."
+  },
+  {
+    "name": "isLoading",
+    "type": "boolean",
+    "default": "false",
+    "description": "Render a skeleton placeholder while diff data is being fetched."
+  },
+  {
+    "name": "tierContext",
+    "type": "TierContext",
+    "default": "undefined",
+    "description": "Optional enterprise tier metadata. When set, panel headers display tier badges instead of leftLabel/rightLabel."
+  }
+]

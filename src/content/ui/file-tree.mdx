@@ -1,0 +1,89 @@
+---
+title: "FileTree"
+description: "Recursive, keyboard-navigable file browser with selection, expand/collapse, and optional create/delete affordances."
+category: "content-viewer"
+status: "stable"
+since: "0.2.0"
+tags: ["file-tree", "navigation", "a11y"]
+seoDescription: "FileTree component from @miethe/ui: ARIA tree pattern, keyboard navigation, and selection state for hierarchical file views."
+---
+
+import ComponentDemo from "../../components/ui-showcase/ComponentDemo.astro";
+import CodeBlock from "../../components/ui-showcase/CodeBlock.astro";
+import PropTable from "../../components/ui-showcase/PropTable.astro";
+import propsData from "../../data/ui/file-tree.json";
+import { FileTreeDemo } from "../../components/ui-showcase/demos/FileTreeDemo.tsx";
+
+## Overview
+
+`FileTree` renders a recursive, accessible tree of files and directories. It is
+built around the WAI-ARIA tree pattern with roving tabindex, so screen readers
+and keyboard users get the same semantics as sighted mouse users. Selection and
+expansion state are fully controlled by the parent, which makes it easy to wire
+into any content-viewer backend.
+
+## Installation
+
+<CodeBlock lang="bash" code={`npm install @miethe/ui`} />
+
+## Usage
+
+<ComponentDemo title="Read-only tree with selection state">
+  <FileTreeDemo client:only="react" />
+</ComponentDemo>
+
+<CodeBlock
+  lang="tsx"
+  code={`import { useState } from "react";
+import { FileTree } from "@miethe/ui/content-viewer";
+
+const files = [
+  {
+    name: "src",
+    path: "src",
+    type: "directory" as const,
+    children: [
+      { name: "index.ts", path: "src/index.ts", type: "file" as const },
+    ],
+  },
+  { name: "README.md", path: "README.md", type: "file" as const },
+];
+
+export function Example() {
+  const [selectedPath, setSelectedPath] = useState<string | null>(null);
+  return (
+    <FileTree
+      entityId="demo-artifact"
+      files={files}
+      selectedPath={selectedPath}
+      onSelect={setSelectedPath}
+      readOnly
+    />
+  );
+}`}
+/>
+
+## Props
+
+<PropTable caption="FileTree props" rows={propsData} />
+
+## Accessibility
+
+`FileTree` implements the ARIA `tree` pattern:
+
+- **Keyboard**: Arrow keys move focus between visible items; Right expands a
+  collapsed folder; Left collapses an expanded folder or moves to the parent;
+  Enter/Space selects a file or toggles a folder; Home/End jump to the first or
+  last visible item.
+- **Roving tabindex**: only the currently focused item is in the tab order, so
+  Tab never traps users inside the tree.
+- **Labels**: pass a descriptive `ariaLabel` (default `"File browser"`) to
+  differentiate multiple trees on the same page.
+
+## Notes
+
+- The tree is fully controlled — keep `selectedPath` and expansion state in
+  your own store if you need persistence.
+- Use `readOnly` when surfacing content viewers that should not mutate the
+  tree (e.g. marketplace previews).
+- Omit `onAddFile` / `onDeleteFile` to hide their respective affordances.

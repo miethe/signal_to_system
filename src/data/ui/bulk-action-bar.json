@@ -1,0 +1,32 @@
+[
+  {
+    "name": "selectedCount",
+    "type": "number",
+    "required": true,
+    "description": "Number of currently selected items. Rendered in the count label and used by aria-live to announce selection changes."
+  },
+  {
+    "name": "hasSelection",
+    "type": "boolean",
+    "required": true,
+    "description": "Controls visibility. True slides the bar up into view; false slides it down and disables pointer events."
+  },
+  {
+    "name": "actions",
+    "type": "BulkAction[]",
+    "required": true,
+    "description": "Ordered action buttons. Each action has id, label, optional icon, variant, and an onClick that may return a Promise — per-action loading state is handled automatically."
+  },
+  {
+    "name": "onClearSelection",
+    "type": "() => void",
+    "required": true,
+    "description": "Invoked when the user hits the Clear / X button to deselect all items."
+  },
+  {
+    "name": "className",
+    "type": "string",
+    "default": "undefined",
+    "description": "Extra classes applied to the fixed-position outer wrapper."
+  }
+]

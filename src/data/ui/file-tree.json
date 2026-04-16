@@ -1,0 +1,56 @@
+[
+  {
+    "name": "entityId",
+    "type": "string",
+    "required": true,
+    "description": "Stable identifier for the artifact this tree belongs to. Used as a key for expansion-state persistence."
+  },
+  {
+    "name": "files",
+    "type": "FileNode[]",
+    "required": true,
+    "description": "Array of tree nodes. Each node has name, path, type ('file' | 'directory'), and optional children."
+  },
+  {
+    "name": "selectedPath",
+    "type": "string | null",
+    "required": true,
+    "description": "Currently selected file path. Pass null when nothing is selected."
+  },
+  {
+    "name": "onSelect",
+    "type": "(path: string) => void",
+    "required": true,
+    "description": "Called with the full path whenever the user selects a file via click or keyboard."
+  },
+  {
+    "name": "onAddFile",
+    "type": "() => void",
+    "default": "undefined",
+    "description": "Optional callback for the 'add file' affordance. Hidden when not provided or when readOnly."
+  },
+  {
+    "name": "onDeleteFile",
+    "type": "(path: string) => void",
+    "default": "undefined",
+    "description": "Optional callback for deleting a file. Hidden when not provided or when readOnly."
+  },
+  {
+    "name": "isLoading",
+    "type": "boolean",
+    "default": "false",
+    "description": "Render a skeleton placeholder while the tree is being fetched."
+  },
+  {
+    "name": "readOnly",
+    "type": "boolean",
+    "default": "false",
+    "description": "Hide create/delete affordances while preserving selection and expand/collapse."
+  },
+  {
+    "name": "ariaLabel",
+    "type": "string",
+    "default": "\"File browser\"",
+    "description": "Accessible label announced by screen readers for the tree region."
+  }
+]

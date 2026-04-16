@@ -1,0 +1,69 @@
+---
+title: "StatusBadge"
+description: "Thin wrapper over Badge that maps a lifecycle status string to a variant via a configurable color map."
+category: "primitives"
+status: "stable"
+since: "0.2.0"
+tags: ["badge", "status", "primitives"]
+seoDescription: "StatusBadge component from @miethe/ui: status-to-variant mapping layered over the shadcn-compatible Badge primitive."
+---
+
+import ComponentDemo from "../../components/ui-showcase/ComponentDemo.astro";
+import CodeBlock from "../../components/ui-showcase/CodeBlock.astro";
+import PropTable from "../../components/ui-showcase/PropTable.astro";
+import propsData from "../../data/ui/status-badge.json";
+import { StatusBadgeDemo } from "../../components/ui-showcase/demos/StatusBadgeDemo.tsx";
+
+## Overview
+
+`StatusBadge` is a small convenience wrapper on top of `Badge`. It takes a
+status string and resolves it to a Badge variant through a configurable
+color map, so a single status field can drive consistent badges across
+different surfaces (tables, detail headers, cards) without scattering
+variant logic.
+
+## Installation
+
+<CodeBlock lang="bash" code={`npm install @miethe/ui`} />
+
+## Usage
+
+<ComponentDemo title="Default statuses with one override">
+  <StatusBadgeDemo client:only="react" />
+</ComponentDemo>
+
+<CodeBlock
+  lang="tsx"
+  code={`import { StatusBadge } from "@miethe/ui/primitives";
+
+export function Example() {
+  return (
+    <div className="flex gap-2">
+      <StatusBadge status="draft" />
+      <StatusBadge status="published" />
+      <StatusBadge
+        status="active"
+        statusColorMap={{ active: "default" }}
+      />
+    </div>
+  );
+}`}
+/>
+
+## Props
+
+<PropTable caption="StatusBadge props" rows={propsData} />
+
+## Accessibility
+
+- Renders as a `<div role="status">` via the underlying Badge, exposing the
+  status text directly to assistive tech.
+- Because the badge is text-first, color is not the sole carrier of status
+  information.
+
+## Notes
+
+- Unknown status values fall back to the `outline` variant — safe default
+  for surfacing unexpected data from an API without a UI crash.
+- The `statusColorMap` is merged over the built-in defaults, so you only
+  need to list overrides rather than repeating the whole map.
