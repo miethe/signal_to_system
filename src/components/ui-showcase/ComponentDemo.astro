@@ -1,0 +1,43 @@
+---
+/**
+ * ComponentDemo — labeled, bordered preview wrapper for live @miethe/ui demos.
+ * Hosts a React island (or Astro children) and renders with dark-mode parity.
+ */
+interface Props {
+  title?: string;
+  description?: string;
+  /** Optional background variant: "surface" (default) or "subtle". */
+  variant?: "surface" | "subtle";
+}
+
+const { title, description, variant = "surface" } = Astro.props;
+
+const bgClass =
+  variant === "subtle"
+    ? "bg-[var(--color-bg-subtle)]"
+    : "bg-[var(--color-bg-surface)]";
+---
+
+<figure
+  class={`ui-demo my-6 overflow-hidden rounded-lg border border-[var(--color-border-subtle)] ${bgClass}`}
+>
+  {
+    (title || description) && (
+      <figcaption class="border-b border-[var(--color-border-subtle)] bg-[var(--color-bg-muted)] px-4 py-2">
+        {title && (
+          <div class="text-xs font-semibold uppercase tracking-wide text-[var(--color-text-secondary)]">
+            {title}
+          </div>
+        )}
+        {description && (
+          <div class="mt-0.5 text-sm text-[var(--color-text-tertiary)]">
+            {description}
+          </div>
+        )}
+      </figcaption>
+    )
+  }
+  <div class="ui-demo__stage px-4 py-6 sm:px-6 sm:py-8">
+    <slot />
+  </div>
+</figure>

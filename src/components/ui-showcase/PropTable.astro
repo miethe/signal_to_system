@@ -1,0 +1,70 @@
+---
+/**
+ * PropTable — tabular reference for a component's public props.
+ * Pass props via the `rows` prop; keep markup semantic for screen readers.
+ */
+export interface PropRow {
+  name: string;
+  type: string;
+  default?: string | null;
+  required?: boolean;
+  description: string;
+}
+
+interface Props {
+  caption?: string;
+  rows: PropRow[];
+}
+
+const { caption, rows } = Astro.props;
+---
+
+<div class="ui-prop-table my-6 overflow-x-auto">
+  <table
+    class="w-full border-collapse text-left text-sm text-[var(--color-text-secondary)]"
+  >
+    {
+      caption && (
+        <caption class="mb-2 text-left text-xs font-semibold uppercase tracking-wide text-[var(--color-text-tertiary)]">
+          {caption}
+        </caption>
+      )
+    }
+    <thead>
+      <tr
+        class="border-b border-[var(--color-border-default)] text-xs uppercase tracking-wide text-[var(--color-text-tertiary)]"
+      >
+        <th scope="col" class="py-2 pr-4 font-semibold">Prop</th>
+        <th scope="col" class="py-2 pr-4 font-semibold">Type</th>
+        <th scope="col" class="py-2 pr-4 font-semibold">Default</th>
+        <th scope="col" class="py-2 font-semibold">Description</th>
+      </tr>
+    </thead>
+    <tbody>
+      {
+        rows.map((row) => (
+          <tr class="border-b border-[var(--color-border-subtle)] align-top last:border-b-0">
+            <td class="whitespace-nowrap py-3 pr-4 font-mono text-xs text-[var(--color-text-primary)]">
+              {row.name}
+              {row.required && (
+                <span
+                  class="ml-1 text-[var(--color-accent-600)]"
+                  aria-label="required"
+                >
+                  *
+                </span>
+              )}
+            </td>
+            <td class="py-3 pr-4 font-mono text-xs text-[var(--color-accent-700)] dark:text-[var(--color-accent-300)]">
+              {row.type}
+            </td>
+            <td class="py-3 pr-4 font-mono text-xs text-[var(--color-text-tertiary)]">
+              {row.default ?? "—"}
+            </td>
+            <td class="py-3 text-sm leading-relaxed">{row.description}</td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</div>

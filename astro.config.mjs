@@ -12,5 +12,11 @@ export default defineConfig({
   integrations: [react(), mdx(), sitemap()],
   vite: {
     plugins: [tailwindcss()],
+    // @miethe/ui ships compiled ESM whose internal imports omit .js extensions,
+    // which strict Node ESM refuses. Let Vite bundle it so its bundler-relative
+    // resolution handles those imports during SSR.
+    ssr: {
+      noExternal: ['@miethe/ui'],
+    },
   },
 });

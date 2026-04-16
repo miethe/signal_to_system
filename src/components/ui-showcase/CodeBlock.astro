@@ -1,0 +1,78 @@
+---
+/**
+ * CodeBlock — highlighted code display with a copy-to-clipboard button.
+ *
+ * Uses Astro's built-in Shiki-based `<code>` rendering for languages it knows;
+ * we render the code ourselves via `<pre><code>` to keep the copy UX consistent
+ * across the showcase (an inline script handles copy + feedback).
+ */
+interface Props {
+  code: string;
+  lang?: string;
+  /** Optional filename shown in the header strip. */
+  filename?: string;
+}
+
+const { code, lang = "tsx", filename } = Astro.props;
+const id = `ui-code-${Math.random().toString(36).slice(2, 10)}`;
+---
+
+<figure
+  class="ui-code-block my-6 overflow-hidden rounded-lg border border-[var(--color-border-subtle)] bg-[var(--color-bg-muted)]"
+  data-code-id={id}
+>
+  <div
+    class="flex items-center justify-between gap-4 border-b border-[var(--color-border-subtle)] bg-[var(--color-bg-subtle)] px-3 py-1.5 text-xs text-[var(--color-text-tertiary)]"
+  >
+    <span class="font-mono lowercase tracking-wide">
+      {filename ?? lang}
+    </span>
+    <button
+      type="button"
+      class="ui-code-copy inline-flex items-center gap-1 rounded border border-[var(--color-border-subtle)] bg-[var(--color-bg-surface)] px-2 py-0.5 text-xs font-medium text-[var(--color-text-secondary)] transition hover:border-[var(--color-accent-400)] hover:text-[var(--color-accent-700)] focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-accent-500)]"
+      data-copy-for={id}
+      aria-label="Copy code to clipboard"
+    >
+      <span class="ui-code-copy__label">Copy</span>
+    </button>
+  </div>
+  <pre class="overflow-x-auto px-4 py-3 text-sm leading-relaxed"><code
+      id={id}
+      class={`language-${lang} font-mono text-[var(--color-text-primary)]`}
+      >{code}</code></pre>
+</figure>
+
+<script>
+  // Delegated handler: one listener, any number of code blocks.
+  const w = window as unknown as { __uiCodeCopyBound?: boolean };
+  if (!w.__uiCodeCopyBound) {
+    w.__uiCodeCopyBound = true;
+    document.addEventListener("click", (event) => {
+      const target = event.target as HTMLElement | null;
+      const button = target?.closest<HTMLButtonElement>(".ui-code-copy");
+      if (!button) return;
+      const id = button.getAttribute("data-copy-for");
+      if (!id) return;
+      const codeEl = document.getElementById(id);
+      if (!codeEl) return;
+      const label = button.querySelector<HTMLElement>(".ui-code-copy__label");
+      const original = label?.textContent ?? "Copy";
+      const text = codeEl.textContent ?? "";
+      navigator.clipboard
+        .writeText(text)
+        .then(() => {
+          if (label) label.textContent = "Copied";
+          button.setAttribute("data-copied", "true");
+        })
+        .catch(() => {
+          if (label) label.textContent = "Error";
+        })
+        .finally(() => {
+          window.setTimeout(() => {
+            if (label) label.textContent = original;
+            button.removeAttribute("data-copied");
+          }, 1400);
+        });
+    });
+  }
+</script>

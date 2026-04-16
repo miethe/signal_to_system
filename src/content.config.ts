@@ -133,7 +133,51 @@ const series = defineCollection({
 });
 
 // ---------------------------------------------------------------------------
+// UI Showcase collection (@miethe/ui component docs)
+// ---------------------------------------------------------------------------
+
+const ui = defineCollection({
+  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/ui" }),
+  schema: z.object({
+    // Required
+    title: z.string(),
+    description: z.string(),
+    category: z.enum([
+      "primitives",
+      "content-viewer",
+      "diff",
+      "editor",
+      "display",
+      "bulk-actions",
+      "filters",
+      "pickers",
+      "utils",
+    ]),
+    status: z.enum(["stable", "beta", "experimental", "deprecated"]),
+    since: z.string(),
+
+    // Optional
+    demos: z
+      .array(
+        z.object({
+          title: z.string(),
+          description: z.string().optional(),
+          component: z.string().optional(),
+        }),
+      )
+      .optional(),
+    propsData: z.string().optional(),
+    tags: z.array(z.string()).optional(),
+    featured: z.boolean().optional(),
+
+    // SEO
+    seoTitle: z.string().optional(),
+    seoDescription: z.string().optional(),
+  }),
+});
+
+// ---------------------------------------------------------------------------
 // Export
 // ---------------------------------------------------------------------------
 
-export const collections = { posts, projects, series };
+export const collections = { posts, projects, series, ui };
