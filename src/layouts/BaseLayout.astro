@@ -112,12 +112,14 @@ const resolvedDescription = description.slice(0, 160);
   </head>
 
   <body class="min-h-screen bg-[var(--bg-base)] text-[var(--text-primary)] antialiased transition-colors duration-200">
+    <a href="#main-content" class="skip-link">Skip to content</a>
+
     <!-- Navigation slot: allows pages to pass a custom nav or use the default -->
     <slot name="nav">
       <Navigation />
     </slot>
 
-    <main class:list={['', className]}>
+    <main id="main-content" class:list={['', className]}>
       <slot />
     </main>
 
