@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import SeriesCard from '../../components/cards/SeriesCard.astro';
+import InteractiveNetwork from '../../components/interactive/InteractiveNetwork';
 
 // ---------------------------------------------------------------------------
 // Data
@@ -40,13 +41,18 @@ const completeSeries = sortedSeries.filter((s) => s.data.status === 'complete');
 >
   <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
     <!-- Page header -->
-    <header class="mb-16 pb-8">
-      <h1 class="font-serif text-5xl font-bold tracking-tight text-[var(--text-primary)] sm:text-6xl mb-6">
-        Series
-      </h1>
-      <p class="text-xl text-[var(--text-secondary)] max-w-2xl leading-relaxed">
-        Structured multi-part explorations of complex topics. Each series builds a complete picture across several interconnected essays.
-      </p>
+    <header class="relative mb-16 overflow-hidden rounded-3xl border border-[var(--border-subtle)] shadow-sm bg-[var(--bg-surface)]">
+      <div class="absolute inset-0 z-0 opacity-80" aria-hidden="true">
+        <InteractiveNetwork className="w-full h-full" client:idle />
+      </div>
+      <div class="relative z-10 px-8 py-16 sm:px-12 sm:py-24">
+        <h1 class="font-serif text-5xl font-bold tracking-tight text-[var(--text-primary)] dark:text-white sm:text-6xl mb-6">
+          <span class="italic text-purple-600 dark:text-purple-300">Signal</span> Series
+        </h1>
+        <p class="text-xl text-[var(--text-secondary)] dark:text-zinc-300 max-w-2xl leading-relaxed">
+          Structured multi-part explorations of complex topics. Each series builds a complete picture across several interconnected essays.
+        </p>
+      </div>
     </header>
 
     <div class="space-y-16">
