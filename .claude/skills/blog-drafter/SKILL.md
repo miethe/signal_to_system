@@ -62,6 +62,21 @@ The skill adapts to the input provided. Each entry point corresponds to a phase 
   - Ground all claims in spec, research, or lived experience
 - Proceed to Phase 5
 
+### Phase 3.5: Forensic Grounding (optional)
+
+**Triggered by**: Any Dev Stories or "I Let Claude Build My App" post — or any post making numeric claims about a shipped feature (story points, timelines, agent counts, session counts, percentages, parallelism).
+
+**Actions**:
+- Enumerate the PRs and features the post references
+- For each feature, run:
+  - `ccdash feature list` — find candidate features
+  - `ccdash feature show <id>` — feature mapping and metadata
+  - `ccdash feature sessions <id>` — session telemetry and task attribution grounded in provenance
+- Save consolidated output to PKM: `MeatyBrain/Blogs/<Series>/<Post>/notes/ccdash/ccdash-insights-report.md`
+- Use that report as the single source of truth for numeric claims in the draft
+
+This step bridges Phase 3 and Phase 4 — the spec frames the story; the forensics report supplies the evidence. Validated on Dev Stories B2, where CCDash replaced several guessed metrics with verifiable numbers.
+
 ### Phase 5: Review & Revision (Draft → Polish)
 
 **Triggered by**: Mode shortcut (`review`, `revise`, `story`) or user signal "review this draft"
@@ -157,6 +172,7 @@ Post N/
 7. **Taxonomy compliance** — respect the 7 fixed categories and tag registry. Do not invent new categories or tags. Escalate to user if post does not fit.
 8. **Voice guardrails** — keep: nuanced recommendations, trade-off framing, "here's what matters in practice" energy, first-person experience, concrete examples, stated caveats. Reduce: empty universals, generic AI phrasing, fake certainty, excessive summaries, product-brochure energy.
 9. **Anti-patterns** — don't flatten opinions into neutral prose; don't add hype or futurism; don't over-explain to technical readers; don't let posts read as purely skeptical; don't revise sections you weren't asked to touch; don't generate research claims without grounding.
+10. **Cite-or-cut** — for posts making numeric claims about shipped features (story points, timelines, agent counts, session counts, percentages, parallelism), every number must trace to CCDash, git history, or another authoritative source. If a number can't be grounded, either cut it or replace with a qualitative claim. Guessed metrics undermine credibility and are a common failure mode in agent-driven Dev Stories posts; readers will notice when the math doesn't reconcile with the artifact.
 
 ## Progressive Disclosure: What to Read When
 
@@ -181,6 +197,7 @@ Post N/
 - **`/notebooklm`** — use for research grounding in Phase 3–4. Pass source documents; get source-grounded summaries and Q&A for spec and draft.
 - **`/gemini-cli`** — use for web search or second opinions during research phases. Useful for validating claims and finding external context.
 - **`/nano-banana` / `/nano-banana-pro`** — use for diagrams or images to include in draft.
+- **`/ccdash`** — use for forensic analysis of agent-driven development work during the research phase. Run for any post making claims about shipped features, agent rosters, session counts, timelines, or parallelism. Produces a `notes/ccdash/ccdash-insights-report.md` with feature mapping, session telemetry, and task attribution grounded in provenance — the source of truth for numeric claims.
 
 ## Quality Checklist by Phase
 
@@ -195,6 +212,7 @@ Post N/
 - Voice spec was read in full
 - At least one published post was read
 - Spec, research materials, and series context were read
+- For posts making numeric claims about shipped features, the CCDash forensics report has been generated and saved to `notes/ccdash/` before drafting began
 - Opening grounds topic in a real problem or misconception
 - Every section has practical payoff
 - Recommendations include rationale, not just verdicts

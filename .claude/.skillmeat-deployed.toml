@@ -584,8 +584,25 @@ deployed_at = "2026-04-05T16:44:08.136224"
 artifact_path = "skills/artifact-tracking"
 content_hash = "0c3931aa3a4787a2588680e693d5fab6d2b682952d10b59d170a06063bd672e4"
 local_modifications = false
+version_lineage = [
+    "0c3931aa3a4787a2588680e693d5fab6d2b682952d10b59d170a06063bd672e4",
+]
 merge_base_snapshot = "0c3931aa3a4787a2588680e693d5fab6d2b682952d10b59d170a06063bd672e4"
 deployment_profile_id = "claude_code"
 platform = "claude_code"
 profile_root_dir = ".claude"
 collection_sha = "0c3931aa3a4787a2588680e693d5fab6d2b682952d10b59d170a06063bd672e4"
+
+[[deployed]]
+artifact_name = "1password"
+artifact_type = "skill"
+from_collection = "default"
+deployed_at = "2026-04-15T17:23:58.257651"
+artifact_path = "skills/1password"
+content_hash = "56b82fa4b1f555fb368d26434d107af9c9a687d1533af8085aead6338223235b"
+local_modifications = false
+merge_base_snapshot = "56b82fa4b1f555fb368d26434d107af9c9a687d1533af8085aead6338223235b"
+deployment_profile_id = "claude_code"
+platform = "claude_code"
+profile_root_dir = ".claude"
+collection_sha = "56b82fa4b1f555fb368d26434d107af9c9a687d1533af8085aead6338223235b"

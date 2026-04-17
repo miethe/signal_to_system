@@ -47,11 +47,11 @@ const isFieldNote = contentType === "field-note";
 
 <article
   class={[
-    "group relative flex flex-col rounded-xl border transition-all duration-200",
+    "tilt-card group relative flex flex-col rounded-xl border transition-all duration-300 ease-out",
     "bg-[var(--bg-surface)]",
     "border-[var(--border-subtle)]",
     "hover:border-[var(--accent)] hover:border-opacity-50",
-    "hover:shadow-md",
+    "hover:shadow-xl hover:shadow-[var(--accent-subtle)] dark:hover:shadow-[rgba(99,102,241,0.1)]",
     featured ? "p-8 md:p-10" : "p-6",
   ].join(" ")}
 >
@@ -121,3 +121,39 @@ const isFieldNote = contentType === "field-note";
     <MetadataRow date={date} readTime={readTime} category={undefined} />
   </footer>
 </article>
+
+<script>
+  function initTilt() {
+    const cards = document.querySelectorAll('.tilt-card');
+    cards.forEach(card => {
+      const htmlCard = card as HTMLElement;
+      htmlCard.addEventListener('mousemove', (e: MouseEvent) => {
+        // Debounce/throttle isn't strictly necessary for lightweight transforms
+        // but we keep calculations minimal
+        const rect = htmlCard.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        
+        // 3 degree max tilt for elegance
+        const tiltX = ((y - centerY) / centerY) * -3; 
+        const tiltY = ((x - centerX) / centerX) * 3;  
+        
+        htmlCard.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale3d(1.02, 1.02, 1.02)`;
+        htmlCard.style.zIndex = '10';
+      });
+      
+      htmlCard.addEventListener('mouseleave', () => {
+        htmlCard.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+        htmlCard.style.zIndex = '1';
+        // Give transition time to settle before dropping z-index completely
+        setTimeout(() => { if(htmlCard.style.transform.includes('rotateX(0deg)')) htmlCard.style.zIndex = '0'; }, 300);
+      });
+    });
+  }
+
+  // Run on initial load and after Astro page transitions
+  initTilt();
+  document.addEventListener('astro:page-load', initTilt);
+</script>

@@ -2,6 +2,7 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ProjectCard from '../../components/cards/ProjectCard.astro';
+import InteractiveNetwork from '../../components/interactive/InteractiveNetwork';
 
 // ---------------------------------------------------------------------------
 // Data
@@ -39,13 +40,18 @@ const filtered = typeParam
 >
   <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
     <!-- Page header -->
-    <header class="mb-12 border-b border-[var(--border-subtle)] pb-10">
-      <h1 class="font-serif text-4xl font-bold tracking-tight text-[var(--text-primary)] sm:text-5xl mb-4">
-        Projects
-      </h1>
-      <p class="text-xl text-[var(--text-secondary)] max-w-2xl leading-relaxed">
-        Hands-on builds and artifacts — the complement to the essays. Component libraries, frameworks, reference implementations, and architecture artifacts.
-      </p>
+    <header class="relative mb-12 overflow-hidden rounded-3xl border border-[var(--border-subtle)] shadow-sm">
+      <div class="absolute inset-0 z-0 opacity-80 bg-slate-950" aria-hidden="true">
+        <InteractiveNetwork className="w-full h-full" client:idle />
+      </div>
+      <div class="relative z-10 px-8 py-16 sm:px-12 sm:py-24">
+        <h1 class="font-serif text-4xl font-bold tracking-tight text-white sm:text-5xl mb-4">
+          <span class="italic text-sky-300">Signal</span> Projects
+        </h1>
+        <p class="text-xl text-zinc-300 max-w-2xl leading-relaxed">
+          Hands-on builds and artifacts — the complement to the essays. Component libraries, frameworks, reference implementations, and architecture artifacts.
+        </p>
+      </div>
     </header>
 
     <!-- Type filter -->

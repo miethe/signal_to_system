@@ -44,11 +44,11 @@ const summaryOnly = visibility === "summary-only";
 
 <article
   class={[
-    "group relative flex flex-col rounded-xl border transition-all duration-200",
+    "tilt-card group relative flex flex-col rounded-xl border transition-all duration-300 ease-out",
     "bg-[var(--bg-surface)]",
     "border-[var(--border-subtle)]",
     "hover:border-sky-400/50 dark:hover:border-sky-700",
-    "hover:shadow-md",
+    "hover:shadow-xl hover:shadow-sky-500/10 dark:hover:shadow-sky-400/10",
     featured ? "p-8 md:p-10" : "p-6",
   ].join(" ")}
 >
@@ -130,3 +130,40 @@ const summaryOnly = visibility === "summary-only";
     <MetadataRow date={date} />
   </footer>
 </article>
+
+<script>
+  function initProjectTilt() {
+    // Only re-attach if not already handled by a generic card listener
+    // Actually, EssayCard.astro might attach to .tilt-card, but if ProjectCard is on a different page,
+    // this ensures it runs. If both are on the same page, we might attach twice. 
+    // It's safer to check for an initialized flag or use a unique class.
+    const cards = document.querySelectorAll('.tilt-card:not([data-tilt-init])');
+    cards.forEach(card => {
+      const htmlCard = card as HTMLElement;
+      htmlCard.setAttribute('data-tilt-init', 'true');
+      
+      htmlCard.addEventListener('mousemove', (e: MouseEvent) => {
+        const rect = htmlCard.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        
+        const tiltX = ((y - centerY) / centerY) * -3; 
+        const tiltY = ((x - centerX) / centerX) * 3;  
+        
+        htmlCard.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale3d(1.02, 1.02, 1.02)`;
+        htmlCard.style.zIndex = '10';
+      });
+      
+      htmlCard.addEventListener('mouseleave', () => {
+        htmlCard.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+        htmlCard.style.zIndex = '1';
+        setTimeout(() => { if(htmlCard.style.transform.includes('rotateX(0deg)')) htmlCard.style.zIndex = '0'; }, 300);
+      });
+    });
+  }
+
+  initProjectTilt();
+  document.addEventListener('astro:page-load', initProjectTilt);
+</script>

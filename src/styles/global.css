@@ -1005,18 +1005,19 @@ pre code {
 @keyframes fadeInUp {
   from {
     opacity: 0;
-    transform: translateY(24px);
+    transform: translateY(24px) perspective(1000px) rotateX(10deg);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) perspective(1000px) rotateX(0deg);
   }
 }
 
 /* Pre-animation state — set on elements before they enter viewport */
 .animate-on-scroll {
   opacity: 0;
-  transform: translateY(24px);
+  transform: translateY(24px) perspective(1000px) rotateX(10deg);
+  transform-origin: center bottom;
 }
 
 /* Triggered state */
