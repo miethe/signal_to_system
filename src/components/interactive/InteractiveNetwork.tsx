@@ -182,7 +182,7 @@ export default function InteractiveNetwork({ className = "" }: InteractiveNetwor
   return (
     <div
       ref={containerRef}
-      className={`relative w-full overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-50 via-violet-50 to-slate-50 dark:from-indigo-950 dark:via-violet-950 dark:to-zinc-950 ${className}`}
+      className={`relative w-full overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-950 via-violet-950 to-zinc-950 ${className}`}
       style={{ minHeight: "320px" }}
       aria-hidden="true"
     >
@@ -194,7 +194,7 @@ export default function InteractiveNetwork({ className = "" }: InteractiveNetwor
       )}
 
       {/* Overlay gradient for content legibility */}
-      <div className="absolute inset-0 bg-gradient-to-t from-slate-50/60 dark:from-zinc-950/60 via-transparent to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/60 via-transparent to-transparent" />
     </div>
   );
 }

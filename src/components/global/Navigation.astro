@@ -7,7 +7,7 @@ import SearchBox from './SearchBox';
 
 <header
   id="site-header"
-  class="sticky top-0 z-[60] w-full bg-[var(--bg-surface)]/80 backdrop-blur-[20px] backdrop-saturate-150 transition-shadow border-b border-[var(--border-subtle)]"
+  class="dark sticky top-0 z-50 w-full bg-[var(--bg-surface)]/80 backdrop-blur-[20px] backdrop-saturate-150 transition-shadow"
 >
   <nav
     class="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8"
@@ -34,7 +34,7 @@ import SearchBox from './SearchBox';
         site.nav.map((item) => (
           <a
             href={item.href}
-            class="rounded-md px-3 py-1.5 text-sm font-medium text-[var(--text-tertiary)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)]"
+            class="rounded-md px-3 py-1.5 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)]"
           >
             {item.label}
           </a>
@@ -60,7 +60,7 @@ import SearchBox from './SearchBox';
         aria-expanded="false"
         aria-controls="mobile-menu"
         aria-label="Open navigation menu"
-        class="flex h-9 w-9 items-center justify-center rounded-md text-[var(--text-tertiary)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)] lg:hidden"
+        class="flex h-9 w-9 items-center justify-center rounded-md text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)] lg:hidden"
       >
         <svg
           id="hamburger-icon"
@@ -101,7 +101,7 @@ import SearchBox from './SearchBox';
           <li>
             <a
               href={item.href}
-              class="block rounded-md px-3 py-2 text-sm font-medium text-[var(--text-tertiary)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)]"
+              class="block rounded-md px-3 py-2 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)]"
             >
               {item.label}
             </a>
