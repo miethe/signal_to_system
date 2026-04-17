@@ -148,7 +148,7 @@ const topicIconColors: Record<string, string> = {
             desc: 'From agent context engineering to org design to platform strategy — the full technical executive stack.',
           },
         ].map(({ label, value, desc }) => (
-          <div class="border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 rounded-2xl shadow-sm transition-all hover:border-[var(--accent)] hover:shadow-ambient">
+          <div class="tilt-card transform-gpu ease-out will-change-transform border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 rounded-2xl shadow-sm transition-all hover:border-[var(--accent)] hover:shadow-ambient">
             <dt class="font-mono text-[11px] font-bold uppercase tracking-widest text-[var(--accent)] mb-2">{label}</dt>
             <dd class="text-2xl font-bold text-[var(--text-primary)] mb-2">{value}</dd>
             <p class="text-sm text-[var(--text-secondary)] leading-relaxed">{desc}</p>
@@ -174,7 +174,7 @@ const topicIconColors: Record<string, string> = {
           </a>
         </div>
         
-        <a href={`/series/${activeSeries[0].id}/`} class="block relative group overflow-hidden rounded-xl bg-[var(--bg-surface)] shadow-ambient border-none">
+        <a href={`/series/${activeSeries[0].id}/`} class="tilt-card transform-gpu ease-out will-change-transform block relative group overflow-hidden rounded-xl bg-[var(--bg-surface)] shadow-ambient border-none">
           <div class="grid grid-cols-1 lg:grid-cols-2">
             <div class="p-10 sm:p-12 flex flex-col justify-center relative overflow-hidden">
               <div class="absolute top-0 left-0 w-1 h-full bg-[var(--accent)]"></div>
@@ -216,7 +216,7 @@ const topicIconColors: Record<string, string> = {
       
       <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
         {TOPIC_HUBS.slice(0, 3).map((hub, i) => (
-          <a href={`/topics/${hub.slug}/`} class={`group p-8 rounded-xl transition-all flex flex-col justify-between border-none ${i === 0 ? 'md:col-span-2 lg:col-span-2 bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)] aspect-video md:aspect-auto' : 'bg-[var(--bg-subtle)] hover:bg-[var(--bg-surface)]'}`}>
+          <a href={`/topics/${hub.slug}/`} class={`tilt-card transform-gpu ease-out will-change-transform group p-8 rounded-xl transition-all flex flex-col justify-between border-none ${i === 0 ? 'md:col-span-2 lg:col-span-2 bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)] aspect-video md:aspect-auto' : 'bg-[var(--bg-subtle)] hover:bg-[var(--bg-surface)]'}`}>
             <div>
               <span class={`material-symbols-outlined text-4xl mb-6 ${topicIconColors[hub.slug] ?? 'text-[var(--accent)]'}`}>
                   {i === 0 ? 'smart_toy' : i === 1 ? 'groups' : 'architecture'}
@@ -231,7 +231,7 @@ const topicIconColors: Record<string, string> = {
         ))}
         
         <!-- Pillar 4 (Special Bottom) -->
-        <div class="md:col-span-3 lg:col-span-4 p-8 rounded-xl bg-[var(--bg-base)] border border-[var(--border-subtle)] flex flex-col md:flex-row items-center justify-between gap-8 hover:border-[var(--accent)] transition-colors">
+        <div class="tilt-card transform-gpu ease-out will-change-transform md:col-span-3 lg:col-span-4 p-8 rounded-xl bg-[var(--bg-base)] border border-[var(--border-subtle)] flex flex-col md:flex-row items-center justify-between gap-8 hover:border-[var(--accent)] transition-colors">
             <div class="flex items-center gap-6">
                 <span class="material-symbols-outlined text-5xl text-[var(--text-tertiary)] opacity-50">terminal</span>
                 <div>

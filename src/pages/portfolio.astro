@@ -55,7 +55,7 @@ const statusConfig: Record<string, { label: string; cls: string; dot: string }> 
     <section>
       <a
         href="/portfolio/ui/"
-        class="not-prose group flex flex-col gap-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 transition hover:-translate-y-0.5 hover:border-[var(--accent)] hover:shadow-md sm:flex-row sm:items-center sm:justify-between"
+        class="tilt-card transform-gpu ease-out will-change-transform not-prose group flex flex-col gap-4 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 transition hover:-translate-y-0.5 hover:border-[var(--accent)] hover:shadow-md sm:flex-row sm:items-center sm:justify-between"
       >
         <div class="space-y-2">
           <div class="flex items-center gap-3">
@@ -117,7 +117,7 @@ const statusConfig: Record<string, { label: string; cls: string; dot: string }> 
               const sc = statusConfig[item.status] ?? statusConfig.active;
               return (
                 <div class:list={[
-                  'rounded-xl border p-6 transition-all duration-200',
+                  'tilt-card transform-gpu ease-out will-change-transform rounded-xl border p-6 transition-all duration-200',
                   'bg-[var(--bg-surface)]',
                   'border-[var(--border-subtle)]',
                   item.featured ? 'border-l-4 border-l-[var(--accent)]' : '',

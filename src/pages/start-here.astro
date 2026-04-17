@@ -80,7 +80,7 @@ const readerPaths = [
 
       <div class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 not-prose">
         {readerPaths.map((path) => (
-          <div class="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6">
+          <div class="tilt-card transform-gpu ease-out will-change-transform rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 transition-all hover:border-[var(--accent)] hover:shadow-md">
             <h3 class="font-semibold text-[var(--text-primary)] mb-2">{path.type}</h3>
             <p class="text-sm text-[var(--text-secondary)] leading-relaxed mb-4">{path.description}</p>
             <div class="flex flex-wrap gap-1.5 mb-4">

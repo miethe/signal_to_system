@@ -53,6 +53,7 @@ const sc = statusConfig[status] ?? statusConfig.active;
 
 <article
   class={[
+    "tilt-card animate-on-scroll transform-gpu ease-out will-change-transform",
     "group relative flex flex-col rounded-xl border transition-all duration-200",
     "bg-[var(--bg-surface)]",
     "border-[var(--border-subtle)]",
@@ -166,3 +167,40 @@ const sc = statusConfig[status] ?? statusConfig.active;
     </span>
   </footer>
 </article>
+
+<script>
+  function initSeriesTilt() {
+    const cards = document.querySelectorAll('.tilt-card:not([data-tilt-init])');
+    cards.forEach(card => {
+      const htmlCard = card as HTMLElement;
+      htmlCard.setAttribute('data-tilt-init', 'true');
+      
+      htmlCard.addEventListener('mousemove', (e: MouseEvent) => {
+        const rect = htmlCard.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        
+        const tiltX = ((y - centerY) / centerY) * -3; 
+        const tiltY = ((x - centerX) / centerX) * 3;  
+        
+        htmlCard.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale3d(1.02, 1.02, 1.02)`;
+        htmlCard.style.zIndex = '10';
+      });
+      
+      htmlCard.addEventListener('mouseleave', () => {
+        htmlCard.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+        htmlCard.style.zIndex = '1';
+        setTimeout(() => { if(htmlCard.style.transform.includes('rotateX(0deg)')) htmlCard.style.zIndex = '0'; }, 300);
+      });
+    });
+  }
+
+  // Run on first load
+  initSeriesTilt();
+
+  // Run on view transitions if Astro ViewTransitions is used
+  document.addEventListener('astro:page-load', initSeriesTilt);
+  document.addEventListener('astro:after-swap', initSeriesTilt);
+</script>
