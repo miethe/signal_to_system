@@ -126,4 +126,40 @@ const resolvedDescription = description.slice(0, 160);
 
     <Footer />
   </body>
+
+  <!-- IntersectionObserver for entrance animations -->
+  <script>
+    function initScrollAnimations() {
+      const animatedSections = document.querySelectorAll('.animate-on-scroll:not(.is-visible)');
+      if (animatedSections.length > 0 && !document.documentElement.classList.contains('perf-lite')) {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                observer.unobserve(entry.target);
+              }
+            });
+          },
+          { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+        );
+        animatedSections.forEach((section) => observer.observe(section));
+      } else {
+        // Ensure content is visible if perf-lite or no observer support
+        animatedSections.forEach((s) => {
+          const htmlS = s as HTMLElement;
+          htmlS.style.opacity = '1';
+          htmlS.style.transform = 'none';
+          htmlS.classList.add('is-visible');
+        });
+      }
+    }
+
+    // Run on first load
+    initScrollAnimations();
+
+    // Run on view transitions if Astro ViewTransitions is used
+    document.addEventListener('astro:page-load', initScrollAnimations);
+    document.addEventListener('astro:after-swap', initScrollAnimations);
+  </script>
 </html>
