@@ -148,7 +148,7 @@ export default function SearchBox() {
         onClick={open}
         aria-label="Search (Cmd+K)"
         title="Search (Cmd+K)"
-        className="flex h-9 items-center gap-2 rounded-md px-2.5 text-[var(--text-tertiary)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-base)] sm:px-3"
+        className="flex h-9 items-center gap-2 rounded-md px-2.5 text-[var(--text-tertiary)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)] focus-ring sm:px-3"
       >
         <Search className="h-4 w-4 shrink-0" aria-hidden="true" />
         <span className="hidden text-sm sm:block">Search</span>
@@ -198,7 +198,7 @@ export default function SearchBox() {
               type="button"
               onClick={close}
               aria-label="Close search"
-              className="flex h-6 w-6 items-center justify-center rounded text-[var(--text-disabled)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-secondary)]"
+              className="flex h-6 w-6 items-center justify-center rounded text-[var(--text-disabled)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-secondary)] focus-ring"
             >
               <X className="h-3.5 w-3.5" aria-hidden="true" />
             </button>
@@ -242,7 +242,7 @@ export default function SearchBox() {
                   <a
                     href={result.url}
                     onClick={close}
-                    className={`flex items-start gap-3 px-4 py-3 transition-colors ${
+                    className={`flex items-start gap-3 px-4 py-3 transition-colors focus-ring ${
                       i === activeIndex
                         ? 'bg-[var(--accent-subtle)] text-[var(--text-primary)]'
                         : 'text-[var(--text-secondary)] hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)]'
