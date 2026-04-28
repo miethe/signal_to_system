@@ -22,6 +22,7 @@ export default function SearchBox() {
   const [error, setError] = useState<string | null>(null);
   const [activeIndex, setActiveIndex] = useState(-1);
 
+  const triggerRef = useRef<HTMLButtonElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const dialogRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
@@ -54,6 +55,11 @@ export default function SearchBox() {
     setQuery('');
     setResults([]);
     setActiveIndex(-1);
+
+    // Small delay to ensure the dialog has closed before focusing
+    setTimeout(() => {
+      triggerRef.current?.focus();
+    }, 10);
   }, []);
 
   // Global keyboard shortcut: Cmd+K / Ctrl+K
@@ -141,12 +147,15 @@ export default function SearchBox() {
     }
   }
 
-  if (!isOpen) {
-    return (
+  return (
+    <>
       <button
+        ref={triggerRef}
         type="button"
         onClick={open}
         aria-label="Search (Cmd+K)"
+        aria-expanded={isOpen}
+        aria-haspopup="dialog"
         title="Search (Cmd+K)"
         className="flex h-9 items-center gap-2 rounded-md px-2.5 text-[var(--text-tertiary)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-base)] sm:px-3"
       >
@@ -156,17 +165,15 @@ export default function SearchBox() {
           ⌘K
         </kbd>
       </button>
-    );
-  }
 
-  return (
-    /* Backdrop */
-    <div
-      className="fixed inset-0 z-[100] flex items-start justify-center px-4 pt-[15vh]"
-      style={{ background: 'rgba(2, 6, 23, 0.75)', backdropFilter: 'blur(4px)' }}
-      role="presentation"
-    >
-      {/* Dialog */}
+      {isOpen && (
+        /* Backdrop */
+        <div
+          className="fixed inset-0 z-[100] flex items-start justify-center px-4 pt-[15vh]"
+          style={{ background: 'rgba(2, 6, 23, 0.75)', backdropFilter: 'blur(4px)' }}
+          role="presentation"
+        >
+          {/* Dialog */}
       <div
         ref={dialogRef}
         role="dialog"
@@ -284,23 +291,25 @@ export default function SearchBox() {
           )}
         </div>
 
-        {/* Footer hint */}
-        <div className="flex items-center gap-4 border-t border-[var(--border-subtle)] px-4 py-2.5 text-xs text-[var(--text-disabled)]">
-          <span className="flex items-center gap-1">
-            <kbd className="rounded border border-[var(--border)] bg-[var(--bg-muted)] px-1 py-0.5 text-[var(--text-tertiary)]">↑</kbd>
-            <kbd className="rounded border border-[var(--border)] bg-[var(--bg-muted)] px-1 py-0.5 text-[var(--text-tertiary)]">↓</kbd>
-            navigate
-          </span>
-          <span className="flex items-center gap-1">
-            <kbd className="rounded border border-[var(--border)] bg-[var(--bg-muted)] px-1 py-0.5 text-[var(--text-tertiary)]">↵</kbd>
-            open
-          </span>
-          <span className="flex items-center gap-1">
-            <kbd className="rounded border border-[var(--border)] bg-[var(--bg-muted)] px-1 py-0.5 text-[var(--text-tertiary)]">Esc</kbd>
-            close
-          </span>
+            {/* Footer hint */}
+            <div className="flex items-center gap-4 border-t border-[var(--border-subtle)] px-4 py-2.5 text-xs text-[var(--text-disabled)]">
+              <span className="flex items-center gap-1">
+                <kbd className="rounded border border-[var(--border)] bg-[var(--bg-muted)] px-1 py-0.5 text-[var(--text-tertiary)]">↑</kbd>
+                <kbd className="rounded border border-[var(--border)] bg-[var(--bg-muted)] px-1 py-0.5 text-[var(--text-tertiary)]">↓</kbd>
+                navigate
+              </span>
+              <span className="flex items-center gap-1">
+                <kbd className="rounded border border-[var(--border)] bg-[var(--bg-muted)] px-1 py-0.5 text-[var(--text-tertiary)]">↵</kbd>
+                open
+              </span>
+              <span className="flex items-center gap-1">
+                <kbd className="rounded border border-[var(--border)] bg-[var(--bg-muted)] px-1 py-0.5 text-[var(--text-tertiary)]">Esc</kbd>
+                close
+              </span>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
+      )}
+    </>
   );
 }
