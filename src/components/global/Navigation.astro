@@ -16,7 +16,7 @@ import SearchBox from './SearchBox';
     <!-- Site logo / wordmark -->
     <a
       href="/"
-      class="group flex items-center gap-2.5 text-[var(--text-primary)] no-underline transition-opacity hover:opacity-80"
+      class="group flex items-center gap-2.5 text-[var(--text-primary)] no-underline transition-opacity hover:opacity-80 focus-ring"
       aria-label={site.title}
     >
       <img
@@ -34,7 +34,7 @@ import SearchBox from './SearchBox';
         site.nav.map((item) => (
           <a
             href={item.href}
-            class="rounded-md px-3 py-1.5 text-sm font-medium text-[var(--text-tertiary)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)]"
+            class="rounded-md px-3 py-1.5 text-sm font-medium text-[var(--text-tertiary)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)] focus-ring"
           >
             {item.label}
           </a>
@@ -60,7 +60,7 @@ import SearchBox from './SearchBox';
         aria-expanded="false"
         aria-controls="mobile-menu"
         aria-label="Open navigation menu"
-        class="flex h-9 w-9 items-center justify-center rounded-md text-[var(--text-tertiary)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)] lg:hidden"
+        class="flex h-9 w-9 items-center justify-center rounded-md text-[var(--text-tertiary)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)] lg:hidden focus-ring"
       >
         <svg
           id="hamburger-icon"
@@ -101,7 +101,7 @@ import SearchBox from './SearchBox';
           <li>
             <a
               href={item.href}
-              class="block rounded-md px-3 py-2 text-sm font-medium text-[var(--text-tertiary)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)]"
+              class="block rounded-md px-3 py-2 text-sm font-medium text-[var(--text-tertiary)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)] focus-ring"
             >
               {item.label}
             </a>
