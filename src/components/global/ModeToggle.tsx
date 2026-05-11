@@ -12,7 +12,7 @@ export default function ModeToggle() {
       onClick={togglePerformanceMode}
       aria-label={isRich ? 'Switch to lite mode (reduced animations)' : 'Switch to rich mode'}
       title={isRich ? 'Lite mode: reduce animations & effects' : 'Rich mode: full experience'}
-      className="flex h-9 w-9 items-center justify-center rounded-md text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-base)]"
+      className="focus-ring flex h-9 w-9 items-center justify-center rounded-md text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)]"
     >
       {isRich ? (
         <Zap className="h-4 w-4" aria-hidden="true" />
