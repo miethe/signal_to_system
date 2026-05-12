@@ -148,7 +148,7 @@ export default function SearchBox() {
         onClick={open}
         aria-label="Search (Cmd+K)"
         title="Search (Cmd+K)"
-        className="flex h-9 items-center gap-2 rounded-md px-2.5 text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--bg-base)] sm:px-3"
+        className="flex h-9 items-center gap-2 rounded-md px-2.5 text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)] focus-visible:outline-none focus-ring sm:px-3"
       >
         <Search className="h-4 w-4 shrink-0" aria-hidden="true" />
         <span className="hidden text-sm sm:block">Search</span>
