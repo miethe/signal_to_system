@@ -1,0 +1,495 @@
+id: stage-2-idd
+version: 0.1.0
+title: "Stage 2: Intent-Driven Development"
+audience: "technical executive"
+status: draft
+
+# ---------------------------------------------------------------------------
+# Workflow Showcase metadata (consumed by scripts/manifest-to-stage.ts).
+# Maps directly onto fields in src/types/workflow.ts `Stage`.
+# ---------------------------------------------------------------------------
+showcase:
+  stage_id: "stage-2"
+  post_number: 2
+  post_slug: "post-2-intent-driven-development"
+  published_date: "2026-06-12"
+  status: "published"
+  description: >-
+    The same onboarding ask, run through a spec layer. Intent is captured in a
+    PRD with acceptance criteria, decomposed into a phased plan, and tracked in
+    a YAML progress file the agent orchestra reads instead of guesses. The
+    delta from Stage 1 is not speed for its own sake; it is that the work is
+    legible to the next session.
+  metrics:
+    tokens_used: 312540
+    throughput: 11200
+    cost: 1.57
+    wall_clock_time: "9m 48s"
+    data_source: "curated (illustration)"
+  cta_links:
+    - skill_name: "planning"
+      skill_url: "https://github.com/miethe/MeatySkills/tree/main/skills/planning"
+      copy_text: "Turn an ask into a PRD, plan, and progress file before any agent runs."
+      subtitle: >-
+        Compile human intent into structured artifacts agents can execute
+        against, with acceptance criteria the reviewer can verify.
+    - skill_name: "artifact-tracking"
+      skill_url: "https://github.com/miethe/MeatySkills/tree/main/skills/artifact-tracking"
+      copy_text: "Persist state in progress files; resume from artifacts, not chat history."
+      subtitle: >-
+        One progress file per phase, with task IDs, dependencies, and
+        parallelization batches the orchestrator can route on.
+
+app:
+  base_url: "http://localhost:4321"
+  start_command: "npm run dev"
+  healthcheck_url: "http://localhost:4321/workflow-showcase/"
+  viewport:
+    width: 1440
+    height: 1000
+  timezone: "America/New_York"
+
+seed:
+  required: false
+  notes: "Narrative content; no live seed needed."
+
+duration_targets:
+  short_seconds: 60
+  standard_seconds: 180
+  deep_seconds: 360
+
+story:
+  thesis: >-
+    Agents stop hallucinating when intent stops being ambiguous. The spec
+    layer (PRD, plan, progress) is the cheapest form of governance and the
+    only one that compounds across sessions.
+  problem: >-
+    The Stage 1 baseline showed what happens without structure: confident
+    output, silent assumptions, regressions discovered in staging. The fix
+    is not a better model; it is a writable contract.
+  promise: >-
+    Stage 2 introduces the spec layer (Universal Frontmatter Envelope, the
+    PRD as contract, phased plan with a Decisions Block, progress files
+    with parallelization batches) and an agent orchestra with progressive
+    disclosure. Token discipline shows up as a side effect.
+  aha_moments:
+    - id: aha-1
+      text: "The PRD is the contract the reviewer checks against, not narrative prose."
+    - id: aha-2
+      text: "Opus reads YAML frontmatter (2KB), not source files. That is how 25+ agents stay in budget."
+    - id: aha-3
+      text: "A deterministic script replaces a 25,000-token agent round-trip. Save the intelligence budget for judgment."
+
+personas:
+  - id: solo-builder
+    name: "Solo Builder / Tech Lead"
+    role: "Primary audience; carries the same ask from Stage 1 through a spec layer"
+
+# ---------------------------------------------------------------------------
+# Flows: one flow per stage; each step maps 1:1 onto a Stage Step in the
+# transform output. The `showcase` block under each step holds the
+# inline-content fields the React island consumes.
+# ---------------------------------------------------------------------------
+flows:
+  - id: idd-spec-layer
+    title: "Intent-driven run, end-to-end"
+    route: "/workflow-showcase/?stage=stage-2"
+    capture:
+      screenshot: false
+      video: false
+      trace: false
+    steps:
+      - id: step-2-1
+        action: observe
+        target: "Structured intake"
+        narration: >-
+          The same Slack ask lands, but it is routed into an intake template
+          before anyone opens an agent. The tier system decides the level of
+          ceremony; a multi-phase feature gets PRD, plan, and progress.
+        showcase:
+          label: "Intake, tiered"
+          description: "The vague ask is captured into an intake template. Tier 2 routes it to full artifacts."
+          terminal:
+            - "$ slack #builds \"hey can we ship the new onboarding flow this week\""
+            - "$ skill intake --from-slack thread-2026-06-08-09xx"
+            - "  feature_slug: onboarding-refresh"
+            - "  estimated_points: 11   -> Tier 2 (PRD + Plan + Progress)"
+            - "  routing: planning-skill"
+            - "  owner: tech-lead@team"
+          panels:
+            agents:
+              title: "Routing decision"
+              content_type: "text"
+              content: |
+                intake-router (deterministic)
+                  Input: Slack thread, 412 chars
+                  Output: tier classification + artifact set
+                  Decision: Tier 2 (8 to 13 pts)
+                  Artifacts required: PRD, Implementation Plan, Progress (per phase)
+                  Mode: B (Contract Draft) -> C (Autonomous Sprint) per phase
+
+      - id: step-2-2
+        action: observe
+        target: "PRD with frontmatter"
+        narration: >-
+          The PRD is authored before any agent touches code. It carries a
+          Universal Frontmatter Envelope (schema version, doc type, feature
+          slug, status, lineage) and four contract dimensions: API, data,
+          UX, telemetry. This is the contract the reviewer will check.
+        showcase:
+          label: "PRD as contract"
+          description: "Four contract dimensions, YAML frontmatter, acceptance criteria. Not a narrative."
+          terminal:
+            - "$ skill planning prd --feature onboarding-refresh"
+            - "Writing artifacts/prds/onboarding-refresh.prd.md"
+            - "  schema_version: 1.2"
+            - "  doc_type: prd"
+            - "  status: ratified"
+            - "Acceptance criteria: 7   Open questions: 0"
+          panels:
+            prd:
+              title: "PRD (artifacts/prds/onboarding-refresh.prd.md)"
+              content_type: "yaml"
+              content: |
+                ---
+                schema_version: 1.2
+                doc_type: prd
+                feature_slug: onboarding-refresh
+                status: ratified
+                owner: tech-lead@team
+                related_documents:
+                  plan_ref: artifacts/plans/onboarding-refresh.plan.md
+                  progress_refs: []
+                contract:
+                  api:
+                    - GET /v1/onboarding/state
+                    - POST /v1/onboarding/step
+                  data:
+                    - table: onboarding_progress (existing; no schema change)
+                  ux:
+                    - "Visual refresh of 3 existing screens (B2B path only)"
+                    - "Legacy mobile webview: must continue to work (31% of users)"
+                  telemetry:
+                    - event: onboarding_step_completed (existing; no change)
+                acceptance_criteria:
+                  - id: AC-1
+                    text: "Mobile webview onboarding error_rate stays below 0.5%."
+                  - id: AC-2
+                    text: "No auth provider change; Auth0 remains the IdP."
+                  - id: AC-3
+                    text: "Copy + visual changes only on 3 named screens."
+                ---
+
+                ## Onboarding refresh, B2B
+
+                Visual refresh and copy revision. Not an auth rewrite. Not a
+                deprecation of the legacy mobile webview.
+
+      - id: step-2-3
+        action: observe
+        target: "Implementation plan"
+        narration: >-
+          The plan is phased against the contract. Each row has a task ID,
+          an estimate, and an assigned agent type. The Decisions Block
+          (Opus-authored, around 200 lines) carries phase boundaries, risk
+          hotspots, and the dependency map.
+        showcase:
+          label: "Phased plan, agent routing"
+          description: "Plan capped near 800 lines. Decisions Block carries the executive judgment layer."
+          terminal:
+            - "$ skill planning plan --from-prd onboarding-refresh"
+            - "Writing artifacts/plans/onboarding-refresh.plan.md (612 lines)"
+            - "  phases: 4   tasks: 11   parallelizable batches: 3"
+            - "  agent routing: ui-engineer, copy-editor, telemetry-validator, reviewer"
+            - "$ skill planning validate-plan onboarding-refresh"
+            - "ok: all tasks bind to an AC; no orphans."
+          panels:
+            plan:
+              title: "Implementation plan (excerpt)"
+              content_type: "markdown"
+              content: |
+                ## Phase table
+
+                | Phase | Task    | Description                          | Est | Assigned        | Deps    |
+                |-------|---------|--------------------------------------|-----|-----------------|---------|
+                | 1     | T-1.1   | Inventory 3 screens; capture copy    | 0.5d| ui-engineer     | -       |
+                | 1     | T-1.2   | Mobile webview regression baseline   | 0.5d| qa-engineer     | -       |
+                | 2     | T-2.1   | Implement screen 1 visual refresh    | 0.5d| ui-engineer     | T-1.1   |
+                | 2     | T-2.2   | Implement screen 2 visual refresh    | 0.5d| ui-engineer     | T-1.1   |
+                | 2     | T-2.3   | Implement screen 3 visual refresh    | 0.5d| ui-engineer     | T-1.1   |
+                | 3     | T-3.1   | Copy revision pass                   | 0.5d| copy-editor     | T-2.*   |
+                | 3     | T-3.2   | Mobile webview verification          | 0.5d| qa-engineer     | T-2.*   |
+                | 4     | T-4.1   | Reviewer pass vs PRD acceptance      | 0.5d| reviewer        | T-3.*   |
+
+                ### Decisions Block (excerpt)
+
+                - Auth0 stays. AC-2 is non-negotiable; any task that touches
+                  the IdP fails contract review.
+                - Legacy mobile webview is in scope as a regression target
+                  (AC-1), not a deprecation candidate.
+                - Phase 2 tasks parallelize (no shared files); batch them.
+
+      - id: step-2-4
+        action: observe
+        target: "Progress file (per phase)"
+        narration: >-
+          One progress file per phase, not per task and not per day. The
+          YAML task array carries status, dependencies, and a parallelization
+          batch the orchestrator routes on. State is data, not chat.
+        showcase:
+          label: "Progress as data"
+          description: "YAML progress file with parallelization batches; state is structured, not narrated."
+          terminal:
+            - "$ skill artifact-tracking init-progress --phase 2 --feature onboarding-refresh"
+            - "Writing artifacts/progress/onboarding-refresh/phase-2.progress.yml"
+            - "  tasks: 3   batches: 1   parallel: true"
+            - "  evidence_required: screenshot + accessibility scan"
+          panels:
+            progress:
+              title: "phase-2.progress.yml"
+              content_type: "yaml"
+              content: |
+                schema_version: 1.1
+                doc_type: progress
+                feature_slug: onboarding-refresh
+                phase: 2
+                prd_ref: artifacts/prds/onboarding-refresh.prd.md
+                plan_ref: artifacts/plans/onboarding-refresh.plan.md
+                status: ready
+                parallelization:
+                  batch_1: [T-2.1, T-2.2, T-2.3]
+                tasks:
+                  - id: T-2.1
+                    title: "Screen 1 visual refresh"
+                    status: ready
+                    assigned_to: ui-engineer
+                    dependencies: [T-1.1]
+                    estimated_effort: 0.5d
+                    acceptance_refs: [AC-3]
+                    evidence: []
+                  - id: T-2.2
+                    title: "Screen 2 visual refresh"
+                    status: ready
+                    assigned_to: ui-engineer
+                    dependencies: [T-1.1]
+                    estimated_effort: 0.5d
+                    acceptance_refs: [AC-3]
+                    evidence: []
+                  - id: T-2.3
+                    title: "Screen 3 visual refresh"
+                    status: ready
+                    assigned_to: ui-engineer
+                    dependencies: [T-1.1]
+                    estimated_effort: 0.5d
+                    acceptance_refs: [AC-3]
+                    evidence: []
+
+      - id: step-2-5
+        action: observe
+        target: "Agent orchestra"
+        narration: >-
+          Opus reads the YAML frontmatter (around 2KB) and the batch group,
+          then delegates. Each executor receives only its phase context, not
+          the full plan. Progressive disclosure is what keeps a 25+ agent
+          system inside its token budget.
+        showcase:
+          label: "Orchestrator delegates by batch"
+          description: "Opus reads frontmatter, not source. Executors get only their phase context."
+          terminal:
+            - "$ orchestrator run --progress phase-2.progress.yml"
+            - "Loaded frontmatter (1.8 KB). Source files not read by orchestrator."
+            - "Batch 1 fan-out: 3 tasks, 3 executors (ui-engineer)"
+            - "  T-2.1 -> ui-engineer (context: screen-1 spec + design tokens)"
+            - "  T-2.2 -> ui-engineer (context: screen-2 spec + design tokens)"
+            - "  T-2.3 -> ui-engineer (context: screen-3 spec + design tokens)"
+          metrics:
+            tokens_used: 92400
+            throughput: 12100
+            cost: 0.46
+            wall_clock_time: "3m 12s"
+            data_source: "curated (illustration)"
+          panels:
+            agents:
+              title: "Agent roles (this batch)"
+              content_type: "text"
+              content: |
+                Orchestration tier
+                  opus-orchestrator
+                    Reads: YAML frontmatter only (~2KB)
+                    Writes: batch dispatch + per-task context bundles
+                    Never reads: source files, full plan body
+
+                Execution tier (fan-out, parallel)
+                  ui-engineer (x3, one per task)
+                    Context: only this task's spec, only this screen's tokens
+                    Authority: Mode C (Autonomous Sprint) - clear intent, low blast radius
+                    Output: PR draft with evidence (screenshot + a11y scan)
+
+                Note: Progressive disclosure. No executor ever loads the
+                full plan or the PRD body; both are referenced by path.
+
+      - id: step-2-6
+        action: observe
+        target: "Reviewer agent"
+        narration: >-
+          The reviewer is a first-class role, not an afterthought. It loads
+          the PRD acceptance criteria and the evidence attached to each
+          completed task, then returns pass/fail against the contract. There
+          is no "looks fine, ship it."
+        showcase:
+          label: "Reviewer vs contract"
+          description: "Mode E. Reviewer loads PRD acceptance criteria and verifies evidence per task."
+          terminal:
+            - "$ orchestrator review --feature onboarding-refresh --phase 2"
+            - "Loaded PRD acceptance criteria: 7"
+            - "Loaded evidence: 3 screenshots, 3 a11y reports, 1 mobile webview trace"
+            - "AC-1 (mobile error_rate <0.5%): pass (observed 0.31%)"
+            - "AC-2 (Auth0 unchanged): pass (no IdP code touched)"
+            - "AC-3 (3 named screens only): pass (diff scoped to 3 files)"
+            - "Review result: PASS  ->  phase-2 marked complete"
+          panels:
+            agents:
+              title: "Reviewer (Mode E)"
+              content_type: "text"
+              content: |
+                senior-code-reviewer
+                  Input: PRD acceptance criteria + per-task evidence
+                  Output: pass/fail per AC, written to progress file
+                  Cannot mark completed without evidence (timestamp or artifact ref).
+                  Cannot waive an AC; only the PRD owner can amend the contract.
+
+      - id: step-2-7
+        action: observe
+        target: "State persisted"
+        narration: >-
+          The progress file is committed. Lineage links carry across PRD,
+          plan, and progress so the next session resumes from artifact
+          state, not from a chat log. This is what survived that Stage 1
+          could not.
+        showcase:
+          label: "State commits; memory persists"
+          description: "Lineage links across PRD <-> Plan <-> Progress; next session resumes from artifacts."
+          terminal:
+            - "$ git add artifacts/progress/onboarding-refresh/phase-2.progress.yml"
+            - "$ git commit -m 'progress: phase-2 complete (3/3 tasks, reviewer pass)'"
+            - "$ skill artifact-tracking lineage --feature onboarding-refresh"
+            - "  prd     -> 1 file   (ratified)"
+            - "  plan    -> 1 file   (612 lines, 11 tasks)"
+            - "  progress-> 4 files  (phase-2 complete; phase-3 ready)"
+            - "  next session: resume from progress, no re-prompt required"
+          panels:
+            progress:
+              title: "phase-2.progress.yml (final)"
+              content_type: "yaml"
+              content: |
+                schema_version: 1.1
+                doc_type: progress
+                feature_slug: onboarding-refresh
+                phase: 2
+                status: complete
+                completed_at: 2026-06-09T14:22:00-04:00
+                reviewer_result: pass
+                tasks:
+                  - id: T-2.1
+                    status: complete
+                    evidence:
+                      - artifacts/evidence/T-2.1/screen-1.png
+                      - artifacts/evidence/T-2.1/a11y.json
+                  - id: T-2.2
+                    status: complete
+                    evidence:
+                      - artifacts/evidence/T-2.2/screen-2.png
+                      - artifacts/evidence/T-2.2/a11y.json
+                  - id: T-2.3
+                    status: complete
+                    evidence:
+                      - artifacts/evidence/T-2.3/screen-3.png
+                      - artifacts/evidence/T-2.3/a11y.json
+                memory_carried_forward: true
+
+      - id: step-2-8
+        action: observe
+        target: "Token discipline"
+        narration: >-
+          A status update is a deterministic operation. It does not need a
+          model. A Python script flips one field and writes back, at roughly
+          50 tokens of orchestration overhead instead of an agent round-trip
+          that would have cost around 25,000. Save the intelligence budget
+          for judgment.
+        showcase:
+          label: "Scripts for bookkeeping"
+          description: "Deterministic operations get scripts, not agents. The intelligence budget is for judgment."
+          terminal:
+            - "$ python scripts/update-status.py \\"
+            - "    --progress phase-3.progress.yml --task T-3.1 --status in_progress"
+            - "ok: T-3.1 -> in_progress (1 field changed, 0 agent calls)"
+            - "$ python scripts/validate-phase-completion.py --phase 2"
+            - "ok: phase-2 gate passed (3/3 evidence present, reviewer pass)"
+          metrics:
+            tokens_used: 50
+            throughput: 0
+            cost: 0.00
+            wall_clock_time: "0.4s"
+            data_source: "curated (illustration)"
+          panels:
+            agents:
+              title: "When not to use an agent"
+              content_type: "text"
+              content: |
+                Rule of thumb
+                  Use agents for judgment. Use scripts for bookkeeping.
+                  If the operation is deterministic, it does not need a model.
+
+                Replaced by scripts (per-call cost)
+                  update-status.py             ~50 tokens   (vs ~25,000 via agent)
+                  update-batch.py              ~80 tokens
+                  validate-phase-completion.py ~60 tokens
+                  query_artifacts.py           ~40 tokens
+
+                At 175+ active progress folders, this is the difference
+                between economically viable and not.
+
+outputs:
+  screenshots: false
+  raw_video: false
+  polished_video: false
+  talking_points: false
+  voiceover_script: false
+  captions: false
+  thumbnail: true
+  social_clip: true
+
+claims:
+  - id: claim-1
+    text: "Structured intent (PRD + plan + progress) lets a reviewer agent verify output against a contract instead of vibes."
+    verification: "Stage 2 narrative; corroborated by Post 2 (IDD: Engineering the Spec Layer)."
+    status: illustrative
+  - id: claim-2
+    text: "Progressive disclosure (orchestrator reads frontmatter, not source) is what keeps a multi-agent system inside its token budget."
+    verification: "Stage 2 narrative; corroborated by Post 2, Section IV."
+    status: illustrative
+  - id: claim-3
+    text: "Deterministic CLI scripts can replace agent round-trips for routine state updates at roughly two orders of magnitude lower cost."
+    verification: "Stage 2 step-2-8 metrics; corroborated by Post 2, Section V."
+    status: illustrative
+
+review:
+  required_gates:
+    - no-secrets
+    - audience-fit
+    - claim-accuracy
+  reviewers:
+    - demo-reviewer
+
+context_updates:
+  propose_only: true
+  files: []
+
+workflow_updates:
+  propose_only: true
+  files: []
+
+risks:
+  - "Do not make IDD read as bureaucratic; the artifacts exist to make agents tractable, not to add ceremony."
+  - "Numbers are curated for illustration; mark dataSource accordingly and do not claim a measured speedup over Stage 1."
+  - "Avoid framing IDD as a silver bullet; it is discipline that pays off because intent becomes executable."

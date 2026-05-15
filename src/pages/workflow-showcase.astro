@@ -58,7 +58,7 @@ const pageDescription = selectedStage
           <label for="stage-select" class="text-[var(--text-tertiary)] font-medium">
             Stage:
           </label>
-          <select id="stage-select" name="stage" onchange="this.form.submit()">
+          <select id="stage-select" name="stage" aria-label="Select workflow stage" onchange="this.form.submit()">
             {publishedStages.map((s) => (
               <option value={s.id} selected={s.id === selectedStage?.id}>
                 {s.title}

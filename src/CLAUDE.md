@@ -60,3 +60,9 @@ const { Content } = await render(entry);
 // entry.id = slug derived from filename
 // entry.data = validated frontmatter
 ```
+
+## Workflow Showcase
+
+The Living Workflow Showcase lives at `/workflow-showcase/` and renders interactive stages of the Governed Agentic SDLC. Stage data is generated, not hand-written: `demo/demos/<slug>/demo.yaml` manifests are transformed into `src/data/workflow-stages.json` and `public/workflow-showcase/<stage-id>/` assets by `scripts/manifest-to-stage.ts`.
+
+**URL scheme is contractual** (`/workflow-showcase/?stage=<stage-id>`). Stage ids are immutable once published; reorder freely, but never rename. Full rules in `docs/specs/workflow-showcase/stage-authoring-template.md` ("URL Scheme (Permanent)").

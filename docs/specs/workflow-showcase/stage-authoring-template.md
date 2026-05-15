@@ -575,3 +575,59 @@ npm run build     # Full static build
 npm run dev       # Visit /workflow-showcase/?stage=<id>
 ```
 
+
+---
+
+## URL Scheme (Permanent)
+
+The Workflow Showcase URL scheme is contractual. External links from blog
+posts, social media, and the MeatyBrain PKM rely on it remaining stable.
+
+### Canonical Form
+
+```
+/workflow-showcase/?stage=<stage-id>
+```
+
+- `<stage-id>` is the **string id** from `workflow-stages.json` (e.g.,
+  `stage-1`, `stage-2`), not the post number and not a positional index.
+- The page resolves the active stage from the `stage` query parameter and
+  falls back to the first published stage if the parameter is missing or
+  refers to an unpublished/unknown id (with an inline notice).
+
+### Stability Rules
+
+- **Stage IDs are immutable once a stage is published.** Renaming a stage
+  id breaks every external link. If you need to change a stage's content
+  or title, edit the manifest, regenerate, and keep the id.
+- **Reordering stages is allowed.** The selector renders in declaration
+  order in `workflow-stages.json`; existing `?stage=stage-N` links continue
+  to resolve because lookup is by id, not by position.
+- **Adding stages is additive.** A new stage gets its own id (`stage-3`,
+  `stage-4`, ...) and a corresponding `demo/demos/<slug>/demo.yaml`
+  manifest. Existing links are unaffected.
+- **Unpublishing a stage** (setting `status` to anything other than
+  `published`) removes it from the selector and the dataset returned to
+  the island. Direct links to that id fall back to the latest published
+  stage with a "stage not found" notice. Prefer leaving content live and
+  versioning the manifest if the goal is to revise.
+
+### Where Blog Posts Should Link
+
+- Post N should link to `?stage=stage-N` (one-to-one mapping where the
+  post number equals the stage number in the id).
+- Use benefit-driven link text. Example: "See the ungoverned run in
+  action in the [Living Workflow Showcase](/workflow-showcase/?stage=stage-1)."
+
+### What Breaks the Contract
+
+Avoid any of these without a planned migration:
+
+- Switching the stage parameter to a positional integer
+  (`?stage=1` meaning "the first stage" instead of `stage=stage-1`).
+- Moving the page off `/workflow-showcase/`.
+- Removing the `stage` query parameter in favour of a path segment
+  (`/workflow-showcase/stage-1/`) without a redirect from the query form.
+
+If any of these is unavoidable, ship a redirect for the old form and
+document it in this section before merging.

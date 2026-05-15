@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Reviewer vs contract</title>
+<style>
+  :root { color-scheme: dark; }
+  body { background: #0b0d10; color: #d9e2ec; font: 14px/1.45 'JetBrains Mono', ui-monospace, Menlo, monospace; padding: 24px; margin: 0; }
+  h1 { font-size: 13px; font-weight: 600; color: #7c93a8; letter-spacing: 0.12em; text-transform: uppercase; margin: 0 0 12px; }
+  pre { white-space: pre-wrap; word-break: break-word; margin: 0; }
+</style>
+</head>
+<body>
+<h1>Reviewer vs contract</h1>
+<pre>$ orchestrator review --feature onboarding-refresh --phase 2
+Loaded PRD acceptance criteria: 7
+Loaded evidence: 3 screenshots, 3 a11y reports, 1 mobile webview trace
+AC-1 (mobile error_rate &lt;0.5%): pass (observed 0.31%)
+AC-2 (Auth0 unchanged): pass (no IdP code touched)
+AC-3 (3 named screens only): pass (diff scoped to 3 files)
+Review result: PASS  -&gt;  phase-2 marked complete</pre>
+</body>
+</html>

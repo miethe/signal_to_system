@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>State commits; memory persists</title>
+<style>
+  :root { color-scheme: dark; }
+  body { background: #0b0d10; color: #d9e2ec; font: 14px/1.45 'JetBrains Mono', ui-monospace, Menlo, monospace; padding: 24px; margin: 0; }
+  h1 { font-size: 13px; font-weight: 600; color: #7c93a8; letter-spacing: 0.12em; text-transform: uppercase; margin: 0 0 12px; }
+  pre { white-space: pre-wrap; word-break: break-word; margin: 0; }
+</style>
+</head>
+<body>
+<h1>State commits; memory persists</h1>
+<pre>$ git add artifacts/progress/onboarding-refresh/phase-2.progress.yml
+$ git commit -m &#39;progress: phase-2 complete (3/3 tasks, reviewer pass)&#39;
+$ skill artifact-tracking lineage --feature onboarding-refresh
+  prd     -&gt; 1 file   (ratified)
+  plan    -&gt; 1 file   (612 lines, 11 tasks)
+  progress-&gt; 4 files  (phase-2 complete; phase-3 ready)
+  next session: resume from progress, no re-prompt required</pre>
+</body>
+</html>

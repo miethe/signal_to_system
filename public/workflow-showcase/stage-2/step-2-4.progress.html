@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>phase-2.progress.yml</title>
+<style>
+  :root { color-scheme: dark; }
+  body { background: #0b0d10; color: #e6edf3; font: 14px/1.55 ui-sans-serif, system-ui, -apple-system, sans-serif; padding: 28px; margin: 0; max-width: 880px; }
+  header { border-bottom: 1px solid #1f2933; padding-bottom: 10px; margin-bottom: 18px; }
+  .meta { color: #7c93a8; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; }
+  h1 { font-size: 20px; margin: 6px 0 0; }
+  pre { background: #11161b; border: 1px solid #1f2933; border-radius: 8px; padding: 16px 18px; overflow-x: auto; font: 13px/1.5 'JetBrains Mono', ui-monospace, Menlo, monospace; color: #d9e2ec; }
+  .lang-yaml, .lang-json { color: #cdb3ff; }
+  .lang-md { color: #e6edf3; }
+</style>
+</head>
+<body>
+<header>
+  <div class="meta">progress · Progress as data</div>
+  <h1>phase-2.progress.yml</h1>
+</header>
+<pre class="lang-yaml">schema_version: 1.1
+doc_type: progress
+feature_slug: onboarding-refresh
+phase: 2
+prd_ref: artifacts/prds/onboarding-refresh.prd.md
+plan_ref: artifacts/plans/onboarding-refresh.plan.md
+status: ready
+parallelization:
+  batch_1: [T-2.1, T-2.2, T-2.3]
+tasks:
+  - id: T-2.1
+    title: &quot;Screen 1 visual refresh&quot;
+    status: ready
+    assigned_to: ui-engineer
+    dependencies: [T-1.1]
+    estimated_effort: 0.5d
+    acceptance_refs: [AC-3]
+    evidence: []
+  - id: T-2.2
+    title: &quot;Screen 2 visual refresh&quot;
+    status: ready
+    assigned_to: ui-engineer
+    dependencies: [T-1.1]
+    estimated_effort: 0.5d
+    acceptance_refs: [AC-3]
+    evidence: []
+  - id: T-2.3
+    title: &quot;Screen 3 visual refresh&quot;
+    status: ready
+    assigned_to: ui-engineer
+    dependencies: [T-1.1]
+    estimated_effort: 0.5d
+    acceptance_refs: [AC-3]
+    evidence: []
+</pre>
+</body>
+</html>
