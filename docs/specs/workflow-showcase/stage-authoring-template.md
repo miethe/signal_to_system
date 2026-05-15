@@ -535,4 +535,43 @@ If you encounter issues while authoring a stage:
 
 ---
 
-**Last Updated**: 2026-05-10
+**Last Updated**: 2026-05-15
+
+---
+
+## Phase 1 Implementation Notes (added 2026-05-15)
+
+The Phase 1 shell ships with the following concrete files and conventions; future stages should target this surface:
+
+### File locations (actual repo conventions)
+
+| Concern | Path |
+|---------|------|
+| TypeScript schema | `src/types/workflow.ts` (`Stage`, `Step`, `Artifact`, `Metrics`, `CTALink`) |
+| React islands | `src/components/interactive/WorkflowStage.tsx` (+ siblings) |
+| Nanostores state | `src/store/workflowStageStore.ts` |
+| Stage manifest | `src/data/workflow-stages.json` |
+| Scoped styles | `src/styles/workflow-showcase.css` |
+| Astro page | `src/pages/workflow-showcase.astro` |
+
+### Schema deltas vs. the original template
+
+The Phase 1 schema differs from the JSON sketch above in two small ways. **Use the new shape for all stages going forward**:
+
+1. **`status` is required** on `Stage` (`"published" | "draft" | "unreleased"`). Only `"published"` stages are filtered into the page.
+2. **`steps[].panels`** is now an inline `Partial<Record<ArtifactType, Artifact>>` (per-step content), not a reference to a stage-wide `artifacts` map. Each step carries the panel content that should be shown when that step is active. This matches the SPIKE recommendation and removes a layer of indirection.
+3. **`steps[].terminal`** is an array of strings (`string[]`), not a single string with `\n` escapes.
+4. **Optional Phase 2 asset fields** are reserved on both `Stage` (`thumbnail`, `socialClip`) and `Step` (`terminalRecording`, `artifactSnapshots`). The demo-foundry pipeline will populate these in Phase 2; leave them omitted for hand-authored fixtures.
+
+### Reference fixture
+
+`src/data/workflow-stages.json` ships with one stage — `test-fixture` (status: `published`) — which exercises every UI surface. Use it as a copy-and-modify template until Stage 1 lands.
+
+### Validation commands
+
+```
+npm run check     # TypeScript + Astro
+npm run build     # Full static build
+npm run dev       # Visit /workflow-showcase/?stage=<id>
+```
+

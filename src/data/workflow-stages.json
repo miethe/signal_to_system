@@ -1,0 +1,351 @@
+{
+  "stages": [
+    {
+      "ctaLinks": [
+        {
+          "copyText": "Replace ad-hoc prompts with a defensible SPIKE.",
+          "skillName": "spike",
+          "skillUrl": "https://github.com/miethe/MeatySkills/tree/main/skills/spike",
+          "subtitle": "Turn a vague feature ask into a PRD with acceptance criteria, risks, and rejection rationale before any agent runs."
+        }
+      ],
+      "description": "What an ungoverned agentic workflow actually looks like: a vague Slack prompt, a confident but wrong agent run, no traceable artifacts, and no memory carried forward. The cost is hidden in re-work, not visible in the token bill.",
+      "id": "stage-1",
+      "metrics": {
+        "cost": 2.44,
+        "dataSource": "curated (illustration)",
+        "throughput": 8400,
+        "tokensUsed": 487300,
+        "wallClockTime": "14m 02s"
+      },
+      "postNumber": 1,
+      "postSlug": "post-1-the-cost-of-ungoverned-agents",
+      "publishedDate": "2026-05-15",
+      "socialClip": "/workflow-showcase/stage-1/social-clip.mp4",
+      "status": "published",
+      "steps": [
+        {
+          "artifactSnapshots": {
+            "prd": "/workflow-showcase/stage-1/step-1-1.prd.html"
+          },
+          "description": "A one-line Slack message kicks off the work. No spec attached.",
+          "label": "Vague ask lands",
+          "panels": {
+            "prd": {
+              "content": "<!-- No PRD exists. The agent will infer requirements from\n     the Slack thread and recent chat context. -->\n\nInferred from Slack:\n\n> \"ship the new onboarding flow this week\"\n\nOpen questions (never written down):\n  - Which onboarding flow? (B2B? Consumer?)\n  - What does \"ship\" mean? (Beta? GA?)\n  - Who is the owner if it breaks in prod?\n",
+              "contentType": "markdown",
+              "title": "PRD (none)"
+            }
+          },
+          "stepId": "step-1-1",
+          "terminal": [
+            "$ slack #builds \"hey can we ship the new onboarding flow this week\"",
+            "Posted by pm at 09:07",
+            "> No PRD, no acceptance criteria, no owner."
+          ],
+          "terminalRecording": "/workflow-showcase/stage-1/step-1-1.terminal.html"
+        },
+        {
+          "artifactSnapshots": {
+            "agents": "/workflow-showcase/stage-1/step-1-2.agents.html"
+          },
+          "description": "Engineer pastes the Slack thread into an agent. No system prompt, no role, no plan.",
+          "label": "Agent spun up",
+          "panels": {
+            "agents": {
+              "content": "generic-agent (unscoped)\n  Inferred to be: PM + architect + frontend + reviewer.\n  No separation of concerns. No reviewer agent.\n  Failure mode: one model carries all responsibility;\n  no second opinion before output ships.\n",
+              "contentType": "text",
+              "title": "Agent roles (implicit)"
+            }
+          },
+          "stepId": "step-1-2",
+          "terminal": [
+            "$ claude --model sonnet --prompt-file slack-thread.txt",
+            "Reading prompt (412 chars)...",
+            "No system prompt. No role. No tools enumerated.",
+            "Starting run..."
+          ],
+          "terminalRecording": "/workflow-showcase/stage-1/step-1-2.terminal.html"
+        },
+        {
+          "artifactSnapshots": {
+            "plan": "/workflow-showcase/stage-1/step-1-3.plan.html"
+          },
+          "description": "Agent emits a 'plan' that contradicts unstated constraints. No one notices.",
+          "label": "Confident wrong plan",
+          "panels": {
+            "plan": {
+              "content": "## Onboarding flow rewrite — plan (draft, agent)\n\n| Phase | Task                              | Est  |\n|-------|-----------------------------------|------|\n| 1     | Replace Auth0 with Clerk          | 2 d  |\n| 2     | Drop legacy mobile webview support | 1 d  |\n| 3     | Ship behind feature flag           | 0.5 d|\n\n**Assumptions made silently:**\n- \"New flow\" means new auth provider. (Wrong; PM meant copy + visual refresh.)\n- Legacy mobile is deprecated. (Wrong; 31% of users.)\n- There is a feature flag service. (No.)\n",
+              "contentType": "markdown",
+              "title": "Agent-generated plan (contradicts unstated constraints)"
+            }
+          },
+          "stepId": "step-1-3",
+          "terminal": [
+            "$ agent run complete",
+            "Tokens: 184220 in / 27110 out  | Time: 4m 38s",
+            "Confidence: high",
+            "Output: 'plan.md' (untracked, in $TMPDIR)"
+          ],
+          "terminalRecording": "/workflow-showcase/stage-1/step-1-3.terminal.html"
+        },
+        {
+          "artifactSnapshots": {
+            "progress": "/workflow-showcase/stage-1/step-1-4.progress.html"
+          },
+          "description": "Engineer accepts the plan and starts work. No PRD comparison, no PM sign-off.",
+          "label": "No verification",
+          "panels": {
+            "progress": {
+              "content": "# No progress file exists. Status is in the engineer's head\n# and the agent has no persistent memory.\nstatus: unknown\nblockers: []\nassumptions_validated: []\nowner: implicit\nnotes: |\n  We have no record of which tasks were done, which were\n  abandoned, or which were silently re-scoped mid-flight.\n",
+              "contentType": "yaml",
+              "title": "Progress tracking (none)"
+            }
+          },
+          "stepId": "step-1-4",
+          "terminal": [
+            "$ git checkout -b onboarding-rewrite",
+            "$ npm i @clerk/clerk-react",
+            "added 47 packages in 6s",
+            "> 'looks fine, I'll figure out the mobile thing later'"
+          ],
+          "terminalRecording": "/workflow-showcase/stage-1/step-1-4.terminal.html"
+        },
+        {
+          "artifactSnapshots": {
+            "progress": "/workflow-showcase/stage-1/step-1-5.progress.html"
+          },
+          "description": "Staging breaks on mobile. The agent's assumptions weren't validated against reality.",
+          "label": "Reality bites",
+          "panels": {
+            "progress": {
+              "content": "status: in-progress (regressed)\ncompleted_tasks: 2\nregressed_tasks: 1\nblockers:\n  - legacy mobile webview support was not deprecated\n  - feature flag service does not exist\n  - PM intent was 'visual refresh', not 'auth rewrite'\nrework_estimate_days: 2\nrework_token_estimate: 220000\n",
+              "contentType": "yaml",
+              "title": "Progress (reconstructed post-hoc)"
+            }
+          },
+          "stepId": "step-1-5",
+          "terminal": [
+            "$ slack #incidents \"onboarding 500s on mobile webview\"",
+            "alert: error_rate=8.2%  baseline=0.4%",
+            "$ git log --oneline | head -3",
+            "  4a1c92e  switch to clerk",
+            "  812df3a  drop legacy webview shim  <-- the regression"
+          ],
+          "terminalRecording": "/workflow-showcase/stage-1/step-1-5.terminal.html"
+        },
+        {
+          "artifactSnapshots": {
+            "agents": "/workflow-showcase/stage-1/step-1-6.agents.html"
+          },
+          "description": "Agent has no session memory. Engineer re-pastes context. Token bill compounds.",
+          "label": "Re-prompt from scratch",
+          "panels": {
+            "agents": {
+              "content": "generic-agent (unscoped, again)\n  Still no role separation. The same model that proposed\n  the wrong plan is now correcting it without a reviewer.\n  No spike-writer. No planner. No progress agent.\n",
+              "contentType": "text",
+              "title": "Agent role (still unscoped)"
+            }
+          },
+          "stepId": "step-1-6",
+          "terminal": [
+            "$ claude --model sonnet --prompt-file 'context-v2.txt'",
+            "Reading prompt (1840 chars)...",
+            "No memory of previous session. No diff awareness.",
+            "Tokens: 156800 in / 31290 out  | Time: 5m 10s"
+          ],
+          "terminalRecording": "/workflow-showcase/stage-1/step-1-6.terminal.html"
+        },
+        {
+          "artifactSnapshots": {
+            "progress": "/workflow-showcase/stage-1/step-1-7.progress.html"
+          },
+          "description": "No PRD, no plan, no progress file. The next session starts from zero.",
+          "label": "Session ends, memory dies",
+          "panels": {
+            "progress": {
+              "content": "stage: ungoverned\nfinal_status: shipped-with-regression\nspec_artifact: null\nplan_artifact: null\nprogress_artifact: null\nagents_artifact: null\nmemory_carried_forward: false\nhidden_costs:\n  rework_days: 2.0\n  rework_tokens_est: 220000\n  rework_cost_usd_est: 1.10\n  team_trust_delta: \"down\"\n",
+              "contentType": "yaml",
+              "title": "Final state"
+            }
+          },
+          "stepId": "step-1-7",
+          "terminal": [
+            "$ exit",
+            "Session ws-2026-05-13-09xx not saved.",
+            "Artifacts (plan.md, scratch.md) remain in $TMPDIR; auto-deleted in 7d.",
+            "> 'we should write this up.'  (we don't.)"
+          ],
+          "terminalRecording": "/workflow-showcase/stage-1/step-1-7.terminal.html"
+        }
+      ],
+      "thumbnail": "/workflow-showcase/stage-1/thumbnail.png",
+      "title": "Stage 1: Pre-Governance Baseline"
+    },
+    {
+      "ctaLinks": [
+        {
+          "copyText": "Run your own SPIKE on a vague feature ask.",
+          "skillName": "spike",
+          "skillUrl": "https://github.com/miethe/MeatySkills/tree/main/skills/spike",
+          "subtitle": "Turn an unstructured prompt into a defensible PRD with acceptance criteria."
+        }
+      ],
+      "description": "Phase 1 smoke-test stage. Exercises every UI surface (scrubber, panels, metrics, CTA) with realistic but illustrative content. Not a published narrative; replaced by Stage 1 in Phase 2.",
+      "id": "test-fixture",
+      "metrics": {
+        "cost": 3.06,
+        "dataSource": "curated (illustration)",
+        "throughput": 11800,
+        "tokensUsed": 612400,
+        "wallClockTime": "8m 14s"
+      },
+      "postNumber": 0,
+      "postSlug": "test-fixture",
+      "publishedDate": "2026-05-15",
+      "status": "published",
+      "steps": [
+        {
+          "description": "A vague Slack message starts the work.",
+          "label": "Request lands",
+          "panels": {
+            "prd": {
+              "content": "---\ntitle: Workflow Showcase (TBD)\nstatus: idea\n---\n\nFeature ask from Slack:\n\n> \"build a workflow showcase\"\n\nNo frontmatter. No acceptance criteria. No owner.",
+              "contentType": "markdown",
+              "title": "PRD (draft)"
+            }
+          },
+          "stepId": "tf-1",
+          "terminal": [
+            "$ slack #team \"build a workflow showcase\"",
+            "Message posted by alice at 09:14",
+            "> No spec attached. No success criteria."
+          ]
+        },
+        {
+          "description": "Spike-writer turns the prompt into a real spec with frontmatter and acceptance criteria.",
+          "label": "PRD drafted",
+          "panels": {
+            "agents": {
+              "content": "spike-writer (Planner)\n  Authors the PRD from prompt + research.\n\nfrontend-architect (Reviewer)\n  Sanity-checks acceptance criteria for buildability.",
+              "contentType": "text",
+              "title": "Agents involved"
+            },
+            "prd": {
+              "content": "title: Living Workflow Showcase\ndescription: Interactive visualization of the agentic SDLC.\ncomplexity: L\neffort: 25-35 SP\nstatus: draft\nacceptance:\n  - URL reachable at /workflow-showcase/\n  - Scrubber latency < 100ms\n  - WCAG AA compliant",
+              "contentType": "yaml",
+              "title": "PRD (frontmatter)"
+            }
+          },
+          "stepId": "tf-2",
+          "terminal": [
+            "$ spike-writer --from prompt.txt --out docs/specs/workflow-showcase-prd.md",
+            "Reading prompt... 47 tokens",
+            "Drafting PRD with frontmatter, acceptance criteria, risks...",
+            "Wrote docs/specs/workflow-showcase-prd.md (412 lines)"
+          ]
+        },
+        {
+          "description": "Planner expands the PRD into a phase + task table.",
+          "label": "Plan generated",
+          "panels": {
+            "plan": {
+              "content": "| Phase | Title                | Effort | Owner              |\n|-------|----------------------|--------|--------------------|\n| 0     | SPIKE: Tech choice   | 6 SP   | spike-writer       |\n| 1     | Shell + routing      | 7 SP   | frontend-architect |\n| 2     | Stage 1 content      | 8 SP   | blog-drafter       |\n| 3     | Stage 2 content      | 5 SP   | blog-drafter       |\n| 4     | Blog integration     | 2 SP   | frontend-architect |\n| 5     | Polish + launch      | 8 SP   | frontend-architect |",
+              "contentType": "markdown",
+              "title": "Implementation plan (excerpt)"
+            },
+            "prd": {
+              "content": "title: Living Workflow Showcase\nstatus: draft\nacceptance:\n  - URL reachable\n  - Scrubber < 100ms\n  - WCAG AA",
+              "contentType": "yaml",
+              "title": "PRD (frontmatter)"
+            }
+          },
+          "stepId": "tf-3",
+          "terminal": [
+            "$ planner --from docs/specs/workflow-showcase-prd.md",
+            "Parsing PRD... 6 phases identified",
+            "Emitting task table... 38 tasks, 36 SP",
+            "Wrote docs/specs/workflow-showcase-implementation.md"
+          ]
+        },
+        {
+          "description": "Progress file initialized; CCDash starts recording the session.",
+          "label": "Progress tracked",
+          "panels": {
+            "plan": {
+              "content": "| Phase | Title           | Status        |\n|-------|-----------------|---------------|\n| 0     | SPIKE           | done          |\n| 1     | Shell + routing | in-progress   |\n| 2     | Stage 1 content | not-started   |",
+              "contentType": "markdown",
+              "title": "Implementation plan"
+            },
+            "progress": {
+              "content": "stage: workflow-showcase\nstatus: in-progress\ncompleted_tasks: 0\nin_progress_tasks: 3\nblocked_tasks: 0\nphase: 1\nmetrics:\n  tokens_used: 184220\n  throughput: 9100\n  cost: 0.92",
+              "contentType": "yaml",
+              "title": "Progress (YAML)"
+            }
+          },
+          "stepId": "tf-4",
+          "terminal": [
+            "$ progress init --plan workflow-showcase-implementation.md",
+            "Created docs/progress/workflow-showcase.yaml",
+            "$ ccdash watch --session ws-2026-05-15",
+            "Recording session ws-2026-05-15..."
+          ]
+        },
+        {
+          "description": "Two subagents pick up parallel tasks under the architect's coordination.",
+          "label": "Agents assigned",
+          "panels": {
+            "agents": {
+              "content": "frontend-architect (Lead)\n  Owns component architecture, scrubber UX, accessibility.\n\ndocumentation-writer (Support)\n  Updates stage authoring checklist and inline JSDoc.\n\nfrontend-developer (Standby)\n  Reserved for Phase 2 content authoring.",
+              "contentType": "text",
+              "title": "Agent team"
+            },
+            "progress": {
+              "content": "stage: workflow-showcase\nstatus: in-progress\ncompleted_tasks: 2\nin_progress_tasks: 4\nphase: 1\nagents: [frontend-architect, documentation-writer]",
+              "contentType": "yaml",
+              "title": "Progress (YAML)"
+            }
+          },
+          "stepId": "tf-5",
+          "terminal": [
+            "$ agents assign --plan workflow-showcase-implementation.md",
+            "frontend-architect → WS-1.1 (schema)",
+            "frontend-architect → WS-1.2 (island)",
+            "documentation-writer → WS-1.12 (authoring template)",
+            "All agents briefed; awaiting first artifact."
+          ]
+        },
+        {
+          "description": "Phase 1 components compile; test fixture renders end-to-end.",
+          "label": "Shell built",
+          "panels": {
+            "agents": {
+              "content": "frontend-architect — Phase 1 complete; handing off schema docs.\ndocumentation-writer — Stage authoring template updated.\nblog-drafter — Briefed for Phase 2 stage authoring.",
+              "contentType": "text",
+              "title": "Agent team"
+            },
+            "plan": {
+              "content": "| Phase | Title           | Status        |\n|-------|-----------------|---------------|\n| 0     | SPIKE           | done          |\n| 1     | Shell + routing | done          |\n| 2     | Stage 1 content | next          |",
+              "contentType": "markdown",
+              "title": "Implementation plan"
+            },
+            "progress": {
+              "content": "stage: workflow-showcase\nstatus: in-progress\ncompleted_tasks: 12\nin_progress_tasks: 0\nblocked_tasks: 0\nphase: 1\nphase_status: complete\nbundle_delta_kb: 12.4\nmetrics:\n  tokens_used: 612400\n  throughput: 11800\n  cost: 3.06",
+              "contentType": "yaml",
+              "title": "Progress (YAML)"
+            }
+          },
+          "stepId": "tf-6",
+          "terminal": [
+            "$ npm run check",
+            "0 errors. 0 warnings.",
+            "$ npm run build",
+            "✓ built in 4.27s",
+            "Bundle delta (showcase): 12.4 KB gzipped — under 15 KB target."
+          ]
+        }
+      ],
+      "title": "Test Fixture: Showcase Shell Validation"
+    }
+  ]
+}
