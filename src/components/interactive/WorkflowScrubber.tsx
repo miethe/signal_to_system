@@ -2,17 +2,21 @@
  * WorkflowScrubber — horizontal timeline with discrete step indicators.
  *
  * Desktop: clickable step chips + progress fill; arrow keys, Home/End navigate.
- * Mobile (compact): Prev/Next buttons with current label.
+ * Mobile (compact, <640px): Prev/Next buttons with current label; no horizontal
+ * scroll; touch targets >=44px.
  *
- * Accessibility:
- * - role="slider", aria-valuemin/max/now/text on the track
- * - aria-label on every step button
- * - Keyboard: ArrowLeft/Right, Home, End
+ * Accessibility (WCAG AA):
+ * - role="slider" with aria-valuemin/max/now/text on the track element.
+ * - Step buttons: role="tab", aria-selected, numeric label + sr-only status text.
+ * - Keyboard: ArrowLeft/Right step, ArrowUp/Down step, Home (first), End (last).
+ * - Visible focus rings in both light and dark mode (see workflow-showcase.css).
+ * - Compact controls: aria-label on Prev/Next, aria-live label announces step.
  *
  * No external animation libraries; CSS transitions only.
+ * Respects prefers-reduced-motion via CSS (see workflow-showcase.css).
  */
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Step } from "../../types/workflow";
 
 interface WorkflowScrubberProps {
@@ -20,6 +24,8 @@ interface WorkflowScrubberProps {
   activeIndex: number;
   onStep: (index: number) => void;
   stageTitle: string;
+  /** Optional tracker for analytics (debounced internally by parent). */
+  onAnalyticsStep?: (stepIndex: number) => void;
 }
 
 export default function WorkflowScrubber({
@@ -27,14 +33,15 @@ export default function WorkflowScrubber({
   activeIndex,
   onStep,
   stageTitle,
+  onAnalyticsStep,
 }: WorkflowScrubberProps) {
+  // Use 640px (Tailwind sm) as the compact breakpoint for mobile prev/next.
   const [compact, setCompact] = useState(false);
   const trackRef = useRef<HTMLDivElement>(null);
 
-  // Detect compact (mobile) mode via matchMedia
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const mq = window.matchMedia("(max-width: 768px)");
+    const mq = window.matchMedia("(max-width: 639px)");
     const update = () => setCompact(mq.matches);
     update();
     mq.addEventListener("change", update);
@@ -44,33 +51,52 @@ export default function WorkflowScrubber({
   const maxIndex = steps.length - 1;
   const progressPct = maxIndex === 0 ? 100 : (activeIndex / maxIndex) * 100;
 
+  const handleStep = (idx: number) => {
+    onStep(idx);
+    onAnalyticsStep?.(idx);
+  };
+
   const handleKeyDown = (e: React.KeyboardEvent) => {
     switch (e.key) {
       case "ArrowRight":
       case "ArrowDown":
         e.preventDefault();
-        onStep(Math.min(activeIndex + 1, maxIndex));
+        handleStep(Math.min(activeIndex + 1, maxIndex));
         break;
       case "ArrowLeft":
       case "ArrowUp":
         e.preventDefault();
-        onStep(Math.max(activeIndex - 1, 0));
+        handleStep(Math.max(activeIndex - 1, 0));
         break;
       case "Home":
         e.preventDefault();
-        onStep(0);
+        handleStep(0);
         break;
       case "End":
         e.preventDefault();
-        onStep(maxIndex);
+        handleStep(maxIndex);
         break;
     }
   };
 
   const currentStep = steps[activeIndex];
 
+  // Compute human-readable state labels for screen readers.
+  const stepStatusLabel = useMemo(
+    () => (idx: number) => {
+      if (idx === activeIndex) return "active";
+      if (idx < activeIndex) return "visited";
+      return "unvisited";
+    },
+    [activeIndex],
+  );
+
   return (
-    <div className="ws-scrubber" aria-label={`Workflow scrubber for ${stageTitle}`}>
+    <div
+      className="ws-scrubber"
+      aria-label={`Workflow scrubber for ${stageTitle}`}
+    >
+      {/* Progress track — acts as the keyboard-navigable slider. */}
       <div
         ref={trackRef}
         className="ws-scrubber__track"
@@ -80,7 +106,7 @@ export default function WorkflowScrubber({
         aria-valuemin={0}
         aria-valuemax={maxIndex}
         aria-valuenow={activeIndex}
-        aria-valuetext={currentStep?.label}
+        aria-valuetext={`Step ${activeIndex + 1} of ${steps.length}: ${currentStep?.label ?? ""}`}
         onKeyDown={handleKeyDown}
       >
         <div
@@ -91,17 +117,19 @@ export default function WorkflowScrubber({
       </div>
 
       {compact ? (
+        /* Mobile: Prev / label / Next layout. */
         <div className="ws-scrubber__controls">
           <button
             type="button"
             className="ws-scrubber__btn"
-            onClick={() => onStep(Math.max(activeIndex - 1, 0))}
+            onClick={() => handleStep(Math.max(activeIndex - 1, 0))}
             disabled={activeIndex === 0}
             aria-label="Previous step"
           >
-            ‹ Prev
+            &#8249; Prev
           </button>
-          <span className="ws-scrubber__label" aria-live="polite">
+          {/* aria-live announces step changes to screen readers on mobile. */}
+          <span className="ws-scrubber__label" aria-live="polite" aria-atomic="true">
             <strong>Step {activeIndex + 1} / {steps.length}</strong>
             <br />
             {currentStep?.label}
@@ -109,43 +137,45 @@ export default function WorkflowScrubber({
           <button
             type="button"
             className="ws-scrubber__btn"
-            onClick={() => onStep(Math.min(activeIndex + 1, maxIndex))}
+            onClick={() => handleStep(Math.min(activeIndex + 1, maxIndex))}
             disabled={activeIndex === maxIndex}
             aria-label="Next step"
           >
-            Next ›
+            Next &#8250;
           </button>
         </div>
       ) : (
+        /* Desktop: chip row. role="tablist" because each chip is role="tab". */
         <div className="ws-scrubber__steps" role="tablist" aria-label="Workflow steps">
           {steps.map((step, idx) => {
-            const state =
-              idx === activeIndex
-                ? "active"
-                : idx < activeIndex
-                  ? "visited"
-                  : "idle";
+            const state = stepStatusLabel(idx);
+            const isActive = idx === activeIndex;
             return (
               <button
                 key={step.stepId}
                 type="button"
                 role="tab"
                 className="ws-step"
-                data-state={state}
-                aria-selected={idx === activeIndex}
+                data-state={isActive ? "active" : idx < activeIndex ? "visited" : "idle"}
+                aria-selected={isActive}
                 aria-label={`Step ${idx + 1}: ${step.label}`}
-                onClick={() => onStep(idx)}
+                onClick={() => handleStep(idx)}
               >
+                {/* Numeric index — visible, aria-hidden to avoid duplicate reads. */}
                 <span className="ws-step__index" aria-hidden="true">
                   {String(idx + 1).padStart(2, "0")}
                 </span>
                 <span>{step.label}</span>
-                {state === "visited" && (
+                {/* Status communicated to screen readers without relying on color. */}
+                <span className="sr-only">{state}</span>
+                {idx < activeIndex && (
+                  /* Checkmark SVG for visited steps (color + icon; not color-only). */
                   <svg
                     className="ws-step__check"
                     viewBox="0 0 20 20"
                     fill="currentColor"
                     aria-hidden="true"
+                    focusable="false"
                   >
                     <path
                       fillRule="evenodd"

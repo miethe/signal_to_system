@@ -1,17 +1,52 @@
 ---
-title: Workflow Showcase — Stage Authoring Checklist
+title: "Workflow Showcase: Stage Authoring Checklist"
 description: "Step-by-step guide for authoring new stages in the Living Workflow Showcase. Used as Phase 5.5 in blog-drafter workflow when publishing Governed Agentic SDLC series posts."
 created: 2026-05-10
 status: draft
 ---
 
-# Workflow Showcase — Stage Authoring Checklist
+# Workflow Showcase: Stage Authoring Checklist
 
 **Purpose**: This checklist is triggered in blog-drafter Phase 5.5 when a Governed Agentic SDLC series post is published. It guides the authoring of a corresponding Workflow Showcase stage.
 
 **Expected Effort**: 1–2 days per stage (4–8 hours active work)
 
 **Outcome**: A new stage config entry in `src/data/workflow-stages.json`, tested and linked from the blog post.
+
+---
+
+## Canonical Authoring Path (Demo-Foundry Driven)
+
+The recommended workflow for authoring stages follows this sequence:
+
+1. **Author scenario manifest** in `demo/demos/stage-N-<slug>/manifest.yaml` (author all workflow steps, terminal output, artifacts, metrics)
+2. **Dry-run and apply** with `demo-foundry dry-run` then `demo-foundry apply` (validates manifest syntax and structure)
+3. **Generate stage config** with `node scripts/manifest-to-stage.ts stage-N` (transforms manifest to workflow-stages.json and copies assets to `public/workflow-showcase/stage-N/`)
+4. **Add blog post link** with `/workflow-showcase/?stage=N` (link from blog post frontmatter or body)
+5. **Test locally** with `npm run dev` and verify scrubber latency, artifact rendering, and dark mode
+
+This path is preferred because:
+- Manifest source lives closer to demo/scripts tooling (easier to update, regenerate, and version)
+- Assets (thumbnails, social clips, terminal recordings) are co-located with step definitions
+- Regeneration is deterministic and scriptable (no manual JSON editing)
+- Allows future tooling (e.g., CLI for interactive stage authoring) to operate on the same source
+
+For hand-authored stages or fixtures (when tooling is not yet available), follow the manual steps below.
+
+---
+
+## Manifest Checklist (If Using demo-foundry Path)
+
+If authoring via the canonical demo-foundry path, your manifest must include:
+
+- **Stage metadata**: id, postNumber, postSlug, title, description, status ("published" or "draft")
+- **Steps** (6–10 total): each with stepId, label, terminal output (1–3 lines), and panel references
+- **Artifacts per step**: PRD, Plan, Progress, Agents panels (with actual content, not templates)
+- **Metrics**: tokensUsed, throughput, cost, wallClockTime, dataSource ("real" or "curated (illustration)")
+- **CTA links** (1–2): skillName, skillUrl (MeatySkills repo), copyText (benefit-driven)
+- **Asset paths** (Phase 2): thumbnail, socialClip, terminalRecording, artifactSnapshots (optional; populated after demo-foundry apply)
+
+Reference Stage 1 and Stage 2 manifests in `demo/demos/` for the full structure.
 
 ---
 
@@ -442,17 +477,23 @@ Each stage has up to 4 artifact panel types:
 
 ## Estimated Time Breakdown
 
+For the canonical demo-foundry-driven path:
+
 | Task | Duration |
 |------|----------|
-| Preparation | 30 min |
-| Script steps (6–10) | 1–2 hours |
+| Preparation (metadata, reference materials) | 30 min |
+| Script workflow steps (6–10) | 1–2 hours |
 | Curate artifacts (PRD, plan, progress, agents) | 2–3 hours |
-| Gather metrics | 1 hour |
-| Create config entry (JSON) | 1–2 hours |
-| Test rendering and interaction | 1–2 hours |
+| Gather metrics (tokens, throughput, cost, time) | 1 hour |
+| Author manifest (demo-foundry YAML) | 1 hour |
+| Dry-run and apply (demo-foundry) | 15 min |
+| Generate stage config (manifest-to-stage.ts) | 5 min |
+| Test rendering and interaction (npm run dev) | 1–2 hours |
 | Add blog post link | 30 min |
 | Final QA and closeout | 30 min |
 | **Total** | **4–8 hours (1–2 days)** |
+
+Note: Time estimates assume artifacts are sourced from real workflow or well-documented examples (Stages 1–2). Entirely illustrative stages may require extra creative effort.
 
 ---
 
@@ -524,6 +565,34 @@ Each stage has up to 4 artifact panel types:
 
 ---
 
+## Gold Standard Examples
+
+### Stage 1 Manifest Structure
+
+Stage 1 ("Pre-Governance Baseline") is the reference implementation for ungoverned agentic workflows. Its manifest includes:
+
+- **7 steps** showing the progression from vague ask -> confident wrong plan -> reality bites -> token inflation
+- **Step panels** with real artifacts: PRD (empty/inferred), Plan (contradictory), Progress (missing)
+- **Terminal recordings** capturing the workflow tool's output at each step
+- **Metrics** illustrating hidden costs (2.44 USD, 487K tokens, 14m wall-clock)
+- **CTA**: "Replace ad-hoc prompts with a defensible SPIKE"
+
+Use this as a template for any stage illustrating a problem domain.
+
+### Stage 2 Manifest Structure
+
+Stage 2 ("Intent-Driven Development") shows the governed equivalent. Its manifest includes:
+
+- **8 steps** with progressive sophistication: intake -> PRD -> plan -> progress file -> orchestrator dispatch -> review -> state commit
+- **Artifact deltas**: each step's panels show realistic artifacts (YAML frontmatter, task tables, progress tracking)
+- **Agent roles**: explicit role separation (spike-writer, planner, executor, reviewer)
+- **Metrics**: demonstrating lower cost (1.57 USD, 312K tokens, 9m 48s) and better throughput
+- **CTA**: Two links (planning skill, artifact-tracking skill)
+
+Use this as a template for any stage illustrating a solution or governance pattern.
+
+---
+
 ## Questions or Blockers?
 
 If you encounter issues while authoring a stage:
@@ -565,7 +634,7 @@ The Phase 1 schema differs from the JSON sketch above in two small ways. **Use t
 
 ### Reference fixture
 
-`src/data/workflow-stages.json` ships with one stage — `test-fixture` (status: `published`) — which exercises every UI surface. Use it as a copy-and-modify template until Stage 1 lands.
+`src/data/workflow-stages.json` ships with one stage: `test-fixture` (status: `published`), which exercises every UI surface. Use it as a copy-and-modify template until Stage 1 lands.
 
 ### Validation commands
 

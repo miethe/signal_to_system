@@ -1,12 +1,20 @@
 /**
  * WorkflowMetrics — small fixed overlay showing tokens / throughput / cost.
  *
- * Position: bottom-right desktop, top-right mobile (CSS-driven).
- * Dismissible via close button (component-local state).
- * Adaptive contrast via dark translucent background with blur.
+ * Position: bottom-right on desktop, top-right on mobile (< 640px), governed
+ * by CSS in workflow-showcase.css. Repositions via media query so it does not
+ * obscure the scrubber or CTA card on narrow viewports.
+ *
+ * Dismissible via close button. Focus is NOT trapped; the button is simply
+ * focusable and triggers a state change that removes the element.
+ *
+ * Accessibility:
+ * - role="status" on the aside (live region, polite by default).
+ * - Close button has aria-label="Dismiss metrics overlay".
+ * - After dismiss, focus returns to the document body (no focus trap).
  */
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { Metrics } from "../../types/workflow";
 
 interface WorkflowMetricsProps {
@@ -15,6 +23,16 @@ interface WorkflowMetricsProps {
 
 export default function WorkflowMetrics({ metrics }: WorkflowMetricsProps) {
   const [dismissed, setDismissed] = useState(false);
+  const dismissRef = useRef<HTMLButtonElement>(null);
+
+  const handleDismiss = () => {
+    setDismissed(true);
+    // Return focus to body so no focus is stranded after the element unmounts.
+    if (typeof document !== "undefined") {
+      (document.activeElement as HTMLElement | null)?.blur();
+    }
+  };
+
   if (dismissed) return null;
 
   return (
@@ -36,12 +54,13 @@ export default function WorkflowMetrics({ metrics }: WorkflowMetricsProps) {
         <span className="ws-metrics__value">${metrics.cost.toFixed(2)}</span>
       </div>
       <button
+        ref={dismissRef}
         type="button"
         className="ws-metrics__dismiss"
-        onClick={() => setDismissed(true)}
+        onClick={handleDismiss}
         aria-label="Dismiss metrics overlay"
       >
-        ×
+        <span aria-hidden="true">&#x2715;</span>
       </button>
     </aside>
   );
