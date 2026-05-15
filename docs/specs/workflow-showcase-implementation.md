@@ -64,11 +64,11 @@ The primary risk is **interaction tech choice regret**: selecting Framer Motion 
 
 | ID | Task | Description | Acceptance Criteria | Est | Assigned |
 |----|------|-------------|-------|-----|----------|
-| **WS-0.1** | Design SPIKE evaluation criteria | [DONE — see workflow-showcase-spike.md] Define metrics: bundle size impact, interaction latency, authoring ergonomics, accessibility story, visual fidelity. | Metrics defined; examples provided. | 2 SP | spike-writer |
-| **WS-0.2** | Build minimal prototypes for each candidate | [DONE — see workflow-showcase-spike.md] Prototypes for Framer Motion, asciinema-style, and Monaco mock. | Working demos; bundle sizes measured. | 5 SP | frontend-architect |
-| **WS-0.3** | Measure performance and accessibility | [DONE — see workflow-showcase-spike.md] Bundle size, latency, a11y implications per candidate. | Comparison table with metrics. | 3 SP | frontend-architect |
-| **WS-0.4** | Evaluate authoring ergonomics per tech | [DONE — see workflow-showcase-spike.md] Document difficulty of scripting stages per tech (1-5 scale). | Authoring checklist per tech. | 2 SP | frontend-architect |
-| **WS-0.5** | Document SPIKE findings and recommendation | [DONE — see workflow-showcase-spike.md] SPIKE doc published with ADR recommendation. | Doc at `docs/specs/workflow-showcase-spike.md`; decision locked. | 3 SP | spike-writer |
+| **WS-0.1** | Design SPIKE evaluation criteria | [DONE, see workflow-showcase-spike.md] Define metrics: bundle size impact, interaction latency, authoring ergonomics, accessibility story, visual fidelity. | Metrics defined; examples provided. | 2 SP | spike-writer |
+| **WS-0.2** | Build minimal prototypes for each candidate | [DONE, see workflow-showcase-spike.md] Prototypes for Framer Motion, asciinema-style, and Monaco mock. | Working demos; bundle sizes measured. | 5 SP | frontend-architect |
+| **WS-0.3** | Measure performance and accessibility | [DONE, see workflow-showcase-spike.md] Bundle size, latency, a11y implications per candidate. | Comparison table with metrics. | 3 SP | frontend-architect |
+| **WS-0.4** | Evaluate authoring ergonomics per tech | [DONE, see workflow-showcase-spike.md] Document difficulty of scripting stages per tech (1-5 scale). | Authoring checklist per tech. | 2 SP | frontend-architect |
+| **WS-0.5** | Document SPIKE findings and recommendation | [DONE, see workflow-showcase-spike.md] SPIKE doc published with ADR recommendation. | Doc at `docs/specs/workflow-showcase-spike.md`; decision locked. | 3 SP | spike-writer |
 | **WS-0.6** | Initialize demo-foundry in repo | Invoke demo-foundry skill for dry-run, review setup plan, then apply to scaffold `demo/` workspace, `demo-foundry.config.yaml`, `.demoignore`, policy checklists. Run example demo end-to-end. Reference workflow-showcase Astro dev server in config. | `demo/` workspace scaffolded; example demo runs end-to-end producing screenshots and walkthrough video; no untracked secrets; config references Astro dev server. | 2 SP | frontend-architect |
 
 ### Quality Gates
