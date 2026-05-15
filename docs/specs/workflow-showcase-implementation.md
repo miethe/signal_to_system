@@ -1,9 +1,10 @@
 ---
 title: Implementation Plan — Living Workflow Showcase
-description: "Phase-by-phase task breakdown for interactive visualization of the Governed Agentic SDLC workflow, with stage progression unlocked as blog series ships."
+description: "Phase-by-phase task breakdown for interactive visualization of the Governed Agentic SDLC workflow, with stage progression unlocked as blog series ships. Incorporates demo-foundry authoring pipeline for Phase 2-3 content production."
 audience: [ai-agents, developers]
 tags: [blog-feature, visualization, workflow, agentic-sdlc, implementation]
 created: 2026-05-10
+updated: 2026-05-15
 status: draft
 category: site-feature
 related:
@@ -13,13 +14,13 @@ related:
 
 # Implementation Plan: Living Workflow Showcase
 
-**Complexity**: Large (L) | **Track**: Full | **Total Effort**: ~28–35 story points | **Timeline**: 5–6 weeks
+**Complexity**: Large (L) | **Track**: Full | **Total Effort**: ~36 story points | **Timeline**: 5–6 weeks
 
 ---
 
 ## Executive Summary
 
-The Living Workflow Showcase is an interactive companion feature that visualizes Nick Miethe's actual Governed Agentic SDLC workflow as a scrubbable, stage-by-stage artifact. Each post in the blog series unlocks a new stage, showing readers a live example of PRD authoring, planning, governance, and agent coordination. This plan covers five phases: (1) SPIKE to select interaction tech; (2) build the reusable `<WorkflowStage>` component shell and routing; (3–4) author Stage 1 and Stage 2 content; (5) polish, accessibility audit, and launch. The feature is production-ready when both stages render smoothly, "try it yourself" CTAs convert, and accessibility is WCAG AA compliant.
+The Living Workflow Showcase is an interactive companion feature that visualizes Nick Miethe's actual Governed Agentic SDLC workflow as a scrubbable, stage-by-stage artifact. Each post in the blog series unlocks a new stage, showing readers a live example of PRD authoring, planning, governance, and agent coordination. This plan covers five phases: (1) SPIKE to select interaction tech; (2) build the reusable `<WorkflowStage>` component shell and routing; (3–4) author Stage 1 and Stage 2 content; (5) polish, accessibility audit, and launch. The architecture comprises two layers: a runtime layer (hybrid scrubber, SPIKE-selected tech) and an authoring layer (demo-foundry pipeline for Phase 2-3 content production; see SPIKE addendum). The feature is production-ready when both stages render smoothly, "try it yourself" CTAs convert, and accessibility is WCAG AA compliant.
 
 ---
 
@@ -55,7 +56,7 @@ The primary risk is **interaction tech choice regret**: selecting Framer Motion 
 
 ## Phase 0: SPIKE — Interaction Technology Choice
 
-**Duration**: 1–2 days | **Effort**: 4 SP | **Exit Criteria**: ADR-style SPIKE decision doc with rejection rationale
+**Duration**: 2–3 days | **Effort**: 6 SP | **Exit Criteria**: ADR-style SPIKE decision doc with rejection rationale; demo-foundry initialized with example demo
 
 **Goal**: Evaluate interaction tech candidates (Lottie/Framer Motion vs. asciinema-style scrubber vs. Monaco IDE mock vs. hybrid scrubber+panels) and lock in a recommendation before Phase 1 begins.
 
@@ -63,11 +64,12 @@ The primary risk is **interaction tech choice regret**: selecting Framer Motion 
 
 | ID | Task | Description | Acceptance Criteria | Est | Assigned |
 |----|------|-------------|-------|-----|----------|
-| **WS-0.1** | Design SPIKE evaluation criteria | Define metrics: bundle size impact, interaction latency, authoring ergonomics (how hard to script a stage), accessibility story, visual fidelity. Document in spike-writer doc. | Metrics defined; examples provided (e.g., "Framer Motion: <35KB gzipped, <100ms scrub latency"). | 2 SP | spike-writer |
-| **WS-0.2** | Build minimal prototypes for each candidate | (1) Framer Motion + state machine: play/pause/scrub through 5 mock steps. (2) Asciinema-style cast player: replay 5-step cast file with scrubber. (3) Monaco IDE mock: syntax-highlighted artifact panels with step transitions. Pick top 2 to prototype. | Working demo for each; bundle size measured via `esbuild --analyze`. Performance profile from Chrome DevTools. | 5 SP | frontend-architect |
-| **WS-0.3** | Measure bundle size, interaction latency, and accessibility implications | For each prototype: (a) gzipped bundle size (target: <60KB Showcase-specific code). (b) Paint-to-interactive latency (target: <100ms scrub response). (c) Screen reader behavior (do panels update with aria-live?). (d) Keyboard navigation feasibility. | Comparison table: candidate, bundle size, latency, a11y grade, recommendation ranking. | 3 SP | frontend-architect |
-| **WS-0.4** | Evaluate authoring ergonomics per tech | For each candidate, document how painful it is to script a stage. Example: Framer Motion requires writing step objects in JSON; asciinema requires cast files; Monaco mock requires artifact JSON. Rate on 1–5 (1=painful, 5=smooth). | Authoring checklist per tech (e.g., "Framer Motion: write JSON step object, define animation timing, test in browser"). | 2 SP | frontend-architect |
-| **WS-0.5** | Document SPIKE findings and recommendation | Write SPIKE doc at `docs/specs/workflow-showcase-spike.md`: executive summary, evaluation criteria, candidate analysis (pros/cons per candidate), metrics comparison table, rejected alternatives section, final ADR recommendation. | SPIKE doc published; clear recommendation locked in (e.g., "Recommend hybrid Framer Motion + custom state machine"). Team consensus on decision. | 3 SP | spike-writer |
+| **WS-0.1** | Design SPIKE evaluation criteria | [DONE — see workflow-showcase-spike.md] Define metrics: bundle size impact, interaction latency, authoring ergonomics, accessibility story, visual fidelity. | Metrics defined; examples provided. | 2 SP | spike-writer |
+| **WS-0.2** | Build minimal prototypes for each candidate | [DONE — see workflow-showcase-spike.md] Prototypes for Framer Motion, asciinema-style, and Monaco mock. | Working demos; bundle sizes measured. | 5 SP | frontend-architect |
+| **WS-0.3** | Measure performance and accessibility | [DONE — see workflow-showcase-spike.md] Bundle size, latency, a11y implications per candidate. | Comparison table with metrics. | 3 SP | frontend-architect |
+| **WS-0.4** | Evaluate authoring ergonomics per tech | [DONE — see workflow-showcase-spike.md] Document difficulty of scripting stages per tech (1-5 scale). | Authoring checklist per tech. | 2 SP | frontend-architect |
+| **WS-0.5** | Document SPIKE findings and recommendation | [DONE — see workflow-showcase-spike.md] SPIKE doc published with ADR recommendation. | Doc at `docs/specs/workflow-showcase-spike.md`; decision locked. | 3 SP | spike-writer |
+| **WS-0.6** | Initialize demo-foundry in repo | Invoke demo-foundry skill for dry-run, review setup plan, then apply to scaffold `demo/` workspace, `demo-foundry.config.yaml`, `.demoignore`, policy checklists. Run example demo end-to-end. Reference workflow-showcase Astro dev server in config. | `demo/` workspace scaffolded; example demo runs end-to-end producing screenshots and walkthrough video; no untracked secrets; config references Astro dev server. | 2 SP | frontend-architect |
 
 ### Quality Gates
 
@@ -108,7 +110,7 @@ The primary risk is **interaction tech choice regret**: selecting Framer Motion 
 
 | ID | Task | Description | Acceptance Criteria | Est | Assigned |
 |----|------|-------------|-------|-----|----------|
-| **WS-1.1** | Design and document stage data schema | Create TypeScript types for stage manifest: `Stage { id, postSlug, title, steps[], artifacts[], metrics[], ctaLinks[] }`. Each step: `{ stepId, label, terminal[], panels[], metrics? }`. Each artifact: `{ type ('prd' \| 'plan' \| 'progress' \| 'agents'), title, content (raw text or path to file) }`. Document in types file with examples. | TypeScript types are complete and exported from `src/types/workflow.ts`. Zod schema optional but recommended. Example stage manifest shows all fields. | 2 SP | frontend-architect |
+| **WS-1.1** | Design and document stage data schema | Create TypeScript types for stage manifest: `Stage { id, postSlug, title, steps[], artifacts[], metrics[], ctaLinks[] }`. Each step: `{ stepId, label, terminal[], panels[], metrics?, terminalRecording?: string, artifactSnapshots?: { prd?, plan?, progress?, agents? } }`. Each artifact: `{ type ('prd' \| 'plan' \| 'progress' \| 'agents'), title, content (raw text or path to file) }`. Add optional fields: `thumbnail?: string`, `socialClip?: string` (PNG/MP4 paths from demo-foundry). Document in types file with examples. Schema accommodates both inline content and demo-foundry-generated asset paths. | TypeScript types complete and exported from `src/types/workflow.ts`. Zod schema optional but recommended. Example stage manifest shows asset fields. Inline content fields (terminal[], panels.*) and asset paths both supported. | 2 SP | frontend-architect |
 | **WS-1.2** | Build `<WorkflowStage>` React island component | Main island that orchestrates: (1) scrubber (controls step progression), (2) artifact panels (tabs/accordions), (3) metrics overlay, (4) CTA card. Props: stage data, active step index, callbacks for step change/panel toggle. Uses Nanostores atoms. Per PRD: scrubber is delegated to SPIKE-chosen tech (Framer Motion or custom state machine). | Component renders without errors. Props are typed. Nanostores integration works (active step persists across re-renders). No console errors. Component accepts test fixture data. | 5 SP | frontend-architect |
 | **WS-1.3** | Build scrubber/timeline UI component | Horizontal timeline with discrete step indicators. Desktop: draggable slider or clickable progress bar. Mobile: prev/next buttons only (no dragging). Step styling: active (bold/highlighted), visited (checkmark), unvisited (faded). Visual feedback instant. Uses SPIKE-recommended tech for animations. | Timeline renders correctly on desktop and mobile. Dragging/clicking steps updates active step. No layout shift. Styling matches wireframe. Keyboard navigation support (arrow keys). | 4 SP | frontend-architect |
 | **WS-1.4** | Build artifact panel component | Tabbed (desktop) or accordion (mobile) display for PRD, plan, progress, agent roles. Each tab shows artifact content (code block or formatted text). Content is scrollable if tall. Copy-to-clipboard button on code blocks. Styling: mono font for YAML/JSON, prose font for text. Dark mode support. | Tabs/accordions toggle without full component re-render. Content displays with correct syntax highlighting (if applicable). Copy button works. Mobile accordion stacks vertically. | 3 SP | frontend-architect |
@@ -143,86 +145,78 @@ The primary risk is **interaction tech choice regret**: selecting Framer Motion 
 
 ## Phase 2: Stage 1 — Post 1 Baseline Content
 
-**Duration**: 2–3 days | **Effort**: 5 SP | **Exit Criteria**: Stage 1 renders with 5–8 steps, artifact panels show content, metrics visible, CTA links to spike skill
+**Duration**: 2–3 days | **Effort**: 8 SP | **Exit Criteria**: Stage 1 renders with 5–8 steps, artifact panels show content, metrics visible, CTA links to spike skill; generated thumbnail and social-clip exist
 
-**Goal**: Author the "pre-governance" stage, showing what an ungoverned agentic workflow looks like. 5–8 steps illustrating: vague prompt → confident-and-wrong output → no traceability → session ends → no learning carried forward. Artifact panels show absence of structure. Metrics show the "before" baseline (real or curated data).
+**Goal**: Author the "pre-governance" stage via demo-foundry manifest, showing what an ungoverned agentic workflow looks like. 5–8 steps illustrating: vague prompt → confident-and-wrong output → no traceability → session ends → no learning carried forward. Manifest is the source of truth; pipeline generates canonical assets (terminal recordings, artifact snapshots, thumbnail, social clip). Transform script converts pipeline output into workflow-stages.json entry.
 
 ### Key Artifacts
 
-- Update `src/data/workflow-stages.json` to add Stage 1 config
-- Create artifact files (or inline content): mock pre-governance PRD excerpt (showing lack of structure), mock agent session log (showing wrong output), mock progress file (or notes showing no tracking)
-- Curate metrics data (tokens, throughput, cost) for Stage 1
+- Author scenario manifest at `demo/demos/stage-1-baseline/manifest.yaml`
+- Demo-foundry pipeline output: terminal screenshots, HTML artifact snapshots, MP4 walkthrough, thumbnail PNG, social clip MP4
+- Transform script at `scripts/manifest-to-stage.ts` (reusable for all stages)
+- Curated metrics data (declared in manifest, embedded in pipeline output)
 
 ### Tasks
 
 | ID | Task | Description | Acceptance Criteria | Est | Assigned |
 |----|------|-------------|-------|-----|----------|
-| **WS-2.1** | Script Stage 1 workflow steps | Write 5–8 steps showing the ungoverned agentic workflow from the blog post. Example steps: (1) "Prompt written (vague)", (2) "Agent generates output", (3) "Output is confident but wrong", (4) "Developer trusts output, no verification", (5) "Implementation fails in prod", (6) "No post-mortem recorded", (7) "Same mistake happens again next week", (8) "Lessons lost". Each step is a label and a set of terminal/panel content that animates in. | Step sequence is coherent and matches Post 1 narrative. Terminal copy is concise and illustrative (not full logs, just key lines). Labels are clear. Steps progress logically. | 2 SP | content-curator |
-| **WS-2.2** | Curate and author artifact content for Stage 1 | Create artifact panels: (1) Pre-governance PRD (show a vague feature request with no spec structure, no frontmatter). (2) Agent session log (show agent making a wrong assumption, hallucinating details). (3) Notes/progress (show lack of traceability, no record of why decision was made). Use real or realistic synthetic data (avoid round numbers; use actual token counts from workflow if available). | Artifacts are readable and illustrative of the "before" state. PRD is intentionally vague. Agent log shows a plausible hallucination. Progress notes show no structure. Content is anonymized if from real workflows. | 3 SP | content-curator, technical-writer |
-| **WS-2.3** | Populate metrics for Stage 1 | Collect or synthesize metrics: tokens used, throughput, cost, wall-clock time. Use real data from Post 1's workflow if available (query CCDash or curate from logs). If unavailable, create illustrative but realistic metrics (e.g., "1.2M tokens, 8.5K tokens/sec, $3.75, 7m 23s"). Label as curated for clarity. | Metrics JSON is valid. Numbers are realistic (not round). Metrics are present for all tracked fields (tokens, throughput, cost, time). Data source documented (real/curated). | 1 SP | technical-writer |
-| **WS-2.4** | Add Stage 1 to workflow-stages.json config | Create Stage 1 entry: id, postSlug (post-1-baseline), title, steps (with terminal and panel content), artifacts (PRD, agent log, progress notes), metrics (tokens, throughput, cost), ctaLinks (spike skill). Validate JSON. | Config entry is valid JSON. Stage 1 appears in stage selector. Clicking Stage 1 loads it. Scrubber shows all 5–8 steps. Artifact tabs show content. Metrics overlay shows numbers. CTA links to correct skill. | 2 SP | ai-artifacts-engineer |
-| **WS-2.5** | Test Stage 1 rendering and interaction end-to-end | Load `/workflow-showcase/?stage=1` (or equivalent). Scrub through all steps. Expand all artifact panels. Verify dark mode. Check for console errors. Validate metrics display. Click CTA button (verify href). | Page loads without errors. Scrubber progresses through all 8 steps. Each step's terminal and panels update. Artifact tabs toggle without full re-render. Metrics visible and readable. CTA button href is correct. Dark/light mode both work. | 2 SP | frontend-architect |
+| **WS-2.1** | Author Stage 1 scenario manifest and run pipeline | Create manifest at `demo/demos/stage-1-baseline/manifest.yaml` (5–8 ungoverned-workflow steps, terminal commands, artifact content, metrics, CTA). Run `demo-foundry dry-run` to validate. Execute with `demo-foundry apply`. Pipeline produces screenshots, HTML snapshots, MP4 walkthrough, thumbnail PNG, social clip MP4. Review outputs for fidelity. | Manifest is valid YAML; dry-run passes. 5–8 steps capture "before" narrative. Pipeline produces readable screenshots, snapshots, walkthrough, and social assets. All assets in expected format. | 3 SP | blog-drafter, frontend-architect |
+| **WS-2.2** | Build transform script (manifest to stage JSON) | Create `scripts/manifest-to-stage.ts`: reads demo-foundry pipeline output, emits workflow-stages.json entry and asset paths for `public/workflow-showcase/stage-N/`. Script handles terminal recordings, artifact snapshots, thumbnail, social clip. Takes stage ID and manifest path as arguments. | Script runs successfully. Converts demo-foundry output to valid JSON. Asset paths relative to `public/`. Script is reusable for all stages (3+). | 3 SP | frontend-architect |
+| **WS-2.3** | Transform pipeline output and test Stage 1 | Run `scripts/manifest-to-stage.ts stage-1`. Verify JSON is valid. Commit assets to `public/workflow-showcase/stage-1/`. Load `/workflow-showcase/?stage=1`, scrub all steps, expand panels, verify dark mode, metrics, CTA button. | JSON valid and includes asset paths. Assets copied to `public/`. Page loads without errors. Scrubber progresses through 8 steps. Artifact tabs toggle. Metrics visible. CTA correct. Dark/light mode work. Generated thumbnail and social-clip exist. | 2 SP | frontend-architect |
 
 ### Quality Gates
 
 - Stage 1 loads and is fully interactive
 - All 5–8 steps render with content
-- Artifact panels display correctly (PRD, agent log, progress)
-- Metrics overlay shows data
-- CTA button links to spike skill repo
-- Dark mode works
-- No console errors
-- Scrubber interaction <100ms latency
+- Artifact panels display correctly (sourced from demo-foundry snapshots)
+- Metrics overlay shows data (sourced from manifest)
+- CTA button links correctly; thumbnail PNG and social-clip MP4 exist in `public/`
+- Manifest re-run is reproducible (byte-identical JSON and asset paths)
+- Dark mode works; no console errors; scrubber latency <100ms
 
 ### Assigned Subagents
 
-- **content-curator**: Script Stage 1 workflow steps
-- **technical-writer**: Artifact content, metrics curation
-- **frontend-architect**: Testing and validation
-- **ai-artifacts-engineer**: JSON config management
+- **blog-drafter**: Scenario manifest authoring
+- **frontend-architect**: Transform script, pipeline execution, testing
+- **documentation-writer**: (optional) Manifest structure guide
 
 ---
 
 ## Phase 3: Stage 2 — Post 2 IDD Content
 
-**Duration**: 2–3 days | **Effort**: 5 SP | **Exit Criteria**: Stage 2 renders with 6–10 steps, shows spec authoring and planning workflow, CTA links to planning skill
+**Duration**: 2–3 days | **Effort**: 5 SP | **Exit Criteria**: Stage 2 renders with 6–10 steps, shows spec authoring and planning workflow, CTA links to planning skill; generated thumbnail and social-clip exist
 
-**Goal**: Author the "spec layer" stage, showing how the Governed Agentic SDLC introduces structure. 6–10 steps illustrating: feature request → PRD with frontmatter → plan generation → progress tracking → agent execution → verification. Artifact panels show real (anonymized) spec/plan/progress artifacts from Post 2. Metrics show the "after" improvement (curated, illustrative).
+**Goal**: Author the "spec layer" stage via demo-foundry manifest, showing how the Governed Agentic SDLC introduces structure. 6–10 steps illustrating: feature request → PRD with frontmatter → plan generation → progress tracking → agent execution → verification. Manifest-driven approach; pipeline generates canonical assets. Transform script (from Phase 2) reused.
 
 ### Key Artifacts
 
-- Update `src/data/workflow-stages.json` to add Stage 2 config
-- Create artifact files: sample PRD with frontmatter (YAML header), sample plan table (markdown), sample progress file (YAML with status tracking), agent role labels
-- Curate metrics data showing improvement from Stage 1
+- Author scenario manifest at `demo/demos/stage-2-idd/manifest.yaml`
+- Demo-foundry pipeline output: terminal screenshots, HTML artifact snapshots, MP4 walkthrough, thumbnail PNG, social clip MP4
+- Reuse transform script from Phase 2
+- Curated metrics data (declared in manifest)
 
 ### Tasks
 
 | ID | Task | Description | Acceptance Criteria | Est | Assigned |
 |----|------|-------------|-------|-----|----------|
-| **WS-3.1** | Script Stage 2 workflow steps | Write 6–10 steps showing the IDD spec layer from Post 2. Example: (1) "Feature request received", (2) "PRD authored with frontmatter (title, complexity, effort)", (3) "Plan generated from PRD", (4) "Progress file initialized", (5) "Agent team assigned (frontend, backend, testing)", (6) "Context loaded (PRD, plan, voice guide)", (7) "Execution begins with contract", (8) "Progress updated in real-time", (9) "Execution completes", (10) "Lessons recorded in progress file". Each step is a label + terminal/panel content. | Step sequence matches Post 2 narrative. Each step builds on previous. Terminal shows actual YAML frontmatter, plan snippets, progress snapshots. Labels are clear. Progression is logical. | 3 SP | content-curator |
-| **WS-3.2** | Curate and author artifact content for Stage 2 | Create artifacts: (1) PRD with YAML frontmatter (show title, description, audience, tags, complexity, effort, status, related links). (2) Plan table excerpt (show phase breakdown, task estimates). (3) Progress file (YAML with completed tasks, in-progress, blocked, metrics). (4) Agent roles (show team composition with role badges). Use real examples from Post 2 if available; anonymize sensitive content. | Artifacts are realistic and show actual frontmatter/plan/progress structure. YAML is valid. PRD frontmatter is properly formatted. Plan table is readable. Progress shows real status tracking. Anonymization is clean (no accidental private data). | 3 SP | content-curator, technical-writer |
-| **WS-3.3** | Populate metrics for Stage 2 | Collect or synthesize metrics showing improvement vs. Stage 1: higher fidelity planning, lower hallucination rate, faster execution, or lower cost. Use real data if available; if not, create illustrative metrics (e.g., "2.1M tokens, 12K tokens/sec, $5.50, 9m 15s"). Label as curated. Note improvement delta vs. Stage 1. | Metrics JSON is valid. Numbers show plausible improvement from Stage 1 (e.g., higher throughput, similar or lower cost due to better planning). Metrics documented as curated. | 1 SP | technical-writer |
-| **WS-3.4** | Add Stage 2 to workflow-stages.json config | Create Stage 2 entry: id, postSlug (post-2-spec-layer), title, steps (with terminal and panel content), artifacts (PRD, plan, progress, agents), metrics (tokens, throughput, cost), ctaLinks (planning + artifact-tracking skills). Validate JSON. | Config entry is valid JSON. Stage 2 appears in stage selector. Clicking Stage 2 loads it. Scrubber shows all 6–10 steps. Artifact tabs show all artifact types (PRD, plan, progress, agents). Metrics visible. CTA links to correct skills. | 2 SP | ai-artifacts-engineer |
-| **WS-3.5** | Test Stage 2 rendering and interaction end-to-end | Load `/workflow-showcase/?stage=2`. Scrub through all steps. Expand all artifact panels. Verify dark mode. Console error check. Metrics and CTA validation. Compare Stage 1 → Stage 2 progression. | Page loads without errors. All 6–10 steps render and animate. Artifacts display (all 4 types: PRD, plan, progress, agents). Metrics show improvement. CTA buttons href to correct skills. Dark/light mode work. No console errors. Scrubber latency <100ms. | 2 SP | frontend-architect |
+| **WS-3.1** | Author Stage 2 scenario manifest and run pipeline | Create manifest at `demo/demos/stage-2-idd/manifest.yaml` (6–10 spec-layer steps, terminal commands, artifact content with PRD/plan/progress/agents, metrics, CTA). Run dry-run to validate. Execute with `demo-foundry apply`. Pipeline produces screenshots, HTML snapshots, MP4 walkthrough, thumbnail, social clip. Review for fidelity and improvement vs. Stage 1. | Manifest valid; dry-run passes. 6–10 steps capture "after" narrative. Pipeline produces readable assets showing improvement in structure/organization vs. Stage 1. | 3 SP | blog-drafter, frontend-architect |
+| **WS-3.2** | Transform pipeline output and test Stage 2 | Run `scripts/manifest-to-stage.ts stage-2` (reuse from Phase 2). Verify JSON valid. Commit assets to `public/workflow-showcase/stage-2/`. Load `/workflow-showcase/?stage=2`, scrub all steps, expand panels, verify dark mode, metrics show improvement, CTA buttons correct. Compare progression Stage 1 → Stage 2. | JSON valid and includes asset paths. Assets in `public/`. Page loads without errors. All 6–10 steps render. Artifact types (PRD, plan, progress, agents) display. Metrics show improvement. CTA correct. Dark/light work. Generated thumbnail and social-clip exist. | 2 SP | frontend-architect |
 
 ### Quality Gates
 
 - Stage 2 loads and is fully interactive
 - All 6–10 steps render with content
-- All artifact types display (PRD, plan, progress, agents)
-- Metrics overlay shows improvement vs. Stage 1
-- CTA buttons link to planning and artifact-tracking skills
-- Dark mode works
-- No console errors
-- Scrubber interaction <100ms latency
+- All artifact types display (PRD, plan, progress, agents); metrics show improvement vs. Stage 1
+- Generated thumbnail PNG and social-clip MP4 exist in `public/workflow-showcase/stage-2/`
+- Manifest re-run is reproducible (byte-identical JSON and assets)
 - Stage 1 and Stage 2 both accessible via stage selector
+- Dark mode works; no console errors; scrubber latency <100ms
 
 ### Assigned Subagents
 
-- **content-curator**: Script Stage 2 steps and artifact content
-- **technical-writer**: Metrics curation and artifact formatting
-- **frontend-architect**: Testing and validation
-- **ai-artifacts-engineer**: JSON config management
+- **blog-drafter**: Scenario manifest authoring
+- **frontend-architect**: Pipeline execution, transform script reuse, testing
+- **documentation-writer**: (optional) Manifest structure guide
 
 ---
 
@@ -275,7 +269,7 @@ The primary risk is **interaction tech choice regret**: selecting Framer Motion 
 | **WS-5.5** | Final QA pass (smoke test) | (1) Load Showcase on Chrome, Safari, Firefox (desktop + mobile). (2) Test Stage 1 and 2 scrubbers fully. (3) Test artifact panel toggling. (4) Verify CTA buttons navigate correctly. (5) Check dark mode on all browsers. (6) Verify metrics overlay renders. (7) Confirm no console errors. Document test results. | Testing checklist completed for all browsers. No console errors. All interactions work smoothly. Dark/light mode both correct. Performance acceptable on all devices. Ready for production. | 2 SP | frontend-architect |
 | **WS-5.6** | Update navigation and sitemap | Add link to Showcase in site nav (header or footer). Update `sitemap.xml` to include `/workflow-showcase/` (mark published stages as included, unreleased stages as noindex or excluded). Update `public/llms.txt` if applicable (add note about Showcase feature for AI agents). | Nav link visible and navigates correctly. Sitemap includes `/workflow-showcase/`. URL shows in search console. llms.txt updated (optional but recommended). | 1 SP | documentation-writer |
 | **WS-5.7** | Final build, deployment, and verification | Run `npm run build` and `npm run check`. Zero errors. Deploy to main branch via GitHub Pages (or manual trigger). Verify site is live: load `/workflow-showcase/` on production, test both stages, verify dark mode, check metrics. | Build passes (zero errors, zero warnings). Deployment successful. Site live and accessible. Both stages functional on production. Performance acceptable. Analytics events logging. | 1 SP | general-purpose |
-| **WS-5.8** | Document Phase 5.5 stage authoring workflow for blog-drafter | Create or update `docs/specs/workflow-showcase/stage-authoring-template.md` with detailed checklist for authoring future stages (Stages 3+). Checklist: (1) Identify blog post number and topic. (2) Script 6–10 workflow steps. (3) Collect/curate artifact content (PRD, plan, progress, agents). (4) Gather metrics (tokens, throughput, cost, time). (5) Create stage config entry in JSON. (6) Test stage rendering. (7) Add blog post link to Showcase. Include template code snippets and examples. | Template is comprehensive and actionable. Checklist can be followed independently. Examples provided. Expected effort per stage documented (~1–2 days). | 2 SP | documentation-writer |
+| **WS-5.8** | Document Phase 5.5 stage authoring workflow for blog-drafter | Create or update `docs/specs/workflow-showcase/stage-authoring-template.md` with detailed checklist for authoring future stages (Stages 3+). Checklist: (1) Author demo-foundry scenario manifest (manifest is source of truth). (2) Run dry-run and apply to generate assets. (3) Run transform script to convert to workflow-stages.json. (4) Test stage rendering. (5) Add blog post link to Showcase. Include template manifest example and expected effort (~1–2 days per stage). Note: blog-drafter workflow now produces a demo-foundry scenario manifest as deliverable for any post mapping to a Showcase stage. workflow-stages.json is generated, not hand-edited. | Template is comprehensive and actionable for demo-foundry workflow. Manifest example provided. Transform script usage documented. Expected effort per stage documented (~1–2 days). Expected: Stages 3+ authored via demo-foundry pipeline. | 2 SP | documentation-writer |
 
 ### Quality Gates
 
@@ -301,11 +295,11 @@ The primary risk is **interaction tech choice regret**: selecting Framer Motion 
 
 ---
 
-## Phase 5.5: Blog-Drafter Integration (Metadata & Workflow Update)
+## Phase 5.5: Blog-Drafter Integration (Demo-Foundry Workflow & Metadata)
 
 **Duration**: 1 day | **Effort**: 2 SP | **Status**: Deferred until first post-publication stage authoring
 
-**Goal**: Update the blog-drafter skill to include a "Phase 5.5: Stage Authoring" step that triggers when a blog series post is published. This ensures future stages (3+) are authored as part of the standard blog publication workflow, not as ad-hoc tasks.
+**Goal**: Update the blog-drafter skill to include a "Phase 5.5: Stage Authoring" step that triggers when a blog series post is published. The workflow now centers on demo-foundry manifests as the source of truth. This ensures future stages (3+) are authored as part of the standard blog publication workflow using the pipeline pattern from Phases 2-3, not as ad-hoc JSON hand-editing.
 
 ### Tasks
 
@@ -325,14 +319,12 @@ The primary risk is **interaction tech choice regret**: selecting Framer Motion 
 
 | Subagent | Phases | Effort | Notes |
 |----------|--------|--------|-------|
-| **spike-writer** | 0 | 5 SP | SPIKE doc, evaluation criteria, synthesis |
-| **frontend-architect** | 0, 1, 2, 3, 4, 5 | 20 SP | Component shell, scrubber, panels, routing, a11y audit, performance, mobile testing, final QA |
-| **content-curator** | 2, 3, 4 | 5 SP | Script stages, artifact content, blog post links |
-| **technical-writer** | 1, 2, 3, 5 | 4 SP | Component API docs, artifact/metrics curation, stage template, nav/sitemap |
-| **ai-artifacts-engineer** | 1, 2, 3, 5.5 | 3 SP | Stage config JSON management, blog-drafter integration |
-| **documentation-writer** | 1, 4, 5, 5.5 | 5 SP | API docs, URL scheme, a11y/mobile/perf docs, stage template, blog-drafter update |
+| **spike-writer** | 0 | 5 SP | SPIKE doc (all tasks marked done) |
+| **frontend-architect** | 0, 1, 2, 3, 4, 5 | 20 SP | Demo-foundry setup (WS-0.6), component shell, transform script, pipeline/testing (Phases 2-3), a11y/perf/QA |
+| **blog-drafter** | 2, 3 | 6 SP | Stage 1 and 2 scenario manifest authoring |
+| **documentation-writer** | 1, 4, 5, 5.5 | 4 SP | API docs, URL scheme, a11y docs, stage authoring template (now demo-foundry-focused), blog-drafter update |
 | **general-purpose** | 5 | 1 SP | Final build and deployment |
-| **Total** | — | **32 SP** | — |
+| **Total** | — | **36 SP** | — |
 
 ---
 
@@ -430,13 +422,13 @@ Quick lookup by phase:
 
 | Phase | Task IDs | Focus |
 |-------|----------|-------|
-| 0 (SPIKE) | WS-0.1 to WS-0.5 | Tech choice evaluation and decision |
-| 1 (Shell) | WS-1.1 to WS-1.12 | Component, routing, schema, Nanostores, test fixture |
-| 2 (Stage 1) | WS-2.1 to WS-2.5 | Pre-governance baseline content |
-| 3 (Stage 2) | WS-3.1 to WS-3.5 | Spec layer content |
+| 0 (SPIKE) | WS-0.1 to WS-0.6 | Tech choice evaluation, decision, demo-foundry setup |
+| 1 (Shell) | WS-1.1 to WS-1.12 | Component, routing, schema (with asset fields), Nanostores, test fixture |
+| 2 (Stage 1) | WS-2.1 to WS-2.3 | Demo-foundry manifest, transform script, pipeline, testing |
+| 3 (Stage 2) | WS-3.1 to WS-3.2 | Demo-foundry manifest, transform script reuse, pipeline, testing |
 | 4 (Integration) | WS-4.1 to WS-4.4 | Blog links, stage selector, URL scheme |
 | 5 (Launch) | WS-5.1 to WS-5.8 | A11y, mobile, performance, analytics, QA |
-| 5.5 (Blog-drafter) | WS-5.5a to WS-5.5b | Future stage workflow, metadata sync |
+| 5.5 (Blog-drafter) | WS-5.5a to WS-5.5b | Future stage workflow (demo-foundry-driven), metadata sync |
 
 ---
 
