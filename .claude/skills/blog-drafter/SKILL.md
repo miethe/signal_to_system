@@ -103,6 +103,27 @@ This step bridges Phase 3 and Phase 4 — the spec frames the story; the forensi
 
 **Proceed to Phase 6** when ready (minor polish or voice integration remaining)
 
+### Phase 5.5: Stage Authoring (Workflow Showcase)
+
+**Triggered by**: Post is part of the Governed Agentic SDLC series and corresponds to a Showcase stage (post-to-stage mapping in `docs/specs/workflow-showcase/blog-metadata-sync.md`).
+
+**Source of truth**: the demo-foundry manifest. The site only renders what the manifest produces; do not hand-edit `src/data/workflow-stages.json`.
+
+**Workflow**:
+1. Confirm the post-to-stage mapping via `docs/specs/workflow-showcase/blog-metadata-sync.md` (post slug, stage number, deep-link anchor).
+2. Author the manifest at `demo/demos/stage-N-<slug>/manifest.yaml` following the template and checklist in `docs/specs/workflow-showcase/stage-authoring-template.md`. Gold examples: `demo/demos/stage-1-baseline/manifest.yaml` and `demo/demos/stage-2-idd/manifest.yaml`.
+3. Run `demo-foundry dry-run` to validate the manifest; then `demo-foundry apply` to produce screenshots, the walkthrough MP4, the thumbnail, and the social clip.
+4. Regenerate the stage data and copy assets: `node scripts/manifest-to-stage.ts stage-N` (updates `src/data/workflow-stages.json` and `public/workflow-showcase/...`).
+5. Verify locally: `npm run dev`, then load `/workflow-showcase/?stage=N` and confirm media, transcript, and metadata render.
+6. Add a deep-link from the post body into the showcase (anchor per `blog-metadata-sync.md`).
+
+**Expected effort**: ~1 to 2 days per stage (manifest authoring and capture review dominate).
+
+**Rules**:
+- Manifest first, site data second; never the reverse.
+- Do not duplicate stage details in the post; link to the showcase.
+- If capture output drifts from the post's claims, fix the manifest (or the claim), not the JSON.
+
 ### Phase 6: Publication Prep (Draft → Published)
 
 **Triggered by**: User signal "ready to publish"
@@ -227,6 +248,14 @@ Post N/
 - Feedback is specific and actionable
 - Gaps flagged with `[NEEDS INPUT]`
 - Top revisions suggested with rationale
+
+**Phase 5.5 (Stage Authoring, Governed Agentic SDLC only)**
+- Post-to-stage mapping confirmed via `docs/specs/workflow-showcase/blog-metadata-sync.md`
+- Manifest authored at `demo/demos/stage-N-<slug>/manifest.yaml` per template
+- `demo-foundry dry-run` passes; `demo-foundry apply` produced screenshots, walkthrough MP4, thumbnail, social clip
+- `node scripts/manifest-to-stage.ts stage-N` ran cleanly; `src/data/workflow-stages.json` updated
+- `/workflow-showcase/?stage=N` renders correctly locally
+- Deep-link from post body to the showcase added
 
 **Phase 6 (Publication Prep)**
 - Frontmatter is finalized and verified

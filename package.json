@@ -10,7 +10,10 @@
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro",
-    "check": "astro check"
+    "check": "astro check",
+    "demo:doctor": "node demo/tools/demo-foundry.mjs doctor",
+    "demo:capture": "playwright test demo/demos/**/*.spec.ts",
+    "demo:review": "node demo/tools/demo-foundry.mjs review"
   },
   "dependencies": {
     "@astrojs/mdx": "^5.0.2",

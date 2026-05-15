@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0b0d10"/>
+      <stop offset="100%" stop-color="#1a2230"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#7c5cff"/>
+      <stop offset="100%" stop-color="#22d3ee"/>
+    </linearGradient>
+  </defs>
+  <rect width="1280" height="720" fill="url(#bg)"/>
+  <rect x="64" y="608" width="280" height="4" fill="url(#accent)"/>
+  <text x="64" y="572" font-family="ui-sans-serif, -apple-system, system-ui, sans-serif" font-size="56" font-weight="700" fill="#e6edf3">Stage 2: Intent-Driven Development</text>
+  <text x="64" y="640" font-family="ui-sans-serif, -apple-system, system-ui, sans-serif" font-size="22" fill="#7c93a8">The same onboarding ask, run through a spec layer. Intent is captured in a PRD with acceptance criteria, decomposed into a phased plan, and tracked in a YAML progress file the agent orchestra reads instead of guesses. The delta from Stage 1 is not speed for its own sake; it is that the work is legible to the next session.</text>
+  <text x="64" y="120" font-family="ui-sans-serif, -apple-system, system-ui, sans-serif" font-size="14" letter-spacing="3" fill="#7c5cff">LIVING WORKFLOW SHOWCASE</text>
+</svg>

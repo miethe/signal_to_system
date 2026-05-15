@@ -1,0 +1,339 @@
+id: stage-1-baseline
+version: 0.1.0
+title: "Stage 1: Pre-Governance Baseline"
+audience: "technical executive"
+status: draft
+
+# ---------------------------------------------------------------------------
+# Workflow Showcase metadata (consumed by scripts/manifest-to-stage.ts).
+# Maps directly onto fields in src/types/workflow.ts `Stage`.
+# ---------------------------------------------------------------------------
+showcase:
+  stage_id: "stage-1"
+  post_number: 1
+  post_slug: "post-1-the-cost-of-ungoverned-agents"
+  published_date: "2026-05-15"
+  status: "published"
+  description: >-
+    What an ungoverned agentic workflow actually looks like: a vague Slack
+    prompt, a confident but wrong agent run, no traceable artifacts, and no
+    memory carried forward. The cost is hidden in re-work, not visible in
+    the token bill.
+  metrics:
+    tokens_used: 487300
+    throughput: 8400
+    cost: 2.44
+    wall_clock_time: "14m 02s"
+    data_source: "curated (illustration)"
+  cta_links:
+    - skill_name: "spike"
+      skill_url: "https://github.com/miethe/MeatySkills/tree/main/skills/spike"
+      copy_text: "Replace ad-hoc prompts with a defensible SPIKE."
+      subtitle: >-
+        Turn a vague feature ask into a PRD with acceptance criteria,
+        risks, and rejection rationale before any agent runs.
+
+app:
+  base_url: "http://localhost:4321"
+  start_command: "npm run dev"
+  healthcheck_url: "http://localhost:4321/workflow-showcase/"
+  viewport:
+    width: 1440
+    height: 1000
+  timezone: "America/New_York"
+
+seed:
+  required: false
+  notes: "Narrative content; no live seed needed."
+
+duration_targets:
+  short_seconds: 60
+  standard_seconds: 180
+  deep_seconds: 360
+
+story:
+  thesis: >-
+    Ungoverned agentic workflows feel fast and look productive but quietly
+    accumulate re-work, hallucinated assumptions, and lost institutional
+    memory. The cost is hidden in the next session.
+  problem: >-
+    A vague feature ask is handed straight to an agent. There is no PRD,
+    no plan, no progress file, and no notion of who owns what. The agent
+    confidently produces output that drifts from intent.
+  promise: >-
+    Stages 2+ introduce the spec layer, planning, progress tracking, and
+    agent role separation. Stage 1 establishes the baseline we're trying
+    to leave behind.
+  aha_moments:
+    - id: aha-1
+      text: "The agent's confidence is uncorrelated with the work being right."
+    - id: aha-2
+      text: "Nothing survives the session: no spec, no plan, no memory."
+    - id: aha-3
+      text: "The token bill looks small. The re-work bill is invisible."
+
+personas:
+  - id: solo-builder
+    name: "Solo Builder / Tech Lead"
+    role: "Primary audience for the baseline post"
+
+# ---------------------------------------------------------------------------
+# Flows: one flow per stage; each step maps 1:1 onto a Stage Step in the
+# transform output. The `showcase` block under each step holds the
+# inline-content fields the React island consumes.
+# ---------------------------------------------------------------------------
+flows:
+  - id: ungoverned-run
+    title: "Ungoverned agentic run, end-to-end"
+    route: "/workflow-showcase/?stage=stage-1"
+    capture:
+      screenshot: false
+      video: false
+      trace: false
+    steps:
+      - id: step-1-1
+        action: observe
+        target: "Slack thread"
+        narration: >-
+          The work starts as a one-line Slack message. No spec, no owner,
+          no success criteria. Just vibes and urgency.
+        showcase:
+          label: "Vague ask lands"
+          description: "A one-line Slack message kicks off the work. No spec attached."
+          terminal:
+            - "$ slack #builds \"hey can we ship the new onboarding flow this week\""
+            - "Posted by pm at 09:07"
+            - "> No PRD, no acceptance criteria, no owner."
+          panels:
+            prd:
+              title: "PRD (none)"
+              content_type: "markdown"
+              content: |
+                <!-- No PRD exists. The agent will infer requirements from
+                     the Slack thread and recent chat context. -->
+
+                Inferred from Slack:
+
+                > "ship the new onboarding flow this week"
+
+                Open questions (never written down):
+                  - Which onboarding flow? (B2B? Consumer?)
+                  - What does "ship" mean? (Beta? GA?)
+                  - Who is the owner if it breaks in prod?
+
+      - id: step-1-2
+        action: observe
+        target: "Agent prompt"
+        narration: >-
+          The agent is invoked directly from the Slack message. The prompt
+          is a copy-paste of the chat thread. No structured context.
+        showcase:
+          label: "Agent spun up"
+          description: "Engineer pastes the Slack thread into an agent. No system prompt, no role, no plan."
+          terminal:
+            - "$ claude --model sonnet --prompt-file slack-thread.txt"
+            - "Reading prompt (412 chars)..."
+            - "No system prompt. No role. No tools enumerated."
+            - "Starting run..."
+          panels:
+            agents:
+              title: "Agent roles (implicit)"
+              content_type: "text"
+              content: |
+                generic-agent (unscoped)
+                  Inferred to be: PM + architect + frontend + reviewer.
+                  No separation of concerns. No reviewer agent.
+                  Failure mode: one model carries all responsibility;
+                  no second opinion before output ships.
+
+      - id: step-1-3
+        action: observe
+        target: "Agent output"
+        narration: >-
+          The agent confidently produces a plan. It sounds reasonable.
+          It is also wrong about half of the constraints, because the
+          constraints were never written down.
+        showcase:
+          label: "Confident wrong plan"
+          description: "Agent emits a 'plan' that contradicts unstated constraints. No one notices."
+          terminal:
+            - "$ agent run complete"
+            - "Tokens: 184220 in / 27110 out  | Time: 4m 38s"
+            - "Confidence: high"
+            - "Output: 'plan.md' (untracked, in $TMPDIR)"
+          panels:
+            plan:
+              title: "Agent-generated plan (contradicts unstated constraints)"
+              content_type: "markdown"
+              content: |
+                ## Onboarding flow rewrite — plan (draft, agent)
+
+                | Phase | Task                              | Est  |
+                |-------|-----------------------------------|------|
+                | 1     | Replace Auth0 with Clerk          | 2 d  |
+                | 2     | Drop legacy mobile webview support | 1 d  |
+                | 3     | Ship behind feature flag           | 0.5 d|
+
+                **Assumptions made silently:**
+                - "New flow" means new auth provider. (Wrong; PM meant copy + visual refresh.)
+                - Legacy mobile is deprecated. (Wrong; 31% of users.)
+                - There is a feature flag service. (No.)
+
+      - id: step-1-4
+        action: observe
+        target: "Engineer reaction"
+        narration: >-
+          The engineer skims the plan. It looks plausible. They start
+          executing the first task. No one queries whether the agent's
+          assumptions match reality.
+        showcase:
+          label: "No verification"
+          description: "Engineer accepts the plan and starts work. No PRD comparison, no PM sign-off."
+          terminal:
+            - "$ git checkout -b onboarding-rewrite"
+            - "$ npm i @clerk/clerk-react"
+            - "added 47 packages in 6s"
+            - "> 'looks fine, I'll figure out the mobile thing later'"
+          panels:
+            progress:
+              title: "Progress tracking (none)"
+              content_type: "yaml"
+              content: |
+                # No progress file exists. Status is in the engineer's head
+                # and the agent has no persistent memory.
+                status: unknown
+                blockers: []
+                assumptions_validated: []
+                owner: implicit
+                notes: |
+                  We have no record of which tasks were done, which were
+                  abandoned, or which were silently re-scoped mid-flight.
+
+      - id: step-1-5
+        action: observe
+        target: "Reality check"
+        narration: >-
+          Two days in, mobile breaks in staging. The auth provider switch
+          was the wrong call. The engineer goes back to re-read the
+          original Slack thread.
+        showcase:
+          label: "Reality bites"
+          description: "Staging breaks on mobile. The agent's assumptions weren't validated against reality."
+          terminal:
+            - "$ slack #incidents \"onboarding 500s on mobile webview\""
+            - "alert: error_rate=8.2%  baseline=0.4%"
+            - "$ git log --oneline | head -3"
+            - "  4a1c92e  switch to clerk"
+            - "  812df3a  drop legacy webview shim  <-- the regression"
+          panels:
+            progress:
+              title: "Progress (reconstructed post-hoc)"
+              content_type: "yaml"
+              content: |
+                status: in-progress (regressed)
+                completed_tasks: 2
+                regressed_tasks: 1
+                blockers:
+                  - legacy mobile webview support was not deprecated
+                  - feature flag service does not exist
+                  - PM intent was 'visual refresh', not 'auth rewrite'
+                rework_estimate_days: 2
+                rework_token_estimate: 220000
+
+      - id: step-1-6
+        action: observe
+        target: "Re-prompt"
+        narration: >-
+          The engineer re-prompts the agent with corrections. The agent
+          has no memory of the previous session. It starts over. New
+          tokens, same risk surface.
+        showcase:
+          label: "Re-prompt from scratch"
+          description: "Agent has no session memory. Engineer re-pastes context. Token bill compounds."
+          terminal:
+            - "$ claude --model sonnet --prompt-file 'context-v2.txt'"
+            - "Reading prompt (1840 chars)..."
+            - "No memory of previous session. No diff awareness."
+            - "Tokens: 156800 in / 31290 out  | Time: 5m 10s"
+          panels:
+            agents:
+              title: "Agent role (still unscoped)"
+              content_type: "text"
+              content: |
+                generic-agent (unscoped, again)
+                  Still no role separation. The same model that proposed
+                  the wrong plan is now correcting it without a reviewer.
+                  No spike-writer. No planner. No progress agent.
+
+      - id: step-1-7
+        action: observe
+        target: "Session ends"
+        narration: >-
+          The session ends. Nothing is persisted. The artifacts live in
+          $TMPDIR, the rationale lives in a stale Slack thread, and the
+          next teammate to touch onboarding will repeat the same loop.
+        showcase:
+          label: "Session ends, memory dies"
+          description: "No PRD, no plan, no progress file. The next session starts from zero."
+          terminal:
+            - "$ exit"
+            - "Session ws-2026-05-13-09xx not saved."
+            - "Artifacts (plan.md, scratch.md) remain in $TMPDIR; auto-deleted in 7d."
+            - "> 'we should write this up.'  (we don't.)"
+          panels:
+            progress:
+              title: "Final state"
+              content_type: "yaml"
+              content: |
+                stage: ungoverned
+                final_status: shipped-with-regression
+                spec_artifact: null
+                plan_artifact: null
+                progress_artifact: null
+                agents_artifact: null
+                memory_carried_forward: false
+                hidden_costs:
+                  rework_days: 2.0
+                  rework_tokens_est: 220000
+                  rework_cost_usd_est: 1.10
+                  team_trust_delta: "down"
+
+outputs:
+  screenshots: false
+  raw_video: false
+  polished_video: false
+  talking_points: false
+  voiceover_script: false
+  captions: false
+  thumbnail: true
+  social_clip: true
+
+claims:
+  - id: claim-1
+    text: "An ungoverned run can ship a regression without any artifact trail."
+    verification: "Stage 1 narrative; corroborated by Post 1."
+    status: illustrative
+  - id: claim-2
+    text: "Re-work costs are invisible in the per-session token bill."
+    verification: "Stage 1 metrics; total tokens include both runs."
+    status: illustrative
+
+review:
+  required_gates:
+    - no-secrets
+    - audience-fit
+    - claim-accuracy
+  reviewers:
+    - demo-reviewer
+
+context_updates:
+  propose_only: true
+  files: []
+
+workflow_updates:
+  propose_only: true
+  files: []
+
+risks:
+  - "Numbers are curated for illustration; mark dataSource accordingly."
+  - "Tone must read as candid, not preachy. The reader is the protagonist."
