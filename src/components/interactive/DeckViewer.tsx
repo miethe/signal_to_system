@@ -132,18 +132,19 @@ export default function DeckViewer({ slides, title, className = "" }: DeckViewer
         </button>
 
         {/* Dot indicators */}
-        <div className="flex gap-1.5" aria-hidden="true">
+        <div className="flex gap-1.5" role="group" aria-label="Slide indicators">
           {slides.map((_, i) => (
             <button
               key={i}
               onClick={() => setCurrent(i)}
               className={[
-                "h-1.5 rounded-full transition-all",
+                "h-1.5 rounded-full transition-all focus-ring",
                 i === current
                   ? "w-4 bg-indigo-500"
                   : "w-1.5 bg-zinc-300 hover:bg-zinc-400 dark:bg-zinc-600 dark:hover:bg-zinc-500",
               ].join(" ")}
               aria-label={`Go to slide ${i + 1}`}
+              title={`Go to slide ${i + 1}`}
             />
           ))}
         </div>
