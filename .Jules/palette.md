@@ -1,3 +1,4 @@
 ## 2026-04-17 - Found unused skip-link class
 **Learning:** Found an unused skip-link class that was implemented to enhance accessibility but not actually applied.
 **Action:** Always check the global styles when considering new classes to add to see if they've already been built but ignored, particularly when performing accessibility checks.
+## 2026-05-27 - Enhance Icon-Only Buttons with Tooltips and Focus Rings\n**Learning:** Sighted keyboard users and mouse users rely on visual focus indicators and tooltips, respectively. The `.focus-ring` global utility class can be paired with `title` attributes on elements that have `aria-label` for icon-only components.\n**Action:** Always verify that an icon-only button without visible text provides both an `aria-label` (for screen readers) and a `title` attribute (for sighted users to see tooltips), and check that keyboard navigation shows a clear focus ring.
