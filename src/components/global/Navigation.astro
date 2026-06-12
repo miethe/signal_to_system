@@ -16,7 +16,7 @@ import SearchBox from './SearchBox';
     <!-- Site logo / wordmark -->
     <a
       href="/"
-      class="group flex items-center gap-2.5 text-[var(--text-primary)] no-underline transition-opacity hover:opacity-80"
+      class="group flex items-center gap-2.5 text-[var(--text-primary)] no-underline transition-opacity hover:opacity-80 focus-visible:outline-none focus-ring"
       aria-label={site.title}
     >
       <img
@@ -34,7 +34,7 @@ import SearchBox from './SearchBox';
         site.nav.map((item) => (
           <a
             href={item.href}
-            class="rounded-md px-3 py-1.5 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)]"
+            class="rounded-md px-3 py-1.5 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)] focus-visible:outline-none focus-ring"
           >
             {item.label}
           </a>
@@ -60,7 +60,8 @@ import SearchBox from './SearchBox';
         aria-expanded="false"
         aria-controls="mobile-menu"
         aria-label="Open navigation menu"
-        class="flex h-9 w-9 items-center justify-center rounded-md text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)] lg:hidden"
+        title="Open navigation menu"
+        class="flex h-9 w-9 items-center justify-center rounded-md text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)] focus-visible:outline-none focus-ring lg:hidden"
       >
         <svg
           id="hamburger-icon"
@@ -101,7 +102,7 @@ import SearchBox from './SearchBox';
           <li>
             <a
               href={item.href}
-              class="block rounded-md px-3 py-2 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)]"
+              class="block rounded-md px-3 py-2 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)] focus-visible:outline-none focus-ring"
             >
               {item.label}
             </a>
@@ -125,6 +126,7 @@ import SearchBox from './SearchBox';
     closeIcon?.classList.toggle('hidden', isOpen);
     toggle.setAttribute('aria-expanded', String(!isOpen));
     toggle.setAttribute('aria-label', isOpen ? 'Open navigation menu' : 'Close navigation menu');
+    toggle.setAttribute('title', isOpen ? 'Open navigation menu' : 'Close navigation menu');
   });
 
   // Close menu when clicking a link
