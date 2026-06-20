@@ -80,10 +80,11 @@ export default function ComponentDemo({
         <div className="flex rounded-lg border border-zinc-200 dark:border-zinc-700 overflow-hidden text-xs">
           {(["preview", "info"] as const).map((t) => (
             <button
+              type="button"
               key={t}
               onClick={() => setTab(t)}
               className={[
-                "px-3 py-1 capitalize transition-colors",
+                "px-3 py-1 capitalize transition-colors focus-ring",
                 tab === t
                   ? "bg-white text-zinc-800 dark:bg-zinc-800 dark:text-zinc-100"
                   : "bg-transparent text-zinc-500 hover:text-zinc-700 dark:text-zinc-500 dark:hover:text-zinc-300",
