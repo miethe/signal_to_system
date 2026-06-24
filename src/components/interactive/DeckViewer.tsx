@@ -91,10 +91,11 @@ export default function DeckViewer({ slides, title, className = "" }: DeckViewer
       {mode === "rich" && slide.notes && (
         <div className="border-t border-zinc-100 dark:border-zinc-800">
           <button
+            type="button"
             onClick={() => setShowNotes((v) => !v)}
             aria-expanded={showNotes}
             aria-controls="speaker-notes"
-            className="w-full px-4 py-2 text-left text-xs text-zinc-500 hover:text-zinc-700 dark:text-zinc-500 dark:hover:text-zinc-300 transition-colors"
+            className="w-full px-4 py-2 text-left text-xs text-zinc-500 hover:text-zinc-700 dark:text-zinc-500 dark:hover:text-zinc-300 transition-colors focus-ring"
           >
             {showNotes ? "Hide" : "Show"} speaker notes
           </button>
@@ -109,10 +110,11 @@ export default function DeckViewer({ slides, title, className = "" }: DeckViewer
       {/* Navigation */}
       <div className="flex items-center justify-between border-t border-zinc-100 px-4 py-3 dark:border-zinc-800">
         <button
+          type="button"
           onClick={prev}
           disabled={isFirst}
           aria-label="Previous slide"
-          className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-40 dark:text-zinc-400 dark:hover:bg-zinc-800"
+          className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-40 dark:text-zinc-400 dark:hover:bg-zinc-800 focus-ring"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -132,27 +134,30 @@ export default function DeckViewer({ slides, title, className = "" }: DeckViewer
         </button>
 
         {/* Dot indicators */}
-        <div className="flex gap-1.5" aria-hidden="true">
+        <div className="flex gap-1.5" role="group" aria-label="Slide indicators">
           {slides.map((_, i) => (
             <button
               key={i}
+              type="button"
               onClick={() => setCurrent(i)}
               className={[
-                "h-1.5 rounded-full transition-all",
+                "h-1.5 rounded-full transition-all focus-ring",
                 i === current
                   ? "w-4 bg-indigo-500"
                   : "w-1.5 bg-zinc-300 hover:bg-zinc-400 dark:bg-zinc-600 dark:hover:bg-zinc-500",
               ].join(" ")}
               aria-label={`Go to slide ${i + 1}`}
+              aria-current={i === current ? "step" : undefined}
             />
           ))}
         </div>
 
         <button
+          type="button"
           onClick={next}
           disabled={isLast}
           aria-label="Next slide"
-          className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-40 dark:text-zinc-400 dark:hover:bg-zinc-800"
+          className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-40 dark:text-zinc-400 dark:hover:bg-zinc-800 focus-ring"
         >
           Next
           <svg
