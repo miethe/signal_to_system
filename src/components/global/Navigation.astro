@@ -3,6 +3,9 @@ import { site } from '../../data/site';
 import ThemeToggle from './ThemeToggle';
 import ModeToggle from './ModeToggle';
 import SearchBox from './SearchBox';
+
+const currentPath = Astro.url.pathname;
+const isCurrentPage = (href: string) => currentPath === href || (currentPath.startsWith(href) && href !== '/');
 ---
 
 <header
@@ -16,7 +19,7 @@ import SearchBox from './SearchBox';
     <!-- Site logo / wordmark -->
     <a
       href="/"
-      class="group flex items-center gap-2.5 text-[var(--text-primary)] no-underline transition-opacity hover:opacity-80"
+      class="group flex items-center gap-2.5 text-[var(--text-primary)] no-underline transition-opacity hover:opacity-80 focus-ring focus-visible:outline-none"
       aria-label={site.title}
     >
       <img
@@ -34,7 +37,8 @@ import SearchBox from './SearchBox';
         site.nav.map((item) => (
           <a
             href={item.href}
-            class="rounded-md px-3 py-1.5 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)]"
+            aria-current={isCurrentPage(item.href) ? "page" : undefined}
+            class="nav-underline focus-ring focus-visible:outline-none rounded-md px-3 py-1.5 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)] aria-[current=page]:text-[var(--text-primary)]"
           >
             {item.label}
           </a>
@@ -60,7 +64,8 @@ import SearchBox from './SearchBox';
         aria-expanded="false"
         aria-controls="mobile-menu"
         aria-label="Open navigation menu"
-        class="flex h-9 w-9 items-center justify-center rounded-md text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)] lg:hidden"
+        title="Open navigation menu"
+        class="focus-ring focus-visible:outline-none flex h-9 w-9 items-center justify-center rounded-md text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)] lg:hidden"
       >
         <svg
           id="hamburger-icon"
@@ -101,7 +106,8 @@ import SearchBox from './SearchBox';
           <li>
             <a
               href={item.href}
-              class="block rounded-md px-3 py-2 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)]"
+              aria-current={isCurrentPage(item.href) ? "page" : undefined}
+              class="focus-ring focus-visible:outline-none block rounded-md px-3 py-2 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)] aria-[current=page]:text-[var(--text-primary)] aria-[current=page]:bg-[var(--bg-muted)]"
             >
               {item.label}
             </a>
@@ -124,7 +130,9 @@ import SearchBox from './SearchBox';
     hamburger?.classList.toggle('hidden', !isOpen);
     closeIcon?.classList.toggle('hidden', isOpen);
     toggle.setAttribute('aria-expanded', String(!isOpen));
-    toggle.setAttribute('aria-label', isOpen ? 'Open navigation menu' : 'Close navigation menu');
+    const label = isOpen ? 'Open navigation menu' : 'Close navigation menu';
+    toggle.setAttribute('aria-label', label);
+    toggle.setAttribute('title', label);
   });
 
   // Close menu when clicking a link
@@ -134,6 +142,8 @@ import SearchBox from './SearchBox';
       hamburger?.classList.remove('hidden');
       closeIcon?.classList.add('hidden');
       toggle?.setAttribute('aria-expanded', 'false');
+      toggle?.setAttribute('aria-label', 'Open navigation menu');
+      toggle?.setAttribute('title', 'Open navigation menu');
     });
   });
 
