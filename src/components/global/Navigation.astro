@@ -3,6 +3,8 @@ import { site } from '../../data/site';
 import ThemeToggle from './ThemeToggle';
 import ModeToggle from './ModeToggle';
 import SearchBox from './SearchBox';
+
+const pathname = Astro.url.pathname;
 ---
 
 <header
@@ -31,14 +33,18 @@ import SearchBox from './SearchBox';
     <!-- Desktop nav links -->
     <div class="hidden items-center gap-1 lg:flex">
       {
-        site.nav.map((item) => (
-          <a
-            href={item.href}
-            class="rounded-md px-3 py-1.5 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)]"
-          >
-            {item.label}
-          </a>
-        ))
+        site.nav.map((item) => {
+          const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
+          return (
+            <a
+              href={item.href}
+              aria-current={isActive ? "page" : undefined}
+              class={`rounded-md px-3 py-1.5 text-sm font-medium transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)] ${isActive ? 'text-[var(--text-primary)] nav-underline' : 'text-[var(--text-secondary)]'}`}
+            >
+              {item.label}
+            </a>
+          );
+        })
       }
     </div>
 
@@ -60,6 +66,7 @@ import SearchBox from './SearchBox';
         aria-expanded="false"
         aria-controls="mobile-menu"
         aria-label="Open navigation menu"
+        title="Open navigation menu"
         class="flex h-9 w-9 items-center justify-center rounded-md text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)] lg:hidden"
       >
         <svg
@@ -97,16 +104,20 @@ import SearchBox from './SearchBox';
   >
     <ul class="space-y-1">
       {
-        site.nav.map((item) => (
-          <li>
-            <a
-              href={item.href}
-              class="block rounded-md px-3 py-2 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)]"
-            >
-              {item.label}
-            </a>
-          </li>
-        ))
+        site.nav.map((item) => {
+          const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
+          return (
+            <li>
+              <a
+                href={item.href}
+                aria-current={isActive ? "page" : undefined}
+                class={`block rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)] ${isActive ? 'text-[var(--text-primary)] bg-[var(--bg-muted)]' : 'text-[var(--text-secondary)]'}`}
+              >
+                {item.label}
+              </a>
+            </li>
+          );
+        })
       }
     </ul>
   </div>
@@ -124,7 +135,9 @@ import SearchBox from './SearchBox';
     hamburger?.classList.toggle('hidden', !isOpen);
     closeIcon?.classList.toggle('hidden', isOpen);
     toggle.setAttribute('aria-expanded', String(!isOpen));
-    toggle.setAttribute('aria-label', isOpen ? 'Open navigation menu' : 'Close navigation menu');
+    const label = isOpen ? 'Open navigation menu' : 'Close navigation menu';
+    toggle.setAttribute('aria-label', label);
+    toggle.setAttribute('title', label);
   });
 
   // Close menu when clicking a link
@@ -134,6 +147,8 @@ import SearchBox from './SearchBox';
       hamburger?.classList.remove('hidden');
       closeIcon?.classList.add('hidden');
       toggle?.setAttribute('aria-expanded', 'false');
+      toggle?.setAttribute('aria-label', 'Open navigation menu');
+      toggle?.setAttribute('title', 'Open navigation menu');
     });
   });
 
