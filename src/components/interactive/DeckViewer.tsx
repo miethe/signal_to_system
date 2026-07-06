@@ -144,6 +144,7 @@ export default function DeckViewer({ slides, title, className = "" }: DeckViewer
                   : "w-1.5 bg-zinc-300 hover:bg-zinc-400 dark:bg-zinc-600 dark:hover:bg-zinc-500",
               ].join(" ")}
               aria-label={`Go to slide ${i + 1}`}
+              title={`Go to slide ${i + 1}`}
             />
           ))}
         </div>
