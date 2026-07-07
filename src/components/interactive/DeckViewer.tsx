@@ -112,6 +112,7 @@ export default function DeckViewer({ slides, title, className = "" }: DeckViewer
           onClick={prev}
           disabled={isFirst}
           aria-label="Previous slide"
+          title="Previous slide"
           className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-40 dark:text-zinc-400 dark:hover:bg-zinc-800"
         >
           <svg
@@ -144,6 +145,7 @@ export default function DeckViewer({ slides, title, className = "" }: DeckViewer
                   : "w-1.5 bg-zinc-300 hover:bg-zinc-400 dark:bg-zinc-600 dark:hover:bg-zinc-500",
               ].join(" ")}
               aria-label={`Go to slide ${i + 1}`}
+              title={`Go to slide ${i + 1}`}
             />
           ))}
         </div>
@@ -152,6 +154,7 @@ export default function DeckViewer({ slides, title, className = "" }: DeckViewer
           onClick={next}
           disabled={isLast}
           aria-label="Next slide"
+          title="Next slide"
           className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-100 disabled:cursor-not-allowed disabled:opacity-40 dark:text-zinc-400 dark:hover:bg-zinc-800"
         >
           Next
