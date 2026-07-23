@@ -55,7 +55,7 @@ Key flags:
 - `--yolo` or `-y`: Auto-approve all tool calls
 - `-o text`: Human-readable output
 - `-o json`: Structured output with stats
-- `-m gemini-2.5-flash`: Use faster model for simple tasks
+- `-m gemini-3.5-flash`: Use faster model for simple tasks
 
 ### Critical: Force Immediate Execution
 YOLO mode auto-approves but does NOT prevent planning prompts. Use forceful language:
@@ -102,7 +102,7 @@ gemini "What are the latest [topic]? Use Google Search." -o text
 
 ### Faster Model (Simple Tasks)
 ```bash
-gemini "[prompt]" -m gemini-2.5-flash -o text
+gemini "[prompt]" -m gemini-3.5-flash -o text
 ```
 
 ## Integration Patterns
@@ -147,8 +147,8 @@ gemini "Create tests" --yolo -o text 2>&1 &
 ### Pattern 5: Model Selection
 ```
 Complex (architecture, multi-file)? → Default (Gemini 2.5 Pro)
-Speed critical? → gemini-2.5-flash
-Trivial (formatting, simple)? → gemini-2.5-flash
+Speed critical? → gemini-3.5-flash
+Trivial (formatting, simple)? → gemini-3.5-flash
 ```
 
 ## Rate Limit Handling
@@ -203,7 +203,7 @@ echo "follow-up" | gemini -r [index] -o text
 
 ### Rate Limit Exceeded
 - CLI auto-retries with backoff
-- Use `-m gemini-2.5-flash` for lower priority tasks
+- Use `-m gemini-3.5-flash` for lower priority tasks
 - Run in background for long operations
 
 ### Command Failures

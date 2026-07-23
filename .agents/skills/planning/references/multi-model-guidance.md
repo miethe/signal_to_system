@@ -13,22 +13,22 @@ Is the task image/asset generation?
 
 Is the task UI wireframing, SVG animation, or complex visuals?
   Is it structural (layout, component hierarchy, interaction states, data tables)?
-    YES → gemini-3.1-pro SVG wireframe (machine-readable, editable, deterministic labels)
+    YES → gemini-3.1-pro-preview SVG wireframe (machine-readable, editable, deterministic labels)
   Is it aesthetic (color exploration, visual feel, high-fidelity stakeholder preview)?
     YES → nano-banana-pro raster mockup (quality mode for finals, standard for iteration)
   Need both? → Gemini SVG first (structure), then Nano Banana (aesthetic target)
   NO  → Continue
 
 Does the task require current web information (post-Feb 2025)?
-  YES → gemini-3.1-pro (web search capability)
+  YES → gemini-3.1-pro-preview (web search capability)
   NO  → Continue
 
 Is this a debug escalation (2+ failed Claude cycles)?
-  YES → gpt-5.3-codex (xhigh effort)
+  YES → gpt-5.6-terra (xhigh effort)
   NO  → Continue
 
 Is this a plan review checkpoint (opt-in)?
-  YES → gpt-5.3-codex (medium effort)
+  YES → gpt-5.6-terra (medium effort)
   NO  → Continue
 
 Is this documentation, exploration, or simple search?
@@ -61,7 +61,7 @@ parallelization:
       effort: quality
 
     - task: RESEARCH-1.1
-      assigned_to: gemini-3.1-pro
+      assigned_to: gemini-3.1-pro-preview
       effort: medium
 
   batch_1:
@@ -84,17 +84,17 @@ parallelization:
 | Task | Model | Effort | Rationale |
 |------|-------|--------|-----------|
 | Generate app icon (final) | nano-banana-pro | quality | visual asset generation at max quality |
-| Research Next.js 15 patterns | gemini-3.1-pro | medium | web search + synthesis needed |
+| Research Next.js 15 patterns | gemini-3.1-pro-preview | medium | web search + synthesis needed |
 | Implement user profile API | sonnet | adaptive | standard implementation |
-| Debug auth flow (3rd attempt) | gpt-5.3-codex | xhigh | escalated debugging (threshold: 2 cycles) |
+| Debug auth flow (3rd attempt) | gpt-5.6-terra | xhigh | escalated debugging (threshold: 2 cycles) |
 | Write component documentation | haiku | adaptive | documentation is cheap (haiku optimized) |
-| UI wireframe (layout/hierarchy) | gemini-3.1-pro | medium | SVG wireframe — machine-readable, editable, precise labels |
+| UI wireframe (layout/hierarchy) | gemini-3.1-pro-preview | medium | SVG wireframe — machine-readable, editable, precise labels |
 | UI mockup (aesthetic/feel) | nano-banana-pro | standard | raster mockup — visual aesthetics, color exploration |
 | UI mockup (stakeholder preview) | nano-banana-pro | quality | high-fidelity raster for sign-off |
 
 ## Checkpoint Policies
 
-- **Plan Review**: Opt-in checkpoint via `multi-model.toml`. Route to gpt-5.3-codex at medium effort for second opinion.
+- **Plan Review**: Opt-in checkpoint via `multi-model.toml`. Route to gpt-5.6-terra at medium effort for second opinion.
 - **PR Cross-Review**: Opt-in checkpoint. Gemini 3.1 Pro for security-sensitive code (auth, crypto patterns).
 - **Debug Escalation**: Auto-trigger after `suggest_codex_debug_after_cycles` (default: 2) failed attempts.
 - **Privacy-Sensitive**: Route to local LLM (if enabled) instead of external services.
