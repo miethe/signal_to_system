@@ -1,0 +1,168 @@
+---
+title: "M6 Abstraction Engine \u2014 After-Action Review (expandable to E2E)"
+excerpt: A field note from the Agentic OS build loop.
+date: '2026-07-29'
+readTime: 6 min read
+contentType: field-note
+category: AI Agents
+tags:
+- agent-ready-repos
+- human-ai-workflow
+- artifact-first
+status: draft
+series: I Let Claude Build My App
+seriesOrder: 3
+whyItMatters: The work shows how agentic systems turn operational evidence into reusable
+  practice.
+leaderTakeaway: Treat after-action reports as publication-ready raw material, but
+  keep the safety gate explicit.
+---
+
+# M6 Abstraction Engine — After-Action Review (expandable to E2E)
+
+---
+schema_version: 2
+doc_type: report
+report_category: aar
+title: "M6 Abstraction Engine — After-Action Review (expandable to E2E)"
+status: draft
+created: 2026-07-02
+updated: 2026-07-02
+feature_slug: intenttree-m6-abstraction-engine
+exploration_charter_ref: docs/project_plans/exploration/intenttree-m6-abstraction-engine/intenttree-m6-abstraction-engine-charter.md
+feasibility_brief_ref: docs/project_plans/exploration/intenttree-m6-abstraction-engine/intenttree-m6-abstraction-engine-feasibility-brief.md
+proposed_adr_ref: docs/project_plans/exploration/intenttree-m6-abstraction-engine/intenttree-m6-abstraction-engine-proposed-adr.md
+related_documents:
+  - docs/project_plans/design-specs/intenttree-m6-abstraction-engine.md
+aar_scope: exploration          # exploration | implementation | e2e — bump to e2e once Part B is filled
+verdict: conditional
+deferred_backlog_ref: DI-235
+intenttree_node: node_01KWJPK0NSBPDD5C1SXAC48S93
+lifecycle: living               # append to this file; do not fork a second AAR post-implementation
+---
+
+# M6 Abstraction Engine — After-Action Review
+
+> **How to use this document.** This is a *living* AAR with two parts. **Part A** (this pass) reviews the
+> pre-commitment **exploration**. **Part B** is a stub to be filled **after** M6 is implemented, at which
+> point flip `aar_scope: exploration → e2e` and this becomes the comprehensive end-to-end AAR. Do not
+> create a second AAR file — expand this one. The gated `op story capture` pipeline should ingest this
+> file when Part B lands (per the AAR discipline in global CLAUDE.md).
+
+---
+
+## Part A — Exploration AAR (complete, 2026-07-02)
+
+### A1. Intent
+
+Turn the deferred M6 design spec (`design-specs/intenttree-m6-abstraction-engine.md`, `maturity: shaping`)
+into a **go/no-go/conditional** verdict *before* authoring a Tier-3 PRD. The spec self-gated as "SPIKE
+before PRD," carried 4 unresolved architectural OQs (OQ-1a–d), and named an unmet M4 prerequisite. The
+request arrived as `/plan:plan-feature intenttree-m6-abstraction-engine.md commit to main when done.`
+
+### A2. What actually happened (timeline)
+
+| Step | Outcome |
+|------|---------|
+| `/plan:plan-feature` Phase 0 triage | Detected the spec self-gate + unmet promotion triggers via a fast code probe (`services/edge.py:106` TODO; no `EmbeddingProvider`; no `/abstract`). Classified **Tier 3, risk high**. |
+| Routing gate (AskUserQuestion #1) | Surfaced speculative signals; user chose **explore-first** (recommended). Routed to `/plan:explore`. |
+| Phase 1 — Charter | Authored `exploration_charter` with a mandatory `deal_killer`, 4 legs (tech/risk/value/prior-art), and pre-declared verdict criteria. Advanced to `in-progress`. |
+| Phase 2 — Legs (parallel) | 4 legs spawned in one message. Confidence: **tech 0.78 · risk 0.85 · value 0.35 · prior-art 0.72**. ~860K subagent tokens total, ~4 min wall-clock. |
+| Phase 3 — Synthesis | Feasibility brief + proposed ADR (status: proposed) authored from the leg findings. |
+| Phase 4 — Verdict | Opus recommended **CONDITIONAL (0.8)**; user signed off (AskUserQuestion #2). Recorded verdict, finalized brief, captured **DI-235** + itt node, annotated the design spec's Promotion Trigger, committed to `main` (`0d2a739`). |
+
+### A3. The verdict and why
+
+**CONDITIONAL (confidence 0.8).** The exploration *succeeded at its job*: it resolved every SPIKE-before-PRD
+open question and confirmed technical feasibility — but it **withheld commitment** because the value floor
+is unmeasured.
+
+- **Feasible** — tech 0.78 (feasible-with-constraints), risk 0.85 (completeness). Not no-go.
+- **OQs resolved** (now locked in the proposed ADR):
+  - **OQ-1a** — provider = OpenAI `text-embedding-3-small` v1 + sentence-transformers SBERT fallback.
+    **Anthropic ships no embeddings API** — the design spec's "Anthropic text-embedding-3" was an error.
+  - **OQ-1b** — reuse precedent comes from the **node graph**, *not* the `Artifact` table (`Artifact.body`
+    is not populated by the decompose path). This corrects the design spec's stated assumption.
+  - **OQ-1c** — parallel **`POST /nodes/{id}/abstract`** + a new `NodeOperation` enum; leave `/decompose`
+    untouched (it has 5 live consumers; extending its union buys nothing).
+  - **OQ-1d / M4** — deliverable in a **bounded first phase** using **LLM-judged** detection; embedding-
+    similarity detection would make M4 a separate epic (defer pgvector).
+- **Withheld** — value leg 0.35: no telemetry, single-user + external-agent base, and the project's own
+  docs frame M6 as *enhancement, not value floor* (Promotion Trigger #3 explicitly unmet). The deal-killer
+  did **not** fire (uplift is *unmeasured*, not *disproven*), but there is no justification to commit a
+  13+ pt build on an untested hypothesis.
+
+**Precondition to re-enter** (DI-235): instrument decompose quality → demonstrate plain-context decompose
+is measurably insufficient → then `/plan:plan-feature --tier=3` sequencing M4 LLM-judged detection first,
+before any pgvector work.
+
+### A4. What went well
+
+- **Phase 0 caught the self-gate cheaply.** A ~2-probe code check (not a deep read) confirmed the unmet
+  prerequisite and prevented a premature PRD over 4 unresolved architectural decisions.
+- **Parallel legs delivered independent verification, not echo.** The tech leg *corrected the design spec*
+  twice (Artifact-table assumption; Anthropic-embeddings error) — first-hand evidence Opus would not have
+  surfaced from the spec alone.
+- **The low-confidence value leg was the decisive input.** Honoring an honest 0.35 (rather than
+  manufacturing demand evidence) is exactly what turned a superficially "feasible → go" into the correct
+  "feasible-but-defer."
+- **Settled ground is now settled.** The proposed ADR + resolved OQs mean re-entry won't re-litigate the
+  provider/API decisions — the exploration's durable payoff even though the verdict was defer.
+
+### A5. What was noisy / to watch
+
+- **Concurrent agents on the shared checkout.** During the run, another agent committed
+  `328c74e feat(node): route template + agent decompose through the shared LLM core` and advanced `main`
+  past this commit; a transient unstaged `services/node.py` diff appeared mid-run. It was *not* a Mode-B
+  violation by the exploration legs (confirmed). **Lesson**: on a shared checkout, stage explicit paths
+  only, verify `merge-base --is-ancestor` for your own commit, and don't be alarmed by foreign diffs —
+  but *do* verify provenance before touching them.
+- **Charter linter reformatting.** `manage-exploration-status.py` re-emits YAML (block scalars, list
+  reflow) and `update-field.py` couldn't detect `doc_type: exploration_charter` — `output_artifacts` was
+  set via a direct `Edit` instead. Minor; note for tooling.
+
+### A6. Process metrics (exploration)
+
+- Legs: 4 (spike-writer, backend-architect, ux-researcher, search-specialist), parallel.
+- Subagent tokens: tech ~307K · risk ~182K · value ~174K · prior-art ~197K · synthesis ~262K.
+- Human gates: 2 (routing, verdict sign-off). Wall-clock: legs ~4 min; end-to-end within the ~30–60K
+  Opus-orchestration budget target.
+- Artifacts: charter, 4 leg findings, feasibility brief, proposed ADR, this AAR, DI-235, itt node.
+
+---
+
+## Part B — Implementation AAR (STUB — expand post-implementation)
+
+> Fill this in **only after** the DI-235 precondition resolves and M6 (or its first phase) ships. Flip
+> `aar_scope` to `e2e`, set `updated`, and append `commit_refs` / `pr_refs` here. Each `[ ]` is a prompt.
+
+### B1. Did the precondition hold?
+- [ ] What did decompose-quality instrumentation actually measure, and did it show plain-context decompose
+      was insufficient? (If it did **not**, record that M6 was correctly *not* built and close DI-235 as
+      no-go — the exploration's defer will have paid off by preventing wasted build.)
+
+### B2. Did the locked decisions survive contact?
+- [ ] **Provider (OQ-1a)** — did OpenAI `text-embedding-3-small` ship as v1? Did the SBERT fallback get
+      used in dev/test? Any cost/latency surprise vs the prior-art estimate?
+- [ ] **Reuse source (OQ-1b)** — did node-graph precedent retrieval work, or did the Artifact-table
+      capture path get built after all?
+- [ ] **API surface (OQ-1c)** — did `/abstract` stay parallel, or did `/decompose` get touched? Any of the
+      5 consumers break?
+- [ ] **Detection sequencing (OQ-1d/M4)** — did LLM-judged detection ship first as a bounded phase? Did
+      embedding-similarity follow, and when?
+- [ ] Which proposed-ADR decisions were **overturned**, and why? (Upgrade the ADR to accepted/rejected.)
+
+### B3. Estimation accuracy
+- [ ] Actual points/effort vs the H5 anchor (MeatyWiki semantic search ~2–3 pts; M6 detection +3–5; 15-op
+      engine "no analog / speculative"). Which heuristic under/over-shot? Feed into `plan-review`.
+
+### B4. Prerequisite reality
+- [ ] Was the M4 gap really 5 pieces / 4×S–M as the risk leg claimed? What was missed?
+
+### B5. Value outcome
+- [ ] Post-ship: did knowledge-backed decomposition *measurably* beat plain-context? By what metric?
+      This closes the loop on the exploration's central withheld judgment.
+
+### B6. Verdict on the verdict
+- [ ] Was CONDITIONAL-defer the right call in hindsight, or did the defer cost real momentum? What would
+      have changed the Phase-4 recommendation?
