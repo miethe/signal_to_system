@@ -77,7 +77,7 @@ Key flags:
 - `--yolo` or `-y`: Auto-approve all tool calls
 - `-o text`: Human-readable output (preferred — avoids JSON envelope overhead)
 - `-o json`: Structured output with stats
-- `-m gemini-3-flash`: Use faster model for simple tasks
+- `-m gemini-3.5-flash`: Use faster model for simple tasks
 
 ### 3. Critical Behavioral Notes
 
@@ -145,7 +145,7 @@ gemini "What are the latest [topic]? Use Google Search." -o text
 
 ### Faster Model (Simple Tasks)
 ```bash
-gemini "[prompt]" -m gemini-3-flash -o text
+gemini "[prompt]" -m gemini-3.5-flash -o text
 ```
 
 ### Image Generation
@@ -162,7 +162,7 @@ gemini "Create an SVG illustration of [subject]. Output complete SVG markup with
 
 ### Rate Limit Exceeded
 - CLI auto-retries with backoff
-- Use `-m gemini-3-flash` for lower priority tasks
+- Use `-m gemini-3.5-flash` for lower priority tasks
 - Run in background for long operations
 
 ### Command Failures

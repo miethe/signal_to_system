@@ -100,7 +100,7 @@ gemini "What's new in [topic]? Use Google Search." -o text
 gemini "Use codebase_investigator to analyze this project" -o text
 
 # Faster model for simple tasks
-gemini "[prompt]" -m gemini-2.5-flash -o text
+gemini "[prompt]" -m gemini-3.5-flash -o text
 ```
 
 ## Why Use Gemini from Claude Code?

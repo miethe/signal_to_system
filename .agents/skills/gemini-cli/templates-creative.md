@@ -229,7 +229,7 @@ pnpm type-check
 |------|-------|------|
 | UI mockup + code | Gemini 3.1 Pro | (default) |
 | Complex SVG / animation | Gemini 3.1 Pro | (default) |
-| Simple CSS animation | Gemini 3 Flash | `-m gemini-3-flash` |
+| Simple CSS animation | Gemini 3 Flash | `-m gemini-3.5-flash` |
 | Screenshot-to-code fix | Gemini 3.1 Pro | (default, multimodal required) |
 | Simple icon SVG | Claude (inline) | — |
 
