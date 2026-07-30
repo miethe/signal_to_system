@@ -1,0 +1,121 @@
+---
+title: "BoxBrain v2 Design Uplift: An Orchestration After-Action Review"
+excerpt: "Taking a green-but-barebones MVP up to design spec with eight file-disjoint parallel writers across three model providers; every per-wave gate stayed green, but only an adversarial review caught the two bugs that mattered."
+date: 2026-07-07
+readTime: "6 min"
+status: draft
+storyType: after-action
+tags:
+  - "agent-ready-repos"
+  - "human-ai-workflow"
+  - "artifact-first"
+automated: true
+sourceAar: "BoxBrain v2 Design Uplift Orchestration"
+projects:
+  - "boxbrain"
+aos: false
+workflow:
+  commits: 20
+series: "I Let Claude Build My App"
+seriesOrder: 2
+whyItMatters: >-
+  Eight parallel writers across three model providers stayed conflict-free
+  because shared files were frozen after the foundation wave; but the two most
+  dangerous defects (a governance-integrity bug and a silent pagination
+  truncation) passed every green gate and surfaced only under an adversarial
+  claims-vs-code review.
+leaderTakeaway: >-
+  Green tests prove "does not crash," not "is correct." Budget an explicit
+  adversarial review over the full diff before declaring parallel agent work
+  done, especially on write-path and governance logic.
+---
+BoxBrain v2 was already green: the MVP passed its full verification suite, but it was barebones. This session took it up to the full Claude Design spec (ten screens) in a single orchestrated pass: a fan-out of audit agents, then eight file-disjoint parallel writer waves running across three different model providers, then an adversarial verification pass. It is a clean natural experiment in one question: is "everything stays green" the same thing as "everything is correct"? It is not, and the gap between the two is where the interesting part of this story lives.
+
+## What we set out to do
+
+The goal was to bring the barebones-but-green v2 MVP up to the Claude Design spec (ten screens across `src_v2/*.jsx` plus mock-ups) without flattening the domain model, and to do it in one governed pass rather than a drift of ad hoc edits. Three constraints shaped the plan:
+
+- Close the batch of backend contract gaps discovered along the way, instead of papering over them in the UI.
+- Leave a phased handoff plan for the large shortfalls (source-aware visibility/RBAC, AI enrichment, publish manifests) rather than half-building them under time pressure.
+- Run the whole thing as a single orchestrated sequence (audit, then parallel implementation waves, then adversarial verification) on a baseline of full `pnpm verify` green.
+
+## What happened
+
+The session ran in three movements.
+
+**First, an audit fan-out.** Eleven parallel agents worked a fixed per-screen gap schema against the existing `src_v2/*.jsx` and the mock-up PNGs, producing a structured digest (`audit-digest.md` plus `audit-full.json`). That turned "make it match the design" into concrete, per-screen specs the writer waves could execute against.
+
+**Then, the writing.** Wave 0 (Codex GPT-5.5 at xhigh effort) laid the foundation: the full design-system CSS layer, fonts, an expanded typed UI kit, and shell/nav parity. That wave was declared frozen; no later wave was allowed to touch the shared files (`globals.css`, `ui.tsx`, `shell.tsx`, `lib/api.ts`). On top of it, eight screen waves ran in parallel with file-disjoint ownership, split across Codex (xhigh), ICA delegates, and Claude agents: My Selection, the Variation Explorer flagship, Library, CU detail, Ask BoxBrain, Reviews Hub, Storyboard, WorkProduct/Publish, Home/Plays/Opportunity, and Admin/Ingestion, with two more tracks (B1 seed-corpus expansion and B2 backend quick fixes) running alongside. Each delegate's output was checked (`git diff --stat` plus targeted reads) and gated on lint/typecheck/test/build before a scoped commit straight to `main`. A short round of post-wave fixes followed: a same-origin API rewrite proxy, seed-thumbnail nulling, an explorer canonicalization-loop fix, and a storyboards index page.
+
+**Finally, verification.** An adversarial two-reviewer pass read the full session diff and produced a fix spec (`review-fixes-spec.md`) with one critical, three high, and several medium confirmed findings. All confirmed findings were implemented in one delegated batch and re-verified. At close-out, the full `pnpm verify` suite was green, Playwright e2e ran 5/5, and both backend modes (in-memory and database/S3/RQ) booted cleanly. Twenty commits landed on `main`.
+
+## Wins
+
+- **The structured-schema audit fan-out was cheap and reusable.** Eleven agents against a fixed gap schema produced directly actionable per-screen specs; this is worth re-running after any major UI change.
+- **File-disjoint wave ownership made eight parallel writers safe.** No merge conflicts, no cross-wave stepping on toes, because shared files were frozen after Wave 0 and screen work was scoped to `components/<screen>/` and `features/<screen>/`.
+- **Seed-corpus expansion (B1) landed before the flagship wave**, so the Variation Explorer rendered against real similarity edges (0.71 to 0.98) and family data instead of an empty demo.
+- **Per-wave green gates kept `main` always-green**, despite eight-plus concurrent delegates and mixed model providers (Codex, ICA, Claude).
+- **The honest-empty-state rule held across all ten screens.** No screen fabricated data for features without a backing API; ratings, usage analytics, and share/collections all render disabled or empty rather than fake.
+
+## Losses and surprises
+
+The headline finding is the uncomfortable one: **green-per-wave is not the same as correct.** The adversarial pass, not any per-wave gate, caught the two most serious defects:
+
+- A critical governance-integrity bug. The Reviews compare "swap" was display-only, while set-canonical and merge-versions applied server-side to the item's own target order. A reviewer could unknowingly record a decision against the wrong object.
+- A silent pagination truncation. The frontend never consumed `nextCursor`, so Library and where-used surfaces silently capped at 25 items.
+
+Both are exactly the kind of bug that passes lint, typecheck, tests, and build cleanly. Everything else that hurt was operational:
+
+- The Next.js dev-server chunk cache corrupted under multi-agent churn, compounded by a delegate running `pnpm build` against the same live dev server's `.next` directory.
+- `NEXT_PUBLIC_*` build-time URL baking broke client fetches in prod/e2e contexts; the fix was to replace it with a runtime-configured rewrite proxy (`BOXBRAIN_API_PROXY_TARGET`) for same-origin `/api/*` access.
+- React streaming creates a transient duplicate-DOM window that hard-fails Playwright's strict-mode locators; the specs needed explicit settled-navigation waits.
+- One delegate stalled mid-wave and had to be resumed with a targeted follow-up message rather than a full restart.
+- IDE diagnostics were persistently stale during multi-agent churn. The diagnostics stream was actively misleading; `tsc`/typecheck output was the only trustworthy signal.
+- `op story capture` would not run from this repo (path resolution appears bound to another environment), so this after-action review was authored by hand instead of flowing through the pipeline.
+
+## What it changed
+
+The durable output of a session like this is not the ten screens; it is the set of process rules that came out of the failures. These are now defaults for orchestrated multi-wave work:
+
+| Lesson | Apply next time |
+|---|---|
+| Gates prove "doesn't crash," not "is correct" | Always run an adversarial claims-vs-code pass over the full diff before calling orchestrated waves done, especially for governance and write-path logic. |
+| Shared-file edits under parallel waves cause churn even when git doesn't conflict | Freeze shared files (`globals.css`, `ui.tsx`, `shell.tsx`, `lib/api.ts`) immediately after the foundation wave; enforce via the wave brief, not just convention. |
+| Delegates default to plausible-looking API shapes instead of the real ones | Give delegates explicit "curl the live API before wiring" instructions in the wave brief. |
+| `next build` and a live dev server share `.next` and corrupt each other | Never let delegates run `next build` against a directory a dev server is using; use a separate build dir or serialize build vs. dev-server use. |
+| Build-time env baking breaks portability across dev/prod/e2e | Prefer a runtime-resolved API base (rewrite proxy) over `NEXT_PUBLIC_*` baking in any Next.js app. |
+| An empty demo undersells a flagship screen | Expand and verify seed data before the UI waves that will be demoed against it, not after. |
+| Streamed SSR pages have a transient duplicate-DOM window | Treat streamed-SSR pages as needing settled-navigation waits in e2e, not just a mount check. |
+
+## Where this fits
+
+BoxBrain is a product build used as a laboratory for agentic delivery patterns, and this session was the clearest test yet of the loop's dominant failure mode. The lesson (green is not correct) is the same one the research pipeline's gate loop reached from a different angle: see [the OPM-1.G gate loop](/dev-stories/aar-the-opm-1-g-gate-loop-mutation-verify-in-the-fix-step-not-the-next-review-ro/), where the fix was to move mutation-verify into the fix step rather than trusting the next review to catch it. It is also the operational underside of the argument in [The AI Productivity Paradox](/essays/governed-agentic-sdlc-01-productivity-paradox/): raw output speed from parallel agents is only real productivity if a correctness gate stands between "it builds" and "it ships." The freeze-shared-files-after-the-foundation-wave rule, meanwhile, is what made the eight-way parallelism safe enough to be worth running at all.
+
+<details>
+<summary>Raw after-action detail</summary>
+
+**Session sequence**
+
+1. Audit fan-out: 11 parallel agents produced a structured per-screen gap schema (`audit-digest.md` + `audit-full.json`) against `src_v2/*.jsx` and mock-up PNGs.
+2. Wave 0 (Codex GPT-5.5, xhigh): foundation, including the full design-system CSS layer, fonts, expanded typed UI kit, and shell/nav parity. Declared frozen; no later wave could touch shared files (`globals.css`, `ui.tsx`, `shell.tsx`, `lib/api.ts`).
+3. 8-way parallel screen waves with file-disjoint ownership across Codex (xhigh), ICA delegates, and Claude agents: My Selection (0.5), Variation Explorer flagship (1), Library (2a), CU detail (2b), Ask BoxBrain (3a), Reviews Hub (3b), Storyboard (4a), WorkProduct/Publish (4b), Home/Plays/Opportunity (5a), Admin/Ingestion (5b), plus B1 (seed corpus expansion) and B2 (backend quick fixes) alongside.
+4. Per-wave gates: each delegate's output was checked via `git diff --stat` plus targeted reads, gated on lint/typecheck/test/build before a scoped commit straight to `main`.
+5. Post-wave fixes: same-origin API rewrite proxy, seed-thumbnail nulling, explorer canonicalization-loop fix, storyboards index page.
+6. Adversarial two-reviewer pass over the full session diff produced `review-fixes-spec.md`: 1 critical, 3 high, and several medium confirmed findings.
+7. Fix batch: all confirmed findings implemented in one delegated pass, then re-verified.
+8. Close-out (see verification below). 20 commits landed on `main` (`ec41ffe`..`9fb7d97`).
+
+**Close-out verification**
+
+- Full `pnpm verify` green: web lint/typecheck/vitest/build; backend ruff/mypy/pytest; OpenAPI check.
+- Playwright e2e 5/5 green.
+- Both memory and database/S3/RQ backend modes boot cleanly.
+- 20 commits landed on `main` (`ec41ffe`..`9fb7d97`).
+
+**Follow-ups**
+
+- Execute the backend-handoff-plan sessions (`backend-handoff-plan.md`): source-aware visibility/RBAC first, then AI enrichment pipeline, publish/export manifests, Collections, generated typed client, and multi-worker DB-mode correctness.
+- Plays and Opportunities remain preview-only surfaces with no backend domain; scope and build the real domain model when prioritized.
+- Fix the `op story capture` path-resolution bug on this machine so future after-action reviews flow through the gated Signal to System pipeline instead of being authored by hand.
+
+</details>

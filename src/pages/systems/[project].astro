@@ -2,102 +2,95 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import EssayCard from '../../components/cards/EssayCard.astro';
-import ProjectCard from '../../components/cards/ProjectCard.astro';
 import StoryCard from '../../components/cards/StoryCard.astro';
-import { TAG_REGISTRY, tagsBySlug } from '../../data/taxonomy';
+import { getAllProjects, getContentByProject } from '../../lib/content';
+import { projectsBySlug } from '../../data/taxonomy';
 import { slugify } from '../../lib/utils';
 
 export async function getStaticPaths() {
-  const allPosts = await getCollection('posts');
-  const allProjects = await getCollection('projects');
-  const allStories = await getCollection('stories');
+  const projectFacets = await getAllProjects();
+  const portfolioProjects = await getCollection('projects');
 
-  // Collect all unique tag slugs
-  const tagSlugSet = new Set<string>();
+  return Promise.all(
+    projectFacets.map(async (facet) => {
+      const { posts, stories } = await getContentByProject(facet.slug);
 
-  for (const post of allPosts) {
-    if (post.data.status === 'draft') continue;
-    for (const tag of post.data.tags ?? []) {
-      tagSlugSet.add(slugify(tag));
-    }
-  }
-  for (const project of allProjects) {
-    for (const tag of project.data.tags ?? []) {
-      tagSlugSet.add(slugify(tag));
-    }
-  }
-  for (const story of allStories) {
-    if (story.data.status === 'draft') continue;
-    for (const tag of story.data.tags ?? []) {
-      tagSlugSet.add(slugify(tag));
-    }
-  }
+      // Best-effort link to a matching portfolio project entry (id or title match).
+      const portfolioMatch = portfolioProjects.find(
+        (p) => p.id === facet.slug || slugify(p.data.title) === facet.slug,
+      );
 
-  return [...tagSlugSet].map((tagSlug) => {
-    const matchedPosts = allPosts.filter(
-      (p) =>
-        p.data.status !== 'draft' &&
-        (p.data.tags ?? []).some((t) => slugify(t) === tagSlug),
-    ).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
-
-    const matchedProjects = allProjects.filter((p) =>
-      (p.data.tags ?? []).some((t) => slugify(t) === tagSlug),
-    ).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
-
-    const matchedStories = allStories.filter(
-      (s) =>
-        s.data.status !== 'draft' &&
-        (s.data.tags ?? []).some((t) => slugify(t) === tagSlug),
-    ).sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
-
-    return {
-      params: { tag: tagSlug },
-      props: { tagSlug, posts: matchedPosts, projects: matchedProjects, stories: matchedStories },
-    };
-  });
+      return {
+        params: { project: facet.slug },
+        props: {
+          projectSlug: facet.slug,
+          posts,
+          stories,
+          portfolioId: portfolioMatch?.id,
+        },
+      };
+    }),
+  );
 }
 
-const { tagSlug, posts, projects, stories } = Astro.props;
+const { projectSlug, posts, stories, portfolioId } = Astro.props;
 
 // Look up registry definition
-const tagDef = tagsBySlug[tagSlug];
-const tagLabel = tagDef?.label ?? tagSlug.replace(/-/g, ' ');
-const tagDescription = tagDef?.description;
-const totalCount = posts.length + stories.length + projects.length;
+const projectDef = projectsBySlug[projectSlug];
+const projectLabel = projectDef?.label ?? projectSlug.replace(/-/g, ' ');
+const projectDescription = projectDef?.description;
+const isAos = projectDef?.aos === true;
+const totalCount = posts.length + stories.length;
 ---
 
 <BaseLayout
-  title={`#${tagLabel}`}
-  description={tagDescription ?? `All content tagged "${tagLabel}" on Signal to System.`}
+  title={projectLabel}
+  description={projectDescription ?? `All writing about ${projectLabel} on Signal to System.`}
 >
   <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
     <!-- Breadcrumb -->
     <nav class="mb-8 flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400" aria-label="Breadcrumb">
       <a href="/" class="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">Home</a>
       <span aria-hidden="true">/</span>
-      <a href="/tags/" class="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">Tags</a>
+      <a href="/systems/" class="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">Systems</a>
       <span aria-hidden="true">/</span>
-      <span class="text-zinc-900 dark:text-zinc-100">{tagLabel}</span>
+      <span class="text-zinc-900 dark:text-zinc-100">{projectLabel}</span>
     </nav>
 
     <!-- Page header -->
     <header class="mb-12 border-b border-zinc-200 dark:border-zinc-800 pb-10">
-      <div class="mb-3">
+      <div class="mb-3 flex flex-wrap items-center gap-2">
         <span class="inline-block rounded-md bg-indigo-100 dark:bg-indigo-900/40 px-2.5 py-1 text-xs font-medium text-indigo-700 dark:text-indigo-300">
-          #{tagLabel}
+          System
         </span>
+        {isAos && (
+          <span class="inline-block rounded-md bg-violet-100 dark:bg-violet-900/40 px-2.5 py-1 text-xs font-medium text-violet-700 dark:text-violet-300">
+            Agentic OS
+          </span>
+        )}
       </div>
       <h1 class="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl mb-4">
-        {tagLabel}
+        {projectLabel}
       </h1>
-      {tagDescription && (
+      {projectDescription && (
         <p class="text-xl text-zinc-600 dark:text-zinc-400 max-w-2xl leading-relaxed mb-2">
-          {tagDescription}
+          {projectDescription}
         </p>
       )}
       <p class="text-zinc-500 dark:text-zinc-400">
-        {totalCount} {totalCount === 1 ? 'item' : 'items'} — {posts.length} {posts.length === 1 ? 'essay' : 'essays'}, {stories.length} {stories.length === 1 ? 'dev story' : 'dev stories'}, {projects.length} {projects.length === 1 ? 'project' : 'projects'}
+        {totalCount} {totalCount === 1 ? 'item' : 'items'} — {posts.length} {posts.length === 1 ? 'essay' : 'essays'}, {stories.length} {stories.length === 1 ? 'dev story' : 'dev stories'}
       </p>
+      {portfolioId && (
+        <a
+          href={`/projects/${portfolioId}/`}
+          class="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors"
+        >
+          View the project page
+          <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+          </svg>
+        </a>
+      )}
     </header>
 
     <div class="space-y-16">
@@ -150,41 +143,18 @@ const totalCount = posts.length + stories.length + projects.length;
           </div>
         </section>
       )}
-
-      <!-- Projects -->
-      {projects.length > 0 && (
-        <section>
-          <h2 class="text-sm font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 mb-6">
-            Projects — {projects.length}
-          </h2>
-          <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {projects.map((project) => (
-              <ProjectCard
-                title={project.data.title}
-                excerpt={project.data.excerpt}
-                date={project.data.date}
-                type={project.data.type}
-                tags={project.data.tags}
-                slug={project.id}
-                featured={false}
-                visibility={project.data.visibility}
-              />
-            ))}
-          </div>
-        </section>
-      )}
     </div>
 
     <!-- Back link -->
     <div class="mt-12">
       <a
-        href="/tags/"
+        href="/systems/"
         class="inline-flex items-center gap-1.5 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors"
       >
         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <path d="M19 12H5"/><path d="m12 19-7-7 7-7"/>
         </svg>
-        All Tags
+        All Systems
       </a>
     </div>
   </div>

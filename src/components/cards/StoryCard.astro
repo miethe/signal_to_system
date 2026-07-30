@@ -1,0 +1,193 @@
+---
+/**
+ * StoryCard — card for dev stories in listing / facet pages.
+ *
+ * Links to /dev-stories/[slug]/. Surfaces story type, project/system badges,
+ * an "Automated" marker, and a headline workflow stat instead of the essay
+ * category treatment.
+ */
+import Badge from "../ui/Badge.astro";
+import MetadataRow from "../ui/MetadataRow.astro";
+import { projectsBySlug } from "../../data/taxonomy";
+
+interface Workflow {
+  version?: string;
+  orchestrator?: string;
+  tier?: number;
+  tokens?: number;
+}
+
+interface Props {
+  title: string;
+  excerpt: string;
+  date: string | Date;
+  readTime?: string;
+  slug: string;
+  storyType?: "after-action" | "feature-story" | "build-note";
+  projects?: string[];
+  automated?: boolean;
+  workflow?: Workflow;
+  tags?: string[];
+  featured?: boolean;
+}
+
+const {
+  title,
+  excerpt,
+  date,
+  readTime,
+  slug,
+  storyType = "after-action",
+  projects = [],
+  automated = true,
+  workflow,
+  tags = [],
+  featured = false,
+} = Astro.props;
+
+const href = `/dev-stories/${slug}/`;
+
+const STORY_TYPE_LABELS: Record<string, string> = {
+  "after-action": "After-Action",
+  "feature-story": "Feature Story",
+  "build-note": "Build Note",
+};
+
+function compact(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(n % 1_000_000 === 0 ? 0 : 1)}M`;
+  if (n >= 1_000) return `${Math.round(n / 1_000)}K`;
+  return `${n}`;
+}
+
+// A single headline workflow chip for the footer, if we have anything worth showing.
+const workflowChips: string[] = [];
+if (workflow?.orchestrator) workflowChips.push(workflow.orchestrator);
+if (workflow?.version) workflowChips.push(workflow.version);
+if (typeof workflow?.tier === "number") workflowChips.push(`T${workflow.tier}`);
+if (typeof workflow?.tokens === "number") workflowChips.push(`${compact(workflow.tokens)} tok`);
+
+const projectDefs = projects
+  .slice(0, featured ? 4 : 2)
+  .map((s) => ({ slug: s, label: projectsBySlug[s]?.label ?? s }));
+---
+
+<article
+  class={[
+    "tilt-card group relative flex flex-col rounded-xl border transition-all duration-300 ease-out",
+    "bg-[var(--bg-surface)]",
+    "border-[var(--border-subtle)]",
+    "hover:border-[var(--accent)] hover:border-opacity-50",
+    "hover:shadow-xl hover:shadow-[var(--accent-subtle)] dark:hover:shadow-[rgba(99,102,241,0.1)]",
+    featured ? "p-8 md:p-10" : "p-6",
+  ].join(" ")}
+>
+  {
+    featured && (
+      <div class="absolute inset-x-0 top-0 h-1 rounded-t-xl bg-gradient-to-r from-indigo-500 to-violet-500" />
+    )
+  }
+
+  <!-- Header: story type + automated marker + projects -->
+  <header class="mb-3 flex flex-wrap items-center gap-2">
+    <Badge variant="type" text={STORY_TYPE_LABELS[storyType] ?? storyType} />
+    {
+      automated && (
+        <span class="inline-flex items-center gap-1 rounded-full bg-[var(--accent-subtle)] px-2 py-0.5 text-[10px] font-mono font-semibold uppercase tracking-widest text-[var(--accent-text)]">
+          <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 8V4H8" /><rect width="16" height="12" x="4" y="8" rx="2" /><path d="M2 14h2M20 14h2" />
+          </svg>
+          Automated
+        </span>
+      )
+    }
+    {projectDefs.map((p) => (
+      <Badge variant="project" text={p.label} />
+    ))}
+  </header>
+
+  <!-- Title -->
+  <h2
+    class={[
+      "font-semibold leading-snug text-[var(--text-primary)]",
+      "group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors",
+      featured ? "text-2xl md:text-3xl mb-3" : "text-lg mb-2",
+    ].join(" ")}
+  >
+    <a href={href} class="before:absolute before:inset-0 before:rounded-xl">
+      {title}
+    </a>
+  </h2>
+
+  <!-- Excerpt -->
+  <p
+    class={[
+      "text-[var(--text-secondary)] leading-relaxed flex-1",
+      featured ? "text-base mb-5" : "text-sm mb-4",
+    ].join(" ")}
+  >
+    {excerpt}
+  </p>
+
+  <!-- Workflow chips -->
+  {
+    workflowChips.length > 0 && (
+      <div class="mb-4 flex flex-wrap gap-1.5">
+        {workflowChips.map((chip) => (
+          <span class="rounded-md bg-[var(--bg-muted)] px-2 py-0.5 font-mono text-[11px] text-[var(--text-tertiary)]">
+            {chip}
+          </span>
+        ))}
+      </div>
+    )
+  }
+
+  <!-- Tags -->
+  {
+    tags.length > 0 && (
+      <div class="mb-4 flex flex-wrap gap-1.5">
+        {tags.slice(0, featured ? 6 : 4).map((tag) => (
+          <a
+            href={`/tags/${tag.toLowerCase().replace(/\s+/g, "-")}/`}
+            class="relative z-10 rounded-md bg-[var(--bg-muted)] px-2 py-0.5 text-xs text-[var(--text-secondary)] hover:bg-[var(--accent-subtle)] hover:text-[var(--accent-text)] transition-colors"
+          >
+            {tag}
+          </a>
+        ))}
+      </div>
+    )
+  }
+
+  <!-- Footer metadata -->
+  <footer class="mt-auto">
+    <MetadataRow date={date} readTime={readTime} category={undefined} />
+  </footer>
+</article>
+
+<script>
+  function initTiltStory() {
+    const cards = document.querySelectorAll('.tilt-card');
+    cards.forEach((card) => {
+      const htmlCard = card as HTMLElement;
+      if (htmlCard.dataset.tiltBound === 'true') return;
+      htmlCard.dataset.tiltBound = 'true';
+      htmlCard.addEventListener('mousemove', (e: MouseEvent) => {
+        const rect = htmlCard.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const tiltX = ((y - centerY) / centerY) * -3;
+        const tiltY = ((x - centerX) / centerX) * 3;
+        htmlCard.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) scale3d(1.02, 1.02, 1.02)`;
+        htmlCard.style.zIndex = '10';
+      });
+      htmlCard.addEventListener('mouseleave', () => {
+        htmlCard.style.transform = `perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)`;
+        htmlCard.style.zIndex = '1';
+        setTimeout(() => { if (htmlCard.style.transform.includes('rotateX(0deg)')) htmlCard.style.zIndex = '0'; }, 300);
+      });
+    });
+  }
+  initTiltStory();
+  document.addEventListener('astro:page-load', initTiltStory);
+</script>

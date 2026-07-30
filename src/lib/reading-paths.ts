@@ -6,10 +6,14 @@ import { TOPIC_HUBS } from "../data/taxonomy";
 // ---------------------------------------------------------------------------
 
 export type Post = CollectionEntry<"posts">;
+export type Story = CollectionEntry<"stories">;
+
+/** A post or a dev story — series can mix both, so nav must accept either. */
+export type SeriesEntry = Post | Story;
 
 export interface SeriesNav {
-  prev: Post | null;
-  next: Post | null;
+  prev: SeriesEntry | null;
+  next: SeriesEntry | null;
   series: string;
   currentIndex: number;
   total: number;
@@ -20,23 +24,25 @@ export interface SeriesNav {
 // ---------------------------------------------------------------------------
 
 /**
- * Given a post and the full list of posts, return navigation context for the
- * post within its series (previous, next, position, and total count).
+ * Given an entry (post or story) and the full list of entries in its
+ * collection(s), return navigation context within its series (previous,
+ * next, position, and total count). Pass a combined posts+stories array
+ * when a series spans both collections; link results with hrefFor().
  *
- * Returns `null` when the post does not belong to a series.
+ * Returns `null` when the entry does not belong to a series.
  */
 export function getSeriesNav(
-  post: Post,
-  allPosts: Post[]
+  entry: SeriesEntry,
+  allEntries: SeriesEntry[]
 ): SeriesNav | null {
-  const seriesSlug = post.data.series;
+  const seriesSlug = entry.data.series;
   if (!seriesSlug) return null;
 
-  // Collect posts in the same series, sorted by seriesOrder asc
-  const seriesPosts = allPosts
+  // Collect entries in the same series, sorted by seriesOrder asc
+  const seriesEntries = allEntries
     .filter(
-      (p) =>
-        p.data.series === seriesSlug && p.data.status !== "draft"
+      (e) =>
+        e.data.series === seriesSlug && e.data.status !== "draft"
     )
     .sort((a, b) => {
       const orderA = a.data.seriesOrder ?? Infinity;
@@ -44,18 +50,20 @@ export function getSeriesNav(
       return orderA - orderB;
     });
 
-  const currentIndex = seriesPosts.findIndex((p) => p.id === post.id);
+  const currentIndex = seriesEntries.findIndex(
+    (e) => e.collection === entry.collection && e.id === entry.id
+  );
   if (currentIndex === -1) return null;
 
   return {
-    prev: currentIndex > 0 ? seriesPosts[currentIndex - 1] : null,
+    prev: currentIndex > 0 ? seriesEntries[currentIndex - 1] : null,
     next:
-      currentIndex < seriesPosts.length - 1
-        ? seriesPosts[currentIndex + 1]
+      currentIndex < seriesEntries.length - 1
+        ? seriesEntries[currentIndex + 1]
         : null,
     series: seriesSlug,
     currentIndex,
-    total: seriesPosts.length,
+    total: seriesEntries.length,
   };
 }
 

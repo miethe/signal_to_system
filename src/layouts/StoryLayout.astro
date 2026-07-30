@@ -1,9 +1,23 @@
 ---
 import BaseLayout from './BaseLayout.astro';
 import Figure from '../components/content/Figure.astro';
+import AutomatedDisclaimer from '../components/content/AutomatedDisclaimer.astro';
+import StoryMetaHeader from '../components/content/StoryMetaHeader.astro';
 import { generateJsonLd, buildCanonicalUrl } from '../lib/seo';
 import { formatDate, formatDateISO } from '../lib/utils';
 import { site } from '../data/site';
+
+interface Workflow {
+  version?: string;
+  orchestrator?: string;
+  model?: string;
+  tokens?: number;
+  tier?: number;
+  points?: number;
+  commits?: number;
+  runId?: string;
+  intentId?: string;
+}
 
 interface Props {
   frontmatter: {
@@ -13,7 +27,6 @@ interface Props {
     date: Date | string;
     updatedDate?: Date | string;
     readTime?: number;
-    category?: string;
     tags?: string[];
     ogImage?: string;
     heroImage?: string;
@@ -22,12 +35,17 @@ interface Props {
     leaderTakeaway?: string;
     series?: string;
     seriesPart?: number;
-    draft?: boolean;
+    // Dev-story specifics
+    storyType: 'after-action' | 'feature-story' | 'build-note';
+    automated?: boolean;
+    sourceAar?: string;
+    projects?: string[];
+    aos?: boolean;
+    aosAreas?: string[];
+    workflow?: Workflow;
   };
-  // Optional: inject prev/next series posts from the page. `href` is
-  // collection-aware (e.g. via hrefFor()) and falls back to /essays/<slug>/.
-  prevPost?: { title: string; slug: string; href?: string };
-  nextPost?: { title: string; slug: string; href?: string };
+  prevPost?: { title: string; slug: string };
+  nextPost?: { title: string; slug: string };
 }
 
 const { frontmatter, prevPost, nextPost } = Astro.props;
@@ -39,7 +57,6 @@ const {
   date,
   updatedDate,
   readTime,
-  category,
   tags = [],
   ogImage,
   heroImage,
@@ -48,6 +65,13 @@ const {
   leaderTakeaway,
   series,
   seriesPart,
+  storyType,
+  automated = true,
+  sourceAar,
+  projects = [],
+  aos = false,
+  aosAreas = [],
+  workflow,
 } = frontmatter;
 
 const pageDescription = description || excerpt || site.description;
@@ -83,29 +107,21 @@ const jsonLd = generateJsonLd('article', {
 
   <article class="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
     <!-- Article header -->
-    <header class="mb-16 space-y-6 pb-4">
-      {
-        series && (
-          <div class="flex items-center gap-2 text-xs font-mono font-medium text-[var(--accent)]">
-            <span class="uppercase tracking-widest">Series</span>
-            <span class="text-[var(--text-disabled)]">/</span>
-            <span>{series}</span>
-            {seriesPart && <span class="text-[var(--text-disabled)]">Part {seriesPart}</span>}
-          </div>
-        )
-      }
+    <header class="mb-8 space-y-6 pb-2">
+      <div class="flex flex-wrap items-center gap-2 text-xs font-mono font-medium text-[var(--accent)]">
+        <a href="/dev-stories/" class="uppercase tracking-widest hover:text-[var(--text-primary)] transition-colors">Dev Stories</a>
+        {
+          series && (
+            <>
+              <span class="text-[var(--text-disabled)]">/</span>
+              <span class="text-[var(--text-tertiary)]">{series}</span>
+              {seriesPart && <span class="text-[var(--text-disabled)]">Part {seriesPart}</span>}
+            </>
+          )
+        }
+      </div>
 
-      {
-        category && (
-          <div>
-            <span class="font-mono inline-block rounded-full bg-[var(--accent-subtle)] px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[var(--accent-text)] ring-1 ring-inset ring-[var(--border-subtle)]">
-              {category}
-            </span>
-          </div>
-        )
-      }
-
-      <h1 class="font-serif text-4xl font-bold leading-[1.1] tracking-tight text-[var(--text-primary)] sm:text-5xl lg:text-7xl">
+      <h1 class="font-serif text-4xl font-bold leading-[1.1] tracking-tight text-[var(--text-primary)] sm:text-5xl lg:text-6xl">
         {title}
       </h1>
 
@@ -124,10 +140,7 @@ const jsonLd = generateJsonLd('article', {
           updatedDate && (
             <>
               <span aria-hidden="true">&middot;</span>
-              <span>
-                Updated{' '}
-                <time datetime={updatedISO}>{formatDate(updatedDate)}</time>
-              </span>
+              <span>Updated <time datetime={updatedISO}>{formatDate(updatedDate)}</time></span>
             </>
           )
         }
@@ -158,18 +171,26 @@ const jsonLd = generateJsonLd('article', {
       }
     </header>
 
-    <!-- Hero illustration (engineering plate) -->
+    <!-- Automated provenance banner -->
+    {automated && <AutomatedDisclaimer variant="banner" sourceAar={sourceAar} class="mb-8" />}
+
+    <!-- Story context: workflow metadata + project/AOS badges -->
+    <StoryMetaHeader
+      storyType={storyType}
+      projects={projects}
+      aos={aos}
+      aosAreas={aosAreas}
+      workflow={workflow}
+    />
+
+    <!-- Hero illustration -->
     {
       heroImage && (
-        <Figure
-          src={heroImage}
-          alt={heroAlt || `Hero illustration for ${title}`}
-          variant="hero"
-        />
+        <Figure src={heroImage} alt={heroAlt || `Hero illustration for ${title}`} variant="hero" />
       )
     }
 
-    <!-- Callout: Why It Matters (executive signal) -->
+    <!-- Callout: Why It Matters -->
     {
       whyItMatters && (
         <aside class="mb-8 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-subtle)] p-6 shadow-sm">
@@ -198,15 +219,14 @@ const jsonLd = generateJsonLd('article', {
       <slot />
     </div>
 
-    <!-- Article footer: series nav + tags recap -->
+    <!-- Article footer: series nav + back links -->
     <footer class="mt-12 space-y-8 border-t border-[var(--border-subtle)] pt-8">
-      <!-- Series navigation -->
       {
         (prevPost || nextPost) && (
           <nav aria-label="Series navigation" class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {prevPost ? (
               <a
-                href={prevPost.href ?? `/essays/${prevPost.slug}/`}
+                href={`/dev-stories/${prevPost.slug}/`}
                 class="group flex flex-col gap-1 rounded-lg border border-[var(--border-subtle)] p-4 transition-colors hover:border-indigo-500/50 hover:bg-[var(--bg-subtle)]"
               >
                 <span class="text-xs font-medium uppercase tracking-widest text-[var(--text-disabled)] transition-colors group-hover:text-[var(--accent)]">
@@ -221,7 +241,7 @@ const jsonLd = generateJsonLd('article', {
             )}
             {nextPost && (
               <a
-                href={nextPost.href ?? `/essays/${nextPost.slug}/`}
+                href={`/dev-stories/${nextPost.slug}/`}
                 class="group flex flex-col items-end gap-1 rounded-lg border border-[var(--border-subtle)] p-4 transition-colors hover:border-indigo-500/50 hover:bg-[var(--bg-subtle)]"
               >
                 <span class="text-xs font-medium uppercase tracking-widest text-[var(--text-disabled)] transition-colors group-hover:text-[var(--accent)]">
@@ -236,21 +256,20 @@ const jsonLd = generateJsonLd('article', {
         )
       }
 
-      <!-- Back links -->
       <div class="flex flex-wrap items-center gap-4 text-sm">
         <a
-          href="/essays"
+          href="/dev-stories"
           class="text-[var(--accent)] transition-colors hover:text-[var(--accent-hover)]"
         >
-          &larr; All Essays
+          &larr; All Dev Stories
         </a>
         {
-          category && (
+          projects[0] && (
             <a
-              href={`/categories/${category.toLowerCase()}`}
+              href={`/systems/${projects[0]}/`}
               class="text-[var(--text-disabled)] transition-colors hover:text-[var(--text-secondary)]"
             >
-              More in {category}
+              More on this system
             </a>
           )
         }
@@ -271,7 +290,6 @@ const jsonLd = generateJsonLd('article', {
   </button>
 
   <script>
-    // Reading progress bar
     const progressBar = document.getElementById('reading-progress');
     const articleEl = document.querySelector('article');
     const scrollToTopBtn = document.getElementById('scroll-to-top');
@@ -286,14 +304,12 @@ const jsonLd = generateJsonLd('article', {
         const progress = Math.min(Math.max(scrolled / (articleHeight - window.innerHeight), 0), 1);
         progressBar.style.width = `${progress * 100}%`;
       };
-
       window.addEventListener('scroll', updateProgress, { passive: true });
       updateProgress();
     } else if (progressBar && isLite) {
       progressBar.style.display = 'none';
     }
 
-    // Scroll to top button
     if (scrollToTopBtn) {
       const toggleButton = () => {
         const show = window.scrollY > window.innerHeight * 0.5;
@@ -304,10 +320,8 @@ const jsonLd = generateJsonLd('article', {
         scrollToTopBtn.classList.toggle('translate-y-0', show);
         scrollToTopBtn.classList.toggle('pointer-events-auto', show);
       };
-
       window.addEventListener('scroll', toggleButton, { passive: true });
       toggleButton();
-
       scrollToTopBtn.addEventListener('click', () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       });

@@ -19,6 +19,7 @@ export const site = {
   nav: [
     { label: "Home", href: "/" },
     { label: "Essays", href: "/essays" },
+    { label: "Dev Stories", href: "/dev-stories" },
     { label: "Series", href: "/series" },
     { label: "Projects", href: "/projects" },
     { label: "Portfolio", href: "/portfolio" },
@@ -29,6 +30,7 @@ export const site = {
   footer: {
     links: [
       { label: "Essays", href: "/essays" },
+      { label: "Dev Stories", href: "/dev-stories" },
       { label: "Series", href: "/series" },
       { label: "Projects", href: "/projects" },
       { label: "Portfolio", href: "/portfolio" },
@@ -46,6 +48,15 @@ export const site = {
 
   defaultDisclaimer:
     "The views expressed here are my own and do not represent any employer, client, or affiliated organization. Content is for informational purposes and reflects my personal opinions and experiences.",
+
+  // Shown on the Dev Stories index and atop each automated story.
+  devStories: {
+    tagline: "Field notes from the agentic build loop.",
+    disclaimer:
+      "Dev Stories are drawn from the after-action records of my agentic execution workflow. They are assembled and edited with the help of AI agents, then reviewed before publishing. Expect real build detail, honest wins and losses, and the occasional rough edge that a hand-written essay would sand away.",
+    disclaimerShort:
+      "This is an automated artifact of the agentic execution workflow, edited for readability. The raw detail is preserved.",
+  },
 } as const;
 
 export type SiteConfig = typeof site;

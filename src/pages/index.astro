@@ -4,10 +4,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import EssayCard from '../components/cards/EssayCard.astro';
 import ProjectCard from '../components/cards/ProjectCard.astro';
 import SeriesCard from '../components/cards/SeriesCard.astro';
+import StoryCard from '../components/cards/StoryCard.astro';
 import Button from '../components/ui/Button.astro';
 import InteractiveNetwork from '../components/interactive/InteractiveNetwork';
 import { site } from '../data/site';
 import { TOPIC_HUBS } from '../data/taxonomy';
+import { getPublishedStories } from '../lib/content';
 
 // ---------------------------------------------------------------------------
 // Data
@@ -31,6 +33,8 @@ const activeSeries = allSeries
   .slice(0, 3);
 
 const featuredProjects = allProjects.filter((p) => p.data.featured).slice(0, 3);
+
+const recentStories = (await getPublishedStories()).slice(0, 3);
 
 // Compute post count per series for SeriesCard
 const seriesPostCounts = new Map<string, number>();
@@ -303,6 +307,61 @@ const topicIconColors: Record<string, string> = {
         </div>
     </div>
   </section>
+
+  <!-- =========================================================
+       FROM THE BUILD LOOP (recent dev stories)
+       ========================================================= -->
+  {recentStories.length > 0 && (
+    <section class="animate-on-scroll py-24 bg-[var(--bg-base)]">
+      <div class="max-w-7xl mx-auto px-8 lg:px-12">
+        <div class="flex items-end justify-between mb-16 gap-6">
+          <div>
+            <h2 class="text-sm font-mono uppercase tracking-[0.3em] text-[var(--text-tertiary)] mb-2">Agentic Build Notes</h2>
+            <h3 class="text-4xl font-serif text-[var(--text-primary)]">From the Build Loop</h3>
+          </div>
+          <a
+            href="/dev-stories/"
+            class="hidden sm:inline-flex items-center gap-1.5 font-mono text-sm uppercase tracking-widest text-[var(--accent)] hover:text-[var(--text-primary)] transition-colors"
+          >
+            All Dev Stories
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+            </svg>
+          </a>
+        </div>
+
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {recentStories.map((story) => (
+            <StoryCard
+              title={story.data.title}
+              excerpt={story.data.excerpt}
+              date={story.data.date}
+              readTime={story.data.readTime}
+              slug={story.id}
+              storyType={story.data.storyType}
+              projects={story.data.projects}
+              automated={story.data.automated}
+              workflow={story.data.workflow}
+              tags={story.data.tags}
+              featured={false}
+            />
+          ))}
+        </div>
+
+        <div class="mt-10 sm:hidden">
+          <a
+            href="/dev-stories/"
+            class="inline-flex items-center gap-1.5 font-mono text-sm uppercase tracking-widest text-[var(--accent)] hover:text-[var(--text-primary)] transition-colors"
+          >
+            All Dev Stories
+            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+    </section>
+  )}
 
   <!-- =========================================================
        FEATURED PROJECTS

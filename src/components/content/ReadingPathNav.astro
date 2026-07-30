@@ -3,8 +3,8 @@
  * ReadingPathNav — previous/next navigation for series posts.
  *
  * Props:
- *   prev         — { title, slug } | null
- *   next         — { title, slug } | null
+ *   prev         — { title, slug, href? } | null
+ *   next         — { title, slug, href? } | null
  *   seriesTitle  — name of the series
  *   currentIndex — 1-based position in the series
  *   total        — total number of posts in the series
@@ -13,6 +13,8 @@
 interface NavItem {
   title: string;
   slug: string;
+  /** Collection-aware URL (e.g. via hrefFor()). Falls back to /essays/<slug>/ for callers that don't pass one. */
+  href?: string;
 }
 
 interface Props {
@@ -80,7 +82,7 @@ const progressPct = hasProgress ? Math.round((currentIndex / total) * 100) : 0;
       {
         prev ? (
           <a
-            href={`/essays/${prev.slug}/`}
+            href={prev.href ?? `/essays/${prev.slug}/`}
             class="group flex flex-col gap-1 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-5 transition-all hover:border-violet-400/50 hover:shadow-sm dark:hover:border-violet-700"
           >
             <span class="flex items-center gap-1 text-xs font-medium text-[var(--text-tertiary)] group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
@@ -119,7 +121,7 @@ const progressPct = hasProgress ? Math.round((currentIndex / total) * 100) : 0;
       {
         next ? (
           <a
-            href={`/essays/${next.slug}/`}
+            href={next.href ?? `/essays/${next.slug}/`}
             class="group flex flex-col items-end gap-1 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-5 text-right transition-all hover:border-violet-400/50 hover:shadow-sm dark:hover:border-violet-700"
           >
             <span class="flex items-center gap-1 text-xs font-medium text-[var(--text-tertiary)] group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">

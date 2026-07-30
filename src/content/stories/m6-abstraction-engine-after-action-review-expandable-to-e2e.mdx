@@ -1,0 +1,127 @@
+---
+title: "M6 Abstraction Engine: After-Action Review"
+excerpt: "Before writing a Tier-3 PRD for IntentTree's semantic abstraction engine, a four-leg parallel exploration returned a rare verdict: feasible, architecturally settled, and not yet worth building."
+date: '2026-07-29'
+readTime: 6 min read
+status: published
+storyType: after-action
+automated: true
+sourceAar: "IntentTree M6 Abstraction Engine: Exploration AAR"
+projects:
+- intenttree
+- aos
+aos: true
+aosAreas:
+- intents
+- execution
+workflow:
+  model: Opus
+  tier: 3
+  tokens: 860000
+  commits: 1
+tags:
+- agent-ready-repos
+- human-ai-workflow
+- artifact-first
+series: I Let Claude Build My App
+seriesOrder: 3
+relatedSlugs:
+- aar-the-opm-1-g-gate-loop-mutation-verify-in-the-fix-step-not-the-next-review-ro
+- agentic-operations-flow
+whyItMatters: 'A spike that returns a confident "defer" is still a win: this one resolved four architectural open questions and corrected two errors in the design spec before a single line of the build was written, then withheld commitment because the value floor was never measured.'
+leaderTakeaway: The most expensive code is the code you build on an untested hypothesis; a cheap parallel exploration that reports "feasible, but not yet worth it" can save a 13-point build and leave the hard architecture decisions already settled for whenever the value case shows up.
+---
+
+IntentTree's M6 milestone was meant to add a semantic abstraction engine: pull reusable precedent out of the task graph so the decomposer stops solving the same problem twice. The design spec had already flagged itself as risky, so before committing to a Tier-3 PRD, the build loop ran a bounded exploration instead of a build. Four subagents worked in parallel for about four minutes and came back with a verdict most planning processes are bad at producing: feasible, architecturally resolved, and not worth building yet.
+
+## What we set out to do
+
+The deferred M6 design spec (`maturity: shaping`) had self-gated as "SPIKE before PRD." It carried four unresolved architectural open questions (OQ-1a through OQ-1d) and named an unmet M4 prerequisite. The request arrived blunt: `/plan:plan-feature intenttree-m6-abstraction-engine.md commit to main when done.`
+
+The exploration's job was narrow and honest: turn that spec into a go / no-go / conditional verdict *before* anyone authored the PRD. Not "how do we build this," but "should we, and is it even feasible the way the spec assumes."
+
+## What happened
+
+Phase 0 triage detected the self-gate and the unmet promotion triggers with a fast code probe (not a deep read): a `TODO` at `services/edge.py:106`, no `EmbeddingProvider`, no `/abstract` endpoint. It classified the work Tier 3, risk high. A routing gate surfaced the speculative signals, and the recommended "explore-first" path was chosen over jumping to a PRD.
+
+From there the exploration authored a charter with a mandatory deal-killer and pre-declared verdict criteria, then spawned four legs in parallel. They came back with independent confidence scores:
+
+| Leg | Confidence | Read |
+|-----|-----------|------|
+| Tech | 0.78 | Feasible, with constraints |
+| Risk | 0.85 | Prerequisites and completeness mapped |
+| Value | 0.35 | Uplift is unmeasured |
+| Prior-art | 0.72 | Usable precedent exists |
+
+Synthesis produced a feasibility brief and a proposed ADR. At the verdict gate, the orchestrating Opus recommended **CONDITIONAL at 0.8 confidence**, and sign-off recorded it: captured decision item DI-235 plus an IntentTree node, annotated the design spec's promotion trigger, and committed to `main`.
+
+The verdict resolved every SPIKE-before-PRD open question:
+
+| Open question | How it resolved |
+|---|---|
+| OQ-1a: embedding provider | OpenAI `text-embedding-3-small` v1, with a sentence-transformers SBERT fallback. (Anthropic ships no embeddings API; the spec's "Anthropic text-embedding-3" was an error.) |
+| OQ-1b: reuse-precedent source | The node graph, *not* the `Artifact` table (`Artifact.body` is never populated by the decompose path). This corrected the spec's stated assumption. |
+| OQ-1c: API surface | A parallel `POST /nodes/{id}/abstract` plus a new `NodeOperation` enum; leave `/decompose` untouched (it has 5 live consumers, and extending its union buys nothing). |
+| OQ-1d / M4: detection | Ship a bounded first phase using LLM-judged detection; defer embedding-similarity (pgvector) to a separate epic. |
+
+So why CONDITIONAL rather than go? Because the value leg scored 0.35: no telemetry, a single-user plus external-agent base, and the project's own docs frame M6 as an enhancement, not a value floor (promotion trigger #3 was explicitly unmet). The deal-killer did not fire (uplift is *unmeasured*, not *disproven*), but there was no justification to commit a 13-point build on an untested hypothesis.
+
+The precondition to re-enter (DI-235): instrument decompose quality, demonstrate that plain-context decompose is measurably insufficient, and only then sequence M4's LLM-judged detection first, before any pgvector work.
+
+## Wins
+
+- **Phase 0 caught the self-gate cheaply.** A roughly two-probe code check (not a deep read) confirmed the unmet prerequisite and prevented a premature PRD over four unresolved architectural decisions.
+- **Parallel legs delivered independent verification, not echo.** The tech leg *corrected the design spec twice* (the Artifact-table assumption; the Anthropic-embeddings error). That is first-hand evidence the orchestrator would not have surfaced from the spec alone.
+- **The low-confidence value leg was the decisive input.** Honoring an honest 0.35, rather than manufacturing demand evidence, is exactly what turned a superficially "feasible, so go" into the correct "feasible, but defer."
+- **Settled ground is now settled.** The proposed ADR and the resolved open questions mean re-entry will not re-litigate the provider or API decisions. That is the exploration's durable payoff even though the verdict was defer.
+
+## Losses and surprises
+
+- **Concurrent agents on a shared checkout.** Mid-run, another agent committed a change routing template and agent decompose through the shared LLM core (`328c74e`) and advanced `main` past this work; a transient unstaged `services/node.py` diff appeared. It was confirmed *not* a Mode-B violation by the exploration legs. The lesson: on a shared checkout, stage explicit paths only, verify `merge-base --is-ancestor` for your own commit, and do not be alarmed by foreign diffs (but do verify their provenance before touching them).
+- **Charter linter reformatting.** The status tool re-emitted YAML (block scalars, list reflow), and the field-update tool could not detect `doc_type: exploration_charter`, so `output_artifacts` had to be set via a direct edit. Minor, but noted for tooling.
+
+## What it changed
+
+The run produced two workflow improvements worth carrying forward. The first is a shared-checkout hygiene rule now written down: stage explicit paths, check `merge-base --is-ancestor` before trusting your own commit, and treat foreign diffs as provenance-to-verify rather than either noise or breakage. The second is the tooling note on the charter linter's YAML round-trip and its blind spot for the `exploration_charter` doc type.
+
+The deeper meta-finding is about the shape of the charter itself. Encoding a mandatory deal-killer and pre-declared verdict criteria up front is what let an honest 0.35 value leg override a healthy 0.78 tech leg. Without that structure, "feasible" tends to launder itself into "approved." The value of the exploration was less the answer than the machinery that kept the answer honest.
+
+## Where this fits
+
+This was one exploration inside a larger operating loop where planning, execution, and review all leave durable, linkable state instead of dying in a chat log; the shape of that loop is the subject of [The Work Is a Graph](/essays/agentic-operations-flow/). The same instinct that made this a spike rather than a build shows up elsewhere in the loop: the [research-foundry OPM-1.G gate loop](/dev-stories/aar-the-opm-1-g-gate-loop-mutation-verify-in-the-fix-step-not-the-next-review-ro/) is another case of putting verification where it actually catches the error, rather than one step too late.
+
+<details>
+<summary>Raw after-action detail</summary>
+
+This is a living after-action review. Part A below (the exploration, complete 2026-07-02) is finished. Part B (the implementation AAR) is a pending stub: it will be filled in only after the DI-235 precondition resolves and M6, or its first phase, ships. Nothing here is a second AAR file; the record expands in place.
+
+**Timeline (Part A exploration)**
+
+| Step | Outcome |
+|------|---------|
+| `/plan:plan-feature` Phase 0 triage | Detected the spec self-gate and unmet promotion triggers via a fast code probe (`services/edge.py:106` TODO; no `EmbeddingProvider`; no `/abstract`). Classified Tier 3, risk high. |
+| Routing gate | Surfaced speculative signals; explore-first chosen (recommended). Routed to `/plan:explore`. |
+| Phase 1, Charter | Authored an `exploration_charter` with a mandatory deal-killer, 4 legs (tech / risk / value / prior-art), and pre-declared verdict criteria. |
+| Phase 2, Legs (parallel) | 4 legs spawned in one message. Confidence: tech 0.78, risk 0.85, value 0.35, prior-art 0.72. About 860K subagent tokens across the legs, about 4 min wall-clock. |
+| Phase 3, Synthesis | Feasibility brief plus a proposed ADR (status: proposed) authored from the leg findings. |
+| Phase 4, Verdict | Opus recommended CONDITIONAL (0.8); user signed off. Recorded the verdict, finalized the brief, captured DI-235 plus an IntentTree node, annotated the design spec's promotion trigger, committed to `main` (`0d2a739`). |
+
+**Process metrics (exploration)**
+
+- Legs: 4 (spike-writer, backend-architect, ux-researcher, search-specialist), run in parallel.
+- Subagent tokens: tech ~307K, risk ~182K, value ~174K, prior-art ~197K, synthesis ~262K. Legs total ~860K; ~1.12M including synthesis.
+- Human gates: 2 (routing, verdict sign-off). Wall-clock: legs ~4 min; end-to-end within the ~30K to 60K Opus-orchestration budget target.
+- Artifacts produced: charter, 4 leg findings, feasibility brief, proposed ADR, this AAR, DI-235, IntentTree node.
+
+**Part B (pending, expand post-implementation)**
+
+To be answered once the DI-235 precondition resolves and M6 (or its first phase) ships:
+
+- Did the precondition hold? What did decompose-quality instrumentation actually measure, and did it show plain-context decompose was insufficient? (If not, M6 was correctly *not* built and DI-235 closes as no-go.)
+- Did the locked decisions survive contact? Provider (OQ-1a), reuse source (OQ-1b), API surface (OQ-1c), detection sequencing (OQ-1d/M4). Which proposed-ADR decisions were overturned, and why?
+- Estimation accuracy: actual effort vs the anchor (semantic search ~2 to 3 pts; M6 detection +3 to 5; the 15-op engine had no analog).
+- Prerequisite reality: was the M4 gap really 5 pieces as the risk leg claimed?
+- Value outcome: did knowledge-backed decomposition measurably beat plain-context, and by what metric?
+- Verdict on the verdict: was CONDITIONAL-defer the right call in hindsight, or did it cost real momentum?
+
+</details>

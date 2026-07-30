@@ -9,6 +9,7 @@ Content collections use the Astro Content Layer API. Schema defined in `src/cont
 | posts | `posts/*.mdx` | essay, field-note | Blog essays and field notes |
 | projects | `projects/*.mdx` | various types | Portfolio artifacts |
 | series | `series/*.mdx` | active, planned, complete | Multi-post sequences |
+| stories | `stories/*.mdx` | after-action, feature-story, build-note | Automated agentic build notes / dev stories |
 
 ## Adding a Post
 
@@ -28,6 +29,41 @@ status: published  # draft | published | evergreen
 ```
 
 Optional fields: `series`, `seriesOrder`, `featured`, `whyItMatters`, `leaderTakeaway`, `relatedSlugs`, `heroImage`, `interactiveElement`, `seoTitle`, `seoDescription`, `canonicalUrl`, `disclaimer`, `draftNotes`
+
+## Adding a Dev Story
+
+Dev Stories are automated build notes generated from the agentic execution workflow (AARs, feature completions, build notes), not hand-authored essays. **Don't hand-write these** — they normally come out of the `op story` pipeline (`op story capture` / `op story scan` / `op story review`) and the `dev-story-editor` skill, which draft, editorialize, and gate the MDX before it lands in `stories/*.mdx`. Use this section as a reference for the shape, not a template to fill in by hand.
+
+Create `stories/my-slug.mdx` with required frontmatter:
+
+```yaml
+---
+title: "Story Title"
+excerpt: "One-line description"
+date: 2026-07-28
+readTime: "6 min"
+status: published  # draft | published | evergreen
+storyType: after-action  # after-action | feature-story | build-note
+tags: ["agentic-sdlc", "context-engineering"]
+automated: true  # default true; set false only for hand-curated edits
+sourceAar: "aar-2026-07-28-feature-x"  # optional provenance label
+projects: ["signal-to-system"]  # slugs from PROJECTS_REGISTRY
+aos: true  # optional — flags AOS-subsystem involvement
+aosAreas: ["research-foundry", "intenttree"]  # optional slugs from AOS_AREAS_REGISTRY
+workflow:
+  version: "v4"
+  orchestrator: "metis"
+  model: "sonnet-5"
+  tokens: 482000
+  tier: 2
+  points: 8
+  commits: 6
+  runId: "run_2026072801"
+  intentId: "itt_9f21"
+---
+```
+
+`workflow` and all of its fields are optional; include whatever the run record actually captured. Optional shared fields (`updatedDate`, `series`, `seriesOrder`, `featured`, `heroImage`, `seoTitle`, `seoDescription`, `canonicalUrl`, `relatedSlugs`, `whyItMatters`, `leaderTakeaway`, `disclaimer`, `draftNotes`) work the same as on posts.
 
 ## Categories (fixed set)
 

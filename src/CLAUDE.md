@@ -9,17 +9,27 @@ src/
   components/
     global/       # Navigation, Footer, ThemeToggle, ModeToggle, SearchBox
     interactive/  # React islands: InteractiveNetwork, AgenticDiagram, etc.
-    content/      # Callout, TagList, RelatedContent, ReadingPathNav
-    cards/        # EssayCard, ProjectCard, SeriesCard, SiteLinkCard
+    content/      # Callout, TagList, RelatedContent, ReadingPathNav, StoryMetaHeader, AutomatedDisclaimer
+    cards/        # EssayCard, ProjectCard, SeriesCard, SiteLinkCard, StoryCard
     ui/           # Badge, Button, MetadataRow
-  content/        # MDX content files (posts/, projects/, series/)
+  content/        # MDX content files (posts/, projects/, series/, stories/)
   data/           # Site config, taxonomy, external-sites, portfolio
-  layouts/        # BaseLayout, PostLayout, ProjectLayout, SeriesLayout, PageLayout
+  layouts/        # BaseLayout, PostLayout, ProjectLayout, SeriesLayout, PageLayout, StoryLayout
   lib/            # Helpers: content.ts, seo.ts, tags.ts, search.ts, reading-paths.ts
-  pages/          # Astro routes
+  pages/          # Astro routes, incl. dev-stories/, systems/, aos/
   store/          # Nanostores: themeStore.ts, performanceStore.ts
   styles/         # global.css (Tailwind v4)
 ```
+
+## Dev Stories
+
+Dev Stories are automated agentic build notes (after-action reports, feature completions, build notes), rendered separately from hand-authored essays:
+
+- `StoryLayout.astro` — MDX layout for `/dev-stories/[slug]/`, parallel to `PostLayout` but wired for the `stories` collection's provenance/workflow metadata.
+- `StoryCard.astro` (`components/cards/`) — story list/grid card; shows storyType, projects, automated badge, workflow summary.
+- `StoryMetaHeader.astro` (`components/content/`) — renders workflow-execution stats (version, orchestrator, model, tokens, tier, points, commits) plus project/AOS-area/story-type badges atop each story.
+- `AutomatedDisclaimer.astro` (`components/content/`) — provenance banner (`variant="banner"` or `"inline"`) flagging a story as AI-assembled; reads copy from `site.devStories`.
+- Routes: `/dev-stories/` (index + `[slug]`) is the Dev Stories home; `/systems/` and `/aos/` are cross-collection facet pages (posts + stories) filtered by project/system and by AOS subsystem area, per `getContentByProject()` / `getContentByAosArea()` in `lib/content.ts`.
 
 ## Data Flow
 

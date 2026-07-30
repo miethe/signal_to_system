@@ -3,15 +3,18 @@ title: "One Codebase, Two Editions: How Clean Abstractions Unlocked SkillMeat's 
 excerpt: "A repository pattern refactor completed months before multi-tenancy was on the roadmap became the architectural seam that made enterprise storage, RBAC, and governance purely additive work."
 date: 2026-04-10
 readTime: "9 min"
-contentType: field-note
-category: "Projects"
+status: published
+storyType: feature-story
 tags:
   - "abstraction"
   - "architecture-decision-records"
   - "governance"
   - "human-ai-workflow"
   - "delivery-systems"
-status: published
+automated: false
+projects:
+  - "skillmeat"
+aos: false
 series: "I Let Claude Build My App"
 heroImage: "/assets/posts/dev-stories-b2-enterprise-multi-tenancy/diagram-three-invariants.png"
 whyItMatters: "This pattern replaces the 'fork the backend' approach often used for enterprise builds. One codebase, two data paths, toggled via DI; all 23 endpoints work correctly on day one without router rewrites."
@@ -160,7 +163,7 @@ The 15 routers migrated in Phase 1 became 15 independent tasks across 5 agents, 
 
 <Figure
   src="/assets/posts/dev-stories-b2-enterprise-multi-tenancy/diagram-parallel-agents.png"
-  alt="Three-column flow. Left: a single locked rectangle labeled 13 abstract repository interfaces, tagged as the repo-pattern-refactor-v1 prerequisite completed before multi-tenancy was on the roadmap. Middle: five parallel swim lanes, one per agent role, with overlapping task rectangles across an 18-day window from March 23 to April 10, 2026, labeled 47.5 active hours and zero merge conflicts. Right: stacked result cards — 23 endpoints working Day 1, 154 repository methods, 134 parametrized tests, 7 concurrent PRs."
+  alt="Three-column flow. Left: a single locked rectangle labeled 13 abstract repository interfaces, tagged as the repo-pattern-refactor-v1 prerequisite completed before multi-tenancy was on the roadmap. Middle: five parallel swim lanes, one per agent role, with overlapping task rectangles across an 18-day window from March 23 to April 10, 2026, labeled 47.5 active hours and zero merge conflicts. Right: stacked result cards showing 23 endpoints working Day 1, 154 repository methods, 134 parametrized tests, 7 concurrent PRs."
   number="04"
   caption="Interface-first design is what lets agents parallelize. Contract locked in Column 1, file-ownership batched execution in Column 2, day-one working system in Column 3."
 />

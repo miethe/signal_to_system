@@ -4,7 +4,7 @@ import type { CollectionEntry } from "astro:content";
 // Types
 // ---------------------------------------------------------------------------
 
-export type ContentType = "post" | "project" | "series";
+export type ContentType = "post" | "project" | "series" | "story";
 
 export interface SearchIndexEntry {
   title: string;

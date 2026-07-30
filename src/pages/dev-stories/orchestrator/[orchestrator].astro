@@ -1,0 +1,90 @@
+---
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import StoryCard from '../../../components/cards/StoryCard.astro';
+import { getPublishedStories } from '../../../lib/content';
+
+export async function getStaticPaths() {
+  const stories = await getPublishedStories();
+
+  const orchestratorSet = new Set<string>();
+  for (const story of stories) {
+    if (story.data.workflow?.orchestrator) orchestratorSet.add(story.data.workflow.orchestrator);
+  }
+
+  return [...orchestratorSet].map((orchestrator) => {
+    const matched = stories
+      .filter((s) => s.data.workflow?.orchestrator === orchestrator)
+      .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+
+    return {
+      params: { orchestrator },
+      props: { orchestrator, stories: matched },
+    };
+  });
+}
+
+const { orchestrator, stories } = Astro.props;
+const totalCount = stories.length;
+---
+
+<BaseLayout
+  title={`Orchestrator: ${orchestrator}`}
+  description={`Dev Stories driven by the ${orchestrator} orchestrator.`}
+>
+  <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+    <!-- Breadcrumb -->
+    <nav class="mb-8 flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400" aria-label="Breadcrumb">
+      <a href="/" class="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">Home</a>
+      <span aria-hidden="true">/</span>
+      <a href="/dev-stories/" class="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">Dev Stories</a>
+      <span aria-hidden="true">/</span>
+      <span class="text-zinc-900 dark:text-zinc-100">Orchestrator {orchestrator}</span>
+    </nav>
+
+    <!-- Page header -->
+    <header class="mb-12 border-b border-zinc-200 dark:border-zinc-800 pb-10">
+      <div class="mb-3">
+        <span class="inline-block rounded-md bg-indigo-100 dark:bg-indigo-900/40 px-2.5 py-1 text-xs font-medium text-indigo-700 dark:text-indigo-300">
+          Orchestrator
+        </span>
+      </div>
+      <h1 class="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl mb-4">
+        {orchestrator}
+      </h1>
+      <p class="text-zinc-500 dark:text-zinc-400">
+        {totalCount} {totalCount === 1 ? 'dev story' : 'dev stories'} driven by {orchestrator}
+      </p>
+    </header>
+
+    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {stories.map((story) => (
+        <StoryCard
+          title={story.data.title}
+          excerpt={story.data.excerpt}
+          date={story.data.date}
+          readTime={story.data.readTime}
+          slug={story.id}
+          storyType={story.data.storyType}
+          projects={story.data.projects}
+          automated={story.data.automated}
+          workflow={story.data.workflow}
+          tags={story.data.tags}
+          featured={false}
+        />
+      ))}
+    </div>
+
+    <!-- Back link -->
+    <div class="mt-12">
+      <a
+        href="/dev-stories/"
+        class="inline-flex items-center gap-1.5 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M19 12H5"/><path d="m12 19-7-7 7-7"/>
+        </svg>
+        All Dev Stories
+      </a>
+    </div>
+  </div>
+</BaseLayout>

@@ -244,3 +244,147 @@ export const TOPIC_HUBS: TopicHub[] = [
       "Hands-on builds, prototypes, and artifacts — including component libraries, frameworks, and reference implementations.",
   },
 ];
+
+// ---------------------------------------------------------------------------
+// Projects / Systems Registry
+// ---------------------------------------------------------------------------
+// The controlled vocabulary of projects and systems that a post or dev story
+// can relate to (the `projects` frontmatter field on posts + stories). Facet
+// pages live at /systems/[slug]. `aos: true` marks a system as part of the
+// Agentic OS. Kept independent of the portfolio `projects` collection so that
+// internal systems without a public artifact page can still be referenced.
+
+export interface ProjectDefinition {
+  slug: string;
+  label: string;
+  description?: string;
+  /** Whether this project is part of the Agentic OS. */
+  aos?: boolean;
+}
+
+export const PROJECTS_REGISTRY: ProjectDefinition[] = [
+  {
+    slug: "aos",
+    label: "Agentic OS",
+    description:
+      "The personal Agentic Operating System: the umbrella of orchestration, memory, research, knowledge, and execution subsystems.",
+    aos: true,
+  },
+  {
+    slug: "agentic-operator",
+    label: "Agentic Operator",
+    description:
+      "The single entry point that classifies an idea on route × tier and dispatches it to the right subsystem.",
+    aos: true,
+  },
+  {
+    slug: "skillmeat",
+    label: "SkillMeat",
+    description:
+      "The agentic artifact registry and packaging platform for skills, agents, and context packs.",
+    aos: true,
+  },
+  {
+    slug: "research-foundry",
+    label: "Research Foundry",
+    description:
+      "The gated research pipeline that turns questions into evidence-backed reports.",
+    aos: true,
+  },
+  {
+    slug: "meatywiki",
+    label: "MeatyWiki",
+    description: "The knowledge base and wiki subsystem for durable, queryable knowledge.",
+    aos: true,
+  },
+  {
+    slug: "intenttree",
+    label: "IntentTree",
+    description: "The task and intent graph that keeps work as durable, linkable state.",
+    aos: true,
+  },
+  {
+    slug: "agentic-node",
+    label: "Agentic Node",
+    description: "The persistent host running the Agentic OS subsystems as always-on services.",
+    aos: true,
+  },
+  {
+    slug: "boxbrain",
+    label: "BoxBrain",
+    description: "A product build used as a laboratory for agentic delivery patterns.",
+  },
+  {
+    slug: "signal-to-system",
+    label: "Signal to System",
+    description: "This publication and portfolio surface.",
+  },
+];
+
+export const projectsBySlug = Object.fromEntries(
+  PROJECTS_REGISTRY.map((p) => [p.slug, p]),
+) as Record<string, ProjectDefinition>;
+
+// ---------------------------------------------------------------------------
+// AOS Areas Registry
+// ---------------------------------------------------------------------------
+// Sub-areas of the Agentic OS, used to group `aos: true` content on /aos/ and
+// to power the /aos/[area] facet pages via the `aosAreas` frontmatter field.
+
+export interface AosAreaDefinition {
+  slug: string;
+  label: string;
+  description?: string;
+}
+
+export const AOS_AREAS_REGISTRY: AosAreaDefinition[] = [
+  {
+    slug: "orchestration",
+    label: "Orchestration & Routing",
+    description: "How work is classified, routed, and driven across subsystems and models.",
+  },
+  {
+    slug: "memory",
+    label: "Memory & Persona",
+    description: "Durable persona memory, recall, and the facts that persist across sessions.",
+  },
+  {
+    slug: "research",
+    label: "Research",
+    description: "Evidence gathering, synthesis, and the research pipeline.",
+  },
+  {
+    slug: "knowledge",
+    label: "Knowledge",
+    description: "The knowledge base and how findings become queryable, reusable knowledge.",
+  },
+  {
+    slug: "artifacts",
+    label: "Artifacts & Skills",
+    description: "Skills, agents, context packs, and the artifact supply chain.",
+  },
+  {
+    slug: "execution",
+    label: "Execution & SDLC",
+    description: "Planning, delegated execution, review gates, and the agentic SDLC.",
+  },
+  {
+    slug: "intents",
+    label: "Intents & Task Graph",
+    description: "Intent capture and the task graph that keeps work as durable state.",
+  },
+  {
+    slug: "infra",
+    label: "Infrastructure",
+    description: "The nodes, services, and deploy loops the Agentic OS runs on.",
+  },
+  {
+    slug: "publishing",
+    label: "Publishing",
+    description: "The Signal→System pipeline that turns operational evidence into published stories.",
+  },
+];
+
+export const aosAreasBySlug = Object.fromEntries(
+  AOS_AREAS_REGISTRY.map((a) => [a.slug, a]),
+) as Record<string, AosAreaDefinition>;

@@ -11,6 +11,8 @@ interface SeriesPost {
   date?: Date | string;
   readTime?: number;
   part?: number;
+  /** Collection-aware URL (e.g. via hrefFor()). Falls back to /essays/<slug>/ for callers that don't pass one. */
+  href?: string;
 }
 
 interface Props {
@@ -149,7 +151,7 @@ const sortedPosts = [...posts].sort((a, b) => {
           sortedPosts.map((post, index) => (
             <li>
               <a
-                href={`/essays/${post.slug}/`}
+                href={post.href ?? `/essays/${post.slug}/`}
                 class="group relative flex items-start gap-5 rounded-2xl bg-[var(--bg-surface)] p-6 transition-all duration-300 hover:z-10 hover:shadow-[var(--shadow-ambient)] hover:bg-[var(--bg-subtle)] border border-[var(--border-subtle)]"
               >
                 <!-- Part number -->

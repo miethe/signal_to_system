@@ -33,6 +33,13 @@ const posts = defineCollection({
     featured: z.boolean().optional(),
     heroImage: z.string().optional(),
 
+    // Cross-collection discovery (shared vocab with the `stories` collection).
+    // Optional on posts so essays can also relate to projects/AOS and appear on
+    // the /systems/ and /aos/ facet pages.
+    projects: z.array(z.string()).optional(),
+    aos: z.boolean().optional(),
+    aosAreas: z.array(z.string()).optional(),
+
     // SEO
     seoTitle: z.string().optional(),
     seoDescription: z.string().optional(),
@@ -133,6 +140,71 @@ const series = defineCollection({
 });
 
 // ---------------------------------------------------------------------------
+// Stories collection (Dev Stories — automated agentic build notes)
+// ---------------------------------------------------------------------------
+
+const stories = defineCollection({
+  loader: glob({ pattern: "**/*.{md,mdx}", base: "./src/content/stories" }),
+  schema: z.object({
+    // Required
+    title: z.string(),
+    excerpt: z.string(),
+    date: z.coerce.date(),
+    readTime: z.string(),
+    status: z.enum(["draft", "published", "evergreen"]),
+
+    // Classification
+    storyType: z.enum(["after-action", "feature-story", "build-note"]),
+    tags: z.array(z.string()),
+
+    // Provenance — drives the automated-disclaimer banner (false = curated/editorial)
+    automated: z.boolean().default(true),
+    sourceAar: z.string().optional(),
+
+    // Cross-collection discovery (shared vocab with posts)
+    projects: z.array(z.string()).default([]),
+    aos: z.boolean().optional(),
+    aosAreas: z.array(z.string()).optional(),
+
+    // Dev-story workflow metadata (all optional)
+    workflow: z
+      .object({
+        version: z.string().optional(), // e.g. "v4"
+        orchestrator: z.string().optional(), // e.g. "metis"
+        model: z.string().optional(), // primary model; multi-model noted in body
+        tokens: z.number().optional(),
+        tier: z.number().optional(),
+        points: z.number().optional(),
+        commits: z.number().optional(),
+        runId: z.string().optional(),
+        intentId: z.string().optional(),
+      })
+      .optional(),
+
+    // Optional metadata (shared display fields)
+    updatedDate: z.coerce.date().optional(),
+    series: z.string().optional(),
+    seriesOrder: z.number().optional(),
+    featured: z.boolean().optional(),
+    heroImage: z.string().optional(),
+
+    // SEO
+    seoTitle: z.string().optional(),
+    seoDescription: z.string().optional(),
+    canonicalUrl: z.string().url().optional(),
+
+    // Relationships
+    relatedSlugs: z.array(z.string()).optional(),
+
+    // Editorial extras
+    whyItMatters: z.string().optional(),
+    leaderTakeaway: z.string().optional(),
+    disclaimer: z.string().optional(),
+    draftNotes: z.string().optional(),
+  }),
+});
+
+// ---------------------------------------------------------------------------
 // UI Showcase collection (@miethe/ui component docs)
 // ---------------------------------------------------------------------------
 
@@ -180,4 +252,4 @@ const ui = defineCollection({
 // Export
 // ---------------------------------------------------------------------------
 
-export const collections = { posts, projects, series, ui };
+export const collections = { posts, projects, series, stories, ui };

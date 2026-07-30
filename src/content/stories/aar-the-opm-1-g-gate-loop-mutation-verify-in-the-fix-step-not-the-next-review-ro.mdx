@@ -1,0 +1,181 @@
+---
+title: "The OPM-1.G gate loop: mutation-verify in the fix step, not the next review round"
+excerpt: "Why a four-point contract-freeze phase burned five security-review rounds and 2.4M+ tokens: closure kept getting asserted instead of demonstrated, and the fix is to prove each remediation breaks a named test inside the fix step, not the next review."
+date: 2026-07-29
+readTime: "6 min read"
+status: draft
+storyType: after-action
+tags:
+  - agent-ready-repos
+  - human-ai-workflow
+  - artifact-first
+automated: true
+sourceAar: "research-foundry operator-mcp P1 (OPM-1.G gate loop)"
+projects:
+  - research-foundry
+  - aos
+aos: true
+aosAreas:
+  - execution
+  - research
+workflow:
+  tokens: 2400000
+  points: 4
+series: "I Let Claude Build My App"
+seriesOrder: 4
+relatedSlugs:
+  - m6-abstraction-engine-after-action-review-expandable-to-e2e
+  - agentic-operations-flow
+whyItMatters: "Review-loop cost compounds when each remediation seeds the next round's findings. Verifying a fix by mutation (revert it in place, confirm a named test fails, restore it) inside the fix step collapses that tail, and it generalizes to any gated agentic workflow where an agent self-reports closure."
+leaderTakeaway: "A green test suite is a floor, not a signal. Require agents to demonstrate closure (a reverted fix must break a named test) rather than assert it, and spend cheap breadth before expensive depth."
+---
+
+P1 of the Research Foundry operator-MCP was supposed to be small: four of twenty-nine story points, a contract-freeze phase with no transport and no production caller, just the schemas, an operator identity model, and a confirmation policy. It cost five security-review rounds and more than 2.4M tokens. The security gate was not broken; it found real defects every single round, including two genuine privilege escalations. What was broken was the shape of the loop. Closure kept getting asserted instead of demonstrated, and each round's remediation quietly seeded the next round's findings.
+
+The one line worth keeping: a remediation is not done until each fix has been reverted in place, shown to break a NAMED test, and restored. Mutation verification belongs in the fix step, not the next review round.
+
+## What we set out to do
+
+P1 of `research-foundry-operator-mcp` is a contract-freeze phase. The job was to lock the schemas, the operator identity model, and the confirmation policy before any transport layer or production caller exists. The scope was deliberately narrow (4 of 29 story points), and the plan was to freeze the contract cleanly and move on. Instead it turned into a five-round security-review loop that consumed roughly 2.4M+ tokens.
+
+## What happened
+
+Each round ran a security review, fixed the findings it surfaced, and asserted the work was closed. The next round opened by discovering that the closure evidence was hollow, then generated a fresh finding set from the remediation itself. Blocking-finding counts converged, but slowly:
+
+| Round | Blocking findings |
+|------:|------------------:|
+| 1 | 6 |
+| 2 | 13 |
+| 3 | 6 |
+| 4 | 9 |
+| 5 | 4 |
+
+The tail is expensive precisely because each remediation seeds the next round. Rounds 4 and 5 exist almost entirely because closure was claimed rather than proven; collapsing them into round 3 was available the entire time.
+
+### The proof case: BLOCK-4
+
+NEW-19 (an audit-health latch) was fixed correctly in the code and shipped with four purpose-built tests. All four passed. All four also passed when the fix was reverted. Their fake `health_check` never persisted a row, so the reverted code path never engaged; the tests re-entered the fake every time and accidentally reproduced the exact behaviour they were meant to assert. A fully green suite proved nothing. The regression was caught only incidentally, by an unrelated test.
+
+That is the whole lesson in one artifact: a green targeted suite is a floor, not a signal. The defects in this phase were found by mutation, adversarial probing, and reading prose against code, never by a passing suite.
+
+## Wins
+
+A few things worked well enough to keep doing:
+
+- **Independent lenses, run in parallel.** A cheap breadth sweep and an expensive depth lens were run as genuinely independent reviewers. They converged on three of the same findings, which raised confidence in both. A ~30k-token Sonnet pre-sweep independently found the highest-severity item of its round.
+- **Orchestrator-side empirical re-verification.** Instead of accepting a subagent's "all layers implemented" report, the orchestrator re-checked it directly. A 4-line probe contradicted the report by showing the runtime path still failed.
+- **Exhaustive map plus an import-time check, not a permissive default.** Replacing a two-way read/mutate role split with a per-kind map that raises at import if any kind is unclassified converts a future fail-open into a loud startup failure.
+- **Inverting tests that pinned unsafe behaviour** rather than weakening the fix to satisfy them. Two cases: a `viewer` reading job status, and audit health being required to deny without re-probing.
+
+## Losses and surprises
+
+Five recurring shapes each produced findings across multiple rounds. Naming them is the point; each is a place the loop leaked.
+
+**1. Fix the sibling, not just the finding.** Fixing one schema field and leaving the structurally identical field beside it produced findings in every round it was examined:
+
+| Fix that closed | Sibling left open |
+|---|---|
+| `terminal_receipt.denial_reason_code` (BLOCK-2) | `action_receipt.reason_code` |
+| `audit_delivery.detail` (R5-BLOCK-1) | `audit_delivery.audit_event_id` |
+| `if/then` presence coupling on one `$def` (BLOCK-3) | the sibling `$def` (R5-BLOCK-3) |
+
+**2. False authoritativeness, introduced by the fix that closed the prior finding.** Comments, docstrings, and schema `description`s asserted properties the code did not have. Three round-3 findings and two round-4 findings were this class. The worst instance: a docstring claimed a caller passing `str(exc)` "cannot land unredacted text in a receipt" while the redaction stripped only marker keywords and left absolute paths verbatim; it was written while fixing the finding about unredacted text. A separate "provable no-op" claim about a barrier-file write was also false (regex-equivalent but not identical patterns change match multiplicity) and got propagated into a closure section before being caught.
+
+**3. Fix the layer below.** Hardening a symbol while its delegate still offered the unsafe path: `authorize_operation` was hardened while `verify_confirmation` still reported a replay as accepted; the serve-extra import was fixed while `resolve_operator_identity` still constructed the serve-gated class at runtime (clean import, failure on first real use).
+
+**4. Reviewer lenses are not fungible.** The validator cleared a critical authorization bypass twice. The security lens found every real defect. Different lenses see different classes of problem, and treating them as interchangeable hid a genuine bypass.
+
+**5. Green tests are not evidence.** Restated from BLOCK-4 because it recurred every round: every round had a green targeted suite, and every round still had real defects.
+
+## What it changed
+
+The meta-findings, the durable rules this loop bought:
+
+- **Mutation verification moves into the fix step.** A remediation is not submitted until each fix has been reverted in place, shown to break a NAMED test, and restored. This is the single highest-leverage change; it is what collapses the round 4 / round 5 tail.
+- **Switch from finding-driven editing to a systematic sweep once a file yields findings in 2+ rounds.** Do a per-container by per-property sweep with an explicit matrix rather than chasing one field at a time.
+- **Check every prose claim against shipped code, especially prose written by a fix.** Comments, docstrings, and schema descriptions are claims, and a fix is exactly when a false one gets written.
+- **Spend cheap breadth before expensive depth.** A small pre-sweep is worth running before the heavy lens, and lenses should be kept independent so their agreement means something.
+
+## Where this fits
+
+This is one node in a larger pattern: the Agentic OS treats work as a gated graph, and gates only help when closure is demonstrated rather than self-reported. [The Work Is a Graph](/essays/agentic-operations-flow/) lays out the operations model this review loop runs inside. The verification lesson here rhymes with the [M6 abstraction-engine after-action](/dev-stories/m6-abstraction-engine-after-action-review-expandable-to-e2e/), where the same instinct (make the check reach all the way to the real behaviour) showed up as "expandable to E2E." Different feature, same failure mode: a check that looks green without ever exercising the path it claims to cover.
+
+<details>
+<summary>Raw after-action detail</summary>
+
+> **Primary lesson (one line):** move mutation verification INTO the fix step. A remediation is not
+> submitted until each fix has been reverted in place and shown to break a NAMED test. Rounds 4 and 5
+> of this gate exist almost entirely because closure was asserted rather than demonstrated.
+
+**Context.** P1 of `research-foundry-operator-mcp` is 4 of 29 story points: a contract-freeze phase
+(schemas + identity + confirmation policy, no transport, no production caller). It consumed **five
+security-review rounds and ~2.4M+ tokens**. The gate was not malfunctioning; it found genuine defects
+every single round, including two real privilege escalations. The *loop shape* malfunctioned.
+
+#### The core finding: closure was asserted, not demonstrated
+
+Each round fixed real findings and **asserted** closure. The next round discovered the closure evidence
+was hollow, and generated a fresh finding set *from the remediation itself*.
+
+The proof case is BLOCK-4. NEW-19 (audit-health latch) was fixed correctly in code, and shipped with
+four purpose-built tests. All four **passed when the fix was reverted**: their fake `health_check`
+never persisted a row, so the reverted code path never engaged and the tests re-entered the fake every
+time, accidentally reproducing the very behaviour they asserted. A fully green suite proved nothing.
+The regression was caught only incidentally, by an unrelated test.
+
+**Rule to encode:** a remediation is not submitted until each fix has been **reverted in place, shown
+to break a NAMED test, and restored**. Move mutation verification into the FIX step, not the next
+REVIEW round. Rounds 4 and 5 exist largely because this was not done; collapsing them into round 3
+was available the whole time.
+
+#### Secondary recurring shapes (each produced findings in multiple rounds)
+
+1. **Fix the sibling, not just the finding.** Fixing one schema field and leaving the structurally
+   identical field beside it produced findings in *every* round it was examined:
+   `terminal_receipt.denial_reason_code` closed then `action_receipt.reason_code` still open (BLOCK-2);
+   `audit_delivery.detail` closed then `audit_delivery.audit_event_id` still open (R5-BLOCK-1); the
+   `if/then` presence coupling applied to one `$def` only (BLOCK-3 then R5-BLOCK-3).
+   **Rule:** once a file yields findings in 2+ rounds, stop finding-driven editing and do a systematic
+   per-container by per-property sweep with an explicit matrix.
+
+2. **False authoritativeness, repeatedly introduced BY the fix that closed the prior finding.**
+   Comments, docstrings and schema `description`s asserting properties the code does not have. Three
+   round-3 findings and two round-4 findings were this class. Worst instance: a docstring claiming a
+   caller passing `str(exc)` "cannot land unredacted text in a receipt" when the redaction stripped
+   only marker keywords and left absolute paths verbatim, *written while fixing the finding about
+   unredacted text*. A "provable no-op" claim about a barrier-file write was also false (regex-equivalent
+   but not identical patterns changed match multiplicity) and was propagated into a closure section
+   before being caught.
+   **Rule:** every prose claim must be checked against shipped code, especially prose written *by* a fix.
+
+3. **Fix the layer below.** Hardening a symbol while its delegate still offers the unsafe path:
+   `authorize_operation` hardened while `verify_confirmation` still reported a replay as accepted;
+   the serve-extra import fixed while `resolve_operator_identity` still *constructed* the serve-gated
+   class at runtime (clean import, failure on first real use).
+
+4. **Reviewer lenses are not fungible.** The validator cleared a critical authorization bypass twice;
+   the security lens found every real defect. A cheap Sonnet pre-sweep (~30k tokens) independently
+   found the highest-severity item of its round; cheap breadth before expensive depth is worth it.
+
+5. **Green tests are not evidence; a passing suite is a floor, not a signal.** Every round had a green
+   targeted suite. The defects were found by mutation, adversarial probing, and reading prose against code.
+
+#### What worked
+
+- Running the cheap sweep and the expensive lens as **independent lenses**; they converged on three
+  findings, which raised confidence in both.
+- **Orchestrator-side empirical re-verification** rather than accepting subagent reports: an agent's
+  "all layers implemented" report was contradicted by a 4-line probe showing the runtime path still
+  failed.
+- **Exhaustive-map-plus-import-time-check** instead of a permissive default: replacing a two-way
+  read/mutate role split with a per-kind map that raises at import if a kind is unclassified converts a
+  future fail-open into a loud startup failure.
+- **Inverting tests that pinned unsafe behaviour** rather than weakening fixes to match them (two cases:
+  `viewer` reading job status; audit health "must deny without re-probing").
+
+#### Process cost note
+
+Blocking-finding counts by round: 6, 13, 6, 9, 4. Converging, but the tail is expensive because
+each remediation seeds the next round. The single highest-leverage change is item 1 above.
+
+</details>

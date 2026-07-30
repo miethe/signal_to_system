@@ -9,7 +9,14 @@
  */
 
 interface Props {
-  variant?: "default" | "category" | "status" | "type";
+  variant?:
+    | "default"
+    | "category"
+    | "status"
+    | "type"
+    | "project"
+    | "aos"
+    | "workflow";
   text: string;
   href?: string;
   class?: string;
@@ -34,6 +41,12 @@ const variants: Record<string, string> = {
     "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400",
   type:
     "bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-400",
+  project:
+    "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300",
+  aos:
+    "bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300",
+  workflow:
+    "font-mono bg-[var(--bg-muted)] text-[var(--text-tertiary)] ring-1 ring-inset ring-[var(--border-subtle)]",
 };
 
 const cls = [base, variants[variant] ?? variants.default, className].join(" ");

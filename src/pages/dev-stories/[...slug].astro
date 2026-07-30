@@ -1,0 +1,60 @@
+---
+import { getCollection, render } from 'astro:content';
+import StoryLayout from '../../layouts/StoryLayout.astro';
+import { getStoriesBySeries } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const stories = await getCollection('stories');
+  return stories.map((story) => ({
+    params: { slug: story.id },
+    props: { story },
+  }));
+}
+
+const { story } = Astro.props;
+const { Content } = await render(story);
+
+// Series navigation — computed from the published stories in the same series,
+// ordered by seriesOrder (mirrors how a series would be wired for essays).
+let prevPost: { title: string; slug: string } | undefined;
+let nextPost: { title: string; slug: string } | undefined;
+
+if (story.data.series) {
+  const seriesStories = await getStoriesBySeries(story.data.series);
+  const index = seriesStories.findIndex((s) => s.id === story.id);
+  if (index !== -1) {
+    const prev = seriesStories[index - 1];
+    const next = seriesStories[index + 1];
+    if (prev) prevPost = { title: prev.data.title, slug: prev.id };
+    if (next) nextPost = { title: next.data.title, slug: next.id };
+  }
+}
+---
+
+<StoryLayout
+  frontmatter={{
+    title: story.data.title,
+    excerpt: story.data.excerpt,
+    date: story.data.date,
+    updatedDate: story.data.updatedDate,
+    readTime: story.data.readTime ? parseInt(story.data.readTime) : undefined,
+    tags: story.data.tags,
+    ogImage: story.data.heroImage,
+    heroImage: story.data.heroImage,
+    whyItMatters: story.data.whyItMatters,
+    leaderTakeaway: story.data.leaderTakeaway,
+    series: story.data.series,
+    seriesPart: story.data.seriesOrder,
+    storyType: story.data.storyType,
+    automated: story.data.automated,
+    sourceAar: story.data.sourceAar,
+    projects: story.data.projects,
+    aos: story.data.aos,
+    aosAreas: story.data.aosAreas,
+    workflow: story.data.workflow,
+  }}
+  prevPost={prevPost}
+  nextPost={nextPost}
+>
+  <Content />
+</StoryLayout>

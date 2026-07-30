@@ -1,0 +1,254 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import StoryCard from '../../components/cards/StoryCard.astro';
+import AutomatedDisclaimer from '../../components/content/AutomatedDisclaimer.astro';
+import InteractiveNetwork from '../../components/interactive/InteractiveNetwork';
+import { getPublishedStories, getAllProjects } from '../../lib/content';
+import { projectsBySlug } from '../../data/taxonomy';
+import { site } from '../../data/site';
+
+// ---------------------------------------------------------------------------
+// Data — the full published set is rendered up front; filtering is client-side
+// so it works on the static (GitHub Pages) build, where request-time query
+// params are not available. Chip links keep shareable/bookmarkable URLs.
+// ---------------------------------------------------------------------------
+
+const allStories = await getPublishedStories();
+
+// Project chips — restricted to slugs that actually appear on a dev story.
+const allProjectFacets = await getAllProjects();
+const storyProjectSlugs = new Set<string>();
+for (const story of allStories) {
+  for (const slug of story.data.projects ?? []) storyProjectSlugs.add(slug);
+}
+const projectFacets = allProjectFacets.filter((f) => storyProjectSlugs.has(f.slug));
+
+// Workflow-version chips — distinct workflow.version values across published stories.
+const versionCounts = new Map<string, number>();
+for (const story of allStories) {
+  const version = story.data.workflow?.version;
+  if (version) versionCounts.set(version, (versionCounts.get(version) ?? 0) + 1);
+}
+const versionFacets = Array.from(versionCounts.entries())
+  .map(([version, count]) => ({ version, count }))
+  .sort((a, b) => a.version.localeCompare(b.version, undefined, { numeric: true }));
+
+const totalCount = allStories.length;
+const featureStories = allStories.filter((s) => s.data.storyType === 'feature-story');
+const otherStories = allStories.filter((s) => s.data.storyType !== 'feature-story');
+
+const chipBase =
+  'filter-chip inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium transition-colors';
+const chipInactive =
+  'bg-[var(--bg-muted)] text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-primary)]';
+const chipActive = 'is-active bg-[var(--accent)] text-white dark:text-[var(--text-inverse)]';
+---
+
+<BaseLayout
+  title="Dev Stories"
+  description="Field notes from the agentic build loop — after-action reports, feature stories, and build notes drawn from the execution workflow."
+>
+  <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+    <!-- Page header -->
+    <header class="dark relative mb-10 overflow-hidden rounded-3xl border border-[var(--border-subtle)] shadow-sm bg-[var(--bg-surface)]">
+      <div class="absolute inset-0 z-0 opacity-80" aria-hidden="true">
+        <InteractiveNetwork className="w-full h-full" client:idle />
+      </div>
+      <div class="relative z-10 px-8 py-16 sm:px-12 sm:py-24">
+        <h1 class="font-serif text-5xl font-bold tracking-tight text-[var(--text-primary)] mb-6">
+          <span class="italic text-[var(--accent)]">Dev</span> Stories
+        </h1>
+        <p class="text-xl text-[var(--text-secondary)] max-w-2xl leading-relaxed">
+          {site.devStories.tagline}
+          <span class="text-[var(--text-primary)]"><span id="dev-count">{totalCount}</span> published</span><span id="dev-filter-label"></span>.
+        </p>
+      </div>
+    </header>
+
+    <!-- Provenance banner -->
+    <AutomatedDisclaimer variant="banner" class="mb-10" />
+
+    <!-- Project filter -->
+    {projectFacets.length > 0 && (
+      <nav class="mb-3 flex flex-wrap gap-2" aria-label="Filter by project" data-filter-group="project">
+        <a href="/dev-stories/" data-project="" class:list={[chipBase, chipActive]}>All Projects</a>
+        {projectFacets.map((f) => {
+          const label = projectsBySlug[f.slug]?.label ?? f.slug;
+          return (
+            <a href={`/dev-stories/?project=${encodeURIComponent(f.slug)}`} data-project={f.slug} class:list={[chipBase, chipInactive]}>
+              {label}
+              <span class="text-xs opacity-70">({f.count})</span>
+            </a>
+          );
+        })}
+      </nav>
+    )}
+
+    <!-- Workflow version filter -->
+    {versionFacets.length > 0 && (
+      <nav class="mb-10 flex flex-wrap gap-2" aria-label="Filter by workflow version" data-filter-group="version">
+        <a href="/dev-stories/" data-version="" class:list={[chipBase, chipActive]}>All Versions</a>
+        {versionFacets.map(({ version, count }) => (
+          <a href={`/dev-stories/?version=${encodeURIComponent(version)}`} data-version={version} class:list={[chipBase, chipInactive]}>
+            {version}
+            <span class="text-xs opacity-70">({count})</span>
+          </a>
+        ))}
+      </nav>
+    )}
+
+    <!-- Empty state (shown by the filter script when nothing matches) -->
+    <div id="dev-empty" class="hidden rounded-xl border border-dashed border-[var(--border)] p-16 text-center">
+      <p class="text-[var(--text-secondary)] text-lg">No dev stories match this filter.</p>
+      <a href="/dev-stories/" class="mt-4 inline-block text-sm text-[var(--accent)] hover:underline">Clear filters</a>
+    </div>
+
+    <div class="space-y-16" id="dev-stories-list">
+      <!-- Feature Stories -->
+      {featureStories.length > 0 && (
+        <section data-section="feature">
+          {otherStories.length > 0 && (
+            <h2 class="font-mono text-xs font-bold uppercase tracking-widest text-[var(--text-disabled)] mb-8">
+              Feature Stories — <span data-section-count>{featureStories.length}</span>
+            </h2>
+          )}
+          <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {featureStories.map((story) => (
+              <div
+                class="story-item"
+                data-projects={(story.data.projects ?? []).join(' ')}
+                data-version={story.data.workflow?.version ?? ''}
+              >
+                <StoryCard
+                  title={story.data.title}
+                  excerpt={story.data.excerpt}
+                  date={story.data.date}
+                  readTime={story.data.readTime}
+                  slug={story.id}
+                  storyType={story.data.storyType}
+                  projects={story.data.projects}
+                  automated={story.data.automated}
+                  workflow={story.data.workflow}
+                  tags={story.data.tags}
+                  featured={story.data.featured ?? false}
+                />
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <!-- After-Action & Build Notes -->
+      {otherStories.length > 0 && (
+        <section data-section="other">
+          <h2 class="font-mono text-xs font-bold uppercase tracking-widest text-[var(--text-disabled)] mb-8">
+            After-Action & Build Notes — <span data-section-count>{otherStories.length}</span>
+          </h2>
+          <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {otherStories.map((story) => (
+              <div
+                class="story-item"
+                data-projects={(story.data.projects ?? []).join(' ')}
+                data-version={story.data.workflow?.version ?? ''}
+              >
+                <StoryCard
+                  title={story.data.title}
+                  excerpt={story.data.excerpt}
+                  date={story.data.date}
+                  readTime={story.data.readTime}
+                  slug={story.id}
+                  storyType={story.data.storyType}
+                  projects={story.data.projects}
+                  automated={story.data.automated}
+                  workflow={story.data.workflow}
+                  tags={story.data.tags}
+                  featured={false}
+                />
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+    </div>
+  </div>
+
+  <script is:inline define:vars={{ projectLabels: Object.fromEntries(projectFacets.map((f) => [f.slug, projectsBySlug[f.slug]?.label ?? f.slug])) }}>
+    (function () {
+      function apply() {
+        const params = new URLSearchParams(window.location.search);
+        const project = (params.get('project') || '').toLowerCase();
+        const version = (params.get('version') || '').toLowerCase();
+
+        // Filter cards
+        let visible = 0;
+        document.querySelectorAll('.story-item').forEach((el) => {
+          const projects = (el.getAttribute('data-projects') || '').toLowerCase().split(/\s+/).filter(Boolean);
+          const v = (el.getAttribute('data-version') || '').toLowerCase();
+          const ok = (!project || projects.includes(project)) && (!version || v === version);
+          el.classList.toggle('hidden', !ok);
+          if (ok) visible++;
+        });
+
+        // Per-section visibility + counts
+        document.querySelectorAll('[data-section]').forEach((section) => {
+          const items = section.querySelectorAll('.story-item');
+          let shown = 0;
+          items.forEach((it) => { if (!it.classList.contains('hidden')) shown++; });
+          section.classList.toggle('hidden', shown === 0);
+          const countEl = section.querySelector('[data-section-count]');
+          if (countEl) countEl.textContent = String(shown);
+        });
+
+        // Header count + filter label
+        const countEl = document.getElementById('dev-count');
+        if (countEl) countEl.textContent = String(visible);
+        const labelEl = document.getElementById('dev-filter-label');
+        if (labelEl) {
+          const bits = [];
+          if (project) bits.push(projectLabels[project] || project);
+          if (version) bits.push('workflow ' + params.get('version'));
+          labelEl.textContent = bits.length ? ' for ' + bits.join(', ') : '';
+        }
+
+        // Empty state
+        const empty = document.getElementById('dev-empty');
+        if (empty) empty.classList.toggle('hidden', visible !== 0);
+
+        // Active chip state
+        document.querySelectorAll('[data-filter-group="project"] .filter-chip').forEach((chip) => {
+          const val = (chip.getAttribute('data-project') || '').toLowerCase();
+          setActive(chip, val === project);
+        });
+        document.querySelectorAll('[data-filter-group="version"] .filter-chip').forEach((chip) => {
+          const val = (chip.getAttribute('data-version') || '').toLowerCase();
+          setActive(chip, val === version);
+        });
+      }
+
+      function setActive(chip, isActive) {
+        chip.classList.toggle('is-active', isActive);
+        chip.classList.toggle('bg-[var(--accent)]', isActive);
+        chip.classList.toggle('text-white', isActive);
+        chip.classList.toggle('dark:text-[var(--text-inverse)]', isActive);
+        chip.classList.toggle('bg-[var(--bg-muted)]', !isActive);
+        chip.classList.toggle('text-[var(--text-secondary)]', !isActive);
+        chip.classList.toggle('hover:bg-[var(--bg-subtle)]', !isActive);
+        chip.classList.toggle('hover:text-[var(--text-primary)]', !isActive);
+      }
+
+      // Intercept chip clicks so we filter in place (and keep shareable URLs).
+      document.querySelectorAll('.filter-chip').forEach((chip) => {
+        chip.addEventListener('click', (e) => {
+          e.preventDefault();
+          const href = chip.getAttribute('href') || '/dev-stories/';
+          window.history.pushState({}, '', href);
+          apply();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      });
+
+      window.addEventListener('popstate', apply);
+      apply();
+    })();
+  </script>
+</BaseLayout>

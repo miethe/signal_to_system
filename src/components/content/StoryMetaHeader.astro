@@ -1,0 +1,110 @@
+---
+/**
+ * StoryMetaHeader — the Dev Story context header.
+ *
+ * Renders the workflow-execution metadata (version, orchestrator, model,
+ * tokens, tier, points, commits) as a compact stat grid, plus project/system,
+ * AOS-area, and story-type badges that link to their facet pages. Anything
+ * absent is simply omitted.
+ */
+import Badge from "../ui/Badge.astro";
+import { projectsBySlug, aosAreasBySlug } from "../../data/taxonomy";
+
+interface Workflow {
+  version?: string;
+  orchestrator?: string;
+  model?: string;
+  tokens?: number;
+  tier?: number;
+  points?: number;
+  commits?: number;
+  runId?: string;
+  intentId?: string;
+}
+
+interface Props {
+  storyType: "after-action" | "feature-story" | "build-note";
+  projects?: string[];
+  aos?: boolean;
+  aosAreas?: string[];
+  workflow?: Workflow;
+  class?: string;
+}
+
+const {
+  storyType,
+  projects = [],
+  aos = false,
+  aosAreas = [],
+  workflow,
+  class: className = "",
+} = Astro.props;
+
+const STORY_TYPE_LABELS: Record<string, string> = {
+  "after-action": "After-Action",
+  "feature-story": "Feature Story",
+  "build-note": "Build Note",
+};
+
+function compact(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(n % 1_000_000 === 0 ? 0 : 1)}M`;
+  if (n >= 1_000) return `${Math.round(n / 1_000)}K`;
+  return `${n}`;
+}
+
+// Build the stat cells for present workflow numerics / labels.
+const stats: { label: string; value: string }[] = [];
+if (workflow?.version) stats.push({ label: "Workflow", value: workflow.version });
+if (workflow?.orchestrator) stats.push({ label: "Orchestrator", value: workflow.orchestrator });
+if (workflow?.model) stats.push({ label: "Model", value: workflow.model });
+if (typeof workflow?.tokens === "number") stats.push({ label: "Tokens", value: compact(workflow.tokens) });
+if (typeof workflow?.tier === "number") stats.push({ label: "Tier", value: `T${workflow.tier}` });
+if (typeof workflow?.points === "number") stats.push({ label: "Points", value: `${workflow.points}` });
+if (typeof workflow?.commits === "number") stats.push({ label: "Commits", value: `${workflow.commits}` });
+
+const projectDefs = projects.map((slug) => ({
+  slug,
+  label: projectsBySlug[slug]?.label ?? slug,
+}));
+const areaDefs = aosAreas.map((slug) => ({
+  slug,
+  label: aosAreasBySlug[slug]?.label ?? slug,
+}));
+
+const hasBadges = projectDefs.length > 0 || aos || areaDefs.length > 0;
+---
+
+<section
+  class={`mb-8 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-subtle)] p-5 sm:p-6 ${className}`}
+  aria-label="Story context"
+>
+  <!-- Badges: story type + projects + AOS -->
+  <div class="flex flex-wrap items-center gap-2">
+    <Badge variant="type" text={STORY_TYPE_LABELS[storyType] ?? storyType} />
+    {aos && <Badge variant="aos" text="Agentic OS" href="/aos/" />}
+    {projectDefs.map((p) => (
+      <Badge variant="project" text={p.label} href={`/systems/${p.slug}/`} />
+    ))}
+    {areaDefs.map((a) => (
+      <Badge variant="aos" text={a.label} href={`/aos/${a.slug}/`} />
+    ))}
+  </div>
+
+  <!-- Workflow stat grid -->
+  {
+    stats.length > 0 && (
+      <dl class="mt-5 grid grid-cols-2 gap-x-4 gap-y-4 sm:grid-cols-3 md:grid-cols-4">
+        {stats.map((s) => (
+          <div>
+            <dt class="font-mono text-[10px] font-bold uppercase tracking-widest text-[var(--text-disabled)]">
+              {s.label}
+            </dt>
+            <dd class="mt-0.5 font-mono text-lg font-semibold text-[var(--text-primary)]">
+              {s.value}
+            </dd>
+          </div>
+        ))}
+      </dl>
+    )
+  }
+</section>

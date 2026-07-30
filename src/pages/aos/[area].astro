@@ -1,0 +1,130 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EssayCard from '../../components/cards/EssayCard.astro';
+import StoryCard from '../../components/cards/StoryCard.astro';
+import { getAllAosAreas, getContentByAosArea } from '../../lib/content';
+import { aosAreasBySlug } from '../../data/taxonomy';
+
+export async function getStaticPaths() {
+  const areaFacets = await getAllAosAreas();
+
+  return Promise.all(
+    areaFacets.map(async (facet) => {
+      const { posts, stories } = await getContentByAosArea(facet.slug);
+      return {
+        params: { area: facet.slug },
+        props: { areaSlug: facet.slug, posts, stories },
+      };
+    }),
+  );
+}
+
+const { areaSlug, posts, stories } = Astro.props;
+
+// Look up registry definition
+const areaDef = aosAreasBySlug[areaSlug];
+const areaLabel = areaDef?.label ?? areaSlug.replace(/-/g, ' ');
+const areaDescription = areaDef?.description;
+const totalCount = posts.length + stories.length;
+---
+
+<BaseLayout
+  title={`${areaLabel} — The Agentic OS`}
+  description={areaDescription ?? `Writing about ${areaLabel} in the Agentic OS on Signal to System.`}
+>
+  <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+    <!-- Breadcrumb -->
+    <nav class="mb-8 flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400" aria-label="Breadcrumb">
+      <a href="/" class="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">Home</a>
+      <span aria-hidden="true">/</span>
+      <a href="/aos/" class="hover:text-zinc-900 dark:hover:text-zinc-100 transition-colors">The Agentic OS</a>
+      <span aria-hidden="true">/</span>
+      <span class="text-zinc-900 dark:text-zinc-100">{areaLabel}</span>
+    </nav>
+
+    <!-- Page header -->
+    <header class="mb-12 border-b border-zinc-200 dark:border-zinc-800 pb-10">
+      <div class="mb-3">
+        <span class="inline-block rounded-md bg-violet-100 dark:bg-violet-900/40 px-2.5 py-1 text-xs font-medium text-violet-700 dark:text-violet-300">
+          Agentic OS
+        </span>
+      </div>
+      <h1 class="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl mb-4">
+        {areaLabel}
+      </h1>
+      {areaDescription && (
+        <p class="text-xl text-zinc-600 dark:text-zinc-400 max-w-2xl leading-relaxed mb-2">
+          {areaDescription}
+        </p>
+      )}
+      <p class="text-zinc-500 dark:text-zinc-400">
+        {totalCount} {totalCount === 1 ? 'item' : 'items'} — {posts.length} {posts.length === 1 ? 'essay' : 'essays'}, {stories.length} {stories.length === 1 ? 'dev story' : 'dev stories'}
+      </p>
+    </header>
+
+    <div class="space-y-16">
+      <!-- Essays -->
+      {posts.length > 0 && (
+        <section>
+          <h2 class="text-sm font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 mb-6">
+            Essays — {posts.length}
+          </h2>
+          <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {posts.map((post) => (
+              <EssayCard
+                title={post.data.title}
+                excerpt={post.data.excerpt}
+                date={post.data.date}
+                readTime={post.data.readTime}
+                category={post.data.category}
+                tags={post.data.tags}
+                slug={post.id}
+                contentType={post.data.contentType}
+                featured={false}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
+      <!-- Dev Stories -->
+      {stories.length > 0 && (
+        <section>
+          <h2 class="text-sm font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 mb-6">
+            Dev Stories — {stories.length}
+          </h2>
+          <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            {stories.map((story) => (
+              <StoryCard
+                title={story.data.title}
+                excerpt={story.data.excerpt}
+                date={story.data.date}
+                readTime={story.data.readTime}
+                slug={story.id}
+                storyType={story.data.storyType}
+                projects={story.data.projects}
+                automated={story.data.automated}
+                workflow={story.data.workflow}
+                tags={story.data.tags}
+                featured={false}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+    </div>
+
+    <!-- Back link -->
+    <div class="mt-12">
+      <a
+        href="/aos/"
+        class="inline-flex items-center gap-1.5 text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M19 12H5"/><path d="m12 19-7-7 7-7"/>
+        </svg>
+        The Agentic OS
+      </a>
+    </div>
+  </div>
+</BaseLayout>

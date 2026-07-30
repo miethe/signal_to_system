@@ -10,6 +10,7 @@ import { slugify } from '../../lib/utils';
 
 const allPosts = await getCollection('posts');
 const allProjects = await getCollection('projects');
+const allStories = await getCollection('stories');
 
 const tagCounts = new Map<string, number>();
 
@@ -23,6 +24,14 @@ for (const post of allPosts) {
 
 for (const project of allProjects) {
   for (const tag of project.data.tags ?? []) {
+    const slug = slugify(tag);
+    tagCounts.set(slug, (tagCounts.get(slug) ?? 0) + 1);
+  }
+}
+
+for (const story of allStories) {
+  if (story.data.status === 'draft') continue;
+  for (const tag of story.data.tags ?? []) {
     const slug = slugify(tag);
     tagCounts.set(slug, (tagCounts.get(slug) ?? 0) + 1);
   }
@@ -47,7 +56,7 @@ const totalTagCount = allTags.length;
 
 <BaseLayout
   title="Tags"
-  description="Browse all tags across essays and projects on Signal to System."
+  description="Browse all tags across essays, dev stories, and projects on Signal to System."
 >
   <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
     <!-- Page header -->
@@ -56,7 +65,7 @@ const totalTagCount = allTags.length;
         Tags
       </h1>
       <p class="text-xl text-zinc-600 dark:text-zinc-400 leading-relaxed">
-        {totalTagCount} tags across essays and projects. Each links to all content sharing that concept.
+        {totalTagCount} tags across essays, dev stories, and projects. Each links to all content sharing that concept.
       </p>
     </header>
 

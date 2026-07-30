@@ -1,27 +1,24 @@
 ---
 /**
- * RelatedContent — "Related Reading" section displayed at the end of a post.
+ * RelatedContent — "Related Reading" section displayed at the end of a post
+ * or dev story.
  *
  * Props:
- *   posts — array of { title, slug, category?, excerpt? }
+ *   items — Post | Story entries (e.g. from getRelatedArticles() in
+ *           lib/content.ts). Linked with hrefFor() so URLs resolve correctly
+ *           for both collections (/essays/... vs /dev-stories/...).
  *   title — optional section heading (defaults to "Related Reading")
  */
-
-interface RelatedPost {
-  title: string;
-  slug: string;
-  category?: string;
-  excerpt?: string;
-}
+import { hrefFor, type Article } from "../../lib/content";
 
 interface Props {
-  posts: RelatedPost[];
+  items: Article[];
   title?: string;
 }
 
-const { posts, title = "Related Reading" } = Astro.props;
+const { items, title = "Related Reading" } = Astro.props;
 
-if (posts.length === 0) return;
+if (items.length === 0) return;
 ---
 
 <section class="mt-12 border-t border-[var(--border-subtle)] pt-10" aria-labelledby="related-heading">
@@ -34,23 +31,23 @@ if (posts.length === 0) return;
 
   <ul class="grid gap-4 sm:grid-cols-2 list-none p-0 m-0">
     {
-      posts.map((post) => (
+      items.map((entry) => (
         <li>
           <a
-            href={`/essays/${post.slug}/`}
+            href={hrefFor(entry)}
             class="group flex flex-col rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-5 transition-all hover:border-[var(--accent)]/50 hover:shadow-sm"
           >
-            {post.category && (
+            {entry.collection === "posts" && entry.data.category && (
               <span class="mb-2 text-xs font-medium text-[var(--accent)]">
-                {post.category}
+                {entry.data.category}
               </span>
             )}
             <span class="font-medium text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors leading-snug">
-              {post.title}
+              {entry.data.title}
             </span>
-            {post.excerpt && (
+            {entry.data.excerpt && (
               <span class="mt-1.5 text-sm text-[var(--text-tertiary)] line-clamp-2 leading-relaxed">
-                {post.excerpt}
+                {entry.data.excerpt}
               </span>
             )}
           </a>

@@ -4,22 +4,37 @@ import { site } from '../data/site';
 
 export async function GET(context: { site: URL }) {
   const posts = await getCollection('posts');
+  const stories = await getCollection('stories');
 
-  const published = posts
-    .filter((p) => p.data.status !== 'draft')
-    .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+  const publishedPosts = posts.filter((p) => p.data.status !== 'draft');
+  const publishedStories = stories.filter((s) => s.data.status !== 'draft');
 
-  return rss({
-    title: site.title,
-    description: site.description,
-    site: context.site,
-    items: published.map((post) => ({
+  const items = [
+    ...publishedPosts.map((post) => ({
       title: post.data.title,
       pubDate: post.data.date,
       description: post.data.excerpt,
       link: `/essays/${post.id}/`,
       categories: [post.data.category, ...(post.data.tags ?? [])],
     })),
+    ...publishedStories.map((story) => ({
+      title: story.data.title,
+      pubDate: story.data.date,
+      description: story.data.excerpt,
+      link: `/dev-stories/${story.id}/`,
+      categories: [
+        story.data.storyType,
+        ...(story.data.tags ?? []),
+        ...(story.data.projects ?? []),
+      ],
+    })),
+  ].sort((a, b) => b.pubDate.getTime() - a.pubDate.getTime());
+
+  return rss({
+    title: site.title,
+    description: site.description,
+    site: context.site,
+    items,
     customData: `<language>en-us</language>`,
   });
 }

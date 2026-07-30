@@ -1,0 +1,263 @@
+---
+title: "After-Action Report: Fable 5 One-Shot Command Center Build"
+excerpt: "One orchestrator, roughly nineteen free delegates, nine of them writing into a single worktree at once with zero file conflicts, shipped a 230-file feature in one background session; the expensive part turned out to be the environment, not the code."
+date: '2026-06-25'
+readTime: 9 min read
+status: draft
+storyType: after-action
+automated: true
+sourceAar: "Fable 5 One-Shot: IntentTree Command Center Build"
+projects:
+- agentic-node
+- aos
+aos: true
+aosAreas:
+- orchestration
+- execution
+workflow:
+  orchestrator: Fable 5
+  model: Sonnet 4.6
+  commits: 6
+tags:
+- agent-ready-repos
+- human-ai-workflow
+- artifact-first
+series: I Let Claude Build My App
+seriesOrder: 1
+relatedSlugs:
+- m6-abstraction-engine-after-action-review-expandable-to-e2e
+- aar-the-opm-1-g-gate-loop-mutation-verify-in-the-fix-step-not-the-next-review-ro
+- agentic-operations-flow
+whyItMatters: "The headline number (nine agents writing into one worktree at once with zero collisions) was bought by a contract stack (frozen files, pre-registered stubs, placeholder components, exclusive ownership, per-feature CSS), not by model horsepower; and most of the early budget was eaten by environment traps (a uv editable-install cache, a silent pytest PATH fallback, a dropped test-library peer), not by writing code."
+leaderTakeaway: "In a large agentic build the scarce resource is orchestrator judgment, not code generation: cost-shift the wide implementation surface to cheap delegates, spend the expensive budget on the few decisions that reshape the whole build (reuse existing tables instead of forking, branch off a frozen commit, fix-versus-delegate), and never trust 'all green' until an adversarial review pass has looked at the seams between the parts."
+---
+
+The brief was a one-shot: take an unusually complete spec pack for IntentTree's Workspace Command Center and build the whole thing in a single background session, with the owner not watching. What made it structurally novel was the delegation model. One orchestrator (Fable 5, running at XHigh effort on the owner's primary token budget) kept all the judgment central and thin, and pushed essentially every line of implementation to roughly nineteen cost-shifted (effectively free) bash delegates running through the ICA gateway. At peak, nine of those delegates wrote into a single git worktree at the same time (four backend, five frontend) and produced zero cross-delegate file conflicts. The feature shipped: about 230 files, roughly 31,000 insertions, around 1,365 net-new tests across six commits on two branches. The most expensive thing in the whole run was not the code. It was the environment.
+
+## What we set out to do
+
+The target was the IntentTree Workspace Command Center, and the spec pack was richer than usual: a 1,725-line v2 spec, a separate Phase-0 launcher build-spec, eight ChatGPT-generated mockup PNGs, and a reconciliation document with five pre-decided architectural choices (D1 through D5). Three firsts stacked up in one session: the first Fable 5-led session, the owner's first one-shot attempt, and the first time bash delegation through the ICA gateway (`~/ica-claude.sh`, cost-shifted and effectively free) served as the primary delegation channel instead of the native Agent tool.
+
+Because it ran as a background session, the owner was not in the loop live. The mid-session steers arrived as discrete interrupts, not conversation, and there were three: pause execution because IntentTree had ongoing work; it is in a worktree, probably fine, but check APWR alignment; and make this report double as a blog post and a process-optimization artifact, not just an internal log. The second steer turned APWR alignment into a hard design constraint, and that constraint produced the most consequential call of the session.
+
+## What happened
+
+Before writing a line, the recon pass read the live tree and found an in-flight feature nobody had mentioned: APWR (the Agentic Work-Product Registry), living in its own worktree `awpr-exec` with 11 commits, 8 new registry tables (`source_artifact`, `work_products`, `completion_evidence`, `external_link`, `validation_run`, and more), migration 0005, and uncommitted frontend work. It overlapped with the planned v2 on exactly the surfaces that hurt most: enums, entities, the router registry, `routes.tsx`, `types/domain.ts`, and `styles/index.css`.
+
+The pivot was to not invent parallel models. v2 would reuse APWR's, and branch off APWR's frozen commit `3375ff5` so migrations chained linearly (0006 through 0008 after 0005). The same reconnaissance surfaced a second reuse opportunity: a shipped `/distill` LLM service (`DistillService`) that got redirected to power capture distillation rather than building a new engine. Neither was in the brief; both came from reading the live tree first, and both deleted large amounts of would-be work while de-risking the eventual merge back into APWR.
+
+From there the session ran as widening-then-narrowing waves with a gate-verified commit at every boundary: recon, design (a 622-line implementation plan), the Phase-0 launcher, the v2 foundation, seed extraction, then the two parallel waves (a four-way backend wave and a five-way frontend wave), a v2 seed, and a merge. The peak of nine concurrent writers in one worktree is the number that justifies the entire coordination apparatus.
+
+Two slices shipped. **Phase-0**, the AOS Launcher on `/command-center`, is a YAML-backed read-only API (apps, layers, diagrams, decisions, health) plus React screens; its backend came back green on the first pass with 42 new tests, and the frontend fixer that cleared five test failures also found a real double-filter bug where toggling "show personal" did nothing. It carries the full 34-app catalog (8 core, 9 supporting, 17 peripheral), 1,532 lines of verbatim-from-catalog YAML with every dependency ID resolving. **v2**, the centerpiece, is the full Workspace Command Center: a carousel landing, an expanded command center with a five-mode focus pane, drag-and-drop with a persistent tabbed Carry Tray, a capture-to-inbox-to-execution flow with execution-packet panels and an evidence timeline, and an `@xyflow/react` canvas with typed edges. Its seed populates four real workspaces (including the Agentic OS one built from 17 catalog projects, 17 intent nodes, 46 backlog tasks, and 16 dependency edges). Tests grew from 508 to 800 on the backend and from 140 to 424-plus on the frontend.
+
+## Wins
+
+**Nine writers, one tree, zero conflicts.** This was the headline result, and it was engineered, not lucky. The stack: a short frozen-file list no delegate could touch (models, enums, IDs, migrations, the API package init); pre-registered router stubs that delegates filled rather than adding routes to a shared registry; placeholder components at every export path so imports never broke mid-wave; disjoint exclusive-ownership file lists partitioned by resource; per-feature prefixed CSS so no two delegates appended to the same block; lazy cross-service imports; string-convention SSE channels (`ws:{workspace_id}`, no shared registry to edit); and central commit discipline where delegates never commit and the orchestrator gates and commits at wave boundaries. Delegates even fixed each other's transient lint errors without colliding.
+
+**The reuse pivot paid for itself.** Reusing APWR's eight tables and branching off its frozen commit removed a migration collision, an enum war, and probably days of rework. Redirecting the existing `/distill` service avoided building a capture engine from scratch. Both decisions came from the recon, not the brief.
+
+**One expensive recon call was the highest-ROI minute of the run.** The single native Explore pass (123k tokens, 54 tool uses, 229 seconds) is what surfaced APWR and `/distill` in the first place. Everything downstream depended on reading the live tree before writing a line.
+
+**The economics inverted.** Because ICA delegates are cost-shifted, the usual calculus flipped: instead of rationing delegate calls, the orchestrator rationed its own context and spent delegate calls freely (about nineteen of them). The scarce, non-fungible resource was orchestrator judgment, so the design goal was to keep that central and thin while making the cheap implementation context wide. Even the one task that looked cheap enough for a small model (YAML catalog extraction) actually demanded the most schema fidelity, so Haiku went unused. Mechanical and low-fidelity are not the same thing.
+
+## Losses and surprises
+
+The early budget did not go to code. It went to environment.
+
+**A uv editable-install cache trap.** In the v2 worktree, the backend delegate's tests imported code from the main checkout, because the worktree's uv venv resolved the editable `intenttree` install against a shared cache pointing at the wrong build artifacts. `uv sync --reinstall-package intenttree` re-pinned it.
+
+**A silent pytest PATH fallback.** `uv run pytest` produced phantom import errors, because a plain `uv sync` did not install pytest (it lives under an optional `dev` extra) and `uv run` then silently fell back to a global pyenv 3.12 pytest that imported main-checkout code. The dangerous part was the silence: a tool that quietly runs the wrong binary is worse than one that errors.
+
+**A dropped test-library peer.** `npm install` quietly removed `@testing-library/dom` (React Testing Library v16 requires it as an explicit peer rather than bundling it), breaking `screen` and `waitFor` across previously-passing tests.
+
+Those three are why the early foundation delegates burned 80 to 90 turns mostly on environment fights, not on producing code. That fed the cleanest process signal of the session: turn caps of 80 to 90 were too low (three of five early delegates capped even though the work was essentially done each time), and 100 to 120 was right (only one of ten capped in the later waves). Running the early delegates with `--no-session-persistence` was a mistake, because a capped delegate could not resume and had to be re-spawned as a fresh fixer.
+
+Two ICA gateway timeouts hit the seed extraction: the first attempt tried one big write and produced nothing; the second, told to write each file as it was ready, salvaged most of its output before dying; the third scoped down to chunked appends and succeeded. The merge produced nine conflicts, eight trivial keep-both and one real add/add collision where both slices had independently created `web/src/styles/command-center.css` (resolved by verifying zero class-name overlap and renaming the launcher's file).
+
+And the honest debts were carried forward rather than papered over: no server-side tray undo endpoint yet, an unexplained vitest file-count quirk, a runner-exit hang, a pending final APWR merge, heuristic-only distillation, a simple layered-column map layout, and a health probe that only covers the six apps with a health URL. At the time this report was first written, the review pass was still in flight.
+
+## What it changed
+
+The run rewrote parts of the workflow it ran under. Several lessons were baked directly into the `ica-delegate` skill's build-and-gate pre-flight so the next one-shot does not repeat them:
+
+- A worktree-delegation pre-flight that re-pins editable installs, installs the right dev extras, and asserts resolved tool paths (`which pytest`, version, venv) before trusting any gate output.
+- "Write incrementally" as a standing delegate rule: incremental writes are checkpointing, and under an unreliable transport a delegate that writes as it goes loses only its last chunk on a timeout, not the whole run.
+- Size turn caps for build plus environment-recovery plus gate iteration (100 to 120), and never trade away resumability when caps can realistically be hit.
+- Reserve namespaced filenames per slice at planning time so two independent branches never converge on the same CSS file.
+
+Then two findings arrived that no green gate could have caught, and both are now pre-flight checks. First, the owner ran the app and it "looked like crap" next to the mockups: the eight sketch PNGs had been synthesized into a prose brief and the frontend delegates were never pointed at the actual images, so they inherited IntentTree's existing unpolished styling instead of the sketch fidelity. Second, every pre-existing page (`/map`, `/tree`) returned 404, because the worktree shipped no backend env file and the demo seed had been made opt-in, so the app booted against a clean database with no `atlas` tree. Neither was Command Center damage; both were the gap between "the suite passes" and "the running app matches the brief."
+
+The most important meta-finding came from the review itself. An independent, adversarial, read-only review pass ran after everything was green and returned NO-GO on four findings, three of them behavioral defects living in the seams between delegates (an SSE invalidation storm, a launch path that bypassed publishing, stale cross-project progress rollups) that every per-work-order gate had passed. It also finally explained the overnight vitest hang: a mocked `@xyflow/react` hook drove an infinite re-render loop in one test file, which the runner quarantined as an exit-0 with 33 missing tests. A single remediation delegate, fed the review verbatim, fixed all four blockers plus three cheap minors, and the verified result was backend 850 passing and frontend 482 of 482 in 4.8 seconds with the suite exiting cleanly: the first genuinely complete frontend run of the session. Net verdict flipped to GO for merge once APWR lands. The lesson is durable: a hanging test is worse than a failing one, and an adversarial review after "all green" is worth one more delegate.
+
+## Where this fits
+
+This was one build inside a larger operating loop where planning, execution, and review all leave durable, linkable state instead of dying in a chat log; that loop is the subject of [The Work Is a Graph](/essays/agentic-operations-flow/), and the Command Center is, quite literally, a UI for it. The review-after-green lesson here rhymes with the [research-foundry OPM-1.G gate loop](/dev-stories/aar-the-opm-1-g-gate-loop-mutation-verify-in-the-fix-step-not-the-next-review-ro/), which is another case of putting verification exactly where it catches the error rather than one step too late. And the same instinct that made this a full build shows up inverted in the [M6 abstraction-engine exploration](/dev-stories/m6-abstraction-engine-after-action-review-expandable-to-e2e/), where the loop chose to defer a build rather than commit to an untested hypothesis.
+
+<details>
+<summary>Raw after-action detail</summary>
+
+Numbers below come from the session's recorded facts and the delegate logs.
+
+### Session architecture: the wave structure
+
+One orchestrator (Fable 5, XHigh effort, primary budget) plus roughly nineteen ICA bash delegates plus one native Explore agent. Gate-verified commit at every wave boundary.
+
+| Wave | What | Channel / parallelism |
+|---|---|---|
+| Recon | Map the live tree, find APWR, find `/distill` | 1 native Explore + 2 ICA (seed extract, design) |
+| Design | 622-line v2 implementation plan | 1 ICA opus[1m] |
+| Phase-0 | Launcher backend + frontend (main checkout) | 2 ICA, then 1 ICA fixer |
+| Foundation (v2) | Models/migrations/enums BE + routes/stores/CSS FE | 2 ICA, then 1 ICA fixer |
+| Seed extraction | apps.yaml catalog data | 3 sequential ICA attempts |
+| BE wave | WO-3..9 services/routers | 4 parallel ICA |
+| FE wave | WO-12..17 screens/features | 5 parallel ICA |
+| Seed (v2) | WO-10 4-workspace seed | 1 ICA |
+| Merge | command-center into command-center-v2 | orchestrator |
+| Review/Docs | review + this report + doc updates | ICA (in flight at write time) |
+
+### The as-built D1 through D5 decisions
+
+- **D1 (launcher placement):** shipped both, the launcher as Phase-0 screens (nav label "AOS Launcher") and as an "Agentic OS" workspace inside v2.
+- **D2 (model reuse):** Item equals TreeNode (a superset via additive enums; a `lifecycle_pinned` shim guards the legacy status auto-derivation). Project equals Tree (plus `parent_tree_id`). Workspace extended in place. Typed links became an EdgeType extension (`informs`/`derives_from`), not a new table, following APWR Decision #2; `evidence_for`/`executed_by`/`documented_in` reuse APWR's `completion_evidence` and `external_link`. External runs extend `agent_runs` (`is_external`, `harness_type`, packet FK, ingestion events); the worker loop skips external runs; SSE dual-publishes to run and workspace channels. The only new tables: `tray_entries`, `captures`, `execution_packets`.
+- **D3 (keeps):** files-canonical, loopback-only, no LLM on the render path (distill is capture-time opt-in via the existing `DistillService`); `approval_policy` and `require_human_approval_for` encoded on packet rows.
+- **D4 (sequencing):** Phase-0 first (proof plus immediate value), v2 in parallel waves after foundation. It worked.
+- **D5 (open questions):** OQ overlap deferred to a read-only Decisions screen (OQ-1..20 from the audit).
+
+### Failure catalog
+
+**5.1 ICA gateway timeouts and the incremental-write fix.** Symptom: seed extraction failed twice with an operation-timed-out error; the first attempt produced nothing (one big write, whole turn lost), the second (write-as-ready) salvaged `layers.yaml` (10 layers), `decisions.yaml` (20), and 5 diagrams before dying. Root cause: a single large terminal write is one fragile, all-or-nothing unit of work. Fix: the third attempt scoped to apps.yaml only, written via chunked appends of 4 to 5 apps per edit (34 apps, all deps resolving). Lesson: incremental writes are checkpointing; bake "write each artifact as soon as it is ready; append in small batches" into delegate prompts by default.
+
+**5.2 The uv worktree editable-install cache trap.** Symptom: the v2 backend delegate's tests imported code from the main checkout. Root cause: the worktree's uv venv resolved the editable `intenttree` install against uv's cache, which pointed at the main checkout's build artifacts (stale by location). Fix: `uv sync --reinstall-package intenttree`. Lesson: editable installs plus git worktrees plus a shared package cache is a known trap; any worktree-based delegation environment needs a pre-flight that re-pins editable installs.
+
+**5.3 uv optional-extras and the silent pytest PATH fallback.** Symptom: `uv run pytest` produced phantom import errors. Root cause: the project declares dev tools under `[project.optional-dependencies] dev`, so a plain `uv sync` does not install pytest; `uv run pytest` then silently fell back to a global pyenv 3.12 pytest on PATH that imported main-checkout code. Fix: `uv sync --extra dev`. Lesson: the dangerous part was the silent fallback; pre-flight should assert the resolved tool path (`which pytest`, version, venv) before trusting any gate output. This and 5.2 together explain the 80-to-90-turn burn on environment.
+
+**5.4 The dropped `@testing-library/dom` peer.** Symptom: frontend foundation reported "no exported member screen / waitFor" across pre-existing, previously-passing tests. Root cause: `npm install` dropped `@testing-library/dom`; React Testing Library v16 requires it as an explicit peer rather than bundling it, so the install "succeeded" while quietly removing the transitive provider. Fix: `npm install -D @testing-library/dom`. Lesson: peer-dependency policy changes between major versions are invisible until they are not; diff the resolved tree or pin known peers up front.
+
+**5.5 The SQLite FK-column downgrade vs the `metadata.create_all` 0001 convention.** Symptom: a migration test failed because SQLite could not `DROP COLUMN` for a column participating in a foreign key. Root cause: the repo convention is that `0001_initial` does `Base.metadata.create_all` from the current models, so fresh databases bake today's v2 FKs directly into the initial schema while the named migrations 0006/0007 are what an existing DB would run; SQLite cannot drop an FK-bearing column with a plain ALTER, so the downgrade needed `op.batch_alter_table`. Fix: edited migrations 0006/0007 directly (about 20 lines), judged faster to do by hand than to round-trip. Lesson: a create_all-from-current-models convention means fresh-DB schema and migration-path schema can disagree about column provenance; test the round-trip on the actual target engine (SQLite), not just upgrade-forward.
+
+**5.6 Exhaustive TS maps rippling from additive enums.** Symptom: after foundation added enum members, three TS integration gaps appeared (`nodeMeta`, the `RunStateView` union, a `MapNode` cast). Root cause: "additive" enum members are only additive at the data layer; on the frontend, exhaustive maps keyed by the enum are now incomplete and the compiler is right to complain. Fix: an ICA fixer added the 7 `NODE_TYPE_META` entries, extended the `RunStateView` union with `prepared`/`reviewing`/`stale`, added `STATE_LABEL`/`STATE_ICON` entries, and fixed the cast. Lesson: enum additions are not free on the consumer side wherever exhaustive mapping is used; enumerate the exhaustive maps that key off them and schedule the consumer updates as part of the same change.
+
+**5.7 The same-filename CSS add/add collision at merge.** Symptom: merging `command-center` into `command-center-v2` produced 9 conflicts, 8 trivial keep-both and one real add/add where both the launcher and v2 had independently created `web/src/styles/command-center.css`. Root cause: two slices on two branches picked the same obvious filename. Fix: verified zero class-name overlap (launcher 86 classes vs v2 50, disjoint), renamed the launcher file to `command-center-launcher.css`, fixed the import; the keep-both conflicts were resolved mechanically with a Python conflict-marker stripper. Lesson: across branches, filename choice is itself a contract; reserve namespaced filenames per slice up front.
+
+**5.8 The vitest runner-exit hang.** Symptom: several vitest invocations hung overnight under background-bash auto-backgrounding of long gates; separately a count quirk (29/30 files, 424/457 tests reported). Root cause: suspected leaked handle under concurrent runs and/or a reporter quirk; not definitively root-caused this session (the review later pinned it, below). Fix/disposition: accepted an earlier exit-0 gate run as authoritative, logged the count quirk for the review pass, kept moving. Lesson: under concurrency, gate runners can leak handles even when results are green; decide in advance what a "good enough" green looks like and log anomalies for a dedicated review pass.
+
+**5.9 Turn-cap data, and the `--no-session-persistence` mistake.** 80-to-90 caps were too low (3 of 5 early delegates capped: `p0-frontend` at 90, `v2-be-foundation` at 80, `v2-fe-foundation` at 90, even though the work was essentially complete). 100 to 120 was right (1 of 10 capped: `v2-fe-5` at 100). `--no-session-persistence` on the early delegates meant a capped delegate could not resume; dropped for waves 2/3. Flag notes: `--bare` is essential (avoids prompt-too-long, speeds startup); zsh needs `'[1m]'` quoted; `< /dev/null` silences the stdin warning. Lesson: size caps for build plus environment-recovery plus gate iteration, and never trade away resumability.
+
+### Coordination patterns that made 9-way parallelism conflict-free
+
+Nine delegates wrote into one worktree across the two waves with zero cross-delegate file conflicts.
+
+1. **Frozen-file contracts.** A short explicit list no delegate may edit: `models/entities.py`, `models/enums.py`, `core/ids.py`, the migration files, and `api/__init__.py`. Established by the foundation wave and frozen before any parallel wave.
+2. **Pre-registered stubs.** The foundation wave pre-registered every router in `_ROUTER_MODULES` and shipped stub routers; parallel delegates filled stubs, never added routes to a shared registry.
+3. **Placeholder components.** The FE foundation pre-created a placeholder component for every region; parallel FE delegates replaced placeholder bodies at identical export paths, so imports never broke mid-wave.
+4. **Exclusive ownership lists.** Each work order got a disjoint set of files it alone owned; the backend wave was partitioned by resource (workspaces/projects, items/links, captures/tray, packets/runs).
+5. **Per-feature CSS.** Each FE delegate wrote its own prefixed stylesheet (`cc-carousel`, `cc-tray`, `cc-ws`, `cc-cd`), appended to `index.css`; no two delegates ever appended to the same block.
+6. **Lazy cross-service imports.** Where one service genuinely needed another, the import was done lazily inside the method.
+7. **String-convention SSE channels.** Generalizing the event-bus key to `ws:{workspace_id}` meant no shared registry to edit; every publisher just formats the string.
+8. **A pre-created `workspace_stream` stub** so the SSE endpoint existed before any delegate needed to publish to it.
+9. **Central commit discipline.** Delegates never commit; the orchestrator runs the gates, verifies green, and commits at wave boundaries.
+10. **Verify-before-patching delegate claims.** One FE delegate reported a cache-key gap that was already fixed; treating delegate-reported defects as hypotheses to verify avoided a needless (potentially conflicting) patch.
+
+The transient cost of concurrency was real but small: simultaneous `vitest`/`tsc` runs produced transient artifacts (a sibling's file momentarily un-compiling). The fix was a prompt rule: if a gate fails on a file you do not own, wait and retry once.
+
+### Delegation economics
+
+ICA delegates are cost-shifted (free); the only primary-budget spend was the orchestrator. The expensive, non-fungible resource was orchestrator judgment.
+
+| Model | Role | Why |
+|---|---|---|
+| `claude-sonnet-4-6[1m]` | Workhorse: every build, fix, seed, extraction | Best capability/throughput for contract-bound implementation |
+| `opus-4-8[1m]` | The 622-line design plan; review (in flight) | Design and review are the high-leverage judgment tasks worth the upgrade |
+| `haiku` | Unused | Even "data extraction" needed schema fidelity: apps.yaml required 17-field-correct records with resolving deps |
+
+Native vs ICA: the native Agent tool was used once, for Explore recon (123k tokens, 54 tool uses, 229s, a superb structured map that surfaced APWR and `/distill`). Native is higher-quality and integrates into orchestrator context but spends primary budget; ICA is free but adds transport risk (two timeouts) and quoting/flag ceremony. The right split was native for the one irreplaceable judgment-input task, ICA for the wide implementation surface.
+
+What XHigh effort changed, at the judgment calls (not the typing): the APWR pivot (reuse 8 tables and branch off `3375ff5` rather than fork parallel models); branch strategy (Phase-0 on its own branch for proof, v2 off APWR's frozen commit for a linear merge back); and surgical-fix-vs-delegate thresholds (fix directly when small/local/understood; delegate when broad/repetitive/exploratory).
+
+### Recommendations for future one-shots
+
+1. Ship a worktree-delegation pre-flight checklist: `uv sync --reinstall-package <editable-pkg>`, `uv sync --extra dev`, assert resolved tool paths, and for FE diff the resolved node tree / pin known peers.
+2. Size turn caps for environment plus gate iteration: 100 to 120 (80 to 90 was demonstrably too low).
+3. Never disable session persistence when caps can realistically be hit.
+4. Make "write incrementally" a standing prompt rule.
+5. Ground FE briefs in the actual images: point each FE delegate at the specific mockup PNG(s) and have it read them.
+6. Enforce gate-running discipline under concurrency (wait-and-retry-once on foreign-file failures; define "green enough" in advance; log anomalies for a review pass).
+7. Codify the conflict-free contract stack as a reusable template.
+8. Orchestrator fixes directly when small/local/understood; delegates otherwise.
+9. Reserve namespaced filenames per slice at planning time.
+10. Spend the one expensive recon call up front: reading the live tree before writing is the highest-ROI minute in a one-shot.
+
+### Appendix A: delegate-run table
+
+Channel: ICA equals `~/ica-claude.sh` bash delegate (free/cost-shifted), all `claude-sonnet-4-6[1m]` unless noted; Native equals Agent tool (primary budget).
+
+| Run | Model / channel | Scope | Turns vs cap | Outcome | Notable |
+|---|---|---|---|---|---|
+| Explore recon | sonnet / native | Map live tree | n/a (123k tok, 54 tools, 229s) | OK, superb map | Found APWR + `/distill` |
+| extract-seed | sonnet[1m] / ICA | Full seed extraction | n/a | FAIL, gateway timeout | Single big write, wrote nothing |
+| extract-seed-retry | sonnet[1m] / ICA | Seed (write-as-ready) | n/a | PARTIAL, timeout | Salvaged layers(10)/decisions(20)/5 diagrams |
+| extract-apps | sonnet[1m] / ICA | apps.yaml only, chunked | n/a | OK | 34 apps, 1,532 lines, deps resolve |
+| v2-design | opus[1m] / ICA | v2 implementation plan | under 700-line cap | OK | 622-line decisive plan |
+| p0-backend | sonnet[1m] / ICA | Launcher API | green first pass | OK | 42 tests, 548 passed |
+| p0-frontend | sonnet[1m] / ICA | Launcher screens | capped @ 90 | PARTIAL | 1 TS err + 5 test fails left |
+| p0-fe-fix | sonnet[1m] / ICA | Fix p0-frontend | n/a | OK | Found real `showPersonal` double-filter bug |
+| v2-be-foundation | sonnet[1m] / ICA | Models/migrations/enums | capped @ 80 | code complete | Caps burned on env (5.2/5.3/5.5) |
+| v2-fe-foundation | sonnet[1m] / ICA | Routes/stores/CSS | capped @ 90 | code complete | Caps burned on env (5.4) |
+| v2-fe-fix | sonnet[1m] / ICA | TS enum-ripple gaps | n/a | OK | nodeMeta/RunStateView/MapNode (174 passed) |
+| v2-be-a | sonnet[1m] / ICA | WO-3/4 workspaces+projects | n/a | OK | WorkspaceCardRead computed counts; 779 passed |
+| v2-be-b | sonnet[1m] / ICA | WO-5/6 items+links | n/a | OK | 2-line `lifecycle_pinned` surgical patch |
+| v2-be-c | sonnet[1m] / ICA | WO-7/8 captures+tray | n/a | OK | Distill wiring; fixed BE-A's lint; 728 passed |
+| v2-be-d | sonnet[1m] / ICA | WO-9 packets+runs+SSE | n/a | OK | External-run extension + `ws:{id}` stream |
+| v2-fe-1 | sonnet[1m] / ICA | WO-12 carousel | n/a | OK | 422 passed (2 fails were sibling-WO files) |
+| v2-fe-2 | sonnet[1m] / ICA | WO-13 command-center layout | n/a | OK | 250 new tests; the centerpiece; exit 0 |
+| v2-fe-3 | sonnet[1m] / ICA | WO-14 dnd + tray | n/a | OK | 90 tests; flagged missing undo endpoint |
+| v2-fe-4 | sonnet[1m] / ICA | WO-15/16 capture+drawer+packets+runs | n/a | OK | No frozen-contract gaps; consumed all hooks |
+| v2-fe-5 | sonnet[1m] / ICA | WO-17 react-flow map | capped @ 100 | PARTIAL | 2 trivial TS6133 left (fixed by orchestrator) |
+| v2-seed | sonnet[1m] / ICA | WO-10 4-workspace seed | n/a | OK | 4 ws / 22 trees / 76 nodes / 16 edges; 800 passed |
+
+Turn-cap tally: early implementation delegates 3/5 capped; waves 2/3 1/10 capped. Transport: 2 gateway timeouts, 0 other transport failures.
+
+### Appendix B: commit table
+
+| SHA | Branch | Message (abridged) | Files / insertions |
+|---|---|---|---|
+| `c85e7bd` | feature/command-center | Phase-0 AOS launcher: YAML API + screens | 44 / +6,239 |
+| `b83c2de` | feature/command-center | Full 34-app catalog data | +1,485 |
+| `784c8b5` | feature/command-center-v2 | BE foundation | 15 / +1,365 |
+| `6b554f4` | feature/command-center-v2 | FE foundation | 65 / +4,155 |
+| `22b1aa6` | feature/command-center-v2 | BE services WO-3..9 | 43 / +7,328 |
+| `20bab93` | feature/command-center-v2 | FE features + v2 seed (WO-10,12-17) | 63 / +16,955 |
+| `dfa3d92` | feature/command-center-v2 | merge: Phase-0 launcher into v2 (keep-both + CSS rename) | merge |
+
+Totals: about 230 files, about 31k insertions. Tests: backend 508 to 800; frontend 140 to 424-plus; plus Phase-0's 42 backend tests. Remediation later added commit `07075d1` (backend 850; frontend 482/482).
+
+### Appendix C: glossary
+
+- **ICA** is the gateway (`~/ica-claude.sh`) used to launch bash delegates whose cost is shifted/free, as distinct from the native Agent tool that spends the primary token budget. The session's primary delegation channel.
+- **APWR** is the Agentic Work-Product Registry, a separate in-flight IntentTree feature (worktree `awpr-exec`): 8 registry tables and migration 0005. v2 branched off APWR's frozen commit `3375ff5` and reuses its models rather than forking.
+- **WO-N** is Work Order N, a parallel-sized unit of work from the implementation plan (WO-1..WO-18), each with a file list, contract refs, test expectations, and a do-not-touch list. The unit of delegation in the parallel waves.
+- **Phase-0 vs v2:** Phase-0 is the self-contained "AOS Launcher" slice (route `/command-center`, YAML-backed read-only API plus screens) on branch `feature/command-center`, built first as proof plus immediate value. v2 is the full Workspace Command Center on branch `feature/command-center-v2`, built in parallel waves after foundation. Per D1 the launcher also appears inside v2 as the "Agentic OS" workspace.
+
+### Review outcome and remediation
+
+The independent opus review (read-only, 10 dimensions) returned NO-GO on four findings and solved the vitest mystery:
+
+- **C-1 (critical):** `MapCanvas.test.tsx`, exactly 33 tests (precisely the 457 minus 424 gap), was hanging, not skipping. The `@xyflow/react` mock implemented `useNodesState` with real `React.useState` while MapCanvas passes a new array every render, so an infinite re-render loop pinned vitest workers at 80% CPU. The exit-0 with 33 missing tests was the environment quarantining a never-completing file.
+- **M-1:** workspace SSE published `run.status_changed` on every step of internal runs, creating an invalidation/refetch storm.
+- **M-2:** `execution_packet.launch` bypassed the publish path, so launched external runs did not appear live on the Active Workflows rail until first ingest.
+- **M-3:** cross-project item moves skipped progress rollups, leaving cached progress stale on both trees.
+
+Everything else passed review cleanly (layering, migrations 0006 to 0008, the lifecycle shim, the external-run state machine, security posture, seed, frontend state discipline). One remediation delegate (sonnet[1m], 110-turn cap, fed the review verbatim) fixed all four blockers plus three cheap minors; the orchestrator verified independently: backend 850 passed; frontend 482/482 in 4.8s with the suite exiting cleanly. Commit `07075d1`. Net verdict: GO for merge to main once APWR lands. Tracked follow-ups remain (tray dangling-ref tombstoning, work-product projection placeholder ids, private cross-service helper promotion, tray undo endpoint, distillation tuning).
+
+Two closing lessons: an adversarial read-only review pass after "all green" is worth one more delegate (three of its four blockers were behavioral defects invisible to per-WO gates); and a hanging test is worse than a failing one (it burned a night, masqueraded as an exit-0 pass, and took process-level forensics to pin).
+
+### Owner field report
+
+When the owner first launched the app and compared it to the brief, two issues the green gates could never have caught surfaced. Both are now baked into the `ica-delegate` skill's build-and-gate pre-flight.
+
+- **F-1: the build ignored the sketches.** The 8 sketch PNGs were synthesized into a prose brief (`design-language.md`, whose hard rule was "no new design system, reuse IntentTree's existing tokens"), and the FE delegates were briefed from that prose, never pointed at the actual images. So the build implemented the layouts and inherited IntentTree's existing unpolished styling. The richer `intenttree-design-system` skill was committed only after the build finished and was out of scope anyway. Lesson: pre-flight the FE briefs against the real images.
+- **F-2: every pre-existing page 404'd.** Not Command Center damage (both checkouts compile and pass tests). The frontend hardcodes `ACTIVE_TREE_SLUG = "atlas"`, but the Atlas demo seed had been made opt-in and the v2 worktree shipped no `backend/.env`, so the backend booted with seeding off against a clean DB. Fix is operational (load the Atlas seed; no code change). Lesson: worktree `.env` parity and data/seed assumptions; smoke the live app, not just the suite.
+
+Cost note worth internalizing: "run by Fable 5 and expensive" is a half-truth. Fable 5 was only the orchestrator (judgment/integration); all implementation was written by the roughly nineteen cost-shifted (free) ICA sonnet-4-6 delegates. The primary-budget spend was the long XHigh Opus-class orchestration (about 14h wall, growing context over 230 files), one 123k-token native Explore recon, and two `opus[1m]` calls (design plan plus review), plus real waste recovering from environment fights, capped-delegate rework, and the overnight vitest hang. The expensive resource was orchestrator judgment over a long session, not code generation.
+
+</details>

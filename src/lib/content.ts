@@ -7,6 +7,25 @@ import { getCollection, type CollectionEntry } from "astro:content";
 export type Post = CollectionEntry<"posts">;
 export type Project = CollectionEntry<"projects">;
 export type Series = CollectionEntry<"series">;
+export type Story = CollectionEntry<"stories">;
+
+/** A post or a dev story — used by cross-collection facet + related helpers. */
+export type Article = Post | Story;
+
+// ---------------------------------------------------------------------------
+// Collection-aware URLs
+// ---------------------------------------------------------------------------
+
+/**
+ * Canonical URL for a post or story entry. Posts render under /essays/, dev
+ * stories under /dev-stories/. Use this instead of hardcoding a base path so
+ * cross-collection relations (related content, shared series) resolve correctly.
+ */
+export function hrefFor(entry: Article): string {
+  return entry.collection === "stories"
+    ? `/dev-stories/${entry.id}/`
+    : `/essays/${entry.id}/`;
+}
 
 // ---------------------------------------------------------------------------
 // Posts
@@ -129,4 +148,145 @@ export async function getAllTags(): Promise<TagCount[]> {
   return Array.from(counts.entries())
     .map(([tag, count]) => ({ tag, count }))
     .sort((a, b) => b.count - a.count);
+}
+
+// ---------------------------------------------------------------------------
+// Stories (Dev Stories)
+// ---------------------------------------------------------------------------
+
+/** All stories not in draft status, sorted newest first. */
+export async function getPublishedStories(): Promise<Story[]> {
+  const stories = await getCollection("stories", ({ data }) => data.status !== "draft");
+  return stories.sort(
+    (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime(),
+  );
+}
+
+/** Published stories belonging to a series slug, sorted by seriesOrder ascending. */
+export async function getStoriesBySeries(seriesSlug: string): Promise<Story[]> {
+  const published = await getPublishedStories();
+  return published
+    .filter((s) => s.data.series === seriesSlug)
+    .sort(
+      (a, b) => (a.data.seriesOrder ?? Infinity) - (b.data.seriesOrder ?? Infinity),
+    );
+}
+
+// ---------------------------------------------------------------------------
+// Cross-collection facets: projects / systems + AOS areas
+// ---------------------------------------------------------------------------
+
+export interface FacetCount {
+  slug: string;
+  count: number;
+}
+
+/** Published posts + stories that reference a given project slug. */
+export async function getContentByProject(
+  projectSlug: string,
+): Promise<{ posts: Post[]; stories: Story[] }> {
+  const [posts, stories] = await Promise.all([
+    getPublishedPosts(),
+    getPublishedStories(),
+  ]);
+  return {
+    posts: posts.filter((p) => (p.data.projects ?? []).includes(projectSlug)),
+    stories: stories.filter((s) => (s.data.projects ?? []).includes(projectSlug)),
+  };
+}
+
+/** All project slugs referenced across published posts + stories, with counts. */
+export async function getAllProjects(): Promise<FacetCount[]> {
+  const [posts, stories] = await Promise.all([
+    getPublishedPosts(),
+    getPublishedStories(),
+  ]);
+  const counts = new Map<string, number>();
+  const all: Article[] = [...posts, ...stories];
+  for (const entry of all) {
+    for (const slug of entry.data.projects ?? []) {
+      counts.set(slug, (counts.get(slug) ?? 0) + 1);
+    }
+  }
+  return Array.from(counts.entries())
+    .map(([slug, count]) => ({ slug, count }))
+    .sort((a, b) => b.count - a.count);
+}
+
+/** Published posts + stories that are part of the AOS (optionally a specific area). */
+export async function getContentByAosArea(
+  area?: string,
+): Promise<{ posts: Post[]; stories: Story[] }> {
+  const [posts, stories] = await Promise.all([
+    getPublishedPosts(),
+    getPublishedStories(),
+  ]);
+  const match = (data: { aos?: boolean; aosAreas?: string[] }) =>
+    data.aos === true && (area ? (data.aosAreas ?? []).includes(area) : true);
+  return {
+    posts: posts.filter((p) => match(p.data)),
+    stories: stories.filter((s) => match(s.data)),
+  };
+}
+
+/** All AOS area slugs referenced across published aos content, with counts. */
+export async function getAllAosAreas(): Promise<FacetCount[]> {
+  const [posts, stories] = await Promise.all([
+    getPublishedPosts(),
+    getPublishedStories(),
+  ]);
+  const counts = new Map<string, number>();
+  const all: Article[] = [...posts, ...stories];
+  for (const entry of all) {
+    if (entry.data.aos !== true) continue;
+    for (const slug of entry.data.aosAreas ?? []) {
+      counts.set(slug, (counts.get(slug) ?? 0) + 1);
+    }
+  }
+  return Array.from(counts.entries())
+    .map(([slug, count]) => ({ slug, count }))
+    .sort((a, b) => b.count - a.count);
+}
+
+// ---------------------------------------------------------------------------
+// Cross-collection related content
+// ---------------------------------------------------------------------------
+
+function scoreArticle(source: Article, candidate: Article): number {
+  if (candidate.collection === source.collection && candidate.id === source.id)
+    return -1;
+
+  let score = 0;
+  if (source.data.relatedSlugs?.includes(candidate.id)) score += 10;
+  if (source.data.series && source.data.series === candidate.data.series) score += 5;
+
+  const sourceProjects = new Set(source.data.projects ?? []);
+  score +=
+    (candidate.data.projects ?? []).filter((p) => sourceProjects.has(p)).length * 2;
+
+  const sourceTags = new Set(source.data.tags ?? []);
+  score += (candidate.data.tags ?? []).filter((t) => sourceTags.has(t)).length;
+
+  return score;
+}
+
+/**
+ * Related content across BOTH posts and stories, scored by explicit relatedSlugs,
+ * shared series, shared projects, and shared tags. Link results with hrefFor().
+ */
+export async function getRelatedArticles(
+  source: Article,
+  limit = 3,
+): Promise<Article[]> {
+  const [posts, stories] = await Promise.all([
+    getPublishedPosts(),
+    getPublishedStories(),
+  ]);
+  const pool: Article[] = [...posts, ...stories];
+  return pool
+    .map((candidate) => ({ candidate, score: scoreArticle(source, candidate) }))
+    .filter(({ score }) => score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit)
+    .map(({ candidate }) => candidate);
 }

@@ -1,29 +1,32 @@
 ---
 import { getCollection } from 'astro:content';
 import SeriesLayout from '../../layouts/SeriesLayout.astro';
+import { getPostsBySeries, getStoriesBySeries, hrefFor } from '../../lib/content';
 
 export async function getStaticPaths() {
   const allSeries = await getCollection('series');
-  const allPosts = await getCollection('posts');
 
-  return allSeries.map((seriesEntry) => {
-    // Find all published posts belonging to this series
-    const seriesPosts = allPosts
-      .filter(
-        (post) =>
-          post.data.status !== 'draft' &&
-          post.data.series === seriesEntry.id,
-      )
-      .sort((a, b) => (a.data.seriesOrder ?? 999) - (b.data.seriesOrder ?? 999));
+  return Promise.all(
+    allSeries.map(async (seriesEntry) => {
+      // Find all published posts + stories belonging to this series
+      const [seriesPosts, seriesStories] = await Promise.all([
+        getPostsBySeries(seriesEntry.id),
+        getStoriesBySeries(seriesEntry.id),
+      ]);
 
-    return {
-      params: { slug: seriesEntry.id },
-      props: { seriesEntry, seriesPosts },
-    };
-  });
+      const seriesEntries = [...seriesPosts, ...seriesStories].sort(
+        (a, b) => (a.data.seriesOrder ?? 999) - (b.data.seriesOrder ?? 999),
+      );
+
+      return {
+        params: { slug: seriesEntry.id },
+        props: { seriesEntry, seriesEntries },
+      };
+    }),
+  );
 }
 
-const { seriesEntry, seriesPosts } = Astro.props;
+const { seriesEntry, seriesEntries } = Astro.props;
 ---
 
 <SeriesLayout
@@ -33,12 +36,13 @@ const { seriesEntry, seriesPosts } = Astro.props;
     status: seriesEntry.data.status,
     ogImage: seriesEntry.data.heroImage,
   }}
-  posts={seriesPosts.map((p) => ({
-    slug: p.id,
-    title: p.data.title,
-    excerpt: p.data.excerpt,
-    date: p.data.date,
-    readTime: p.data.readTime ? parseInt(p.data.readTime) : undefined,
-    part: p.data.seriesOrder,
+  posts={seriesEntries.map((entry) => ({
+    slug: entry.id,
+    title: entry.data.title,
+    excerpt: entry.data.excerpt,
+    date: entry.data.date,
+    readTime: entry.data.readTime ? parseInt(entry.data.readTime) : undefined,
+    part: entry.data.seriesOrder,
+    href: hrefFor(entry),
   }))}
 />
