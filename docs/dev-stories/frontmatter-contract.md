@@ -96,10 +96,15 @@ Full detail lives in the skill's `references/frontmatter-contract.md`. Summary:
 
 ## 5. Follow-ups for the op side
 
-These are **not implemented by this task**; this repo (`signal_to_system`) has no write access to
-`agentic_meta_dev`. They are the concrete changes needed in `agentic_meta_dev` before Entry Mode A
-(the `$OP_STORY_BLOG_CHAIN_CMD` pipeline seam) produces conformant output end to end. File these as
-follow-up work in `agentic_meta_dev`, not here.
+> **Status (2026-07-30): implemented in `agentic_meta_dev`.** All three follow-ups below landed in
+> `src/operator_core/adapters/story.py` (+ `tests/adapters/test_story*.py`) and are documented in
+> `docs/agentic-operator/contracts/story.md` §7/§7.1. The subsections are retained as the spec they
+> were built against; the op-side `story.md` contract now describes the resulting behavior. One
+> deferred item is called out inline in §5.1.
+
+These were **not implemented on the `signal_to_system` side**; this repo has no write access to
+`agentic_meta_dev`. They were the concrete changes needed in `agentic_meta_dev` before Entry Mode A
+(the `$OP_STORY_BLOG_CHAIN_CMD` pipeline seam) produces conformant output end to end.
 
 ### 5.1 Point the adapter at `src/content/stories/` with the new schema
 
@@ -130,6 +135,16 @@ directory in three places:
   hand-authored essays is still wanted; the `stories` schema's `relatedSlugs`/`series` fields are
   shared vocabulary with `posts`, so cross-collection awareness has real value. That's a design
   choice for the op-side owner, not dictated here).
+
+  **Resolved (op side):** `_next_series_order` now scans `src/content/stories/` and takes the
+  series as an argument (series is trusted from chain output, no longer force-set to
+  "I Let Claude Build My App"). `_published_match`/`_published_posts` scan **both** `posts/` and
+  `stories/` but only `published`/`evergreen` content — filtering out drafts is deliberate, because
+  dev stories all share the same fallback tags and an unfiltered scan would false-positive-archive
+  a fresh candidate against a sibling draft. **Deferred:** `_catalog_signal_posts` (the MeatyWiki
+  catalog-export projection) still scans only `posts/` with `/essays/` URLs; extending it to the
+  `stories` collection / `/dev-stories/` URLs is out of scope here (separate catalog contract) and
+  remains a follow-up.
 
 ### 5.2 Wire `OP_STORY_BLOG_CHAIN_CMD`
 
