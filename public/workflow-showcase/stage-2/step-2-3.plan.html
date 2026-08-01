@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Implementation plan (excerpt)</title>
+<style>
+  :root { color-scheme: dark; }
+  body { background: #0b0d10; color: #e6edf3; font: 14px/1.55 ui-sans-serif, system-ui, -apple-system, sans-serif; padding: 28px; margin: 0; max-width: 880px; }
+  header { border-bottom: 1px solid #1f2933; padding-bottom: 10px; margin-bottom: 18px; }
+  .meta { color: #7c93a8; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; }
+  h1 { font-size: 20px; margin: 6px 0 0; }
+  pre { background: #11161b; border: 1px solid #1f2933; border-radius: 8px; padding: 16px 18px; overflow-x: auto; font: 13px/1.5 'JetBrains Mono', ui-monospace, Menlo, monospace; color: #d9e2ec; }
+  .lang-yaml, .lang-json { color: #cdb3ff; }
+  .lang-md { color: #e6edf3; }
+</style>
+</head>
+<body>
+<header>
+  <div class="meta">plan · Phased plan, agent routing</div>
+  <h1>Implementation plan (excerpt)</h1>
+</header>
+<pre class="lang-md">## Phase table
+
+| Phase | Task    | Description                          | Est | Assigned        | Deps    |
+|-------|---------|--------------------------------------|-----|-----------------|---------|
+| 1     | T-1.1   | Inventory 3 screens; capture copy    | 0.5d| ui-engineer     | -       |
+| 1     | T-1.2   | Mobile webview regression baseline   | 0.5d| qa-engineer     | -       |
+| 2     | T-2.1   | Implement screen 1 visual refresh    | 0.5d| ui-engineer     | T-1.1   |
+| 2     | T-2.2   | Implement screen 2 visual refresh    | 0.5d| ui-engineer     | T-1.1   |
+| 2     | T-2.3   | Implement screen 3 visual refresh    | 0.5d| ui-engineer     | T-1.1   |
+| 3     | T-3.1   | Copy revision pass                   | 0.5d| copy-editor     | T-2.*   |
+| 3     | T-3.2   | Mobile webview verification          | 0.5d| qa-engineer     | T-2.*   |
+| 4     | T-4.1   | Reviewer pass vs PRD acceptance      | 0.5d| reviewer        | T-3.*   |
+
+### Decisions Block (excerpt)
+
+- Auth0 stays. AC-2 is non-negotiable; any task that touches
+  the IdP fails contract review.
+- Legacy mobile webview is in scope as a regression target
+  (AC-1), not a deprecation candidate.
+- Phase 2 tasks parallelize (no shared files); batch them.
+</pre>
+</body>
+</html>

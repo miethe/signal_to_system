@@ -1,0 +1,590 @@
+{
+  "stages": [
+    {
+      "ctaLinks": [
+        {
+          "copyText": "Replace ad-hoc prompts with a defensible SPIKE.",
+          "skillName": "spike",
+          "skillUrl": "https://github.com/miethe/MeatySkills/tree/main/skills/spike",
+          "subtitle": "Turn a vague feature ask into a PRD with acceptance criteria, risks, and rejection rationale before any agent runs."
+        }
+      ],
+      "description": "What an ungoverned agentic workflow actually looks like: a vague Slack prompt, a confident but wrong agent run, no traceable artifacts, and no memory carried forward. The cost is hidden in re-work, not visible in the token bill.",
+      "id": "stage-1",
+      "metrics": {
+        "cost": 2.44,
+        "dataSource": "curated (illustration)",
+        "throughput": 8400,
+        "tokensUsed": 487300,
+        "wallClockTime": "14m 02s"
+      },
+      "postNumber": 1,
+      "postSlug": "post-1-the-cost-of-ungoverned-agents",
+      "publishedDate": "2026-05-15",
+      "socialClip": "/workflow-showcase/stage-1/social-clip.mp4",
+      "status": "published",
+      "steps": [
+        {
+          "artifactSnapshots": {
+            "prd": "/workflow-showcase/stage-1/step-1-1.prd.html"
+          },
+          "description": "A one-line Slack message kicks off the work. No spec attached.",
+          "label": "Vague ask lands",
+          "panels": {
+            "prd": {
+              "content": "<!-- No PRD exists. The agent will infer requirements from\n     the Slack thread and recent chat context. -->\n\nInferred from Slack:\n\n> \"ship the new onboarding flow this week\"\n\nOpen questions (never written down):\n  - Which onboarding flow? (B2B? Consumer?)\n  - What does \"ship\" mean? (Beta? GA?)\n  - Who is the owner if it breaks in prod?\n",
+              "contentType": "markdown",
+              "title": "PRD (none)"
+            }
+          },
+          "stepId": "step-1-1",
+          "terminal": [
+            "$ slack #builds \"hey can we ship the new onboarding flow this week\"",
+            "Posted by pm at 09:07",
+            "> No PRD, no acceptance criteria, no owner."
+          ],
+          "terminalRecording": "/workflow-showcase/stage-1/step-1-1.terminal.html"
+        },
+        {
+          "artifactSnapshots": {
+            "agents": "/workflow-showcase/stage-1/step-1-2.agents.html"
+          },
+          "description": "Engineer pastes the Slack thread into an agent. No system prompt, no role, no plan.",
+          "label": "Agent spun up",
+          "panels": {
+            "agents": {
+              "content": "generic-agent (unscoped)\n  Inferred to be: PM + architect + frontend + reviewer.\n  No separation of concerns. No reviewer agent.\n  Failure mode: one model carries all responsibility;\n  no second opinion before output ships.\n",
+              "contentType": "text",
+              "title": "Agent roles (implicit)"
+            }
+          },
+          "stepId": "step-1-2",
+          "terminal": [
+            "$ claude --model sonnet --prompt-file slack-thread.txt",
+            "Reading prompt (412 chars)...",
+            "No system prompt. No role. No tools enumerated.",
+            "Starting run..."
+          ],
+          "terminalRecording": "/workflow-showcase/stage-1/step-1-2.terminal.html"
+        },
+        {
+          "artifactSnapshots": {
+            "plan": "/workflow-showcase/stage-1/step-1-3.plan.html"
+          },
+          "description": "Agent emits a 'plan' that contradicts unstated constraints. No one notices.",
+          "label": "Confident wrong plan",
+          "panels": {
+            "plan": {
+              "content": "## Onboarding flow rewrite — plan (draft, agent)\n\n| Phase | Task                              | Est  |\n|-------|-----------------------------------|------|\n| 1     | Replace Auth0 with Clerk          | 2 d  |\n| 2     | Drop legacy mobile webview support | 1 d  |\n| 3     | Ship behind feature flag           | 0.5 d|\n\n**Assumptions made silently:**\n- \"New flow\" means new auth provider. (Wrong; PM meant copy + visual refresh.)\n- Legacy mobile is deprecated. (Wrong; 31% of users.)\n- There is a feature flag service. (No.)\n",
+              "contentType": "markdown",
+              "title": "Agent-generated plan (contradicts unstated constraints)"
+            }
+          },
+          "stepId": "step-1-3",
+          "terminal": [
+            "$ agent run complete",
+            "Tokens: 184220 in / 27110 out  | Time: 4m 38s",
+            "Confidence: high",
+            "Output: 'plan.md' (untracked, in $TMPDIR)"
+          ],
+          "terminalRecording": "/workflow-showcase/stage-1/step-1-3.terminal.html"
+        },
+        {
+          "artifactSnapshots": {
+            "progress": "/workflow-showcase/stage-1/step-1-4.progress.html"
+          },
+          "description": "Engineer accepts the plan and starts work. No PRD comparison, no PM sign-off.",
+          "label": "No verification",
+          "panels": {
+            "progress": {
+              "content": "# No progress file exists. Status is in the engineer's head\n# and the agent has no persistent memory.\nstatus: unknown\nblockers: []\nassumptions_validated: []\nowner: implicit\nnotes: |\n  We have no record of which tasks were done, which were\n  abandoned, or which were silently re-scoped mid-flight.\n",
+              "contentType": "yaml",
+              "title": "Progress tracking (none)"
+            }
+          },
+          "stepId": "step-1-4",
+          "terminal": [
+            "$ git checkout -b onboarding-rewrite",
+            "$ npm i @clerk/clerk-react",
+            "added 47 packages in 6s",
+            "> 'looks fine, I'll figure out the mobile thing later'"
+          ],
+          "terminalRecording": "/workflow-showcase/stage-1/step-1-4.terminal.html"
+        },
+        {
+          "artifactSnapshots": {
+            "progress": "/workflow-showcase/stage-1/step-1-5.progress.html"
+          },
+          "description": "Staging breaks on mobile. The agent's assumptions weren't validated against reality.",
+          "label": "Reality bites",
+          "panels": {
+            "progress": {
+              "content": "status: in-progress (regressed)\ncompleted_tasks: 2\nregressed_tasks: 1\nblockers:\n  - legacy mobile webview support was not deprecated\n  - feature flag service does not exist\n  - PM intent was 'visual refresh', not 'auth rewrite'\nrework_estimate_days: 2\nrework_token_estimate: 220000\n",
+              "contentType": "yaml",
+              "title": "Progress (reconstructed post-hoc)"
+            }
+          },
+          "stepId": "step-1-5",
+          "terminal": [
+            "$ slack #incidents \"onboarding 500s on mobile webview\"",
+            "alert: error_rate=8.2%  baseline=0.4%",
+            "$ git log --oneline | head -3",
+            "  4a1c92e  switch to clerk",
+            "  812df3a  drop legacy webview shim  <-- the regression"
+          ],
+          "terminalRecording": "/workflow-showcase/stage-1/step-1-5.terminal.html"
+        },
+        {
+          "artifactSnapshots": {
+            "agents": "/workflow-showcase/stage-1/step-1-6.agents.html"
+          },
+          "description": "Agent has no session memory. Engineer re-pastes context. Token bill compounds.",
+          "label": "Re-prompt from scratch",
+          "panels": {
+            "agents": {
+              "content": "generic-agent (unscoped, again)\n  Still no role separation. The same model that proposed\n  the wrong plan is now correcting it without a reviewer.\n  No spike-writer. No planner. No progress agent.\n",
+              "contentType": "text",
+              "title": "Agent role (still unscoped)"
+            }
+          },
+          "stepId": "step-1-6",
+          "terminal": [
+            "$ claude --model sonnet --prompt-file 'context-v2.txt'",
+            "Reading prompt (1840 chars)...",
+            "No memory of previous session. No diff awareness.",
+            "Tokens: 156800 in / 31290 out  | Time: 5m 10s"
+          ],
+          "terminalRecording": "/workflow-showcase/stage-1/step-1-6.terminal.html"
+        },
+        {
+          "artifactSnapshots": {
+            "progress": "/workflow-showcase/stage-1/step-1-7.progress.html"
+          },
+          "description": "No PRD, no plan, no progress file. The next session starts from zero.",
+          "label": "Session ends, memory dies",
+          "panels": {
+            "progress": {
+              "content": "stage: ungoverned\nfinal_status: shipped-with-regression\nspec_artifact: null\nplan_artifact: null\nprogress_artifact: null\nagents_artifact: null\nmemory_carried_forward: false\nhidden_costs:\n  rework_days: 2.0\n  rework_tokens_est: 220000\n  rework_cost_usd_est: 1.10\n  team_trust_delta: \"down\"\n",
+              "contentType": "yaml",
+              "title": "Final state"
+            }
+          },
+          "stepId": "step-1-7",
+          "terminal": [
+            "$ exit",
+            "Session ws-2026-05-13-09xx not saved.",
+            "Artifacts (plan.md, scratch.md) remain in $TMPDIR; auto-deleted in 7d.",
+            "> 'we should write this up.'  (we don't.)"
+          ],
+          "terminalRecording": "/workflow-showcase/stage-1/step-1-7.terminal.html"
+        }
+      ],
+      "thumbnail": "/workflow-showcase/stage-1/thumbnail.png",
+      "title": "Stage 1: Pre-Governance Baseline"
+    },
+    {
+      "ctaLinks": [
+        {
+          "copyText": "Turn an ask into a PRD, plan, and progress file before any agent runs.",
+          "skillName": "planning",
+          "skillUrl": "https://github.com/miethe/MeatySkills/tree/main/skills/planning",
+          "subtitle": "Compile human intent into structured artifacts agents can execute against, with acceptance criteria the reviewer can verify."
+        },
+        {
+          "copyText": "Persist state in progress files; resume from artifacts, not chat history.",
+          "skillName": "artifact-tracking",
+          "skillUrl": "https://github.com/miethe/MeatySkills/tree/main/skills/artifact-tracking",
+          "subtitle": "One progress file per phase, with task IDs, dependencies, and parallelization batches the orchestrator can route on."
+        }
+      ],
+      "description": "The same onboarding ask, run through a spec layer. Intent is captured in a PRD with acceptance criteria, decomposed into a phased plan, and tracked in a YAML progress file the agent orchestra reads instead of guesses. The delta from Stage 1 is not speed for its own sake; it is that the work is legible to the next session.",
+      "id": "stage-2",
+      "metrics": {
+        "cost": 1.57,
+        "dataSource": "curated (illustration)",
+        "throughput": 11200,
+        "tokensUsed": 312540,
+        "wallClockTime": "9m 48s"
+      },
+      "postNumber": 2,
+      "postSlug": "post-2-intent-driven-development",
+      "publishedDate": "2026-06-12",
+      "socialClip": "/workflow-showcase/stage-2/social-clip.mp4",
+      "status": "published",
+      "steps": [
+        {
+          "artifactSnapshots": {
+            "agents": "/workflow-showcase/stage-2/step-2-1.agents.html"
+          },
+          "description": "The vague ask is captured into an intake template. Tier 2 routes it to full artifacts.",
+          "label": "Intake, tiered",
+          "panels": {
+            "agents": {
+              "content": "intake-router (deterministic)\n  Input: Slack thread, 412 chars\n  Output: tier classification + artifact set\n  Decision: Tier 2 (8 to 13 pts)\n  Artifacts required: PRD, Implementation Plan, Progress (per phase)\n  Mode: B (Contract Draft) -> C (Autonomous Sprint) per phase\n",
+              "contentType": "text",
+              "title": "Routing decision"
+            }
+          },
+          "stepId": "step-2-1",
+          "terminal": [
+            "$ slack #builds \"hey can we ship the new onboarding flow this week\"",
+            "$ skill intake --from-slack thread-2026-06-08-09xx",
+            "  feature_slug: onboarding-refresh",
+            "  estimated_points: 11   -> Tier 2 (PRD + Plan + Progress)",
+            "  routing: planning-skill",
+            "  owner: tech-lead@team"
+          ],
+          "terminalRecording": "/workflow-showcase/stage-2/step-2-1.terminal.html"
+        },
+        {
+          "artifactSnapshots": {
+            "prd": "/workflow-showcase/stage-2/step-2-2.prd.html"
+          },
+          "description": "Four contract dimensions, YAML frontmatter, acceptance criteria. Not a narrative.",
+          "label": "PRD as contract",
+          "panels": {
+            "prd": {
+              "content": "---\nschema_version: 1.2\ndoc_type: prd\nfeature_slug: onboarding-refresh\nstatus: ratified\nowner: tech-lead@team\nrelated_documents:\n  plan_ref: artifacts/plans/onboarding-refresh.plan.md\n  progress_refs: []\ncontract:\n  api:\n    - GET /v1/onboarding/state\n    - POST /v1/onboarding/step\n  data:\n    - table: onboarding_progress (existing; no schema change)\n  ux:\n    - \"Visual refresh of 3 existing screens (B2B path only)\"\n    - \"Legacy mobile webview: must continue to work (31% of users)\"\n  telemetry:\n    - event: onboarding_step_completed (existing; no change)\nacceptance_criteria:\n  - id: AC-1\n    text: \"Mobile webview onboarding error_rate stays below 0.5%.\"\n  - id: AC-2\n    text: \"No auth provider change; Auth0 remains the IdP.\"\n  - id: AC-3\n    text: \"Copy + visual changes only on 3 named screens.\"\n---\n\n## Onboarding refresh, B2B\n\nVisual refresh and copy revision. Not an auth rewrite. Not a\ndeprecation of the legacy mobile webview.\n",
+              "contentType": "yaml",
+              "title": "PRD (artifacts/prds/onboarding-refresh.prd.md)"
+            }
+          },
+          "stepId": "step-2-2",
+          "terminal": [
+            "$ skill planning prd --feature onboarding-refresh",
+            "Writing artifacts/prds/onboarding-refresh.prd.md",
+            "  schema_version: 1.2",
+            "  doc_type: prd",
+            "  status: ratified",
+            "Acceptance criteria: 7   Open questions: 0"
+          ],
+          "terminalRecording": "/workflow-showcase/stage-2/step-2-2.terminal.html"
+        },
+        {
+          "artifactSnapshots": {
+            "plan": "/workflow-showcase/stage-2/step-2-3.plan.html"
+          },
+          "description": "Plan capped near 800 lines. Decisions Block carries the executive judgment layer.",
+          "label": "Phased plan, agent routing",
+          "panels": {
+            "plan": {
+              "content": "## Phase table\n\n| Phase | Task    | Description                          | Est | Assigned        | Deps    |\n|-------|---------|--------------------------------------|-----|-----------------|---------|\n| 1     | T-1.1   | Inventory 3 screens; capture copy    | 0.5d| ui-engineer     | -       |\n| 1     | T-1.2   | Mobile webview regression baseline   | 0.5d| qa-engineer     | -       |\n| 2     | T-2.1   | Implement screen 1 visual refresh    | 0.5d| ui-engineer     | T-1.1   |\n| 2     | T-2.2   | Implement screen 2 visual refresh    | 0.5d| ui-engineer     | T-1.1   |\n| 2     | T-2.3   | Implement screen 3 visual refresh    | 0.5d| ui-engineer     | T-1.1   |\n| 3     | T-3.1   | Copy revision pass                   | 0.5d| copy-editor     | T-2.*   |\n| 3     | T-3.2   | Mobile webview verification          | 0.5d| qa-engineer     | T-2.*   |\n| 4     | T-4.1   | Reviewer pass vs PRD acceptance      | 0.5d| reviewer        | T-3.*   |\n\n### Decisions Block (excerpt)\n\n- Auth0 stays. AC-2 is non-negotiable; any task that touches\n  the IdP fails contract review.\n- Legacy mobile webview is in scope as a regression target\n  (AC-1), not a deprecation candidate.\n- Phase 2 tasks parallelize (no shared files); batch them.\n",
+              "contentType": "markdown",
+              "title": "Implementation plan (excerpt)"
+            }
+          },
+          "stepId": "step-2-3",
+          "terminal": [
+            "$ skill planning plan --from-prd onboarding-refresh",
+            "Writing artifacts/plans/onboarding-refresh.plan.md (612 lines)",
+            "  phases: 4   tasks: 11   parallelizable batches: 3",
+            "  agent routing: ui-engineer, copy-editor, telemetry-validator, reviewer",
+            "$ skill planning validate-plan onboarding-refresh",
+            "ok: all tasks bind to an AC; no orphans."
+          ],
+          "terminalRecording": "/workflow-showcase/stage-2/step-2-3.terminal.html"
+        },
+        {
+          "artifactSnapshots": {
+            "progress": "/workflow-showcase/stage-2/step-2-4.progress.html"
+          },
+          "description": "YAML progress file with parallelization batches; state is structured, not narrated.",
+          "label": "Progress as data",
+          "panels": {
+            "progress": {
+              "content": "schema_version: 1.1\ndoc_type: progress\nfeature_slug: onboarding-refresh\nphase: 2\nprd_ref: artifacts/prds/onboarding-refresh.prd.md\nplan_ref: artifacts/plans/onboarding-refresh.plan.md\nstatus: ready\nparallelization:\n  batch_1: [T-2.1, T-2.2, T-2.3]\ntasks:\n  - id: T-2.1\n    title: \"Screen 1 visual refresh\"\n    status: ready\n    assigned_to: ui-engineer\n    dependencies: [T-1.1]\n    estimated_effort: 0.5d\n    acceptance_refs: [AC-3]\n    evidence: []\n  - id: T-2.2\n    title: \"Screen 2 visual refresh\"\n    status: ready\n    assigned_to: ui-engineer\n    dependencies: [T-1.1]\n    estimated_effort: 0.5d\n    acceptance_refs: [AC-3]\n    evidence: []\n  - id: T-2.3\n    title: \"Screen 3 visual refresh\"\n    status: ready\n    assigned_to: ui-engineer\n    dependencies: [T-1.1]\n    estimated_effort: 0.5d\n    acceptance_refs: [AC-3]\n    evidence: []\n",
+              "contentType": "yaml",
+              "title": "phase-2.progress.yml"
+            }
+          },
+          "stepId": "step-2-4",
+          "terminal": [
+            "$ skill artifact-tracking init-progress --phase 2 --feature onboarding-refresh",
+            "Writing artifacts/progress/onboarding-refresh/phase-2.progress.yml",
+            "  tasks: 3   batches: 1   parallel: true",
+            "  evidence_required: screenshot + accessibility scan"
+          ],
+          "terminalRecording": "/workflow-showcase/stage-2/step-2-4.terminal.html"
+        },
+        {
+          "artifactSnapshots": {
+            "agents": "/workflow-showcase/stage-2/step-2-5.agents.html"
+          },
+          "description": "Opus reads frontmatter, not source. Executors get only their phase context.",
+          "label": "Orchestrator delegates by batch",
+          "metrics": {
+            "cost": 0.46,
+            "dataSource": "curated (illustration)",
+            "throughput": 12100,
+            "tokensUsed": 92400,
+            "wallClockTime": "3m 12s"
+          },
+          "panels": {
+            "agents": {
+              "content": "Orchestration tier\n  opus-orchestrator\n    Reads: YAML frontmatter only (~2KB)\n    Writes: batch dispatch + per-task context bundles\n    Never reads: source files, full plan body\n\nExecution tier (fan-out, parallel)\n  ui-engineer (x3, one per task)\n    Context: only this task's spec, only this screen's tokens\n    Authority: Mode C (Autonomous Sprint) - clear intent, low blast radius\n    Output: PR draft with evidence (screenshot + a11y scan)\n\nNote: Progressive disclosure. No executor ever loads the\nfull plan or the PRD body; both are referenced by path.\n",
+              "contentType": "text",
+              "title": "Agent roles (this batch)"
+            }
+          },
+          "stepId": "step-2-5",
+          "terminal": [
+            "$ orchestrator run --progress phase-2.progress.yml",
+            "Loaded frontmatter (1.8 KB). Source files not read by orchestrator.",
+            "Batch 1 fan-out: 3 tasks, 3 executors (ui-engineer)",
+            "  T-2.1 -> ui-engineer (context: screen-1 spec + design tokens)",
+            "  T-2.2 -> ui-engineer (context: screen-2 spec + design tokens)",
+            "  T-2.3 -> ui-engineer (context: screen-3 spec + design tokens)"
+          ],
+          "terminalRecording": "/workflow-showcase/stage-2/step-2-5.terminal.html"
+        },
+        {
+          "artifactSnapshots": {
+            "agents": "/workflow-showcase/stage-2/step-2-6.agents.html"
+          },
+          "description": "Mode E. Reviewer loads PRD acceptance criteria and verifies evidence per task.",
+          "label": "Reviewer vs contract",
+          "panels": {
+            "agents": {
+              "content": "senior-code-reviewer\n  Input: PRD acceptance criteria + per-task evidence\n  Output: pass/fail per AC, written to progress file\n  Cannot mark completed without evidence (timestamp or artifact ref).\n  Cannot waive an AC; only the PRD owner can amend the contract.\n",
+              "contentType": "text",
+              "title": "Reviewer (Mode E)"
+            }
+          },
+          "stepId": "step-2-6",
+          "terminal": [
+            "$ orchestrator review --feature onboarding-refresh --phase 2",
+            "Loaded PRD acceptance criteria: 7",
+            "Loaded evidence: 3 screenshots, 3 a11y reports, 1 mobile webview trace",
+            "AC-1 (mobile error_rate <0.5%): pass (observed 0.31%)",
+            "AC-2 (Auth0 unchanged): pass (no IdP code touched)",
+            "AC-3 (3 named screens only): pass (diff scoped to 3 files)",
+            "Review result: PASS  ->  phase-2 marked complete"
+          ],
+          "terminalRecording": "/workflow-showcase/stage-2/step-2-6.terminal.html"
+        },
+        {
+          "artifactSnapshots": {
+            "progress": "/workflow-showcase/stage-2/step-2-7.progress.html"
+          },
+          "description": "Lineage links across PRD <-> Plan <-> Progress; next session resumes from artifacts.",
+          "label": "State commits; memory persists",
+          "panels": {
+            "progress": {
+              "content": "schema_version: 1.1\ndoc_type: progress\nfeature_slug: onboarding-refresh\nphase: 2\nstatus: complete\ncompleted_at: 2026-06-09T14:22:00-04:00\nreviewer_result: pass\ntasks:\n  - id: T-2.1\n    status: complete\n    evidence:\n      - artifacts/evidence/T-2.1/screen-1.png\n      - artifacts/evidence/T-2.1/a11y.json\n  - id: T-2.2\n    status: complete\n    evidence:\n      - artifacts/evidence/T-2.2/screen-2.png\n      - artifacts/evidence/T-2.2/a11y.json\n  - id: T-2.3\n    status: complete\n    evidence:\n      - artifacts/evidence/T-2.3/screen-3.png\n      - artifacts/evidence/T-2.3/a11y.json\nmemory_carried_forward: true\n",
+              "contentType": "yaml",
+              "title": "phase-2.progress.yml (final)"
+            }
+          },
+          "stepId": "step-2-7",
+          "terminal": [
+            "$ git add artifacts/progress/onboarding-refresh/phase-2.progress.yml",
+            "$ git commit -m 'progress: phase-2 complete (3/3 tasks, reviewer pass)'",
+            "$ skill artifact-tracking lineage --feature onboarding-refresh",
+            "  prd     -> 1 file   (ratified)",
+            "  plan    -> 1 file   (612 lines, 11 tasks)",
+            "  progress-> 4 files  (phase-2 complete; phase-3 ready)",
+            "  next session: resume from progress, no re-prompt required"
+          ],
+          "terminalRecording": "/workflow-showcase/stage-2/step-2-7.terminal.html"
+        },
+        {
+          "artifactSnapshots": {
+            "agents": "/workflow-showcase/stage-2/step-2-8.agents.html"
+          },
+          "description": "Deterministic operations get scripts, not agents. The intelligence budget is for judgment.",
+          "label": "Scripts for bookkeeping",
+          "metrics": {
+            "cost": 0,
+            "dataSource": "curated (illustration)",
+            "throughput": 0,
+            "tokensUsed": 50,
+            "wallClockTime": "0.4s"
+          },
+          "panels": {
+            "agents": {
+              "content": "Rule of thumb\n  Use agents for judgment. Use scripts for bookkeeping.\n  If the operation is deterministic, it does not need a model.\n\nReplaced by scripts (per-call cost)\n  update-status.py             ~50 tokens   (vs ~25,000 via agent)\n  update-batch.py              ~80 tokens\n  validate-phase-completion.py ~60 tokens\n  query_artifacts.py           ~40 tokens\n\nAt 175+ active progress folders, this is the difference\nbetween economically viable and not.\n",
+              "contentType": "text",
+              "title": "When not to use an agent"
+            }
+          },
+          "stepId": "step-2-8",
+          "terminal": [
+            "$ python scripts/update-status.py \\",
+            "    --progress phase-3.progress.yml --task T-3.1 --status in_progress",
+            "ok: T-3.1 -> in_progress (1 field changed, 0 agent calls)",
+            "$ python scripts/validate-phase-completion.py --phase 2",
+            "ok: phase-2 gate passed (3/3 evidence present, reviewer pass)"
+          ],
+          "terminalRecording": "/workflow-showcase/stage-2/step-2-8.terminal.html"
+        }
+      ],
+      "thumbnail": "/workflow-showcase/stage-2/thumbnail.png",
+      "title": "Stage 2: Intent-Driven Development"
+    },
+    {
+      "ctaLinks": [
+        {
+          "copyText": "Run your own SPIKE on a vague feature ask.",
+          "skillName": "spike",
+          "skillUrl": "https://github.com/miethe/MeatySkills/tree/main/skills/spike",
+          "subtitle": "Turn an unstructured prompt into a defensible PRD with acceptance criteria."
+        }
+      ],
+      "description": "Phase 1 smoke-test stage. Exercises every UI surface (scrubber, panels, metrics, CTA) with realistic but illustrative content. Not a published narrative; replaced by Stage 1 in Phase 2.",
+      "id": "test-fixture",
+      "metrics": {
+        "cost": 3.06,
+        "dataSource": "curated (illustration)",
+        "throughput": 11800,
+        "tokensUsed": 612400,
+        "wallClockTime": "8m 14s"
+      },
+      "postNumber": 0,
+      "postSlug": "test-fixture",
+      "publishedDate": "2026-05-15",
+      "status": "published",
+      "steps": [
+        {
+          "description": "A vague Slack message starts the work.",
+          "label": "Request lands",
+          "panels": {
+            "prd": {
+              "content": "---\ntitle: Workflow Showcase (TBD)\nstatus: idea\n---\n\nFeature ask from Slack:\n\n> \"build a workflow showcase\"\n\nNo frontmatter. No acceptance criteria. No owner.",
+              "contentType": "markdown",
+              "title": "PRD (draft)"
+            }
+          },
+          "stepId": "tf-1",
+          "terminal": [
+            "$ slack #team \"build a workflow showcase\"",
+            "Message posted by alice at 09:14",
+            "> No spec attached. No success criteria."
+          ]
+        },
+        {
+          "description": "Spike-writer turns the prompt into a real spec with frontmatter and acceptance criteria.",
+          "label": "PRD drafted",
+          "panels": {
+            "agents": {
+              "content": "spike-writer (Planner)\n  Authors the PRD from prompt + research.\n\nfrontend-architect (Reviewer)\n  Sanity-checks acceptance criteria for buildability.",
+              "contentType": "text",
+              "title": "Agents involved"
+            },
+            "prd": {
+              "content": "title: Living Workflow Showcase\ndescription: Interactive visualization of the agentic SDLC.\ncomplexity: L\neffort: 25-35 SP\nstatus: draft\nacceptance:\n  - URL reachable at /workflow-showcase/\n  - Scrubber latency < 100ms\n  - WCAG AA compliant",
+              "contentType": "yaml",
+              "title": "PRD (frontmatter)"
+            }
+          },
+          "stepId": "tf-2",
+          "terminal": [
+            "$ spike-writer --from prompt.txt --out docs/specs/workflow-showcase-prd.md",
+            "Reading prompt... 47 tokens",
+            "Drafting PRD with frontmatter, acceptance criteria, risks...",
+            "Wrote docs/specs/workflow-showcase-prd.md (412 lines)"
+          ]
+        },
+        {
+          "description": "Planner expands the PRD into a phase + task table.",
+          "label": "Plan generated",
+          "panels": {
+            "plan": {
+              "content": "| Phase | Title                | Effort | Owner              |\n|-------|----------------------|--------|--------------------|\n| 0     | SPIKE: Tech choice   | 6 SP   | spike-writer       |\n| 1     | Shell + routing      | 7 SP   | frontend-architect |\n| 2     | Stage 1 content      | 8 SP   | blog-drafter       |\n| 3     | Stage 2 content      | 5 SP   | blog-drafter       |\n| 4     | Blog integration     | 2 SP   | frontend-architect |\n| 5     | Polish + launch      | 8 SP   | frontend-architect |",
+              "contentType": "markdown",
+              "title": "Implementation plan (excerpt)"
+            },
+            "prd": {
+              "content": "title: Living Workflow Showcase\nstatus: draft\nacceptance:\n  - URL reachable\n  - Scrubber < 100ms\n  - WCAG AA",
+              "contentType": "yaml",
+              "title": "PRD (frontmatter)"
+            }
+          },
+          "stepId": "tf-3",
+          "terminal": [
+            "$ planner --from docs/specs/workflow-showcase-prd.md",
+            "Parsing PRD... 6 phases identified",
+            "Emitting task table... 38 tasks, 36 SP",
+            "Wrote docs/specs/workflow-showcase-implementation.md"
+          ]
+        },
+        {
+          "description": "Progress file initialized; CCDash starts recording the session.",
+          "label": "Progress tracked",
+          "panels": {
+            "plan": {
+              "content": "| Phase | Title           | Status        |\n|-------|-----------------|---------------|\n| 0     | SPIKE           | done          |\n| 1     | Shell + routing | in-progress   |\n| 2     | Stage 1 content | not-started   |",
+              "contentType": "markdown",
+              "title": "Implementation plan"
+            },
+            "progress": {
+              "content": "stage: workflow-showcase\nstatus: in-progress\ncompleted_tasks: 0\nin_progress_tasks: 3\nblocked_tasks: 0\nphase: 1\nmetrics:\n  tokens_used: 184220\n  throughput: 9100\n  cost: 0.92",
+              "contentType": "yaml",
+              "title": "Progress (YAML)"
+            }
+          },
+          "stepId": "tf-4",
+          "terminal": [
+            "$ progress init --plan workflow-showcase-implementation.md",
+            "Created docs/progress/workflow-showcase.yaml",
+            "$ ccdash watch --session ws-2026-05-15",
+            "Recording session ws-2026-05-15..."
+          ]
+        },
+        {
+          "description": "Two subagents pick up parallel tasks under the architect's coordination.",
+          "label": "Agents assigned",
+          "panels": {
+            "agents": {
+              "content": "frontend-architect (Lead)\n  Owns component architecture, scrubber UX, accessibility.\n\ndocumentation-writer (Support)\n  Updates stage authoring checklist and inline JSDoc.\n\nfrontend-developer (Standby)\n  Reserved for Phase 2 content authoring.",
+              "contentType": "text",
+              "title": "Agent team"
+            },
+            "progress": {
+              "content": "stage: workflow-showcase\nstatus: in-progress\ncompleted_tasks: 2\nin_progress_tasks: 4\nphase: 1\nagents: [frontend-architect, documentation-writer]",
+              "contentType": "yaml",
+              "title": "Progress (YAML)"
+            }
+          },
+          "stepId": "tf-5",
+          "terminal": [
+            "$ agents assign --plan workflow-showcase-implementation.md",
+            "frontend-architect → WS-1.1 (schema)",
+            "frontend-architect → WS-1.2 (island)",
+            "documentation-writer → WS-1.12 (authoring template)",
+            "All agents briefed; awaiting first artifact."
+          ]
+        },
+        {
+          "description": "Phase 1 components compile; test fixture renders end-to-end.",
+          "label": "Shell built",
+          "panels": {
+            "agents": {
+              "content": "frontend-architect — Phase 1 complete; handing off schema docs.\ndocumentation-writer — Stage authoring template updated.\nblog-drafter — Briefed for Phase 2 stage authoring.",
+              "contentType": "text",
+              "title": "Agent team"
+            },
+            "plan": {
+              "content": "| Phase | Title           | Status        |\n|-------|-----------------|---------------|\n| 0     | SPIKE           | done          |\n| 1     | Shell + routing | done          |\n| 2     | Stage 1 content | next          |",
+              "contentType": "markdown",
+              "title": "Implementation plan"
+            },
+            "progress": {
+              "content": "stage: workflow-showcase\nstatus: in-progress\ncompleted_tasks: 12\nin_progress_tasks: 0\nblocked_tasks: 0\nphase: 1\nphase_status: complete\nbundle_delta_kb: 12.4\nmetrics:\n  tokens_used: 612400\n  throughput: 11800\n  cost: 3.06",
+              "contentType": "yaml",
+              "title": "Progress (YAML)"
+            }
+          },
+          "stepId": "tf-6",
+          "terminal": [
+            "$ npm run check",
+            "0 errors. 0 warnings.",
+            "$ npm run build",
+            "✓ built in 4.27s",
+            "Bundle delta (showcase): 12.4 KB gzipped — under 15 KB target."
+          ]
+        }
+      ],
+      "title": "Test Fixture: Showcase Shell Validation"
+    }
+  ]
+}

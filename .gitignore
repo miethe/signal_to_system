@@ -27,3 +27,12 @@ Thumbs.db
 npm-debug.log*
 
 .claude/
+
+# demo-foundry: generated capture/render outputs are not checked in.
+# Only manifests (demo/demos/<id>/demo.yaml + storyboard etc.) are versioned.
+# Final published assets live under public/workflow-showcase/<stage-id>/.
+demo/demos/*/output/
+!demo/demos/*/output/.gitkeep
+demo/output/
+test-results/
+playwright-report/

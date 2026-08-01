@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>When not to use an agent</title>
+<style>
+  :root { color-scheme: dark; }
+  body { background: #0b0d10; color: #e6edf3; font: 14px/1.55 ui-sans-serif, system-ui, -apple-system, sans-serif; padding: 28px; margin: 0; max-width: 880px; }
+  header { border-bottom: 1px solid #1f2933; padding-bottom: 10px; margin-bottom: 18px; }
+  .meta { color: #7c93a8; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; }
+  h1 { font-size: 20px; margin: 6px 0 0; }
+  pre { background: #11161b; border: 1px solid #1f2933; border-radius: 8px; padding: 16px 18px; overflow-x: auto; font: 13px/1.5 'JetBrains Mono', ui-monospace, Menlo, monospace; color: #d9e2ec; }
+  .lang-yaml, .lang-json { color: #cdb3ff; }
+  .lang-md { color: #e6edf3; }
+</style>
+</head>
+<body>
+<header>
+  <div class="meta">agents · Scripts for bookkeeping</div>
+  <h1>When not to use an agent</h1>
+</header>
+<pre class="lang-text">Rule of thumb
+  Use agents for judgment. Use scripts for bookkeeping.
+  If the operation is deterministic, it does not need a model.
+
+Replaced by scripts (per-call cost)
+  update-status.py             ~50 tokens   (vs ~25,000 via agent)
+  update-batch.py              ~80 tokens
+  validate-phase-completion.py ~60 tokens
+  query_artifacts.py           ~40 tokens
+
+At 175+ active progress folders, this is the difference
+between economically viable and not.
+</pre>
+</body>
+</html>

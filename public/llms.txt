@@ -9,6 +9,7 @@ A technical publication by Nick Miethe covering AI agents, agentic SDLC, archite
 - /dev-stories/ - Dev Stories: automated agentic build notes (after-action reports, feature completions, build notes) generated from the agentic execution workflow, distinct from the hand-curated /essays/
 - /systems/ - Cross-collection facet (essays + dev stories) grouped by project/system
 - /aos/ - Cross-collection facet (essays + dev stories) grouped by Agentic OS subsystem area
+- /workflow-showcase/ - Living Workflow Showcase (interactive visualization of the agentic SDLC)
 - /portfolio/ - Summary portfolio page
 - /portfolio/ui/ - @miethe/ui component showcase (live demos + prop references)
 - /tags/ - Tag-based content discovery

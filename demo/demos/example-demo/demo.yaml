@@ -1,0 +1,98 @@
+id: example-demo
+version: 0.1.0
+title: "Workflow Showcase Smoke Test"
+audience: "technical executive"
+status: draft
+
+app:
+  base_url: "http://localhost:4321"
+  start_command: "npm run dev"
+  healthcheck_url: "http://localhost:4321/workflow-showcase/"
+  viewport:
+    width: 1440
+    height: 1000
+  timezone: "America/New_York"
+
+seed:
+  required: false
+  notes: "Static Astro site; no seed needed for showcase smoke test."
+
+duration_targets:
+  short_seconds: 60
+  standard_seconds: 180
+  deep_seconds: 420
+
+story:
+  thesis: "This demo proves the core product value through a repeatable workflow."
+  problem: "What pain or gap the audience currently has."
+  promise: "What changes after adopting the product or feature."
+  aha_moments:
+    - id: aha-1
+      text: "The system turns raw user intent into structured execution context."
+    - id: aha-2
+      text: "The workflow is observable, repeatable, and agent-ready."
+
+personas:
+  - id: operator
+    name: "Operations Lead"
+    role: "Primary demo user"
+
+flows:
+  - id: open-showcase
+    title: "Open the Workflow Showcase"
+    route: "/workflow-showcase/"
+    capture:
+      screenshot: true
+      video: true
+      trace: true
+    steps:
+      - id: navigate-showcase
+        action: navigate
+        target: "/workflow-showcase/?stage=test-fixture"
+        narration: "Open the test-fixture stage to confirm the scrubber renders."
+      - id: inspect-scrubber
+        action: observe
+        target: "[role=\"region\"][aria-label^=\"Workflow stage\"]"
+        narration: "Verify the workflow stage region mounts and the timeline appears."
+
+outputs:
+  screenshots: true
+  raw_video: true
+  polished_video: false
+  talking_points: true
+  voiceover_script: true
+  captions: false
+  thumbnail: true
+
+claims:
+  - id: claim-1
+    text: "The application can summarize active workflows from the dashboard."
+    verification: "Visible on opening dashboard screenshot."
+    status: needs-verification
+
+review:
+  required_gates:
+    - capture-success
+    - no-secrets
+    - freshness
+    - claim-accuracy
+    - audience-fit
+  reviewers:
+    - demo-reviewer
+
+context_updates:
+  propose_only: true
+  files:
+    - CLAUDE.md
+    - AGENTS.md
+    - docs/demo-workflow.md
+
+workflow_updates:
+  propose_only: true
+  files:
+    - package.json
+    - .github/workflows/demo-foundry.yml
+
+risks:
+  - "Selectors may need stable data-testid attributes."
+  - "Synthetic voiceover may need manual review."
