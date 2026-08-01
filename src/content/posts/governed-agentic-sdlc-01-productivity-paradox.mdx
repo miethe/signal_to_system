@@ -197,6 +197,8 @@ In practice, this means:
 
 I've been iterating on versions of this for over a year now; in my own projects and on teams where I'm accountable for the outcomes. Parts 2-5 break down the specific patterns, tooling, and organizational shape that make it hold up at scale.
 
+If you want to see what an ungoverned run actually looks like (the artifact-free, memory-less version of the workflow this series moves away from), the [Living Workflow Showcase](/workflow-showcase/?stage=stage-1) lets you scrub through it step by step.
+
 ## What's Next
 
 Post 2 starts where most of the pain actually lives: **intent**. The reason agents generate plausible-but-wrong code usually isn't that the model is bad; it's that the spec they're working from is ambiguous in ways a human would silently resolve and an agent can't. **Post 2** is about *Intent-Driven Development*: how to write specs that agents can execute deterministically, and what it means for the developer's role to shift from writing syntax to engineering intent. If you've ever gotten back a technically correct implementation that completely missed the point, that's where this picks up.

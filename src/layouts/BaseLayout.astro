@@ -12,6 +12,8 @@ interface Props {
   canonicalUrl?: string;
   jsonLd?: Record<string, unknown>;
   class?: string;
+  /** Emit robots noindex/nofollow. For pages that build but aren't published yet. */
+  noindex?: boolean;
 }
 
 const {
@@ -21,6 +23,7 @@ const {
   canonicalUrl,
   jsonLd,
   class: className,
+  noindex = false,
 } = Astro.props;
 
 const resolvedTitle = formatTitle(title);
@@ -51,6 +54,7 @@ const resolvedDescription = description.slice(0, 160);
     <title>{resolvedTitle}</title>
     <meta name="description" content={resolvedDescription} />
     <link rel="canonical" href={resolvedCanonical} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
