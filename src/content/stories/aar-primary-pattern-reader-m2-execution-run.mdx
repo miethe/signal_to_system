@@ -1,0 +1,178 @@
+---
+title: "AAR: Primary Pattern Reader M2 execution run"
+excerpt: A field note from the Agentic OS build loop.
+date: '2026-08-01'
+readTime: 6 min read
+status: draft
+storyType: after-action
+tags:
+- agent-ready-repos
+- human-ai-workflow
+- artifact-first
+automated: true
+whyItMatters: The work shows how agentic systems turn operational evidence into reusable
+  practice.
+leaderTakeaway: Treat after-action reports as publication-ready raw material, but
+  keep the safety gate explicit.
+sourceAar: "AAR: Primary Pattern Reader M2 execution run"
+---
+
+## AAR — M2 execution (Reader shell)
+
+**Scope**: milestone M2 of the Tier 3 Primary Pattern Reader plan, run as a background
+`/dev:execute-plan` from a fresh session. Orchestrator Opus 5 @ high; one Fable 5 design leg; one
+Opus phase-owner (died of context exhaustion, replaced); ICA + claude-native implementer legs;
+gates = `task-completion-validator`, then `karen` + `codex gpt-5.6-terra` at the boundary.
+
+**Outcome**: shipped. `** TEST SUCCEEDED **`, **2,912 tests / 378 suites, 0 failures** (M1 baseline
+2,794/370). Reader stays dark — `patternReaderEnabled` still OFF; no user-visible change on main.
+
+---
+
+## What worked
+
+### 1. The Fable 5 design leg paid for itself before implementation started
+
+M1's completion note listed three items as "decide these, do not discover them". Routing them to a
+single Fable 5 leg (Mode B, decision doc only, no code) produced concrete signatures and numbers the
+implementer executed without re-opening anything — and **found a latent M1 defect while designing**:
+`focusModeExited(nil)` with a nil active step set `ownership = .programmaticScroll` *before* the
+guard and returned `.none`, parking the machine with no scroll in flight. Reachable today, zero
+timing failures required.
+
+Generalizable: a design leg reading a state machine adversarially finds bugs a reviewer reading a
+*diff* cannot, because the bug is in code the diff doesn't touch. Worth the premium at exactly the
+points a plan already labels "decide, don't discover".
+
+### 2. karen + codex were disjoint again — third consecutive milestone
+
+Codex found dead and unwired production code by static reachability. Karen found the **false premise**
+in the source comment and completion note that made the deferral look safe, and traced the clobber
+through to a *destroying persist*. Both landed on the same root cause independently; neither would
+have been sufficient alone. Running one is still not a substitute for the other.
+
+### 3. Requiring a RED test before the fix
+
+The blocker fix was preceded by a committed test proving the bug (`6c93e40`), then made green
+(`fca548e`). Cheap, and it converts "we fixed it" into evidence.
+
+### 4. The fix came back better than specified
+
+Asked to perform the discarded scroll effect, the implementer added `adoptUnstartedFlight()` — the
+driver adopts a generation the machine started but the driver didn't, **and arms the watchdog for
+it**. So a flight nobody ever performs still settles within one deadline instead of parking. Same
+§1d guarantee `perform()` gives, reached from the one entry point `perform()` didn't cover. A tight
+contract plus room for judgment beat a prescriptive one.
+
+---
+
+## What went wrong
+
+### 1. Context exhaustion killed the phase-owner mid-fix-round
+
+The M2 phase-owner ran implementation, a validator fix cycle, and the boundary fix round in **one
+session**, accumulated ~810K tokens, and died on `Prompt is too long` — after committing the RED test
+and making the fix, but before the gate build finished. Recovery was clean only because it committed
+incrementally and left a coherent working tree.
+
+**This is the 150% context tripwire, and nothing enforced it.** The doctrine says an executor watches
+its own utilization and splits; in practice nothing checks, and a long-lived phase-owner has no
+natural prompt to stop.
+
+**Change**: split the phase-owner at gate boundaries by default — implementation session, then a
+*fresh* session for the boundary fix round with a narrow contract. The continue-don't-redispatch rule
+is right for a fix *within* a lens; it is wrong for a whole second round of work. The replacement
+agent closed four items in 129K tokens against the previous one's 810K.
+
+### 2. A false comment justified deferring a shipped-severity bug
+
+The source comment at `ReaderContainerView.swift:793-796` and completion-note deviation #2 both
+asserted that the first content observation "is classified `isUserInitiated == false`". False:
+`isUserInitiated` is `self != .animating`, the driver starts at `.idle`, and `.onScrollPhaseChange`
+fires only on *change*. That single false sentence was the **entire justification** for carrying the
+defect to M3 — and the defect was not cosmetic: a project saved at round 47 reopened at round 1, and
+`scenePhase` then persisted round 1 over the real position.
+
+**A comment asserting a safety property the code does not deliver is worse than no comment**, because
+it survives review by being confident. Both reviewers had to re-derive the property from source to
+catch it.
+
+**Change**: treat a comment that asserts an invariant as a claim requiring the same evidence as a
+test. Where the invariant is checkable, check it (this round turned the "watchdog ≥ 2× animation
+duration" doc comment into a `precondition` plus an assertable `isValid` companion — that is the
+pattern).
+
+Corollary observed the same round: a delegate introduced a *new* false comment ("neither list is
+derived from `LoopNestSchema.allModels`" — it was, structurally, by type identity). The phase-owner
+caught and rewrote it. Claims in comments need the scrutiny we give claims in tests.
+
+### 3. A new defect class the falsifier rule does not catch
+
+M1's class was **vacuous tests** — asserting something true for a reason unrelated to the behavior.
+M2's is different: **right assertion, wrong layer**. The tests were genuinely real and would fail if
+their logic broke; they simply never crossed the boundary the feature needed to cross.
+
+Four instances: tip-dismissal persistence (`.makeSnapshot(` had zero production call sites while its
+tests passed); `ReaderContextStripView` (dead production UI, zero call sites tree-wide); the three
+resume tests calling the *pure* overload and hand-constructing the `resumeTarget` the layer exists to
+produce — one of them even asserting the effect scrolls, thereby **proving the contract emits
+something production throws away**; and the discarded resume effect itself.
+
+A falsifier proves a test *can fail*. It says nothing about whether the code under test is *reached*.
+
+**Change (the design change, per the same-class stop rule)**: a **composition-reachability gate** —
+`ReaderCompositionReachabilityTests.swift`. For each Reader production view type and
+persistence-writing API, assert a production call site outside its own defining file. View types are
+*derived* by scanning the source directory rather than hand-listed, since a hand-list carries the
+same blind spot as the tests it backstops. Proven red-at-parent / green-today against `fca548e^`.
+
+**Its honest limit, recorded in the test's own doc comment**: it would have caught **two** of the four
+defects, not four. `.dismissContextStrip(` and `.recordReaderPreferences(` already had external call
+sites; and `.open(with:)` *was* called — its **return value** was dropped, which no source scan of
+this shape can detect. A discarded return value is a distinct, still-uncovered class. (Swift's
+`@discardableResult` posture is the obvious lever; not pursued this round.)
+
+### 4. My dispatch brief was stale
+
+Two of the four items in the final fix-round brief were already done — I built it from greps taken
+against the *uncommitted* diff, not against `HEAD` after `6c93e40` had landed. The phase-owner
+verified rather than re-implementing and told me plainly, which is the right behavior and cost only a
+little time. **Change**: re-derive state at the moment of dispatch, not from earlier inspection in the
+same session.
+
+### 5. An exit criterion was written in a vocabulary the milestone had no way to satisfy
+
+Criterion 1 said "flag-on **UI tests** cover all four fidelity tiers + both contexts". The repo has
+no UI-test harness at all — no ViewInspector, no XCUITest target, no snapshot tooling. The criterion
+was reported met by model-level tests, which is not what it says. Now restated as model-level coverage
+with UI-level owed at M4.
+
+**Change**: at plan time, an AC naming a test *kind* should be checked against the harnesses that
+actually exist, or it becomes an invitation to quietly redefine the word at gate time.
+
+---
+
+## Numbers
+
+| | M1 | M2 |
+|---|---|---|
+| Tests / suites | 2,794 / 370 | **2,912 / 378** |
+| Reviewer rounds after a green suite | 3 | 3 (validator, karen, codex) |
+| Real defects found *after* a green suite | 12 | 9 |
+| Phase-owner sessions | 1 | 2 (first died at ~810K tokens) |
+| Est. → actual | 8 → ~15 pts | 13 → ~16 pts (revised est. held) |
+
+The stable, uncomfortable pattern across both milestones: **a green suite is the start of review, not
+the end of it.** Nine real defects survived a 2,888-test green gate in M2, including one that
+destroyed user data on every reopen.
+
+---
+
+## Carried forward
+
+Schema shape-pin debt now spans **three** versions (v1/v2/v3) — hard blocker before the M4 flag flip;
+`v2AndV3HaveDistinctResolvedShapes` cannot catch a live v2 class gaining a property. UI-level test
+coverage owed at M4. Magnifier pixel fit owed at the M4 device check. `TrustPanelView.swift:489`
+VoiceOver hint still says "Work Mode" — a *third* removed name, for the M4 a11y pass.
+`ReaderContentModelTests.swift:513` vacuous-if-empty. `tipDismissalRoundTrips` overclaims next to the
+real persisted suite. Discarded-return-value defect class uncovered by any current gate.
