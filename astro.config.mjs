@@ -9,7 +9,13 @@ import sitemap from '@astrojs/sitemap';
 export default defineConfig({
   site: 'https://nickmiethe.com',
   trailingSlash: 'ignore',
-  integrations: [react(), mdx(), sitemap()],
+  integrations: [
+    react(),
+    mdx(),
+    // /workflow-showcase/ is restored but unlisted pending editorial review —
+    // keep it out of the sitemap alongside its noindex and absent nav entry.
+    sitemap({ filter: (page) => !page.includes('/workflow-showcase') }),
+  ],
   vite: {
     plugins: [tailwindcss()],
     // @miethe/ui ships compiled ESM whose internal imports omit .js extensions,
