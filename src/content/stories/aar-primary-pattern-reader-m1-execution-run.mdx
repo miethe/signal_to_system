@@ -1,0 +1,137 @@
+---
+title: "AAR \u2014 Primary Pattern Reader M1 execution run"
+excerpt: A field note from the Agentic OS build loop.
+date: '2026-07-31'
+readTime: 6 min read
+status: draft
+storyType: after-action
+tags:
+- agent-ready-repos
+- human-ai-workflow
+- artifact-first
+automated: true
+whyItMatters: The work shows how agentic systems turn operational evidence into reusable
+  practice.
+leaderTakeaway: Treat after-action reports as publication-ready raw material, but
+  keep the safety gate explicit.
+sourceAar: "AAR \u2014 Primary Pattern Reader M1 execution run"
+---
+
+## AAR — Primary Pattern Reader, milestone M1
+
+Tier 3 plan, 4 milestones, strictly sequential. This run executed **M1 only** (Reader foundation:
+state, fidelity, progress seam) and stopped at the milestone boundary by operator instruction.
+Final SHA `993ae73`; suite green at 2,794 tests / 370 suites.
+
+## What shipped
+
+Unified reader position mapped additively onto the existing append-only `ProgressState` stream via
+a new `ProgressMode.reader` case; new `StepProgressRecord` model; capability/fidelity resolver;
+`patternReaderEnabled` flag added and OFF; scroll-sync/hysteresis state machine as pure logic;
+lazy idempotent backfill. Zero visible UI change, proven by unreachability rather than asserted.
+
+## The five lessons worth keeping
+
+### 1. A `VersionedSchema` cannot be frozen by freezing class *names*
+
+`LoopNestSchemaV1.models` listed the 17 live `@Model` classes. SwiftData's `Schema` resolves a
+version from live types **and transitively pulls in every model reachable through a relationship**.
+`ProjectInstance` was in V1's list and now pointed at the new `StepProgressRecord`, so V1 resolved
+to the same 18 entities as V2 — one checksum for two versions — and `NSLightweightMigrationStage`
+rejected the pair inside `makeContainer`. **The shipped app would have crashed on launch.**
+
+The fix is that a version must own snapshot model types for its entire relationship-connected
+component (here ten classes, not two — `Counter`/`Note`/`Photo`/`YarnAssignment` type their
+`.project` as the live `ProjectInstance`, dragging the v2-shaped entity back in).
+
+Generalizable: **any "frozen" artifact defined by reference to live types is not frozen.** Cheap to
+write, invisible until launch.
+
+### 2. The dominant defect class was tests that pass for the wrong reason
+
+Five instances in one milestone, found across three separate rounds:
+
+| Instance | Why it could not fail |
+|---|---|
+| Invariant 3 `noCounterLoss` | Asserted `syncBase` equality; nothing in the codebase writes `syncBase` — `nil == nil` |
+| Invariant 6 | Never referenced `patternReaderEnabled`; could not distinguish "correctly empty" from "always empty" |
+| Invariant 1 | Assertion not exercised by its setup |
+| `unversionedSchemaForTestFixtureOnly` | `Schema(allModels)` now includes `StepProgressRecord` — wrote V2, opened V2 |
+| `readerFlagDoesNotCrossTalkWithExtractionFlags` | Discarded the value it constructed; asserted unrelated constants duplicated from two other test files |
+
+They share one shape: **the test asserted something true for a reason unrelated to the behavior
+under test.** Green suites are not evidence; *falsifiable* green suites are.
+
+**The response was a design change, not five patches** (execution doctrine's same-class stop rule:
+two consecutive rounds of one class means change the design). Standing rule adopted for M2–M4:
+every preservation/guard/invariant test must carry a **falsifier** — a companion assertion or
+mutation proving the test can fail for the reason its name claims. Deliberately scoped to
+gate-evidence tests, not all tests, so it does not get dropped later as too expensive.
+
+Evidence it works: the falsifier additions are visible as +29 tests / +4 suites in the final run.
+Test-count deltas turned out to be the cheapest available proof that new tests *execute* rather
+than merely compile.
+
+### 3. Two review lenses found disjoint defect sets — running both was not redundancy
+
+At the M1 boundary, `karen` (architectural) and `codex gpt-5.6-terra` (adversarial, read-only
+shell) ran in parallel against the same diff. Overlap in findings: **near zero**.
+
+- codex found runtime/ordering defects: bare-`updatedAt` max over an unordered SwiftData
+  relationship array, `.reader` leaking into the legacy picker's unrepresented selection, backfill
+  partial-failure permanently degraded.
+- karen found a contract insufficiency (`activeRowFrame` nil during exactly the interactions the
+  *next* milestone introduces) and a fifth vacuous test.
+
+Both also reported where they attacked and came up empty, which is what made the GO trustworthy —
+codex diffed all ten snapshot models against the pre-M1 declarations and found zero divergence.
+
+This repo's prior history (codex finding real bugs after green Claude gates) held again, in both
+directions.
+
+### 4. `Sequence.max(by:)` keeps the earlier element on a tie
+
+`ProjectInstance.currentProgressState` used `max { $0.updatedAt < $1.updatedAt }` over a SwiftData
+relationship array. On tied timestamps that returns **the array's undefined order** — and the
+dual-write path writes ties deliberately. The Reader (which had a total ordering) and the watch cue
+path could name different current steps for the same store: the app disagreeing with itself.
+
+The general trap: a comparator that is merely *not wrong* is insufficient where the underlying
+collection has no defined order. Total orderings must be total.
+
+### 5. A test that asserts a degraded state codifies the bug
+
+`ReaderBackfillTests:484` asserted that a partial backfill failure leaves the store permanently
+degraded — locking in the defect as expected behavior. Worse than no test. Worth an explicit check
+during review: *does this test assert the behavior we want, or the behavior we observed?*
+
+## Process findings
+
+- **Concurrent `xcodebuild` corrupts the build.** `make test` uses a fixed shared
+  `DERIVED_DATA ?= /tmp/dd-loopnest-test` and runs `xcodegen generate`, rewriting the `.xcodeproj`
+  in place. Two overlapping runs produced `Abort trap: 6` + a DVT invalidation assertion, which
+  reads exactly like a product failure and is not. Adopted: one build at a time, per-milestone
+  derived-data path, `nohup`/`disown` (not `setsid`, which does not exist on macOS), always
+  redirect to a durable log. One round was lost reconstructing a verdict from a half-written
+  `.xcresult` after a SIGTERM at the ~1-hour mark.
+- **Orchestrator build-state checks must not match themselves.** A `pgrep -f "<pattern>"` whose own
+  wrapper shell contains the pattern is unreliable; the executing agent correctly refused a
+  "toolchain is free" signal derived from one. Use the `[x]codebuild` bracket trick.
+- **A shared append-target across parallel agents races.** Four agents appending to one
+  `implementation-notes.md` produced a read/write race. Per-agent fragments merged at the end would
+  be safer.
+- **A delegated agent wrote into the shared main checkout** instead of the worktree, then detected,
+  reverted, and disclosed it. Verified clean independently. Guardrail: delegates should resolve
+  paths from `git rev-parse --show-toplevel` at call time, never a remembered absolute root.
+- **Estimation.** M1 was planned at 8 pts and cost ~15. The plan's own adversarial review had
+  predicted "M1 migration foundation + M3 novel interaction under-scoped"; the first half is
+  confirmed. Revised plan total 45 → ~56 pts, with no milestone changing *shape*.
+
+## What I would do differently
+
+1. Establish the serial-build rule and per-agent derived-data paths **before** the first dispatch,
+   not after a corrupted baseline.
+2. Apply the falsifier requirement from milestone one, rather than adopting it after five instances.
+3. Run the adversarial lens against the *foundation* milestone specifically — the schema bug and
+   the ordering bugs were both foundation-shaped, and foundation defects propagate into every
+   milestone that binds to them.
