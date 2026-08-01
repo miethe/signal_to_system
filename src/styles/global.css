@@ -857,11 +857,12 @@ pre code {
   text-decoration: none;
 }
 
-/* Focus ring utility */
+/* Focus ring utility.
+   No border-radius here: the outline follows each element's own rounding, so
+   applying .focus-ring to a rounded-lg button no longer reshapes it on focus. */
 .focus-ring:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 2px;
-  border-radius: 0.25rem;
 }
 
 /* Skip-to-content link (accessibility) */

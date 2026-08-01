@@ -1,0 +1,282 @@
+---
+title: "The Registry Wave Is Here. The Agentic Artifact Supply Chain Comes Next."
+excerpt: "Skills registries validate the first layer of the agentic artifact thesis, but enterprises will need a broader control plane for artifacts, context, policy, execution, evidence, and outcomes."
+date: 2026-07-01T12:00:00-04:00
+readTime: "15 min"
+contentType: essay
+category: "AI Agents"
+tags:
+  - "artifact-first"
+  - "context-engineering"
+  - "governance"
+  - "platform-strategy"
+  - "delivery-systems"
+status: published
+heroImage: "/assets/posts/the-registry-wave-agentic-artifact-supply-chain/diagram-market-wave.svg"
+whyItMatters: "The reusable files that shape agent behavior are becoming operational assets. Treating them as copied prompts will not survive contact with enterprise scale, security, or audit requirements."
+leaderTakeaway: "Registries answer where an agentic capability lives. The next platform layer must answer whether it should be trusted, where it can run, what it depends on, and what outcomes it produced."
+relatedSlugs:
+  - "agentic-operations-flow"
+  - "governed-agentic-sdlc-01-productivity-paradox"
+  - "dev-stories-b2-enterprise-multi-tenancy"
+seoTitle: "Agentic Artifact Supply Chain: Why Skills Registries Are Only the First Layer"
+seoDescription: "A thesis essay on why agent skills, prompts, MCP servers, context packs, policies, evals, and evidence need a governed artifact supply chain beyond basic registries."
+draftNotes: "Created from 2026-07-01 SkillMeat and agentic artifact thesis handoff packet. PKM vault was unavailable in this environment, so working artifacts were saved under docs/blog-work/."
+---
+import Callout from '../../components/content/Callout';
+import Figure from '../../components/content/Figure.astro';
+
+Over the last several months, I have become increasingly convinced that one of the most important missing layers in agentic AI is not another model, another chat interface, or even another agent framework.
+
+It is the artifact layer.
+
+The reusable pieces that shape agent behavior -- skills, prompts, commands, tools, MCP servers, workflows, context packs, policies, evals, and deployment bindings -- are becoming the operational substrate of agentic systems. That is why I started building SkillMeat: first as a practical way to manage and reuse skills, and then increasingly as a reference implementation for a broader idea I now think is inevitable.
+
+Agentic work is going to need a supply chain.
+
+That claim sounded a little abstract when skills were mostly local folders, copied prompt files, and scattered project conventions. It sounds less abstract now. GitHub has added [`gh skill`](https://github.blog/changelog/2026-04-16-manage-agent-skills-with-github-cli/) to the GitHub CLI for discovering, installing, managing, and publishing agent skills from repositories. JFrog now has [Artifactory Skills repositories](https://docs.jfrog.com/artifactory/docs/skills-repositories) and an [Agent Skills Registry](https://jfrog.com/ai-catalog/skills-registry/) with versioning, scanning, signing, and access-control language. Red Hat is publishing a [catalog of skills, agents, and MCP servers](https://catalog.redhat.com/en/ai), and OpenShift AI is adding an [MCP catalog](https://www.redhat.com/en/blog/mcp-catalog-here-discover-deploy-and-connect-red-hat-openshift-ai) that moves from discovery into deployment and runtime connectivity. The [official MCP Registry](https://modelcontextprotocol.io/registry/about) is formalizing metadata and sub-registry infrastructure for MCP servers.
+
+That is not a threat to the thesis. It is validation of the first layer.
+
+The important point is not that these efforts are the same as SkillMeat. They are not. The important point is that the industry is independently reaching the same conclusion: agentic capabilities need package and registry semantics.
+
+The registry wave is real. It is also only the beginning.
+
+<Figure
+  src="/assets/posts/the-registry-wave-agentic-artifact-supply-chain/diagram-market-wave.svg"
+  alt="A progression from copied prompts to local skills, skill and MCP registries, governed artifact supply chains, and intent-to-outcome control planes."
+  number="01"
+  caption="The first wave makes agentic capabilities discoverable and installable. The next layer has to govern their full lifecycle."
+/>
+
+## Before Skills Were Products, They Were Reusable Behavior
+
+My starting point was not a category name. It was a practical annoyance.
+
+I was using AI coding agents heavily and kept seeing the same pattern: the valuable behavior was not only in the model. It was in the environment around the model. It lived in reusable instruction files, project prompts, shell scripts, context snippets, tool configs, examples, guardrails, and workflow conventions.
+
+At first, those looked like helper prompts.
+
+Then they looked like local conventions.
+
+Then they looked like reusable skills.
+
+Eventually it became obvious that they were something larger: agentic artifacts.
+
+The hard part was not getting an agent to do something useful once. The hard part was making that behavior repeatable across projects, machines, teams, and runtimes. Good agent behavior was a bundle: instructions, context, assumptions, examples, tools, permissions, and review expectations. When that bundle lived in one chat transcript or one local folder, it was fragile. When another project needed it, the answer was usually copy and paste.
+
+Copy and paste is fine for discovery. It is not a lifecycle.
+
+Once teams start copying these pieces, they immediately need the boring software questions: where did this come from, what version is it, who owns it, what does it depend on, who approved it, where can it run, and what breaks if we change it?
+
+That is the origin insight behind SkillMeat.
+
+## Why SkillMeat Started With Skills
+
+Skills were the natural first artifact type because they had the right shape.
+
+They are discrete. Developers can understand them. They can be moved between projects. They are often expressed as Markdown plus supporting files. They encode procedural knowledge. Most importantly, they make agent behavior packageable.
+
+That matters. A skill is small enough to install and large enough to carry intent. It can tell an agent how to perform a task, when to use supporting scripts, which references matter, and which constraints should shape execution. It is not just a prompt; it is a capability bundle.
+
+But once I started managing skills, the broader pattern became impossible to ignore. Prompts had the same lifecycle problem. So did commands, hooks, MCP servers, context packs, policy bundles, eval sets, deployment profiles, workflow definitions, and generated outputs with provenance.
+
+SkillMeat started with skills because skills were the obvious first unit. It was never meant to stop there.
+
+The project began as a local skill manager for reusable agent capabilities. It then broadened into artifact records, source acquisition, collection curation, project deployment, context packaging, and governance/provenance work. That evolution matters because it matches the underlying pattern: agent capabilities are not just files to copy. They are supply-chain artifacts that get acquired from sources, curated into collections, materialized into runtimes, and governed with policy and evidence.
+
+The deeper bet is that agentic systems need an artifact management layer: something closer to a supply-chain control plane than a folder sync tool. Local-first workflows, project sync, artifact versioning, import and discovery, and deployment into agent runtimes are the first moves. Governance, federation, context, policy, evidence, and outcome linkage are where the problem gets interesting.
+
+<Callout type="info" title="Scope note">
+I am intentionally staying at the thesis and architecture-pattern level here. There are deeper implementation questions around provenance, federation, packaging, and evidence that I am still working through carefully.
+</Callout>
+
+## The Market Is Catching the First Wave
+
+The current market movement is useful because it makes the category visible.
+
+GitHub's `gh skill` brings agent skills into a package-manager-shaped workflow: discover, install, update, publish, pin to tags or commits, target multiple agent hosts, and carry source-tracking metadata in frontmatter. The docs are explicit about the supply-chain problem: skills are executable instructions that shape agent behavior, and silent changes between installs create risk.
+
+JFrog is coming at the same problem from the software supply-chain side. Its Skills repositories make skills a package type in Artifactory, with CLI flows for publish, install, search, update, list, and delete. Its Agent Skills Registry language is even more direct: versioned, scanned, signed, access-controlled skills managed alongside other AI assets. Skill scanning extracts metadata from `SKILL.md`, applies artifact properties, and indexes through Xray.
+
+Red Hat is validating the enterprise platform angle. Its agentic skills catalog presents skills, agents, and MCP servers as curated building blocks backed by a subscription. Its OpenShift AI MCP catalog goes further than a static listing: the catalog is tied to discovery, deployment, lifecycle management, runtime connectivity, identity-aware routing, and per-tool metrics, with some components still in preview.
+
+The MCP Registry validates the server-discovery layer. It is an official centralized metadata repository for publicly accessible MCP servers, with namespace verification, a REST API for clients and aggregators, standardized install/configuration metadata, and an OpenAPI spec that downstream and private registries can implement.
+
+The research and security ecosystem is making the risk visible too. Recent work on [`SKILL.md` supply-chain attacks](https://arxiv.org/abs/2605.11418) argues that skill metadata is not passive documentation; it affects discovery, selection, and governance outcomes. [Snyk's ToxicSkills research](https://snyk.io/blog/toxicskills-malicious-ai-agent-skills-clawhub/) and [Unit 42's OpenClaw marketplace analysis](https://unit42.paloaltonetworks.com/openclaw-ai-supply-chain-risk/) both frame agent skills as a live supply-chain attack surface, not a theoretical future concern.
+
+Taken together, the pattern is hard to miss.
+
+Skills are becoming installable packages. MCP servers are becoming registry-managed tool surfaces. Security teams are starting to treat agent capabilities like software supply-chain objects. Platform vendors are adding catalog, deployment, and governance language around agentic assets.
+
+That is the first wave.
+
+## A Registry Is Not a Supply Chain
+
+A registry solves important problems.
+
+Where do I find this skill? How do I install it? What version am I using? Where did it come from? Can I update it? Can I publish it?
+
+Those are real questions. They need good answers. But they are not the whole enterprise problem.
+
+<Figure
+  src="/assets/posts/the-registry-wave-agentic-artifact-supply-chain/diagram-registry-control-plane.svg"
+  alt="A side-by-side comparison of registry actions and control-plane responsibilities."
+  number="02"
+  caption="Registries manage package and discovery semantics. Control planes manage trust, deployment, runtime, revocation, and proof."
+/>
+
+The supply-chain questions start one layer deeper:
+
+| Registry question | Supply-chain question |
+| --- | --- |
+| Where is this skill? | Should this skill be trusted? |
+| What version is installed? | What policy, context, evals, and permissions govern it? |
+| How do I publish it? | How does it move across teams, runtimes, and approval gates? |
+| How do I update it? | What breaks if I revoke or replace it? |
+| What repo did it come from? | What outcomes did it help produce? |
+
+A registry tells you where the artifact is.
+
+A control plane tells you whether it should be used, where it can run, what it depends on, what evidence supports it, and what outcomes it produced.
+
+That distinction matters because agentic artifacts do not behave like passive files. A prompt can change a decision path. A skill can run scripts. An MCP server can bridge an agent into an enterprise system. A context pack can make stale assumptions look authoritative. A policy bundle can constrain action, or fail to. An eval set can create confidence or false confidence. A generated output can become a PR, a release, a support response, or an operational change.
+
+The enterprise question is not "do we have a place to store these things?"
+
+It is "can we govern the lifecycle of the things that shape agent behavior?"
+
+## Agentic Artifacts Are Bigger Than Skills
+
+Here is the public definition I use:
+
+> An agentic artifact is any reusable, versionable unit that shapes how an agent reasons, acts, accesses tools, applies context, follows policy, or produces work.
+
+That includes skills, but it does not end there.
+
+<Figure
+  src="/assets/posts/the-registry-wave-agentic-artifact-supply-chain/diagram-artifact-taxonomy.svg"
+  alt="A taxonomy of agentic artifacts: instruction, tool, context, governance, execution, and evidence artifacts."
+  number="03"
+  caption="The artifact surface spans instruction, tool, context, governance, execution, and evidence layers."
+/>
+
+The taxonomy I find useful looks like this:
+
+| Artifact category | Examples |
+| --- | --- |
+| Instruction artifacts | prompts, skills, commands, hooks |
+| Tool artifacts | MCP servers, tool declarations, API adapters |
+| Context artifacts | context packs, memory bundles, domain packs, ADR packs |
+| Governance artifacts | policies, approvals, eval sets, permissions |
+| Execution artifacts | workflows, agent definitions, sessions, traces |
+| Evidence artifacts | provenance records, run manifests, audit events, outcome links |
+
+The lifecycle is starting to look familiar:
+
+1. Prompt reuse: people copy and paste prompts because the behavior worked once.
+2. Skill packaging: reusable capabilities become installable units.
+3. Registry semantics: skills and MCP servers become discoverable, versioned, and updatable.
+4. Governance semantics: approval, policy, trust, access, scanning, and revocation arrive.
+5. Context supply chain: reusable context becomes managed infrastructure instead of tribal knowledge.
+6. Execution evidence: sessions link back to artifacts, policies, tools, outputs, and outcomes.
+7. Artifact control plane: organizations manage the lifecycle across runtimes, teams, registries, IDEs, and platforms.
+
+This is where the conversation moves beyond skills registries.
+
+The enterprise will not accept ten different governance models for ten kinds of agentic artifacts. Skills in one place, MCP servers in another, prompts in a third, evals in a fourth, context packs in a wiki, policies in a security tool, generated outputs in Git, and evidence in whatever transcript happened to survive.
+
+That fragmentation is exactly how Shadow AI becomes operational debt.
+
+## The Control Plane Enterprises Will Need
+
+The control plane I think enterprises will need has several layers.
+
+It needs a registry core, because artifacts need identity, versioning, metadata, search, install semantics, and update paths.
+
+It needs a governance layer, because some artifacts are low-risk helpers and others carry production permissions, security assumptions, or regulated context.
+
+It needs a context layer, because agent performance depends heavily on current, governed, domain-specific context. Context is not just documentation. It is runtime input.
+
+It needs a marketplace and federation layer, because no one vendor will own every runtime, IDE, cloud, model, registry, package system, and enterprise agent platform. GitHub, JFrog, Red Hat, MCP registries, internal catalogs, IDEs, and agent runtimes will all be part of the terrain.
+
+It needs a deployment and distribution layer, because an artifact that works in one host may need different placement, permissions, packaging, or compatibility metadata in another.
+
+It needs an evidence and provenance layer, because the important executive question is not how many agents ran. It is which accepted delivery outcomes were produced, with what evidence, by which artifacts, tools, contexts, policies, models, and sessions.
+
+And it needs runtime adapters, because the control plane has to connect to the real places agents run.
+
+<Figure
+  src="/assets/posts/the-registry-wave-agentic-artifact-supply-chain/diagram-intent-outcome-chain.svg"
+  alt="A chain from human intent to governed context, approved artifacts, an agent session, produced work, a shipped change, and outcome evidence."
+  number="04"
+  caption="The durable enterprise unit is not an agent session. It is the intent-to-outcome chain the session participates in."
+/>
+
+This is the broader space SkillMeat is building toward: reusable agentic artifacts and their lifecycle across projects, teams, and runtimes. The implementation will keep changing. The thesis has been stable for me: the artifacts that shape agent behavior need to become governed assets.
+
+## Why This Matters for Enterprises
+
+At small scale, unmanaged agentic artifacts look like convenience.
+
+At enterprise scale, they become risk.
+
+One team installs a public skill because it saves time. Another forks it and changes the assumptions. A third copies the prompt into an internal repo. Someone adds a script. Someone else points an MCP server at a production system. A context pack drifts out of date. An eval set gets treated as proof even though it no longer matches the runtime. A generated output turns into a PR, and nobody can reconstruct which instructions, tools, context, and policies shaped it.
+
+That is not a hypothetical edge case. It is the normal failure mode of unmanaged reuse.
+
+The pain points are predictable:
+
+- Shadow AI: capabilities installed outside platform visibility.
+- Prompt injection and semantic manipulation: natural-language instructions become part of the attack surface.
+- Stale context: agents confidently act on old assumptions.
+- Duplicate artifacts: teams solve the same problem with subtly different behavior.
+- No approval trail: nobody can tell who allowed a capability into the environment.
+- No revocation path: replacing a risky artifact becomes a scavenger hunt.
+- Vendor fragmentation: each host has its own artifact format and governance story.
+- No outcome linkage: agent usage cannot be connected to accepted delivery value.
+
+This is why I do not think the winning metric will be tokens, sessions, or number of agents.
+
+The winning metric will be accepted outcomes with evidence.
+
+How many changes made it to production? Which ones were accepted by reviewers? Which incidents were resolved? Which documents were approved? Which customer workflows improved? Which artifacts contributed to those outcomes? Which ones should be reused, retired, or blocked?
+
+That is the control-plane question.
+
+## My Bet
+
+My bet is that the next several years will look like this:
+
+Skills become package-manager-native. Every major agent runtime will support installable skills or equivalent capability packs.
+
+MCP registries become enterprise infrastructure. MCP servers will need discovery, deployment, authorization, scoring, revocation, and runtime policy.
+
+Registries fragment by artifact class first. Skills, MCP servers, prompts, agents, workflows, evals, and context packs will each get their own registries, catalogs, and marketplaces before the enterprise pushes for unification.
+
+Context becomes infrastructure. Reusable context packs will matter as much as skill packages because agent performance depends on governed, current, domain-specific context.
+
+Provenance moves beyond code. SBOM-style thinking will extend into agentic execution: which skills, prompts, tools, context, policies, models, and sessions produced a change?
+
+Outcome evidence becomes the executive metric. The board-level conversation will not be "how many agents did we deploy?" It will be "which trusted outcomes did this operating model produce, and can we prove it?"
+
+The control plane becomes federated. The enterprise layer has to integrate across registries, runtimes, clouds, IDEs, internal catalogs, and security systems. Single-vendor purity is not a serious operating assumption.
+
+The registry wave is here, and I think that is worth celebrating. It means the industry is beginning to recognize that agentic capabilities need package semantics, versioning, distribution, and governance.
+
+But registries are only the first visible layer. The real enterprise challenge is larger: governing the artifacts, context, policies, runtimes, evidence, and outcomes that turn agentic AI from impressive demos into trusted delivery capacity.
+
+That is the space I am building toward with SkillMeat, and I believe it is where the next several years of enterprise agentic architecture will be defined.
+
+## Sources
+
+- GitHub Changelog, [*Manage agent skills with GitHub CLI*](https://github.blog/changelog/2026-04-16-manage-agent-skills-with-github-cli/), April 16, 2026.
+- GitHub CLI Manual, [`gh skill install`](https://cli.github.com/manual/gh_skill_install) and [`gh skill publish`](https://cli.github.com/manual/gh_skill_publish).
+- JFrog Docs, [*Skills Repositories*](https://docs.jfrog.com/artifactory/docs/skills-repositories), [*JFrog CLI for Skills*](https://docs.jfrog.com/artifactory/docs/jf-skills), and [*Scanning AI Agent Skills*](https://docs.jfrog.com/security/docs/skill-scanning).
+- JFrog, [*Agent Skills Registry*](https://jfrog.com/ai-catalog/skills-registry/).
+- Red Hat Ecosystem Catalog, [*Red Hat agentic skills*](https://catalog.redhat.com/en/ai).
+- Red Hat Blog, [*The MCP catalog is here: Discover, deploy, and connect on Red Hat OpenShift AI*](https://www.redhat.com/en/blog/mcp-catalog-here-discover-deploy-and-connect-red-hat-openshift-ai).
+- Model Context Protocol, [*The MCP Registry*](https://modelcontextprotocol.io/registry/about) and [*Introducing the MCP Registry*](https://blog.modelcontextprotocol.io/posts/2025-09-08-mcp-registry-preview/).
+- Saha, Faghih, and Feizi, [*Under the Hood of SKILL.md: Semantic Supply-chain Attacks on AI Agent Skill Registry*](https://arxiv.org/abs/2605.11418), arXiv, May 2026.
+- Snyk Research, [*ToxicSkills Study of Agent Skills Supply Chain Compromise*](https://snyk.io/blog/toxicskills-malicious-ai-agent-skills-clawhub/).
+- Palo Alto Networks Unit 42, [*OpenClaw's Skill Marketplace and the Emerging AI Supply Chain Threat*](https://unit42.paloaltonetworks.com/openclaw-ai-supply-chain-risk/), June 2026.
