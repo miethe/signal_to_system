@@ -1,0 +1,297 @@
+---
+title: 'Implementation Plan: Patent Review Council Initiative'
+excerpt: A field note from the Agentic OS build loop.
+date: '2026-08-02'
+readTime: 6 min read
+status: draft
+storyType: after-action
+tags:
+- agent-ready-repos
+- human-ai-workflow
+- artifact-first
+automated: true
+whyItMatters: The work shows how agentic systems turn operational evidence into reusable
+  practice.
+leaderTakeaway: Treat after-action reports as publication-ready raw material, but
+  keep the safety gate explicit.
+sourceAar: 'Implementation Plan: Patent Review Council Initiative'
+---
+
+**Complexity:** XL (T3) | **Track:** Full (orchestration initiative, multi-subsystem)
+**Estimated effort:** 19–20 story points | **Timeline:** ~4–5 weeks (gated — each hop requires human approval before execution)
+
+> **Framing (critical).** This is NOT a code feature in `agentic_meta_dev`. The "tasks" are
+> artifact-authoring steps (YAML role/rubric/council authoring) and gated CLI run-orchestration hops
+> across AOS subsystems. P0 is already complete. P2–P5 are gated — they do NOT run automatically.
+> Each expensive/irreversible hop requires explicit human `op approve <run_id>` before the next phase
+> executes. "Owner/CLI" in task tables names the CLI or delegate that executes the work, not a
+> SkillMeat code subagent.
+
+---
+
+## Phase Overview
+
+| Phase | Goal | Exit Gate | Est pts | Owner/CLI |
+|-------|------|-----------|:-------:|-----------|
+| **P0** — Housekeeping | Frontmatter fix, vault move, MeatyWiki ingest | DONE — no gate | DONE | `meatywiki` CLI (complete) |
+| **P1** — Author patent armory ✅ DONE | 6 new reviewer roles + 1 adapted + rubric + council def + schema + agent stubs | `arc councils resolve --project patent-review --type patent-review-council --dry-run` exits 0 (+ roles/council lint + repo validate) | 5 pts | in-session (2026-06-25) |
+| **P2** — Run council | Provider preflight + op plan gate + ARC run (12 families × 9 dims) + adjudication review | ARC schema/evidence gates pass; op plan gate approved; all 6 artifacts emitted | 5 pts | `op` + `arc` CLIs; in-session Opus for adjudication |
+| **P3** — Prior-art on survivors | rf evidence run scoped to top-ranked families; concept-level queries only (R2 enforced) | rf verification pass; op writeback gate approved | 3 pts | `rf` CLI; op writeback gate (human) |
+| **P4** — Verdict writeback | Distill scorecard + prior-art → decision record filed in MeatyWiki at `[REDACTED]/ip/` | Op writeback gate approved; file exists at canonical path | 2 pts | In-session Opus (verdict prose); `meatywiki` CLI |
+| **P5** — Filing-prep initiative | IntentTree tree scaffold: §9 (evidence) + §11 (claim chain) + §10 (IBM alignment) nodes | Op task-graph gate approved; `itt show` ≥ 15 nodes | 3 pts | `itt`/`intenttree` CLI; op task-graph gate (human) |
+| **DOC** — Deferred design specs | Design-spec authoring for OQ-SCHEMA, OQ-PROVIDER, OQ-EVIDENCE-WIRE, OQ-101-MODEL | Files authored and cross-referenced in plan frontmatter | 1–2 pts | `~/ica-claude.sh` (sonnet-4-6[1m]) |
+| **Total** | | | **19–20 pts** | |
+
+---
+
+## Dependency Map
+
+```
+P0 (DONE)
+  └─→ P1: Author patent armory
+         └─→ [op plan gate] ──→ P2: Run council
+                                     └─→ [ARC automated gates]
+                                           └─→ [op plan gate] ──→ P3: Prior-art on survivors
+                                                                       └─→ [rf verification]
+                                                                             └─→ [op writeback gate] ──→ P4: Verdict writeback
+                                                                                                              └─→ [op writeback gate] ──→ P5: Filing-prep initiative
+                                                                                                                                               └─→ [op task-graph gate]
+
+DOC: Parallelizable with P1 and later — no gate dependency; can be authored any time after P1 exit
+```
+
+**Critical path:** P0 → P1 → P2 → P3 → P4 → P5 (strictly sequential; each phase is gated)
+**Parallelizable:** DOC phase design-spec tasks can be authored in parallel with P1 or between any two gated hops.
+
+---
+
+## Ownership Map
+
+| Concern | Repo/Location |
+|---------|---------------|
+| Entrypoint, durable run record, all gates | `op` run record in `agentic_meta_dev` |
+| Council def, reviewer roles, rubric, run outputs | `../[REDACTED]/{councils/,reviewer_roles/,rubrics/,schemas/,runs/}` |
+| Prior-art evidence bundle | `../research-foundry` run artifacts |
+| Source packet + verdict + decision record | `~/Documents/Other/PKM/llm-wiki/[REDACTED]/ip/` |
+| Filing-prep task graph | `itt` workspace, patent-triage tree |
+
+---
+
+## P0 — Housekeeping (DONE)
+
+P0 is complete. Included here for the run record.
+
+| Task ID | Description | CLI/Owner | Status |
+|---------|-------------|-----------|--------|
+| P0-001 | Fix frontmatter on source packet (`patent-review-council-context-2026-06-24.md`): set `work_sensitive: true`, `doc_type: prd` → `doc_type: report` or appropriate vault type | `meatywiki` CLI / manual edit | DONE |
+| P0-002 | Move source packet to canonical vault path: `~/Documents/Other/PKM/llm-wiki/[REDACTED]/ip/patent-review-council-context-2026-06-24.md` | Filesystem + `meatywiki` CLI | DONE |
+| P0-003 | Ingest source packet into MeatyWiki (`meatywiki sync` or equivalent) | `meatywiki` CLI | DONE |
+
+**P0 exit:** Source packet is accessible at its canonical vault path. No gate.
+
+---
+
+## P1 — Author Patent Armory (5 pts)
+
+**Entry criterion:** P0 complete; `../[REDACTED]` repo available locally; ARC schemas unchanged since discovery sweep (2026-06-24).
+**Status: ✅ COMPLETE (2026-06-25), in-session.** All 8 tasks done; gate green. See `.claude/progress/patent-review-council/phase-1-progress.md`.
+
+**Exit gate (CORRECTED).** The originally-documented command `arc councils resolve --council-type patent-review --dry-run` does not run: `arc councils resolve` *requires* `--project <profile>` (none existed → authored `projects/patent-review/project.yaml`) and the flag is `--type`, not `--council-type` (the latter exists only on `arc run`). The resolver loads `councils/<--type>.yaml`, so `--type` is the council **name** (`patent-review-council`); `councilType: patentability` is a separate field. Actual gate, all passed:
+```
+uv run arc roles lint reviewer_roles/<each>.yaml                              # 7× exit 0
+uv run arc councils lint councils/patent-review-council.yaml                  # valid, 0 ref warnings
+uv run arc validate .                                                        # ARC validation passed
+uv run arc councils resolve --project patent-review --type patent-review-council --dry-run   # exit 0, lock written
+```
+
+**P1-001 (OQ-SCHEMA) DECISION = (b)** author `schemas/patent-triage.schema.json` (per-family triage records). The flat ARCScorecard cannot carry the 12-family axis + triage bucket; scorecard stays the run-level rollup. **DOC-004 (OQ-101-MODEL)** folded into `eligibility-101-specialist.yaml`: `strong_reasoning` + `hypothesisLabeling: required_when_evidence_below_E2` (agent `model: opus`).
+
+### Reuse inventory (no authoring needed)
+
+The following ARC artifacts are reused as-is and require no P1 work:
+- `reviewer_roles/adjudicator-validation-planner.yaml` — council adjudicator
+- `reviewer_roles/skeptic-red-team.yaml` — patent-skeptic / validity red-team seat
+- `reviewer_roles/evidence-quality-scribe.yaml` — optional evidence-sufficiency reviewer
+- `rubrics/evidence-quality.yaml` — E0–E5 evidence ladder; reused as confidence rubric
+
+### P1 task table
+
+| Task ID | Description | Target file(s) in `../[REDACTED]` | Owner/CLI | Depends on | Acceptance |
+|---------|-------------|----------------------------------------|-----------|------------|------------|
+| P1-001 | **Resolve OQ-SCHEMA.** Inspect `schemas/scorecard.schema.json`; determine if it can carry 9 patentability dims + `triage_bucket` per family row. Decision: (a) extend scorecard schema, or (b) author `patentTriage.schema.json`. Record decision in a code comment / inline note before proceeding to P1-007. | `schemas/scorecard.schema.json` (read) | In-session (Opus judgment call) | P0 DONE | Decision is written and visible; path (a) or (b) recorded |
+| P1-002 | **Author 6 new reviewer role YAMLs.** Each YAML must validate against ARC `ReviewerRole` schema (`kind: ReviewerRole`, `spec.mission`, `spec.roleType`, `spec.domains`, `spec.source.claudeAgent`, `spec.modelPolicy`, `spec.output`, `spec.calibration.confidenceRubric` → reuse E0–E5 ladder). Use extend-by-overlay for ibm-strategic-fit-reviewer (base: `control-plane-strategist`) and prior-art-overlap-analyst (base: `domain-research-reviewer`). | `reviewer_roles/patentability-examiner.yaml`; `reviewer_roles/eligibility-101-specialist.yaml`; `reviewer_roles/prior-art-overlap-analyst.yaml`; `reviewer_roles/technical-enablement-rtp-reviewer.yaml`; `reviewer_roles/disclosure-risk-reviewer.yaml`; `reviewer_roles/ibm-strategic-fit-reviewer.yaml` | `~/ica-claude.sh` (sonnet-4-6[1m]) | P1-001 (schema decision) | All 6 files exist; each validates against ReviewerRole schema; `spec.source.claudeAgent` points to a path under `..[REDACTED]/.claude/agents/` |
+| P1-003 | **Author 1 adapted reviewer role YAML** for the business-value seat: `business-value-analyst.yaml` overlaying `dora-roi-analyst`. Extend, do not fork. | `reviewer_roles/business-value-analyst.yaml` | `~/ica-claude.sh` (sonnet-4-6[1m]) | — | File exists; schema valid; `spec.mission` reflects commercial-value / cost-per-outcome scoring; overlay reference to base role noted in YAML comment |
+| P1-004 | **Author agent stubs** (`.claude/agents/<name>.md`) for all 7 new/adapted reviewer roles (P1-002 + P1-003). Per FR-7, each `ReviewerRole` YAML's `spec.source.claudeAgent` must point to a valid agent definition. Keep stubs minimal: mission, domain, model policy. | `../[REDACTED]/.claude/agents/patentability-examiner.md`; `…/eligibility-101-specialist.md`; `…/prior-art-overlap-analyst.md`; `…/technical-enablement-rtp-reviewer.md`; `…/disclosure-risk-reviewer.md`; `…/ibm-strategic-fit-reviewer.md`; `…/business-value-analyst.md` | `~/ica-claude.sh` (sonnet-4-6[1m]) | P1-002, P1-003 | 7 agent stub files exist; each `spec.source.claudeAgent` path in the corresponding role YAML resolves |
+| P1-005 | **Author `patentability.yaml` rubric.** Must include all 9 dimensions (D1–D9) with scoring question per dim; severity rubric (high/medium/low/info); confidence rubric = reference to `evidence-quality.yaml` E0–E5 ladder (not duplicated). Grounded in PRD §5.2 + MPEP §§101/102/103/112. | `rubrics/patentability.yaml` | `~/ica-claude.sh` (sonnet-4-6[1m]) | P1-001 | File exists; ARC rubric loader parses it; all 9 dimension IDs (novelty, non_obviousness, technical_specificity_101, enablement_rtp, prior_art_overlap, ibm_strategic_fit, business_value, disclosure_risk, disclosure_readiness) are present |
+| P1-006 | **Author `patent-review-council.yaml` CouncilDefinition.** Key fields: `apiVersion: arc/v1alpha1`; `kind: CouncilDefinition`; `spec.councilType: patentability`; `spec.defaultRunMode: independent-review-then-adjudicate`; `spec.requiredInputs: [source_packet, family_list]`; reviewers = 8 roles (P1-002/P1-003 + 3 reused); `spec.adjudicator: adjudicator-validation-planner`; `spec.requiredArtifacts: [findings.yaml, adjudication_record.yaml, scorecard.json, risk_register.yaml, validation_plan.md, arc_certification.yaml]`; `spec.gates: [schema_validation, evidence_required_for_material_findings, human_approval_for_high_risk_actions, trace_bundle_written]`; `spec.dataBoundaries.networkPolicy: loopback_only`; `spec.runConfig.objectiveTemplate` encodes 12-family batch (per-family rows in scorecard, single run). | `councils/patent-review-council.yaml` | `~/ica-claude.sh` (sonnet-4-6[1m]) + in-session spine review | P1-002, P1-003, P1-005 | File exists; `spec.councilType: patentability`; all 8 named reviewers resolve against authored role files; `runConfig.objectiveTemplate` references the 12-family batch structure |
+| P1-007 | **Author output schema** based on P1-001 decision. If (a): extend `scorecard.schema.json` with `patentability_dims` block + `triage_bucket` enum per family entry. If (b): author `patentTriage.schema.json` — schema for per-family triage records with D1–D9 scores + `triage_bucket` + `confidence` + `adjudicator_rationale`. | `schemas/scorecard.schema.json` (extend) OR `schemas/patentTriage.schema.json` (new) | `~/ica-claude.sh` (sonnet-4-6[1m]) | P1-001, P1-005 | Schema file exists and is valid JSON Schema; `patent-review-council.yaml` `spec.outputSchemas` references it correctly |
+| P1-008 ✅ | **Validate P1 exit gate.** Run the corrected gate (`arc roles lint` ×7 + `arc councils lint` + `arc validate .` + `arc councils resolve --project patent-review --type patent-review-council --dry-run`). All reviewer roles resolve; rubric parses; schema validates; lock written, no errors/warnings. | — | `arc` CLI (`uv run`) | P1-002 through P1-007 | ✅ All exit 0; 0 warnings; lock written |
+
+**P1 model routing:**
+- YAML authoring (P1-002 through P1-007): `~/ica-claude.sh` delegated batches (sonnet-4-6[1m], bounded contract-clear authoring)
+- OQ-SCHEMA judgment (P1-001) + council-composition spine review: in-session (Opus)
+- P1-008 validation: `arc` CLI shell call, no model
+
+---
+
+## P2 — Run Council (5 pts)
+
+**Entry criterion:** P1 exit gate passed (`arc --dry-run` exits 0). Op plan gate approved by human before fan-out.
+**Note:** P2 is the most expensive and model-intensive phase. The plan gate fires BEFORE the council fan-out begins — this is the human checkpoint to confirm provider readiness, budget, and evidence_pack completeness.
+**Exit gate:** ARC `schema_validation` + `evidence_required_for_material_findings` + `trace_bundle_written` automated gates all pass; op plan gate approved; all 6 required ARC artifacts exist in the run directory.
+
+| Task ID | Description | Owner/CLI | Depends on | Acceptance |
+|---------|-------------|-----------|------------|------------|
+| P2-001 | **Provider preflight.** Verify LLM provider key is reachable before scheduling fan-out. Test that the agentic node (`[REDACTED]`) services are live (or ICA gateway configured). Do NOT proceed to P2-003 if preflight fails — file the failure in the op run record and pause. | `op doctor` / `ssh [REDACTED]` / ICA health check (in-session) | P1-008 | Provider endpoint returns a successful health probe; key is valid; provider name logged in op run record |
+| P2-002 | **Assemble evidence_pack for enablement/RTP dimension (OQ-EVIDENCE-WIRE).** Gather certification outputs from SME councils (skillbom-provenance, golden-context-pack-certification, ccdash-evidence-attribution, skillmeat-artifact-promotion, asdlc-strategy) as evidence inputs for the `enablement_rtp` (D4) dimension per family. Manual assembly acceptable for v1 (see DOC-003 for the design spec). Format as a structured YAML or JSON evidence manifest keyed by family ID. | In-session (manual assembly) | P1-008 | Evidence manifest file exists; each family entry has at least one evidence reference for D4; manifest path noted in op run record |
+| P2-003 | **Open op run record.** Initialize the op run for the council initiative: `op "<run title>"` or `op new "patent-review-council run"`. Record the council YAML path, evidence_pack path, source packet path, and planned gate sequence in the run record. | `op` CLI | P2-001, P2-002 | `op show <run_id>` returns the run record; gate states are all `pending`; artifact refs are recorded |
+| P2-004 | **Approve op plan gate** (human action). Human reviews: provider preflight passed, evidence_pack is assembled, council YAML is authored and dry-run validated. Approve with `op approve <run_id>`. This is the irreversibility checkpoint — fan-out begins after this. | Human + `op approve` | P2-003 | `op show <run_id>` shows the plan gate as `approved`; timestamp recorded |
+| P2-005 | **Execute ARC council run.** Invoke `arc councils run --council patent-review-council --input source_packet=<path> --input family_list=<path> --input evidence_pack=<path>` (or equivalent `council-run` skill invocation). Single run; all 12 families scored in one pass; per-family rows in scorecard. Adjudication uses Opus; classify/extract roles use cheap models per ARC reviewer `modelPolicy`. | `arc` CLI / `council-run` skill | P2-004 | Run completes without fatal error; run directory created under `../[REDACTED]/runs/`; progress visible in ARC trace |
+| P2-006 | **ARC automated gates.** ARC enforces `schema_validation`, `evidence_required_for_material_findings`, `human_approval_for_high_risk_actions`, and `trace_bundle_written` internally during the run. If any gate fails, the run halts with a structured error; the operator must remediate before continuing. | `arc` (system, automated) | P2-005 | All 4 gates show `pass` in ARC run summary; `arc_certification.yaml` and `provenance.skillbom` exist in run dir |
+| P2-007 | **Adjudication review in-session.** Load `adjudication_record.yaml` and `scorecard.json` from the run directory. In-session Opus reviews: are triage buckets coherent with dimension scores? Any family with an ambiguous bucket requires a note. Confirm each of the 12 families has a `triage_bucket` assignment (FILE / CONTINUATION / DEFENSIVE PUB / TRADE SECRET / DROP). | In-session (Opus) | P2-006 | All 12 families have a `triage_bucket` in `adjudication_record.yaml`; reviewer notes any bucket that required override or disambiguation |
+| P2-008 | **Verify artifact completeness.** Confirm all 6 required ARC artifacts exist: `findings.yaml`, `adjudication_record.yaml`, `scorecard.json`, `risk_register.yaml`, `validation_plan.md`, `arc_certification.yaml`. Assert `scorecard.json` has 12 rows × 9 scored dimensions. | In-session (shell/file check) | P2-006, P2-007 | File-existence check passes for all 6 artifacts; scorecard row/column count assertion passes (AC-4, AC-5, AC-6) |
+
+**P2 model routing:**
+- Provider preflight, op gate ops, file checks: no model / CLI-native
+- ARC reviewer roles: per-role `modelPolicy` (cheap models for classify/extract, Opus for adjudicator)
+- Adjudication in-session review (P2-007): in-session Opus
+
+---
+
+## P3 — Prior-Art on Survivors (3 pts)
+
+**Entry criterion:** P2 adjudication complete; triage buckets assigned; op plan gate has been approved for P2. Survivor families are those ranked FILE or CONTINUATION/PROVISIONAL.
+**Entry gate:** Explicitly decide which families are "survivors" before queuing the rf run. This is not automatic — the op plan gate must approve the survivor list AND the query set (R2 check).
+**Exit gate:** rf verification pass; op writeback gate approved.
+
+| Task ID | Description | Owner/CLI | Depends on | Acceptance |
+|---------|-------------|-----------|------------|------------|
+| P3-001 | **Identify survivor families.** From `scorecard.json` and `adjudication_record.yaml`, extract families with `triage_bucket: FILE` or `triage_bucket: CONTINUATION`. These are the families that enter the rf prior-art run. Record the survivor list in the op run record. | In-session (scorecard parse) | P2-008 | Survivor list is written to op run record; each survivor references the corresponding `scorecard.json` row |
+| P3-002 | **Draft rf query set.** For each survivor family and each applicable prior-art search area from PRD §5.4 (FR-16: ~18 areas including SPDX/CycloneDX/SLSA, SBOM/AI-BOM, OTel GenAI, Langfuse/Phoenix, watsonx Orchestrate, Microsoft Agent 365, ServiceNow AI Control Tower, Salesforce Agentforce, JFrog AI Catalog, MCP registries, GitHub packages, Backstage/RHDH, A2A/ARD, CI/CD provenance patents, workflow replay (Temporal-like), package-manager federation patents, code-assistant project rules), draft concept-level search queries. **R2 constraint:** no claim text, no family descriptions, no invention-specific language in queries — concept framing only. | In-session (query authoring) | P3-001 | Query set YAML/markdown file exists; covers ≥15 of 18 §8 search areas; no query contains verbatim invention language |
+| P3-003 | **R2 gate check — human review of query list.** Human reviews the full query list against R2 (disclosure risk). Confirms: (a) no claim text, (b) no family-specific descriptions, (c) no proprietary terminology that would identify the invention to an external service. This is a named pre-condition for P3-004. | Human (manual review) | P3-002 | Human confirms R2 compliance in writing (op run note or inline gate comment); any flagged queries are reworded before proceeding |
+| P3-004 | **Approve op plan gate for rf run.** After R2 check passes, human approves the rf execution gate via `op approve <run_id>`. | Human + `op approve` | P3-003 | `op show <run_id>` shows rf plan gate as `approved` |
+| P3-005 | **Execute rf evidence run** on survivor families. `rf run --query-file <path> --scope survivors` (or equivalent rf invocation). Covers concept-level queries across §8 search areas. | `rf` CLI | P3-004 | rf run completes; run artifacts written to `../research-foundry/runs/<run-id>/`; evidence bundle covers ≥15 of 18 prior-art areas |
+| P3-006 | **rf verification** (automated). rf's own verification gate confirms evidence quality and query coverage. | `rf` (system, automated) | P3-005 | `rf verify <run-id>` passes; verification report written |
+| P3-007 | **Approve op writeback gate.** Before rf artifacts are stored to any persistent/shared location, human approves the writeback via `op approve <run_id>`. | Human + `op approve` | P3-006 | `op show <run_id>` shows writeback gate as `approved`; rf artifacts are then canonically referenced in op run record |
+
+**P3 model routing:**
+- Query drafting (P3-002), survivor identification (P3-001): in-session (lightweight, no expensive model)
+- rf run (P3-005): rf's own key-profile governance (rf determines model class per query type)
+- All gate ops: no model
+
+---
+
+## P4 — Verdict Writeback (2 pts)
+
+**Entry criterion:** P3 writeback gate approved; rf evidence bundle accessible.
+**Exit gate:** Op writeback gate approved; decision record file exists at `~/Documents/Other/PKM/llm-wiki/[REDACTED]/ip/patent-triage-verdict.md` (or equivalent canonical path) with all 12 families covered.
+
+| Task ID | Description | Owner/CLI | Depends on | Acceptance |
+|---------|-------------|-----------|------------|------------|
+| P4-001 | **Distill verdict.** Load `scorecard.json`, `adjudication_record.yaml`, and rf evidence bundle. For each of the 12 families, produce a decision record entry: `triage_bucket`, `confidence_level`, `top_blocking_factors` (≤3 bullet points), `prior_art_proximity` (from rf), `recommended_next_action`. Author the full decision record document at draft path. | In-session (Opus) | P3-007 | Draft decision record file exists; all 12 families have a structured entry; each entry has `triage_bucket`, `confidence_level`, `recommended_next_action` |
+| P4-002 | **Approve op writeback gate.** Human reviews the draft decision record for accuracy, sensitivity, and completeness. Approves `op approve <run_id>` to authorize the MeatyWiki mutation. MeatyWiki mutations are treated as irreversible from the op run-record perspective. | Human + `op approve` | P4-001 | `op show <run_id>` shows writeback gate as `approved`; human has reviewed the draft content |
+| P4-003 | **Write decision record to MeatyWiki vault.** File the approved decision record at `~/Documents/Other/PKM/llm-wiki/[REDACTED]/ip/patent-triage-verdict.md`. Update the MeatyWiki index as needed (`meatywiki sync` or equivalent). Include a legal-disclaimer header (per PRD §13): output is decision-support, not legal advice. | `meatywiki` CLI | P4-002 | File exists at canonical path; `meatywiki` index reflects the new file; legal-disclaimer header present (AC-9) |
+| P4-004 | **Verify writeback.** Confirm file at canonical path via `meatywiki show` or filesystem check. Record artifact ref in op run record. | `meatywiki` CLI / shell | P4-003 | File-existence confirmed; op run record references the verdict path |
+
+**P4 model routing:**
+- Verdict distillation (P4-001): in-session Opus (expensive synthesis; one-time)
+- File write + verification: CLI-native, no model
+
+---
+
+## P5 — Filing-Prep Initiative (3 pts)
+
+**Entry criterion:** P4 complete; verdict record written and verified in MeatyWiki.
+**Exit gate:** Op task-graph gate approved; IntentTree tree created; `itt show <tree_id>` returns ≥15 nodes covering packet §9, §11, and §10 action items.
+
+| Task ID | Description | Owner/CLI | Depends on | Acceptance |
+|---------|-------------|-----------|------------|------------|
+| P5-001 | **Decompose filing-prep actions into IntentTree node list.** From source packet §9 (evidence gathering: dated engineering notes, commit evidence, screenshots, disclosure timeline, NDA/confidentiality status), §11 (first-disclosure claim chain: primary family, claim sketch, figures, inventor list, prior-art matrix), and §10 (IBM team alignment: contact map, submission checklist, disclosure form outline), derive a structured node list with parent-child hierarchy and effort estimates. Draft as a YAML or markdown scaffold for `itt` ingest. | In-session (decomposition) | P4-004 | Node-list scaffold exists with ≥15 nodes; parent-child structure reflects §9/§11/§10 groupings; each node has a title and a one-line description |
+| P5-002 | **Approve op task-graph gate.** Human reviews the node list for completeness and scope before the IntentTree tree is created. IntentTree tree creation is irreversible from the op run-record perspective. `op approve <run_id>`. | Human + `op approve` | P5-001 | `op show <run_id>` shows task-graph gate as `approved` |
+| P5-003 | **Execute `itt` workspace + patent-triage tree scaffold.** Create IntentTree workspace (if not exists) and seed the patent-triage tree from the node list. Use `itt create-tree` / `itt add-node` (or equivalent) to materialize the structure. Tag nodes with `source: §9`, `source: §11`, or `source: §10` for traceability. | `itt`/`intenttree` CLI | P5-002 | Tree and workspace created; `itt show <tree_id>` returns ≥15 nodes; nodes are tagged by source section |
+| P5-004 | **Verify tree and close op run.** Confirm node count and structure via `itt show`. Record tree ID in op run record. Confirm all op gates are `approved` in `op show <run_id>`. | `itt` CLI + `op show` | P5-003 | Node count ≥ 15 (AC-10); all op gate states = `approved` (AC-11); op run record is complete |
+
+**P5 model routing:**
+- Node-list decomposition (P5-001): in-session (lightweight reasoning, no expensive model needed)
+- Tree scaffold (P5-003): `itt` CLI, no model
+- Gate ops: no model
+
+---
+
+## DOC — Deferred Design Specs (1–2 pts)
+
+**Rationale.** The PRD §10 identifies 6 open questions. OQ-ROLE-STRATEGY and OQ-BATCHING are already decided (decisions block §2/§3). The remaining 4 require design-spec authoring to ensure the decisions are documented, reproducible, and traceable. These specs are written BEFORE the phase they unblock (OQ-SCHEMA before P1-007; OQ-PROVIDER and OQ-EVIDENCE-WIRE before P2; OQ-101-MODEL before P1-002).
+
+**Target path pattern:** `docs/project_plans/design-specs/patent-review-council-<slug>.md`
+
+| Task ID | OQ blocked | Description | Owner/CLI | Depends on | Acceptance |
+|---------|------------|-------------|-----------|------------|------------|
+| DOC-001 | OQ-SCHEMA | **Design spec: output schema decision.** Document the chosen approach (extend scorecard vs new patentTriage schema): schema field list, rationale, forward-compatibility note. Reference the authored schema file. Should be brief (1–2 pages). | In-session or `~/ica-claude.sh` | P1-001 (decision) | File at `docs/project_plans/design-specs/patent-review-council-output-schema.md`; linked in `deferred_items_spec_refs` in this plan's frontmatter |
+| DOC-002 | OQ-PROVIDER | **Design spec: provider preflight procedure.** Name the specific provider target (agentic node `[REDACTED]` as primary; ICA gateway as fallback). Document the preflight check steps, failure modes, and escalation procedure. Resolves the "agentic node vs ICA gateway" ambiguity before P2 is scheduled. | In-session or `~/ica-claude.sh` | P1 exit | File at `docs/project_plans/design-specs/patent-review-council-provider-preflight.md`; linked in `deferred_items_spec_refs` |
+| DOC-003 | OQ-EVIDENCE-WIRE | **Design spec: evidence_pack assembly procedure for enablement/RTP.** Define how SME-council outputs (skillbom-provenance, golden-context-pack-certification, ccdash-evidence-attribution, skillmeat-artifact-promotion, asdlc-strategy) are gathered, formatted, and injected as `evidence_pack` for the `enablement_rtp` (D4) dimension per family. Manual assembly is the v1 posture; spec defines the manifest format. | `~/ica-claude.sh` (sonnet-4-6[1m]) | P1 exit | File at `docs/project_plans/design-specs/patent-review-council-evidence-wire.md`; manifest format is unambiguous; v1 = manual assembly documented |
+| DOC-004 | OQ-101-MODEL | **Design spec: eligibility-101-specialist model class + evidence minimum.** Pin the model class (`strong_reasoning`) and minimum evidence level (E2 from the E0–E5 ladder) for the `eligibility-101-specialist` reviewer role. Document the rationale (§101 is the hardest call; hypothesis labeling below E2 reduces false confidence). This spec feeds directly into P1-002 when authoring the `eligibility-101-specialist.yaml`. | In-session | Before P1-002 | File at `docs/project_plans/design-specs/patent-review-council-101-model-class.md`; `eligibility-101-specialist.yaml` references the spec |
+
+---
+
+## Risk Register
+
+| Risk ID | Risk | Impact | Likelihood | Phase(s) | Mitigation |
+|---------|------|:------:|:----------:|----------|------------|
+| R1 | No LLM provider key offline; rules-only fallback does not produce a valid council verdict | High | High | P2, P3 | P2-001 provider preflight is mandatory first task; do NOT proceed past P2-004 gate if preflight fails. Run against agentic node or ICA gateway. |
+| R2 | Disclosure risk: invention-claim language in external rf queries may constitute a public disclosure event | High | Med | P3 | P3-003 R2 gate check is a named blocker before P3-004 gate approval. All queries are concept-level; human must confirm before rf runs. |
+| R3 | `skillmeat discover` 401 + marketplace mock-only: no upstream IP bundle to track | Med | Confirmed | P1 | Not blocking; build-net-new decision stands. No mitigation action. |
+| R4 | Council scope creep: 12 families × 9 dims × 9 reviewers is token-heavy | Med | Med | P2 | Single review pass (not 12 runs); op plan gate in P2-004 caps spend before fan-out; pre-filter to top-8 families if budget insufficient. |
+| R5 | `patentTriage` output schema gap: `scorecard.schema.json` may not carry patentability dims + triage_bucket | Low | Med | P1 | P1-001 resolves this before P1-007 executes; either approach (extend or new schema) is acceptable; decision documented in DOC-001. |
+
+---
+
+## Quality Gates Summary
+
+| Gate | Type | Phase | Triggering condition | Pass criterion |
+|------|------|-------|----------------------|----------------|
+| P1 exit: dry-run ✅ | Automated (ARC CLI) | P1 → P2 | All P1 tasks complete | `arc councils resolve --project patent-review --type patent-review-council --dry-run` exits 0 (+ roles/council lint + `arc validate .`) — PASSED 2026-06-25 |
+| R2 query review | Human (named gate) | P3-003 | rf query set drafted | Human confirms no claim text / invention-specific language in queries |
+| Op plan gate (P2) | Human (`op approve`) | P2-004 | Provider preflight + evidence_pack ready | Human approves in op run record |
+| ARC schema/evidence/trace gates | Automated (ARC) | P2-006 | During council run | All 4 ARC gates pass; `arc_certification.yaml` emitted |
+| Op plan gate (P3) | Human (`op approve`) | P3-004 | R2 check passed | Human approves rf run in op run record |
+| Op writeback gate (P3) | Human (`op approve`) | P3-007 | rf verification pass | Human approves before rf artifacts stored |
+| Op writeback gate (P4) | Human (`op approve`) | P4-002 | Draft verdict reviewed | Human approves MeatyWiki mutation |
+| Op task-graph gate (P5) | Human (`op approve`) | P5-002 | Node list drafted and reviewed | Human approves IntentTree tree creation |
+
+---
+
+## Acceptance Criteria Traceability
+
+The following PRD acceptance criteria (AC-1 through AC-11) map to tasks in this plan:
+
+| AC ID | PRD criterion (summary) | Plan task(s) |
+|-------|------------------------|--------------|
+| AC-1 | `arc --dry-run` exits 0 | P1-008 |
+| AC-2 | All 6 new role YAMLs validate against ReviewerRole schema | P1-002, P1-008 |
+| AC-3 | `patentability.yaml` parses with all 9 dims | P1-005, P1-008 |
+| AC-4 | Council run emits all 6 required ARC artifacts | P2-008 |
+| AC-5 | Scorecard has 12 rows × 9 scored dims | P2-008 |
+| AC-6 | Every family has a `triage_bucket` in adjudication_record | P2-007, P2-008 |
+| AC-7 | rf bundle covers ≥15 of 18 §8 prior-art areas | P3-005, P3-006 |
+| AC-8 | No rf query contains verbatim invention-claim language | P3-002, P3-003 |
+| AC-9 | Decision record at `[REDACTED]/ip/` in MeatyWiki vault | P4-003, P4-004 |
+| AC-10 | IntentTree tree with ≥15 nodes covering §9/§11/§10 | P5-003, P5-004 |
+| AC-11 | All op gates recorded as `approved` in op run record | P2-004, P3-004, P3-007, P4-002, P5-002 |
+
+---
+
+## Estimation Sanity Check
+
+- **P1 (5 pts):** 7 new/adapted YAML files + 7 agent stubs + 1 rubric + 1 council def + 1 schema = ~11 artifacts; bounded authoring via ICA delegation; dry-run exit gate is deterministic. 5 pts is reasonable.
+- **P2 (5 pts):** Provider preflight (0.5) + evidence_pack assembly (1) + run + gates (2, expensive model) + adjudication review (1) + artifact verification (0.5) = 5 pts. Council fan-out is the expensive hop; human gates are 0 model cost.
+- **P3 (3 pts):** Survivor scoping (0.5) + query authoring + R2 review (1) + rf run + verification (1) + gate ops (0.5) = 3 pts.
+- **P4 (2 pts):** Verdict distillation is a single Opus synthesis pass (1) + file write + verify (1) = 2 pts.
+- **P5 (3 pts):** Node decomposition (1) + tree scaffold (1) + verify + run close (0.5) + gate ops (0.5) = 3 pts.
+- **DOC (1.5 pts):** 4 design specs, each 0.25–0.5 pts = ~1.5 pts.
+- **Total: 20 pts.** Consistent with decisions block T3 estimate of 16–21 pts and PRD §11 estimate of 19–20 pts.
+
+---
+
+## Legal Disclaimer
+
+All council output produced by this initiative is decision-support for IBM invention-disclosure triage. It is not legal advice, does not constitute a legal opinion, and does not replace review by IBM IP counsel. All findings are advisory. The `patent-review-council.yaml` `spec.dataBoundaries` must encode this as a data-class boundary, and P4-003's decision record must carry a disclaimer header per PRD §13.
