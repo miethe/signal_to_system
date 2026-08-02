@@ -60,6 +60,7 @@ import SearchBox from './SearchBox';
         aria-expanded="false"
         aria-controls="mobile-menu"
         aria-label="Open navigation menu"
+        title="Open navigation menu"
         class="flex h-9 w-9 items-center justify-center rounded-md text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)] focus-ring lg:hidden"
       >
         <svg
@@ -125,6 +126,7 @@ import SearchBox from './SearchBox';
     closeIcon?.classList.toggle('hidden', isOpen);
     toggle.setAttribute('aria-expanded', String(!isOpen));
     toggle.setAttribute('aria-label', isOpen ? 'Open navigation menu' : 'Close navigation menu');
+    toggle.setAttribute('title', isOpen ? 'Open navigation menu' : 'Close navigation menu');
   });
 
   // Close menu when clicking a link
@@ -134,6 +136,8 @@ import SearchBox from './SearchBox';
       hamburger?.classList.remove('hidden');
       closeIcon?.classList.add('hidden');
       toggle?.setAttribute('aria-expanded', 'false');
+      toggle?.setAttribute('aria-label', 'Open navigation menu');
+      toggle?.setAttribute('title', 'Open navigation menu');
     });
   });
 
