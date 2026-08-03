@@ -1,0 +1,242 @@
+---
+title: "AAR \u2014 Onboarding Skills Program Phase 1 execution"
+excerpt: A field note from the Agentic OS build loop.
+date: '2026-08-03'
+readTime: 6 min read
+status: draft
+storyType: after-action
+tags:
+- agent-ready-repos
+- human-ai-workflow
+- artifact-first
+automated: true
+whyItMatters: The work shows how agentic systems turn operational evidence into reusable
+  practice.
+leaderTakeaway: Treat after-action reports as publication-ready raw material, but
+  keep the safety gate explicit.
+sourceAar: "AAR \u2014 Onboarding Skills Program Phase 1 execution"
+---
+
+Tier 2, 15 points, 4 milestones, executed in a git worktree with one commit per milestone and one
+reviewer gate per milestone. Two gates rejected; both rejections were correct and both found things a
+self-review would not have.
+
+## What shipped
+
+| Milestone | Outcome | Gate | Commit |
+|---|---|---|---|
+| M1 — dependency mechanism | `depends_on:` in skill-dev SPEC §3.1 + validator check 13, optional and vacuous-pass when absent | `task-completion-validator` APPROVED first pass | `ea203f2` |
+| M2 — onboarding template set | `onboarding-skill-template.md`, `onboarding-route-template.md`, `references/content-boundary.md` | Codex `gpt-5.6-terra` CHANGES_REQUESTED (4 findings) → APPROVED re-pass 1 | `38b6e9c` |
+| M3 — route W | `aos-onboarding` skill scaffold, route W, `references/workflow-doctrine/` | `task-completion-validator` (claude-primary) clause-2 clean, CHANGES_REQUESTED on accuracy (3 findings) → fixed | `934f6e0` |
+| M4 — `meaty-onboarding` member group | cross-repo: `meaty-[REDACTED]/packs/meaty-onboarding/` — 5 `type:name` members, doctrine pinned **by reference** to the v4.1 snapshot (no fourth copy), harness matrix with no state upgraded | `karen` boundary pass folded into the single feature-level lens | MeatySkills `b01ff2f` |
+| feature gate fixes | closed karen's C1/C2 + H3/H4/H5/H6 | verified mechanically | `2ccb8f6` |
+
+Landed on `main` as squash-merge **`80827df`** (PR #91). MeatySkills side is committed on
+`feat/meaty-onboarding-member-group` (`b01ff2f`) and **not pushed** — base-branch decision is the
+operator's (ITT `node_01KZ27CHMY4T51TR7K8HRQVSRX`).
+
+## The one systemic finding
+
+**Every gate that rejected did so on the same defect class: a claim stronger than its evidence.**
+Not style, not structure, not test coverage — four separate false claims, three of them *inherited*
+from documents we had every reason to trust:
+
+1. Route W repeated the **"35 pins vs 0"** contrast that the very pack it pins lists as *not citable,
+   "wrong at its source."*
+2. **My own brief** told M4 that `skill:skill-dev` was a workflow-set-v4.1 member and asked for a
+   staleness caveat about it. It is explicitly **excluded**. The implementer refused the false caveat
+   and wrote the true adjacent statement.
+3. M4's manifest asserted a SHA was "the HEAD of the branch this pack was assembled from." It wasn't.
+4. `aos-onboarding` claimed the `meaty-onboarding` pinned excerpt was **"not cut yet"** — after M4 had
+   cut it. Found by a fixer's own sweep, unprompted.
+
+Three rounds of gates on one defect class is the doctrine's signal to stop reviewing and change the
+design. The design change was `2ccb8f6`: **the normative layer now defines the mechanism it
+delegates.** M2, M3, and M4 all treated per-entry `locator:`/`verifier:` as "the whole mechanism" and
+declared an entry without them unusable — while those fields appeared **zero times** in the SPEC that
+`skill-dev` sends authors to. An author could follow the normative contract, pass check 13, and ship a
+conformant skill whose dependency nothing could resolve. That is precisely the plan's own named risk
+("the template propagates an unbacked promise") arriving through the door the template was placed in
+front of.
+
+**The generalisable rule:** when a plan's rubric is about honesty, the gate budget should be spent on
+*verifying assertions against their sources*, not on reading for quality. Every finding worth having
+in this run came from someone opening the cited file. None came from reading the prose.
+
+## The lessons
+
+### L1 — Two probes that share a failure mode are not corroboration
+
+Verifying M3's disambiguation target, two independent checks both returned "not found":
+`GET /api/v1/context-entities/<uuid>` → 404, and `skillmeat search "onboarding playbook"` → `[]`. I was
+one step from recording a false finding against the plan. Both were wrong for the *same* underlying
+reason — I had the lookup shape wrong twice. A `context_file` is not a "context entity" (different
+resource), and remote catalog search is **name-only**, so a query containing a space cannot match
+`key-context/project-onboarding-playbook`. Searching the exact hyphenated name returned the record with
+the plan's exact uuid.
+
+**Behavior:** when two probes agree on a negative, ask whether they share a mechanism before believing
+them. Verify the *lookup* before doubting the *claim*.
+
+### L2 — A pinned snapshot's "not citable" list is a first-class authoring input
+
+M3's reviewer caught route W propagating the "35 pins vs 0" contrast — a measurement the very pack W
+pins lists as **not citable, "wrong at its source"** (`WORKFLOW-SET-V4.1-HANDOFF-SPEC.md` §9.2, detail
+in §8.3 item 5: the retro table shows 38/38 vs 22/22 — every plan in the corpus was 100% pinned). The
+implementer had read the pack's teaching-set section and its Gate C forward-inputs, and never opened
+§8.3/§9.2.
+
+Worse: **pointing correctly was not sufficient**, because the false claim lives in the normative file W
+points at (`plan-doctrine.md:13-14`) and in the design spec. W's own evidence pointer would have walked
+a reader straight into it.
+
+**Behavior:** when authoring against a pinned artifact set, read its retraction/not-citable list before
+its content. And when a normative file you point at carries a known error, the pointer is not enough —
+carry the correction.
+
+### L3 — Paraphrasing a claim strips the fingerprint that makes it findable
+
+W paraphrased the retracted contrast rather than quoting it, so the string `35 vs 0` was absent — and
+that string is the only fingerprint the pack's not-citable list is keyed on. No grep against that list
+could have caught the wording. The fix deliberately reintroduces the literal string inside the
+correction note, so a future search lands on the refutation instead of a silent paraphrase.
+
+**Behavior:** if you paraphrase a claim you may later need to audit, keep the searchable token.
+
+### L4 — Verify-then-stage must be atomic when a subagent may still be alive
+
+I verified M2's template at 232 lines, then staged, then committed. Between the `wc -l` and the
+`git add`, a resumed agent I had written off as dead woke up and rewrote the file — so `38b6e9c`
+captured a **222-line version I had never verified**. It turned out equivalent (both agents implemented
+the same four fixes independently; the committed one was actually stronger), but that was luck, not
+process.
+
+Root cause: I had double-dispatched. The M2 resume looked dead (transcript idle, no writes for 25
+minutes), so I sent a fresh fix agent at the same files. Both eventually landed.
+
+**Behavior:** (a) verify and stage in one command, or verify the commit rather than the working tree;
+(b) a resumed agent is slow, not dead — wait for its completion notification instead of re-dispatching
+onto the same files.
+
+### L5 — A cross-repo delegate needs the read path, not the repo name
+
+M4's first Codex run burned ~6 minutes and 831 lines of output hunting for `aos-onboarding` and the new
+templates in the launchpad's **main** checkout. They only existed in the worktree. My prompt had said
+"refer to the launchpad as `agentic_meta_dev`, not an absolute path" — good advice for *committed
+content*, actively harmful as a *read instruction* during worktree execution.
+
+**Behavior:** when delegating from a worktree, state the worktree read root explicitly and separate it
+from the durable reference convention. Killing and re-dispatching with the path cost less than letting
+it search.
+
+### L6 — Offloading the *review* is a better use of a cross-family lane than offloading the *build*
+
+The plan marked M2 and M4 offload-eligible. `delegation-router` resolved M2 to ICA Haiku 4.5 (free,
+`documentation` chain) — below the plan's own workhorse bar for a template that propagates a promise to
+every future project, and on M3's critical path. I moved the offload to M2's **gate** instead: Codex
+`gpt-5.6-terra` as the reviewer.
+
+That lens returned 4 findings, of which 3 were real and one was a genuine scope call. Its highest-value
+finding — that the boilerplate implied a resolver M1 never shipped — is exactly the failure the plan's
+rubric named in advance and exactly what a same-family reviewer was least likely to see, because the
+implementer and I shared the framing that produced it.
+
+**Behavior:** when a lane is cheaper than primary but not obviously better, spend it on adversarial
+review rather than authoring. Cost-shifting the build risks the artifact; cost-shifting the review
+risks only a wasted review.
+
+### L7 — The router's chain does not know the plan's capability bar
+
+`delegation-router` resolved by `task_class` chain (free-first) and returned Haiku 4.5 for
+`documentation` and Sonnet 5 for `implementation` — twice below the bar the plan's own
+`routing_constraints` set (`frontier for M1 and M3; workhorse for M2 and M4`). The v3 resolver ranks by
+chain/priority/availability/capability and does **not** read the `scores:` block, so nothing mechanical
+reconciles a plan's stated bar with the router's pick.
+
+Every override was logged to the routing audit log with its reason, so the decisions are auditable —
+but the reconciliation was manual every time.
+
+**Behavior / candidate improvement:** a plan's `routing_constraints` capability bar should be an input
+to `resolve()`, or the router's output should be checked against it at the plan gate rather than
+per-dispatch by hand.
+
+### L8 — The validator cannot sweep a worktree, so no sweep-based gate can run during execution
+
+`validate_skill.py --sweep` excludes any path containing `/.claude/worktrees/`, which is correct for a
+census and means sweep mode finds **0 skills** from inside an execution worktree. This bit once at
+baseline capture and was pre-empted in every subsequent dispatch. The per-skill loop is the workaround
+and is what the plan's own AC table specifies.
+
+### L9 — "All skills still pass" was never the criterion, and the plan knew it
+
+M1's AC reads "every skill currently in the repo still passes unchanged", which sounds like a
+100%-conformance bar. The repo baseline is **4 of 31 passing**. The plan's own AC *command* says the
+real thing — "no new failures vs. the pre-change run" — and the measured diff was empty. Capturing that
+baseline **before** the change was what made the criterion checkable at all.
+
+### L10 — Environment-sensitive tests read as regressions
+
+Two mirror-parity tests fail on the laptop, one on the node, zero relationship to this work: the
+fixtures carry no `.git` marker (git cannot track one), so `find_repo_root()` escapes to whatever real
+repo encloses them. The differing laptop/node result is the proof of location-dependence. Certifying
+M1's declared Python 3.10+ floor required running on the node (3.11.2: 47 passed, 1 failed) because the
+laptop is pyenv 3.12 — a passing local run could not certify the floor the SPEC claims.
+
+## Deferrals opened
+
+| ITT node | Item |
+|---|---|
+| `node_01KZ23053HQJMXREXWT7SHBAY4` | base `skill-template.md` Key References placeholders fail check 9 if copied literally (repo-wide convention) |
+| `node_01KZ230EQ4PD5TVX1TV57624DV` | mirror-parity fixture tests are location-dependent |
+| `node_01KZ251CKVCMF0RD744PJDSRCD` | correct the retracted "35 pins vs 0" claim at source in `plan-doctrine.md` + the design spec |
+| `node_01KZ251PHX8QNQC0NG7519BV55` | `dev-execution` SKILL.md Do-Not-Say row is stale — the gate-budget counter hook DOES exist in `execute-plan.js` |
+| `node_01KZ251PQKTXH763G3HJ4MZ2J3` | tracked duplicate fixture tree under `scripts/tests/fixtures/.claude/` |
+| `node_01KZ25CJ1SMM66Q36HVVFT1F14` | register `skill:aos-onboarding` in SkillMeat enterprise + republish the skill-dev SPEC amendment (plan scoped this out as a follow-on) |
+| `node_01KZ27CHB99RSV0SRGD0V1DVCA` | warn-severity check 14: a `depends_on` entry carries both `locator:` and `verifier:` (the non-breaking way to close C1 mechanically) |
+| `node_01KZ27CHG3JS6AZTGT3FQSWEGN` | wire the onboarding template + route W to the harness matrix, and actually declare the group as a `depends_on` |
+| `node_01KZ27CHMY4T51TR7K8HRQVSRX` | push MeatySkills `b01ff2f` — operator decision on the `ibm-main` base |
+
+### L11 — A pin to a commit on a branch you are about to squash-merge is a pin to nothing
+
+M4's member manifest originally pinned two members to per-milestone SHAs on the unmerged worktree
+branch, and asserted they were current. Under this ecosystem's squash-merge + `--delete-branch`
+protocol those commits stop existing at merge: the manifest's own verifier would have reported both
+members `stale-vs-pin` on day one, and after GC could not distinguish "moved" from "never existed."
+`karen` caught it before merge; nothing in either repo had acknowledged it.
+
+The fix was an **ordering** fix, not a workaround: merge first, then pin to the squash SHA — the only
+SHA for that content that is durably reachable. Verified after merge by running the manifest's own
+step-3 verifier: both paths return `80827df`, matching the pin.
+
+**Behavior:** when a cross-repo artifact pins a SHA from the branch under review, the pin must be
+written *after* the merge, or it is decorative by construction. Add this to the worktree/PR protocol's
+post-merge step alongside the landing pointer.
+
+### L12 — Offload lanes fail in ways that look like slowness
+
+Codex `gpt-5.6-terra` was the router's pick for M4's authoring and produced **nothing** across two runs
+(~20 min). From outside it looked like a slow model. The actual cause was in its log:
+`apply_patch verification failed: invalid hunk at line 127` — its patch tool was erroring repeatedly
+while its reasoning was fine (it had already chosen a sound placement, `packs/`, with a good rationale).
+
+Two costs: the first run was also mis-pathed by *my* prompt (it read the launchpad's main checkout, where
+the worktree's new artifacts don't exist), and the second burned its budget retrying patches.
+
+**Behavior:** when an offloaded leg produces no artifact, read its *tool* errors before concluding the
+model is slow — and prefer whole-file writes over patch application for delegates whose patch tool you
+cannot debug. Carry a failed delegate's *decisions* forward (the placement rationale was reused) rather
+than discarding the whole run.
+
+## What went right and is worth repeating
+
+- **Capturing a measurable baseline before the first change.** M1's regression criterion was only
+  checkable because the pre-change per-skill exit codes were on disk.
+- **Testing the subtraction rubric mechanically.** Rather than arguing about whether route W restates
+  doctrine, we grepped for the specific rule *parameters* it must not contain (the re-pass count, the
+  three trigger names, the C1–C4 table, the tripwire threshold): zero hits, against 23 pointers. Then
+  the reviewer ran a five-question probe against it. A subjective criterion was made falsifiable.
+- **Adversarial gates earned their cost.** Two of four milestones were rejected. Neither rejection was
+  about style; both were about a claim being stronger than its evidence.
+- **The implementers' self-audits were honest.** M3's implementer volunteered the two passages a
+  reviewer would most likely attack, and separately caught that a claim in my own brief was not findable
+  in the file I sent it to. That is worth more than a clean report.
