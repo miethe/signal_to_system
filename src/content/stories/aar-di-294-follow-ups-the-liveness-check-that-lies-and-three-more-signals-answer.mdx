@@ -1,0 +1,178 @@
+---
+title: "AAR \u2014 DI-294 follow-ups: the liveness check that lies, and three more\
+  \ signals answering the wrong question"
+excerpt: A field note from the Agentic OS build loop.
+date: '2026-08-06'
+readTime: 6 min read
+status: draft
+storyType: after-action
+tags:
+- agent-ready-repos
+- human-ai-workflow
+- artifact-first
+automated: true
+whyItMatters: The work shows how agentic systems turn operational evidence into reusable
+  practice.
+leaderTakeaway: Treat after-action reports as publication-ready raw material, but
+  keep the safety gate explicit.
+sourceAar: "AAR \u2014 DI-294 follow-ups: the liveness check that lies, and three\
+  \ more signals answering the wrong question"
+---
+
+## AAR — DI-294 follow-ups (FU1 backfill + FU2 completion evidence)
+
+Ran the two DI-294 follow-up nodes. **FU1** (operational, human-gated): the OC-006 outcome backfill
+against live production — `scanned=1087 updated=1086 skipped=1`, taking completed-`atomic_task`
+outcome coverage from **62/1148 to 1147/1148**. **FU2**: completion evidence now flows into the
+consolidated outcome on both completion seams — intenttree PR #25, CI green, open at the human
+merge gate.
+
+**Read [`../di294-outcome-consolidation/AAR.md`](../di294-outcome-consolidation/AAR.md) first.** Its
+lessons 1 (check the denominator, including your own), 2 (look for the tool before building one),
+3 (nothing errored), and 5 (autopilot cannot target a sibling repo) all recurred in this run exactly
+as written, and are not restated here. This AAR records only what that one does not — including a
+**correction to its lesson 4**.
+
+## Lessons
+
+### 1. The parent AAR's own liveness remedy produces a false negative — correct it
+
+DI-294's lesson 4 prescribes: *"to confirm a fix is live, compare service start time against the
+mtime of the changed file … do not infer liveness from the checkout SHA."*
+
+I followed that. `systemctl --user show [REDACTED] -p ActiveEnterTimestamp` returned
+`Sun 2026-08-02 17:00:17 EDT`; DI-294 landed `Mon 2026-08-03 13:42`. Service older than fix ⇒ **not
+live**. I reported that to the operator as a hard blocker on the backfill.
+
+It was wrong. The operator said "we already redeployed," and they were right. `[REDACTED]`
+is a **oneshot unit** (`ActiveState=active`, `SubState=exited`) whose job is to launch a podman pod
+and exit. Its `ActiveEnterTimestamp` records when the *unit* last ran, not when the containers were
+created. The actual API container, `deploy_api_1`, was created `2026-08-03 15:47` — nearly two hours
+*after* the fix. A corollary: `podman ps | grep -i intent` returns nothing, because the containers
+are named `deploy_*` after the compose project, not after the service.
+
+So a lesson written to stop a false *positive* ("checkout is current, therefore fix is live") created
+the mirror-image false *negative*. Both failures share a cause: **inferring liveness from a proxy
+instead of observing behaviour.**
+
+**How to apply.** Prefer a **functional probe** over any timestamp. What actually settled it here was
+three cheap calls: create a scratch `atomic_task`, complete it via `update_node(status=completed)`
+(the seam DI-294 fixed, deliberately *not* `complete_node`), and read back whether `meta.outcome`
+materialised. It did — `{"result_class":"succeeded","artifact_refs":[],"lesson":null}` — which proved
+liveness and, as a bonus, demonstrated the exact record thinness FU2 then fixed. Archive the probe
+after. Only if a probe is impossible, fall back to **container `CreatedAt`** (`podman ps
+--format '{{.Names}}\t{{.CreatedAt}}'`), never a oneshot unit's timestamp. Update DI-294's lesson 4
+accordingly rather than leaving two contradictory instructions in the corpus.
+
+### 2. A pipeline's exit code is the last stage's, so `| tail` silently launders a failure
+
+I twice ran `uv run pytest -q 2>&1 | tail -6`, saw the harness report **exit code 0**, and told the
+operator the full backend suite passed. That claim was unfounded: the pipeline's status was `tail`'s,
+and `tail` essentially always succeeds. Had the suite failed, I would have reported a pass with the
+same confidence.
+
+This is worse than a missing check, because it *looks* like a check. It also compounds with lesson 3
+below: the fix-shaped output (a clean-looking tail) is present, so nothing prompts a second look.
+
+**How to apply.** Never read a gate's result through a pipe. Redirect to a file, capture `$?`
+immediately, then inspect the file:
+
+```bash
+uv run pytest -q > /tmp/suite.log 2>&1
+echo "PYTEST_EXIT=$?"          # the only authoritative signal
+grep -cE "^(FAILED|ERROR)" /tmp/suite.log
+```
+
+`${PIPESTATUS[0]}` is not a fix here — it is bash-specific and was empty under this zsh harness,
+which is its own quiet failure. If a validation claim reaches the operator, it must trace to a
+captured exit status, not to output that merely looks healthy.
+
+### 3. `addopts = "-q"` plus your own `-q` is `-qq`, which deletes the evidence you wanted
+
+Having fixed lesson 2, I still could not produce a pass count: a 2163-test run left a 144-line log
+with no `N passed` line anywhere. Cause: `backend/pyproject.toml:130` already sets
+`addopts = "-q"`, so adding `-q` on the command line yields `-qq`, and pytest suppresses the summary
+line entirely at that level. Exit 0 was valid; the count was simply never printed.
+
+The prior note on this trap in project memory said *"`addopts="-q"` hides your pass count"* — true,
+but it under-describes the mechanism, so I walked into the doubled form anyway.
+
+**How to apply.** Check `addopts` before adding verbosity flags. To recover a count cheaply without
+re-running a 7-minute suite, `pytest --collect-only -o addopts="" | tail -3` gives the denominator in
+about a second; pair it with the captured exit status. Reporting "2163 collected, exit 0, 0
+FAILED/ERROR lines" is honest and complete; asserting "2163 passed" without seeing that line is not.
+
+### 4. Diff a branch against an explicit merge-base, never `origin/main..HEAD` — a moving main will corrupt a review
+
+`origin/main` moved **twice** mid-run (`7ead0a3` → `6f2e333` → `4d6a95a`) while I was validating an
+18-file branch. Because the branch base was stale, `git diff --stat origin/main..HEAD` reported
+**41 files, +1602/−2535** — the 18 real files plus the *inverse* of everything that had landed
+meanwhile, rendered as phantom deletions of `web/` files and of `edge_vocab.py`.
+
+The cost was not cosmetic. An adversarial reviewer's data-gathering leg faithfully collected that
+5083-line diff, so the review was analysing another commit's work (`c0af599`, rich edge metadata v1)
+as though it were the change under review. I discarded the review and re-ran it. Note the phantom
+diff was *self-consistent and plausible* — nothing about it announced itself as wrong.
+
+**How to apply.** Resolve the base once and pin it: `MB=$(git merge-base HEAD origin/main)`, then
+diff `"$MB"..HEAD`. When handing a diff to a reviewer, state the **expected file count and insertion
+total** and instruct it to re-fetch if its own diff disagrees — a reviewer that cannot detect a
+corrupted input will confidently review the wrong thing. Rebase immediately before the review that
+gates the PR, not before the one that gates the implementation, and re-run the gates after rebasing
+if the incoming commits touch adjacent code (here `c0af599` touched AWPR/milestone materialisation,
+so `test_work_item_sync.py` went into the targeted re-run deliberately).
+
+### 5. The trap a node warns you about will recur one layer up, in the dimension it did not name
+
+FU1's node carried an explicit ⚠️ **measurement trap**: the backfill script filters
+`type == atomic_task`, so a *tree-wide* percentage stays below 100% even on total success — scope the
+re-measure to `atomic_task` or a win reads as a loss. That warning was correct and I honoured it
+(the all-types figure came out **1187/1390 = 85.4%** against the true **1147/1148**).
+
+But the same denominator error was live in a second dimension the node had not noticed. Its ACs
+described "the 223 pre-existing completed atomic_tasks" and asked me to sanity-check the dry-run
+against 223 — yet `backfill_outcomes.py` has **no tree filter at all**. It walks every completed
+`atomic_task` in the database: **1148 rows across 15 trees**, of which 1087 needed backfill. The node
+had warned about the *type* denominator while itself getting the *tree* denominator wrong, so a
+naive "223 expected vs 1087 reported" comparison would have looked like a 5× runaway and aborted a
+correct run.
+
+**How to apply.** When a node hands you a baseline number, re-derive it before comparing against it,
+and state which scope it belongs to. I measured both scopes up front (tree: 227/4; global: 1148/62),
+predicted 1148−62 = 1086 candidates, and matched the reported 1087 — which is what made the sanity
+check meaningful instead of decorative. Then surface the scope difference to the human *before* the
+irreversible step: the operator had approved a write described as 223 rows and was actually
+approving 1086, and that is their call to re-confirm, not mine to absorb quietly.
+
+### 6. Corollary — the unifying shape
+
+Lessons 1–4 are one failure class: **an authoritative-looking signal that answers a different
+question than the one asked.** A oneshot unit's start time answers "when did the unit run," not "what
+code is serving." A pipeline's exit code answers "did `tail` work," not "did the tests pass."
+`-qq` answers "was there a failure," not "how many passed." `origin/main..HEAD` answers "how does
+this branch differ from *current* main," not "what did this branch change." Each is a valid answer
+to its own question, which is exactly why none of them look broken.
+
+The generalisable move, and the one that resolved every instance here: **stop inferring and observe
+the thing directly** — probe the behaviour, capture the status, pin the base, re-derive the baseline.
+
+## What went well
+
+- The human gate was honoured as a gate, not a formality: the operator was given the pre-run
+  baseline, the 5× blast-radius discrepancy, and the abort condition *before* approving the live
+  write, and the dry-run was reviewed rather than treated as ceremony.
+- Refusing to route FU2 through autopilot's scripted lane (parent lesson 5) and hand-orchestrating
+  against an explicit intenttree worktree avoided the known wrong-ref-commit failure mode entirely;
+  `main` stayed clean throughout, verified.
+- Verifying FU2's premise before planning against it paid for itself: the node claimed
+  `CompletionEvidence` was "unreachable from the REST route," but `POST /nodes/{id}/evidence` already
+  existed. The real gap was that `consolidate_outcome` had no evidence input at all, so evidence
+  attached through that route flowed nowhere. Planning from the node's text would have built more
+  surface on top of a dead path.
+- The adversarial reviewer earned its cost on the re-run: it traced
+  `update_node` → `should_cascade_completion` → `_apply_outcome` → `list_for_consolidation` in code
+  and confirmed the majority-seam claim, rather than accepting the design doc's assertion of it.
+- Three findings were filed at detection time with concrete detail
+  (`node_01KZ4NCAM9VDBHTQXR3RN5F3ZT`, `node_01KZ4QMCVT74NGADPZ2Q8BCBJG`, plus the contract-doc
+  narrowing the reviewer caught), including the observation that the obvious one-line `isinstance`
+  guard for the non-dict-outcome bug would silently destroy a human-authored lesson.
