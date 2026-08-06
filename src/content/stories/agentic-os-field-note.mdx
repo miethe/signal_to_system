@@ -1,7 +1,7 @@
 ---
 title: Agentic OS Field Note
 excerpt: A field note from the Agentic OS build loop.
-date: '2026-08-04'
+date: '2026-08-06'
 readTime: 6 min read
 status: draft
 storyType: after-action
@@ -16,89 +16,503 @@ leaderTakeaway: Treat after-action reports as publication-ready raw material, bu
   keep the safety gate explicit.
 ---
 
-## AAR — Session adoption read path (W2/W3), autopilot-routed execution
+## Implementation Notes — Live Work Observability
 
-**Date:** 2026-08-03
-**Work:** IntentTree `node_01KZ20E22VQ4638F71K8SF3B86` — adoption read path W2+W3 per ADR-0006
-**Outcome:** shipped. PR #2 squash-merged to `main` as `f3fe036`. 99/99 tests + smoke green (31 at branch point), 3950 insertions across 33 files.
-**Entry point:** `/dev:autopilot <node-id>` with in-prompt "operate in worktree, squash to main, clean up tree".
+Per the plan's Execution ledger: deviations are logged with rationale and reviewed at each
+milestone boundary rather than halting. Blockers still stop.
 
----
-
-## What went well
-
-- **The plan carried its own `execution_graph`.** The Tier 3 plan embedded a complete `autopilot-graph` JSON block with per-task prompts, file ownership, effort, and `routing_constraints`. Execution was a pass-through, not a re-derivation. Plans that ship their own dispatch graph are dramatically cheaper to execute.
-- **`routing_constraints` in the plan did real work.** The plan pre-declared which tasks must stay claude-primary (origin null-honesty; the transcript-non-persistence regression test) and which were offload-eligible (provider parsers/fixtures, UI, docs). That removed the routing decision from execution time entirely.
-- **The privacy invariant held under test, not just assertion.** `tests/tail-privacy.test.mjs` proves the fixture marker reaches the SSE consumer and appears **zero** times in `state.events` and the NDJSON audit log. `publishTransient()` was implemented as an *explicit* method rather than a reliance on omission — exactly as the plan demanded, so a later refactor can't quietly reintroduce persistence.
-- **Codex was implemented, not deferred.** The plan's reasoning held: since Codex rollouts carry no `state` field ever, the mtime-liveness helper is universal infrastructure, so deferring Codex would have saved nothing.
+Plan: `docs/project_plans/implementation_plans/live-work-observability-v1.md`
+Design spec: `docs/project_plans/design-specs/live-work-observability-handoff.md`
 
 ---
 
-## What went wrong
+## M1 / G-1 — 2026-08-02
 
-### 1. The deployed workflow cannot dispatch to project-local agents (highest-value finding)
+### The headline: the "~one-line write" thesis is falsified. Three writers were missing, not one.
 
-`execute-plan.js` carries a hardcoded `KNOWN_AGENT_TYPES` allowlist inherited from the launchpad. `isHitlTask()` treats **any** `assigned_to` not in that set as a *human* assignee:
+The plan's central bet (decision: "M1 (G-1) ships alone and stops") was justified by *"a ~one-line
+write lights up four already-built-but-dark surfaces"* (design-spec §3). **That estimate was wrong,
+and learning so is exactly what M1 was chartered to discover.** The join required closing three
+independent gaps, two of which nothing in the spec or PRD had identified:
 
-```js
-return t?.hitl === true || (!!t?.assigned_to && !KNOWN_AGENT_TYPES.has(t.assigned_to))
+| # | Gap | Verified how | Status |
+|---|---|---|---|
+| 1 | **Nothing creates an `AgentRun` at all** in the dev-execution flow. `sdlc-sync.sh` only ever called `itt sync import` (node status). The spec assumed a run existed to link. | `grep` for `itt run`/`create_run`/`link_session` across `dev-execution/` + `artifact-tracking/scripts/` → zero hits. All 100 live runs were created by the autonomy loop, none by a dev-execution phase. | Closed — hook now resolves-or-creates a run |
+| 2 | **Nothing writes `log_ref_url` either.** A second never-populated column, in the same class as `ccdash_session_id` — the spec's keystone finding applies to it too but did not name it. | Repo-wide grep: zero assignments in backend source; only writer is `PATCH /agent-runs/{id}` via `AgentRunUpdate.log_ref_url`. `services/agent_run.py:410` carries a comment conceding the link path does not handle it. | Closed — client PATCH via the run API |
+| 3 | **CCDash's session key is `S-<harness-uuid>`, not the bare UUID.** `ccdash_client.pull_session` passes its argument verbatim to `GET /api/sessions/{id}`. | Live node CCDash: `/api/sessions/<uuid>` → **404**; `/api/sessions/S-<uuid>` → **200**. Convention held for 6/6 root-shaped session ids sampled from 25 live sessions, each with a matching laptop transcript. | Closed — hook derives the CCDash-form id |
+
+Gap 3 is the one that mattered most. Without it the join writes successfully, `pull_session` 404s,
+`ccdash_metrics` lands as `{"status":"pull_failed"}`, and `CCDashMetricsPanel` renders a *linked*
+run with no numbers — a seam that is technically closed and gives the operator nothing. That is the
+precise failure mode design-spec §0 exists to prevent, reproduced inside the fix for it.
+
+### Deviation: `log_ref_url` gets a CCDash deep link, NOT the raw transcript path
+
+Design-spec §10 clause 3 states `transcript_ref` is "the harness transcript pointer
+(`transcript_path`); **also what populates IntentTree's existing `AgentRun.log_ref_url`**". We
+deliberately did not do that literally.
+
+**Why the spec's literal instruction fails its own acceptance.** All three consumers render the
+field as a plain anchor with `target="_blank"`
+(`command-center/drawer/ItemDetailDrawer.tsx:798`, `command-center/workflows/RunCard.tsx:130`,
+`screens/WorkspaceRuns.tsx:118`). IntentTree's web UI is served over http. Every modern browser
+**blocks navigation from an `http(s)://` page to a `file://` URL** — the click silently does
+nothing. A bare POSIX path is not a URL at all and puts a copy-paste-into-a-terminal step back on
+the operator, violating CL-6 directly. Either literal reading fails CL-2 ("transcript in ≤1
+click") while *appearing* to succeed.
+
+**What we did instead.** `log_ref_url` = `<AOS_CCDASH_UI_URL>/sessions?session=<ccdash-session-id>`.
+CCDash's `SessionInspector` accepts exactly this deep link (`getSessionIdFromQuery` reads
+`?session=`, `components/SessionInspector.tsx:73-76`, consumed at `:6049`); verified live at
+`http://[REDACTED][REDACTED]/sessions?session=S-…` → HTTP 200. The raw path is retained where it
+already lands (the sidecar + `aos_native_aliases.ccdash_transcript_path`) — two fields, two jobs:
+one durable filesystem pointer, one *reachable* pointer.
+
+**Governing principle** (plan §Rubric): the spec's intent — one click, zero operator knowledge —
+governs over an incidental mechanism claim. **Follow-up: design-spec §10 clause 3 wants correcting**,
+since as written it instructs an implementation that fails CL-2.
+
+### Two conventions we now depend on that are NOT published contracts
+
+Both are verified against the live instance and both are isolated + env-overridable so a change is
+a config edit rather than a code hunt. Recording them plainly because M1's value depends on them:
+
+- **`S-` session-id prefix** (`AOS_CCDASH_SESSION_PREFIX`) — CCDash's root-session id scheme.
+- **`/sessions?session=<id>` UI deep link** (`AOS_CCDASH_UI_URL`) — CCDash's SessionInspector query param.
+
+A CCDash-side change to either silently degrades the metrics half or the transcript link. Neither
+is covered by a test on the CCDash side, because CCDash does not know it has these consumers.
+
+### Rollout reality (design-spec §11 unknown #3, "deployed state node vs laptop")
+
+This unknown bit exactly where the plan predicted it would.
+
+- **CCDash and IntentTree run only on the node** (`[REDACTED][REDACTED]` / `[REDACTED]`); no local CCDash is
+  listening on `127.0.0.1:[REDACTED]`. Transcripts are written on the **laptop**.
+- Laptop transcripts nevertheless *do* reach node CCDash (verified: laptop-originated sessions
+  present in the node's index minutes after they ended), so ingestion is not a blocker. The
+  `force_sync(transcript_path)` call, however, hands node-CCDash a laptop path it cannot read — so
+  metrics arrive via CCDash's own ingestion, not via that call. Harmless (best-effort, swallowed),
+  but it means the *timing* of metrics is CCDash's ingest cadence, not our link call.
+- Consequence for the metrics half: a link issued mid-phase will often precede ingestion. The
+  create-once / refresh-at-every-boundary design handles this — later boundaries re-pull and
+  populate. First-boundary `pull_failed` is expected, not a defect.
+
+### Deploy gap — the installed `itt` predates this change
+
+`~/.local/bin/itt` → a **non-editable** `uv tool` copy of `intenttree-client`, so the new
+`run link-session` subcommand is absent from the installed CLI until it is reinstalled (laptop
+*and* node). Until then the hook's calls fail **non-fatally** (by design — it always exits 0), which
+means the join silently does not happen rather than breaking a run. Acceptance testing therefore ran
+with the branch client PATH-prepended (`intenttree/client/.venv/bin`), leaving the global tool
+install untouched; refreshing it is a post-merge deploy step, not part of this diff.
+
+### A fourth dark switch, found only by running it live: `ccdash_enabled` is `False`
+
+The three missing writers were the code half. Running the hook against the live node surfaced a
+config half that no amount of code reading would have found:
+
+```
+ccdash_metrics = {"status": "disabled"}
 ```
 
-`agent-dock-builder` is a real, registered agent in this repo — and is absent from the allowlist. The first run returned `needs_opus / hitl_required` in **29 ms with 0 agents spawned**, having silently reclassified all four wave-2 tasks as human gates.
+`intenttree/backend/src/intenttree/core/config.py:104` — `ccdash_enabled: bool = False`, and the
+node's `[REDACTED]` never sets `INTENTTREE_CCDASH_ENABLED`. So `link_ccdash_session` takes
+its `if not settings.ccdash_enabled` branch: it still writes `ccdash_session_id` (unconditional),
+but **never calls CCDash at all**. The whole metrics seam — the four "built but dark" surfaces this
+milestone was chartered to light up — is switched off at the service level.
 
-The failure mode is **self-documented in the same file**, patched once before for provider-routing executors: *"Omitting them here made any task with `assigned_to:'ica-executor'` fall through `isHitlTask()` and be silently reclassified as a human gate, so cost-shifted leaves were never dispatched."* Project-local agents were never added.
+**Consequence for M1 exit criterion 2.** It is a compound criterion and it splits:
 
-- **Blast radius:** every repo with project-owned agents. No `/dev:execute-plan` run in Agent Dock can dispatch to `agent-dock-*`.
-- **Why it's insidious:** the failure is a *plausible status* (`hitl_required`), not an error. It looks like the workflow correctly found a human gate.
-- **Systemic cause:** a closed allowlist in a launchpad-owned artifact, gating names that are by definition project-scoped. `.claude/workflows/` is explicitly refresh-from-launchpad / do-not-hand-edit, so the local copy cannot legitimately be fixed in place. **The allowlist is the wrong mechanism** — it needs to either resolve against the live agent registry (which the harness already exposes; the error message even prints it) or accept an `extra_agent_types` passthrough from args.
-- **Workaround used:** swapped to `feature-sprint-executor` (allowlisted, canonical Mode-C) and prepended a project-agent-contract preamble instructing each executor to read `AGENTS.md` + `agents/builder.md` first. Fixed in args, not in the deployed script.
-
-### 2. An empty phase auto-approves — a failed task produced an *approved* phase
-
-Wave-2 phase-2 (Codex adapter) lost its agent to `API Error: Connection closed mid-response`. The phase returned `tasks: []` and got `verdict: {approved: true, reviewer_type: "none"}`. Zero work reviewed as success. The reviewer gate has no "phase produced nothing" branch — vacuous truth passes it.
-
-A second concurrent failure (`agent type 'claude-code' not found`) shows the same class: infrastructure failures degrade into empty-but-approved rather than blocking.
-
-### 3. Top-level `status: complete` was not trustworthy
-
-The run reported `complete` while containing: one `status: failed` task, one dead agent, and a task whose own report said BLOCKED that karen separately identified as *actually landed* ("stale-blocker-report"). Ground truth only came from `git log`, file existence checks, and re-running `npm run validate` myself. **Verifying on disk was not paranoia — it was the only accurate signal.**
-
-### 4. "Do NOT git add/commit/push/stash" was ignored, and a shared worktree made it dangerous
-
-Every task prompt forbade git writes. Agents produced 23 commits anyway. Worse, parallel agents shared one worktree, and one agent's commit **swept a concurrent agent's staged changes into it** — requiring an orphaned-commit recovery (`aa88d35 "recover W2 domain/server wiring + codex discovery from orphaned commit"`).
-
-Outcome was recoverable and content verified byte-identical, but the pattern is a data-loss hazard. **Parallel agents + one shared worktree + git index = a race with no lock.** Either give parallel implementers `isolation: 'worktree'`, or make the no-git instruction enforceable rather than advisory.
-
-### 5. Invariant-adjacent findings shipped as NON-BLOCKING
-
-The wave-2 karen gate correctly found, then classed as non-blocking, that discovery shelled `claude` with full inherited `process.env`, bypassing `CLAUDE_SUBSCRIPTION_ONLY_UNSET_ENV`. That is a **credential/billing-identity boundary** (AGENTS.md invariant #1): a stray `ANTHROPIC_BASE_URL`/`ANTHROPIC_API_KEY` could redirect the probe off the operator's subscription. The repo already treats that strip as a tested invariant for the runtime adapter.
-
-It also found that `discoverClaudeSessions()` was called with no args — hardcoding `claude`, ignoring `config.runtimes.claude.command`, and returning `[]` on failure with no signal. On the mock-runtime-only nuc instance, discovery would be **permanently and silently empty**: the exact invisible-sessions failure this feature exists to remove.
-
-Both survived to merge review and were fixed by hand in `edab3dc` (+6 regression tests). **Lesson: severity classification, not detection, was the gate's weak point.** A finding touching a named invariant should not be classifiable as non-blocking.
-
-### 6. Autopilot was the wrong lane, and its own preflight knew it
-
-The node was **16 pts / `effort_size: xl`** with an implementation plan already on disk. Autopilot's own routing table rejects both (13-pt ceiling; existing plan → `/dev:execute-plan`), and the plan's `## Execute` line said `/dev:execute-plan` explicitly. Rerouting cost one cheap read. **Reading the node before trusting the invoked command's lane was the correct move.**
-
----
-
-## Deliberate deviations
-
-- **Gate lens narrowed** from `[security, validator]` to `[validator]` on both tier-3 phases. `reviewerFor()` maps a `security` lens to a full `council-review` **sub-workflow** nested inside an already-nested run; `review_intensity: tier3` still routed to karen, and I verified both load-bearing invariants directly. Flagged at the time rather than silently applied — but note this is precisely the gate that would otherwise have been most likely to escalate finding #5.
-- **Deferred, documented, not dropped:** per-event try/catch in the ≤50-event host-events batch (unreachable from today's adapters); `discoveredSignatures` unbounded growth.
-
----
-
-## Actions
-
-| # | Action | Where |
+| Half | Status | Evidence |
 |---|---|---|
-| 1 | Replace `KNOWN_AGENT_TYPES` with live-registry resolution or an `extra_agent_types` args passthrough | launchpad `execute-plan.js` (upstream, per ARTIFACT-UPSTREAM-REGISTRY) |
-| 2 | Make an empty phase a blocking condition, never `approved: true, reviewer_type: "none"` | launchpad `execute-plan.js` reviewer gate |
-| 3 | Never report `status: complete` when any task is `failed` or any agent errored | launchpad `execute-plan.js` report assembly |
-| 4 | Give parallel same-wave implementers `isolation: 'worktree'`, or enforce the no-git rule | launchpad workflow patterns |
-| 5 | A finding touching a named AGENTS.md invariant cannot be classed non-blocking | reviewer-gate severity rubric |
-| 6 | Ship `extra_agent_types` or registry lookup before the next `execute-plan` run in this repo | Agent Dock (blocked on #1) |
+| "transcript reachable in ≤1 click (CL-2)" | **MET** | `log_ref_url` = `http://[REDACTED][REDACTED]/sessions?session=S-…`, verified HTTP 200 |
+| "CCDashMetricsPanel renders **real metrics**" | **NOT MET** | blocked on node config, not on code — nothing we can write closes it |
 
-**Note on #1–#5:** these are launchpad-owned artifacts. Fixing them in `agent-dock/.claude/workflows/` would be wiped by the next refresh and is forbidden by CLAUDE.md.
+Unblocking it needs `INTENTTREE_CCDASH_ENABLED=true` + `INTENTTREE_CCDASH_BASE_URL` (+ optional
+bearer) on the node's `[REDACTED]`, then a restart. That is a **live-service config change
+on a running service**, deliberately not made here: it is outside the plan's authored scope (which
+names the hook write and the intenttree surfaces, not node service config), and it changes a live
+service's outbound-call behaviour. Escalated as an operator decision instead.
+
+Note the ordering this reveals: the `S-` prefix work (gap 3) is **currently moot for metrics** —
+the pull never fires — but it is still the correct value to store, because the moment the flag is
+enabled a bare UUID would 404. Getting it wrong now would have produced a bug that only appeared
+later, at the exact moment someone flipped a switch and expected it to work.
+
+### Live acceptance — what actually populated
+
+Run `run_01KZ0BAYF6KNB7VAS4NPS1VZMW`, created by the hook itself against node
+`node_01KYWX3Z0XNN5ZRXWH5GGRT7R9` (branch client PATH-prepended; global `itt` untouched):
+
+```
+harness_type      = 'claude_code'          # exit criterion 3
+is_external       = True
+ccdash_session_id = 'S-fcad3388-…'         # CCDash form, not the bare UUID
+log_ref_url       = 'http://[REDACTED][REDACTED]/sessions?session=S-fcad3388-…'
+ccdash_metrics    = {"status": "disabled"}  # the config gap above
+```
+
+The transcript resolved via the **depth-2 fallback**, not the direct derivation: cwd was the
+worktree, whose mangled name differs from the repo-root project dir where the session's `.jsonl`
+actually lives. The fallback is load-bearing for any worktree-based run, which is every
+`dev-execution` run by protocol — worth knowing before anyone "simplifies" it away.
+
+### A defect the live run found that reading could not: no agent, no run
+
+`itt run start` needs an agent, and resolves one from a workspace when `--agent` is absent. The hook
+passed neither, so the first live run failed with `no workspace configured` and the join silently
+did not happen (non-fatally, exactly as designed — which is precisely why it would have gone
+unnoticed). Fixed by threading `--workspace` from `INTENTTREE_WORKSPACE` when set, and by making the
+failure message **name the knob to set** rather than reporting only the symptom. A message that
+leaves the operator to go debug which of two env vars is missing is the same cognitive load this
+milestone exists to remove.
+
+### ⚠️ Escalated, NOT fixed here: `log_ref_url` has no server-side URL validator
+
+The adversarial security lens (gpt-5.6-terra) found that `PATCH /api/v1/agent-runs/{id}` accepts
+`log_ref_url` as an unvalidated `str`, and all three consumers render it verbatim as an
+`<a href>`. An authenticated caller can store `javascript:…`. **This is pre-existing** — the column
+and the renderers both predate this change, and nothing ever wrote the field, so there were no
+stored values. What this milestone changes is that the field is now *populated*, which makes the
+missing validator worth closing rather than leaving theoretical.
+
+Not fixed here because the authoritative fix is a **server-side URL policy plus frontend
+sanitisation**, and both are explicitly out of M1 scope (no server changes; `web/` is M2-M4). Our
+CLI validates strictly, but a CLI is not an enforcement boundary — any other client bypasses it.
+Practical risk today is low (bearer-gated API, single-user LAN), which is why this is a follow-up
+rather than a halt. Full finding list: `/tmp/m1-codex-review.txt`.
+
+### The security gate found 10 things; 8 were fixed, and a 9th was found fixing them
+
+Gate: `gate_lens: [security, validator]`, trigger `untrusted-input`. Security lens = gpt-5.6-terra
+(adversarial, instructed to refute); validator lens = `task-completion-validator`. Both fresh-context.
+Full review text preserved at `/tmp/m1-codex-review.txt`.
+
+Fixed in-scope (all in code this milestone wrote): hostile `AOS_CCDASH_UI_URL` (credentials /
+query / fragment / control chars / non-http now refused before composition, built via `urlunparse`
+from parsed components); a `urlparse` `ValueError` that created a run then lost its id — every
+later boundary would have created another (now: **once the run exists its id always reaches
+stdout**); the CLI transcript validator not doing what its docstring claimed; a hand-edited
+`"agent_run_id": "--help"` parsed as an option (leading-dash rejection + shape re-validation on
+read-back); no watchdog on `itt` (20s, portable — no GNU `timeout` dependency); the depth-2 fallback
+binding another project's transcript (fails closed on >1 match); a bare `session_id` Python local
+violating the rule this milestone set; and a non-canonical UUID regex whose message claimed
+otherwise. Plus the local half of the concurrency fix: an atomic `mkdir` lock with stale reclaim.
+
+**A 9th, found while fixing the others and missed by the review:** `CCDashClient.pull_session`
+builds `/api/sessions/{session_id}` as a **raw f-string** (`ccdash_client.py:163`), so
+`--session-id '../../admin'` traverses CCDash's API path. The review had explicitly *cleared*
+"session query injection through the intended CLI route" — but that assessment was about the CLI's
+own `log_ref_url` composition, where `urlencode` genuinely does protect. Different code path. The
+hook was never exposed (it only ever sends `<prefix><canonical-uuid>`); the new subcommand was.
+Closed at the CLI; the authoritative fix is server-side and out of scope.
+
+**One suspected-High DE-ESCALATED by checking rather than assuming.** The review suspected that
+forwarding an arbitrary `transcript_path` to CCDash `force_sync` could become arbitrary local-file
+ingestion. It cannot: CCDash's `SyncRequest` (`backend/routers/cache.py:25`) accepts only
+`force: bool` and `trigger: str` — there is no `transcript_path` field, so intenttree's extra key is
+silently dropped and the path is never opened. (CCDash does carry proper containment logic —
+`_is_under` / `_resolve_changed_path` — for the paths it genuinely accepts.) Worth recording as a
+method note: the reviewer flagged it *as* unverified and said so, which is what made it cheap to
+resolve instead of inheriting as fear.
+
+### Three process notes worth keeping
+
+- **A mutation that does not reproduce the real defect proves nothing.** The first mutation for the
+  fallback-collision test replaced a count guard with `if false`, which left the candidate as a
+  multi-line string that failed `[ -f ]` anyway — suite stayed green. Re-mutating to the *faithful*
+  original defect (`head -1`) produced the expected failure. 9 mutations were run in total; each file
+  was confirmed byte-identical to its pre-mutation copy afterwards.
+- **`pkill -f "<pattern>"` matches any shell whose command line contains that literal** — including
+  the test runner and the operator's own shell. It killed this session's shell twice (exit 144)
+  before being removed entirely in favour of PID-exact signalling. The test file now documents it.
+- A fixed `sleep` as a settle before a liveness probe is the wrong shape: it flaked ~1 run in 5,
+  because "long enough" is a property of the machine, not of the code. Replaced with a bounded poll.
+  Also: **do not run a test suite while another agent is editing the files under test** — an
+  interrupted mutation run left the hook in a mutated state and produced two failures that looked
+  real and were not.
+
+### Follow-ups captured as IntentTree nodes (tree `tree_01KVTH95ETM8YRYCV2ENHVR124`)
+
+All children of the pillar `node_01KYWX3M11YCT9Q0SM6Q4SKVMK`:
+
+| Node | Item |
+|---|---|
+| `node_01KZ0D0Y3YX23CMCAQ6N67DVPB` | Enable `INTENTTREE_CCDASH_ENABLED` on the node (unblocks M1's metrics half) — **blocks** the re-confirm node |
+| `node_01KZ0D1AV4EAKXRGJR768H0KDK` | `log_ref_url` has no server-side validator; 3 renderers emit it verbatim |
+| `node_01KZ0DAJX7Y98G6FYRZ1EJQQ19` | `pull_session` raw f-string path traversal (`relates_to` the above) |
+| `node_01KZ0D1Z2A2DS3ZECAT7VRRJ9E` | Server-side idempotency key on (node, harness session) — Mode-D adjacent |
+| `node_01KZ0D28AWDAS7Y3WVQBYME2M4` | Deploy: refresh the installed `itt` client, laptop + node |
+| `node_01KZ0D2HF9CP7XQESSNJTTNYJV` | Deploy: `~/.aos/shims/aos-env.sh` is a stale copy |
+| `node_01KZ0D34J8HCRHZC4WY4MYDQNT` | Correct design-spec §10 clause 3 (its `log_ref_url` instruction fails CL-2) |
+| `node_01KZ0D3DQ8NGNW9PY6QHW5DK6C` | Incidental: model-registry drift (ICA sonnet → `4-5[1m]`) |
+| `node_01KZ0D3X37Q14785YHG60S1FV8` | Re-confirm M2-M4 against what M1 revealed (the plan's own gate) |
+
+### Scope held
+
+- **DEF-1 (the `CF-C` binding-block edit) was NOT done** — the PRD defers it to `CF-C`'s own epic
+  (`§9 Deferred Register`). When it lands it must add `harness_session_id`, `transcript_ref`,
+  `harness_type` and mirror into `context-fabric-initiative.md` §2 **in the same commit** (design-spec
+  §10 header). Our field naming was chosen to match those three names exactly so the later edit is
+  additive.
+- **No schema migration, no CCDash code change, no server change, no node-`meta` write.** All four
+  held; the single-writer invariant (design-spec §10 clause 6) is intact — `bind_manifest` remains
+  the only writer of node `meta`.
+- **M2-M4 not started.** Per the plan's accepted decision, M1 ships alone and stops so the thesis
+  can be re-confirmed against what M1 revealed. Given the three-gaps finding above, that
+  re-confirmation is no longer a formality — see the Next Actions handoff.
+
+---
+
+## M2 / G-2 + G-3 — 2026-08-03
+
+### Verification first (plan's standing WIRED-and-ENABLED rule); record: `m2-verification-record.md`
+
+Both §11 unknowns were answered with file:line evidence **and a live node probe** before any code
+(commit `b47795e`). Two findings shaped the milestone:
+
+- **`/projection` emits no unblocked-next, but its consumers are WIRED and it is ENABLED on the
+  node** (HTTP 200, `running_runs` already 23 rows). The opposite of M1's finding — adding a field
+  reaches live surfaces immediately. So G-2 is *enrichment + one cross-workspace read*, not a new
+  subsystem; G-3 is genuine new derivation but from **existing** edge primitives, at read time.
+- **`get_session_family_v1` misses agent-teams** — and the Codex leg's `UNKNOWN` verdict was wrong
+  on the facts (it read only the CCDash repo; the answer is a filesystem fact: 409 `.meta.json`
+  sidecars carry `taskKind=in_process_teammate`+`teamName`, and `parser.py` never opens them). Same
+  failure shape as M1: *code existing ≠ the data it runs on*. Fixing it is a CCDash change, which
+  the plan's scope excludes → deferred to `node_01KZ2K09G0SA1Y8DNZPCDG8J6M`.
+
+### Shipped (intenttree `1dacb3f`, branch `worktree-live-work-obs-m2`)
+
+- **G-2 roster (CL-1):** widened `RunSummary` additively (node label + M1 join fields +
+  `started_at`/`last_event_at`); new `GET /agent-runs/roster`, cross-workspace by default, declared
+  before `/{run_id}`, node labels joined in one query. One shared `build_run_summary()` feeds both
+  the roster and the existing projection so they cannot drift.
+- **G-3 unblocked-next (CL-3):** `GET /nodes/{id}/unblocked` + `GET /workspaces/{id}/unblocked-next`.
+  Actionability **derived from edges, not stored status** (completing a node does not flip its
+  edge-blocked dependents out of `blocked`). Direction tested against inversion for both families;
+  `depends_on` (~98% of real rows) is read incoming, `blocks`/`unlocks` outgoing. Read-only, bounded
+  bulk queries.
+- **Client (the CLIs are the stable contract; M2 ships no UI):** CLI `run roster` /
+  `node unblocked` / `workspace unblocked-next`; MCP `agent_roster` / `node_unblocked` /
+  `workspace_unblocked_next`, docstrings written to separate them from `ready_nodes`/`whats-next`.
+- Full intenttree backend + client suites green; new tests: `test_agent_run_roster.py`,
+  `test_node_unblocked.py`, `test_unblocked_next.py`, `test_live_work_observability.py`, and MCP
+  dispatch tests.
+
+### Deviations logged
+
+- **design-spec §5 reassignment.** §5 put G-2's live-session endpoint in CCDash. It landed in
+  **IntentTree** instead: M1 made IntentTree the holder of the session↔node join, and only
+  IntentTree knows the node binding. This keeps CCDash read-only — §5's stronger intent.
+- **Execution note — the workflow failed; M2 was completed in-session.** The `execute-plan`
+  workflow's four sonnet-5 subagents all died with "Prompt too long" (~173K ctx reading whole files
+  in a large repo; 705K tokens, 0 commits). A second wave of agents partially rewrote the same files
+  concurrently, producing a two-author blend on disk. Resolution: adopted the stronger G-3
+  implementation (scoped `dependency_edges_for_nodes`, centralized `DEPENDENCY_TYPES`, `ARCHIVED`
+  handling), reconciled field names to one contract (`newly_actionable`), deduplicated the tests,
+  and finished the whole milestone in-session with targeted reads. Generalizable lesson for the
+  fleet: **worktrees must be `uv sync`-preflighted, and per-file ownership must be exclusive across
+  waves** — the plan's own "parallel legs collide on shared seams" warning recurred, this time as
+  two agents rewriting the same modules.
+
+### Follow-ups opened (children of the pillar)
+
+- `node_01KZ2K09G0SA1Y8DNZPCDG8J6M` — CCDash parser never reads `.meta.json`; agent-team teammates
+  surface as unlabeled subagents (blocks session-family kind/depth). Out of M2 scope (CCDash change).
+- `node_01KZ2K0GYFMVTFGKHTET0911MK` — 23 `AgentRun`s stuck in `running`; the roster will surface
+  stale runs. M2 mitigates presentationally (`started_at`/`last_event_at` visible); reaping is out
+  of scope.
+
+### Not done (correctly out of scope)
+
+- No new UI (WS-10/WS-11 own it), no CCDash code change, no schema migration, no node-`meta` write.
+- M3/M4 unchanged. M3 remains materially gated on sibling WS-13 (backlog), per the plan's own
+  corrected decision.
+
+### M2 gate close — 2026-08-03, `gate_lens: [validator]`
+
+**The gate ran after the merge, not before it.** A concurrent session squash-merged both halves
+(intenttree #14 `ff6516a`, launchpad #97 `2f98e69`) while this session's legs were still mid-flight.
+Recorded plainly because it inverts the protocol: the worktree → PR → *gate* → squash-merge order
+exists so the gate can withhold approval, and here it could not. The gate was therefore run against
+merged `main` as a post-hoc verification. It passed, so nothing had to be reverted — but that is
+luck, not process.
+
+Evidence gathered in-session against `ff6516a` (not taken from the implementers' reports):
+
+| Check | Result |
+|---|---|
+| `uv run ruff check .` | clean **after** the E501 fix below; **red before it** |
+| `uv run mypy` | Success — no issues in 400 source files |
+| `uv run pytest` (backend) | **2049 passed, 37 skipped**, exit 0 |
+| client suite | exit 0 |
+| the 3 new M2 test files | 36/36 pass |
+
+**A regression fixed on the way: `main`'s lint gate was red, and it was ours.** `E501` (101 chars)
+at `backend/tests/services/test_run_session_idempotency.py:100`, introduced by **our own M1
+follow-ups commit `6299e96`** — confirmed with `git log -L`. So M1 merged with a red ruff gate and
+nothing caught it for two days. Fixed by wrapping the signature. The generalizable point is not the
+line length: **a milestone's own gate evidence has to be re-derived at the next milestone, because a
+"suites green" claim in a completion note is a claim about a tree that no longer exists.**
+
+### Verification-record corrections (the falsification pass earned its keep)
+
+M2's exit criterion 3 was already satisfied by a prior session's record. Re-verifying it rather than
+trusting it changed the implementation:
+
+- **The load-bearing one.** The record told G-3 to assemble the existing `BLOCKS`/`UNLOCKS`
+  adjacency. Live DB: `depends_on` **1427** rows, `blocks` 31, `unlocks` **0** — and `depends_on`
+  points the *other way* (`A depends_on B` ⇒ **B** unblocks A). Built as recorded, G-3 would have
+  returned empty for ~98% of real dependency data while looking correct. The failure mode is
+  seductive: `_unlock_adjacency` is real, working, *and named for unblocking* — it was written for
+  the DI-042 prioritization signal, not dependency traversal. **A helper whose name matches your
+  question is not evidence that it answers your question.** Same family as M1's lesson.
+- Two further claims were wrong in the safe direction (agent-team transcripts are *absent* from the
+  session-family response, not mislabeled in it; and a team sidecar collector *does* exist and is
+  dead on a path-template bug). Both are written up in the record's §Corrections with live evidence,
+  and both became better-aimed follow-ups than the original research-shaped one.
+
+### Deviations logged (this session)
+
+- **`op context pack` is unusable for laptop subagents under `aos-target set node`.** It SSH-execs on
+  the node and returns a **node-local** path (`/home/miethe/dev/agentic_meta_dev/.operator/runs/...`)
+  that does not exist on the laptop, so the delegation-context contract's "thread the printed path
+  into every leg" cannot be honored. Worked around with self-contained leg contracts (local subagents
+  inherit `CLAUDE.md` anyway). This is a real seam defect in the contract, not a one-off — worth a
+  follow-up if it recurs.
+- **Two agents wrote one worktree, and the worktree was deleted under them mid-run.** Both legs had
+  explicit disjoint file ownership and still collided via a third party: the concurrent session
+  committed, merged, and `git worktree remove`d the tree while a full suite was running. One leg then
+  chased a phantom mypy failure that was the other leg's mid-rename. Nothing was lost, but neither
+  leg could re-run gates against the tree it had just validated. Compounds the M2 deviation already
+  logged above; the fleet-level fix is the same (exclusive per-file ownership **and** an exclusive
+  worktree per run).
+- **A naming disagreement was resolved by spec, not by the last writer.** `newly_actionable` vs
+  `is_now_actionable` — one agent twice reverted the other's rename, arguing that the derivation
+  holds no before/after state so "newly" overstates it. That argument has merit; the spec name won
+  and "newly" is scoped to the subject in the field comment. Flagged rather than buried in case the
+  naming is revisited.
+
+### Follow-ups opened (this session, children of the pillar)
+
+- `node_01KZ2Y2K0239CAPZ1DSQATJCT0` — **CCDash `get_session_family_v1` filters out every subagent.**
+  The handler never passes `include_subagents`, so `sessions.py:419-420` excludes them all. Live:
+  `session_count: 1` for a root with 8+ real children. A one-line handler fix; it makes the endpoint
+  cover neither teams *nor* plain subagents. Sharpens CL-2 — "transcript in ≤1 click" must not land
+  the operator on a family view that hides every child.
+- `node_01KZ2Y2T7NSFDTNQE9ABH09JFX` — **`_collect_team_sidecar` is dead on a path-template bug.** It
+  globs `~/.claude/teams/{full-uuid}/inboxes/` while real dirs are `session-<first8>` (38 of 39 on
+  disk); 0 of 200 sampled sessions have `teams.exists == true`. And `config.json` — the actual team
+  identity — sits one level above the glob, unread.
+
+---
+
+## M3 — Portfolio scope + semantic zoom (G-4, G-5, G-7) · 2026-08-03
+
+### WS-13 dependency — path taken: **CONSUME, no shim**
+
+WS-13 (`node_01KYQV5Y0MHWECCYX12RHXGA35`) is `completed`, and its code is on intenttree `origin/main`
+as `2e2aba3` (PR #16) — verified with `git branch -r --contains`, not by reading the tracker. So the
+plan's "M3 waits or shims and logs the deviation" branch does **not** apply: M3 consumes
+`GET /me/whats-next` directly and builds no parallel aggregation. The plan frontmatter's decision
+("M3 is materially gated on sibling WS-13 … backlog") is **stale** — written 2026-08-02, WS-13 landed
+2026-08-03.
+
+Two plan statements look contradictory and are not: OQ-1 resolves the portfolio *node projection* to a
+synthetic client-side pass over `GET /workspaces`, while the M3 exit criterion requires *aggregation*
+from WS-13. Both hold — nodes are synthetic, the per-workspace counts decorating them come from WS-13's
+ranked union. Only that reading avoids standing up a second aggregation.
+
+### Deviations logged
+
+- **The plan's "semantic zoom ladder" does not exist, so "only the last hop is new" is wrong.**
+  `MapCanvas` had no `scope` abstraction to extend: it derived `mode: "boxed" | "spread"` from
+  `spreadProject != null` (`:411-412`), itself derived from `focusedProjectId` **or** "exactly one
+  project has visible nodes" (`:402-409`). A derived boolean keyed on a *project id* structurally
+  cannot express a rung *above* the workspace. **Resolution:** explicit
+  `scope: 'portfolio' | 'workspace' | 'project'` with `mode` derived from it, gating the existing
+  derivation so lower rungs stay bit-identical. A workable breakpoint design exists, so M3 did **not**
+  escalate to C4 under design-spec §11 — but it had to be decided in-session. **This is the other half
+  of why three prior dispatches produced zero commits.** The recorded cause (turn-cap floor cost) is
+  true and incomplete: a delegate told to extend a ladder that isn't there burns its budget looking
+  for it. Floor cost explains the ceiling; the missing design explains the flailing.
+
+- **"Exactly ONE graph renderer must exist afterward" was already false before M3 was authored.**
+  Baseline grep on `origin/main`: **five** pre-existing `<ReactFlow>` mounts (`MapCanvas:1294`,
+  `AosMapCanvas:517`, `AosRouteCanvas:370`, `SharedProjectionCanvas:443`, `SubtreeMapCanvas:66`) plus
+  `features/tree/TreeCanvas.tsx`, which is a **separate hand-rolled div/SVG canvas, not ReactFlow at
+  all**, used at two sites. The check as written could not have passed the day it was authored.
+  **Reinterpreted to the enforceable, intended form (§6 NG-4): M3 adds ZERO renderers** — proven by
+  stashing the diff and re-globbing (21 files before, 21 after, empty diff), not by eyeballing paths.
+  Recorded rather than quietly satisfied: a gate that reads as passing when it was never evaluable is
+  worse than one that fails honestly. **The plan's AC-table row should be corrected to the adds-none
+  form.**
+
+- **A tracker node read `completed` with zero evidence, and the code disagreed.** leg-b
+  (`node_01KZ2G8EKXNFBR9HTS8DT17EQE`) was `completed`/progress 1.0 with `outcome: null` and empty
+  `agent_runs`/`artifacts`/`completion_evidence`/`external_links`, while its declared dependency leg-a
+  was still `blocked`. Falsified against the code and reset to `not_started`. The read was only
+  trustworthy because `include=external_links` was passed — a bare node read hides that collection and
+  would look empty either way (the PF-3 false-negative trap, fixed upstream in #17). **`progress` 1.0
+  survived the reset** — status and progress are independent fields, so progress is not a completion
+  signal.
+
+- **Cross-workspace saved views are DEFERRED — they cannot be built under M3's own constraints.**
+  Listed under G-4 citing `api/v1/workspaces.py:225`. The citation is right, the surface is not what it
+  sounds like: it is the **dashboard** saved-view feature (`/{workspace_id}/dashboards/views`) and
+  **the map has no saved-view concept at all**, so this is introducing one, not promoting one.
+  Persistence is `dashboard_layouts` with unique `(workspace_id, user_id, name)` (migration `0035`),
+  and `workspace_id` is non-optional through the whole repo→service→API chain. Cross-workspace needs a
+  **nullable-`workspace_id` migration** + a new endpoint — which M3's hard constraint #2 declares a
+  **Mode-D stop**. So the constraint and the work item conflict, and the constraint wins by its own
+  terms. leg-b's node already scoped it out as WS-5-adjacent. **Surfaced, not silently dropped** —
+  scaling M3 down is the operator's call.
+
+- **The validator gate earned its keep; 217/217 green did not.** The single `validator` lens returned
+  CHANGES_REQUESTED on a defect a fully green suite could not surface: `MapCanvas` is mounted at
+  `/w/:workspaceId/map` with **no `key={workspaceId}`** (`screens/WorkspaceMap.tsx:8-17`), and the
+  route element is a *pre-constructed shared element* (`app/App.tsx:94`), so React Router does not
+  remount on a dynamic-segment-only change. Clicking a **different** workspace's portfolio card
+  changed the URL and the `workspaceId` prop (queries refetched) while `scope` stayed `"portfolio"` — a
+  click that visibly did nothing — and `savedSelectionRef` leaked a workspace-A selection id into
+  workspace B. Both new tests used a fixed-prop render helper that *structurally cannot* reproduce it;
+  the reviewer verified empirically against the project's own harness, not by inspection.
+  **Generalizable lesson — the M1 lesson one level up:** M1 learned that code existing ≠ code wired.
+  This adds that **a passing test ≠ the path tested** — a component test that injects props bypasses
+  the routing layer where the bug lives. When a feature's discoverability path is a *navigation*, the
+  test must render through the real router wiring or it is testing a different program.
+
+- **Chose the scoped fix over the architecturally cleaner one, deliberately.** `key={workspaceId}` on
+  the route would fix the whole class, and `selectionStore`'s own header ("selection resets on
+  workspace navigation") suggests a remount is what the design always intended — the missing key is
+  arguably a latent pre-existing bug. Rejected for M3 anyway: a forced remount changes behaviour on the
+  **non-portfolio** path, violating this milestone's invariant that `scope !== "portfolio"` is
+  identical to `origin/main`. Reset the rung state inside `map/` instead. **The `key` question is a
+  real follow-up, not something to settle inside a feature diff.**
+
+- **`op context pack` returned a node-local path again** (`/home/miethe/…`) under `aos-target set
+  node`, unusable by a laptop subagent. This is the **recurrence** the M2 entry above called for a
+  follow-up on. Same workaround: a self-contained leg contract carrying design, seams and constraints
+  inline.
+
+- **My own preflight caused a 6-file test failure I initially accepted as pre-existing.** A fresh
+  `pnpm install` (this repo tracks **no lockfile anywhere**) produced a stricter tree than the parent
+  checkout's older `node_modules`, breaking `workspace-dashboard/*`. Root cause is a real latent
+  defect: `@dnd-kit/utilities` and `react-resizable` are **imported but declared in neither
+  `package.json`**, resolving only via transitive hoisting. Filed as
+  `node_01KZ46X84ZCT1P1914NJMB2C5W` (intenttree tree); **not** fixed in M3's diff, to keep it scoped.
+  Trap for whoever takes it: a green suite on an existing checkout proves nothing — stale
+  `node_modules` masks it.
+
+- **A contract instruction of mine was a silent no-op, and the delegate caught it.** I told the
+  implementer to run `pnpm tsc --noEmit`; the repo's root `tsconfig.json` is references-only
+  (`"files": []`), so that exits 0 checking **nothing**. It used `-p tsconfig.app.json` and told me
+  rather than reporting a false green. Worth propagating: any AOS doc or contract prescribing the bare
+  form is handing out a false pass.
+
+- **Stale Hermes branches on the node.** The blocking one
+  (`hermes/edit/run_01KZ2G98J3WWAP3M4STC5WCHFH`) was deleted after confirming `git log main..<branch>`
+  was empty — its worktree had already been removed, so only the branch needed clearing, a smaller
+  action than the recorded remediation implied. `hermes/edit/run_01KZ2FZ98SPF19FABPEEJQF12V` (the first
+  failed run) is equally stale and left in place as out-of-scope.
