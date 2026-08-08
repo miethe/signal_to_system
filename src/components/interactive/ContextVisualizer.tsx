@@ -106,14 +106,17 @@ export default function ContextVisualizer({
                   </div>
 
                   {/* Value */}
-                  <p className="mt-1 font-mono text-xs leading-relaxed text-zinc-500 dark:text-zinc-400 whitespace-pre-wrap break-words">
+                  <p id={`ctx-val-${i}`} className="mt-1 font-mono text-xs leading-relaxed text-zinc-500 dark:text-zinc-400 whitespace-pre-wrap break-words">
                     {isExpanded || !isLong ? ctx.value : truncate(ctx.value, 120)}
                   </p>
 
                   {isLong && mode === "rich" && (
                     <button
+                      type="button"
+                      aria-expanded={isExpanded}
+                      aria-controls={`ctx-val-${i}`}
                       onClick={() => toggle(i)}
-                      className="mt-1 text-xs text-indigo-600 hover:underline dark:text-indigo-400"
+                      className="mt-1 text-xs text-indigo-600 hover:underline dark:text-indigo-400 focus-ring rounded"
                     >
                       {isExpanded ? "Show less" : "Show more"}
                     </button>
