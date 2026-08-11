@@ -113,7 +113,7 @@ export default function ContextVisualizer({
                   {isLong && mode === "rich" && (
                     <button
                       onClick={() => toggle(i)}
-                      className="mt-1 text-xs text-indigo-600 hover:underline dark:text-indigo-400"
+                      className="mt-1 text-xs text-indigo-600 hover:underline dark:text-indigo-400 focus-ring"
                     >
                       {isExpanded ? "Show less" : "Show more"}
                     </button>

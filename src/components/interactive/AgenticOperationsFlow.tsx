@@ -105,7 +105,7 @@ export default function AgenticOperationsFlow() {
                 aria-selected={selected}
                 aria-controls={`aof-panel-${tab.key}`}
                 id={`aof-tab-${tab.key}`}
-                className={`aof-tab ${selected ? "aof-tab--active" : ""}`}
+                className={`aof-tab ${selected ? "aof-tab--active" : ""} focus-ring`}
                 onClick={() => setActiveTab(tab.key)}
               >
                 <Icon aria-hidden="true" size={18} />
@@ -328,7 +328,7 @@ function LoopPanel({
           <button
             key={node.id}
             type="button"
-            className={`aof-node aof-node--${index + 1} ${selected ? "aof-node--active" : ""}`}
+            className={`aof-node aof-node--${index + 1} ${selected ? "aof-node--active" : ""} focus-ring`}
             onClick={() => setActiveLoopNode(node.id)}
           >
             <span className="aof-node__icon">
@@ -360,7 +360,7 @@ function TriagePanel({
           <button
             key={path.id}
             type="button"
-            className={`aof-route-card ${selected ? "aof-route-card--active" : ""}`}
+            className={`aof-route-card ${selected ? "aof-route-card--active" : ""} focus-ring`}
             onClick={() => setActiveTriagePath(path.id)}
           >
             <span className="aof-route-card__label">{path.label}</span>
@@ -388,7 +388,7 @@ function ArtifactPanel({
           <button
             key={artifact.id}
             type="button"
-            className={`aof-artifact-card ${selected ? "aof-artifact-card--active" : ""}`}
+            className={`aof-artifact-card ${selected ? "aof-artifact-card--active" : ""} focus-ring`}
             onClick={() => setActiveArtifact(artifact.id)}
             style={{ "--aof-stack-index": index } as CSSProperties}
           >
@@ -423,7 +423,7 @@ function AutonomyPanel({
                   <button
                     key={option.label}
                     type="button"
-                    className={`aof-segment ${selected ? "aof-segment--active" : ""}`}
+                    className={`aof-segment ${selected ? "aof-segment--active" : ""} focus-ring`}
                     onClick={() => updateAutonomy(factor.id, option.value)}
                     title={option.description}
                   >
@@ -458,7 +458,7 @@ function ExecutionPanel({
           <div key={step.id} className="aof-execution-line__item">
             <button
               type="button"
-              className={`aof-execution-step ${selected ? "aof-execution-step--active" : ""}`}
+              className={`aof-execution-step ${selected ? "aof-execution-step--active" : ""} focus-ring`}
               onClick={() => setActiveExecutionStep(step.id)}
             >
               <span>{index + 1}</span>
@@ -492,6 +492,7 @@ function GatePanel({
               "aof-gate-card",
               selected ? "aof-gate-card--active" : "",
               dangerous ? "aof-gate-card--stop" : "",
+              "focus-ring"
             ].join(" ")}
             onClick={() => setActiveGate(gate.id)}
           >
@@ -523,7 +524,7 @@ function EvidencePanel({
           <button
             key={layer.id}
             type="button"
-            className={`aof-evidence-layer ${selected ? "aof-evidence-layer--active" : ""}`}
+            className={`aof-evidence-layer ${selected ? "aof-evidence-layer--active" : ""} focus-ring`}
             onClick={() => setActiveEvidence(layer.id)}
           >
             <span className="aof-evidence-layer__index">0{index + 1}</span>
