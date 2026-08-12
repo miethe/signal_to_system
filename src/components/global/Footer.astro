@@ -42,6 +42,7 @@ const socialIcons: Record<string, string> = {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={social.label}
+                title={social.label}
                 class="flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--border-default)] text-[var(--text-tertiary)] transition-colors hover:border-[var(--border-strong)] hover:text-[var(--text-secondary)] focus-ring"
                 set:html={socialIcons[social.label] ?? social.label}
               />
@@ -54,6 +55,7 @@ const socialIcons: Record<string, string> = {
             target="_blank"
             rel="noopener noreferrer"
             aria-label="RSS feed"
+            title="RSS feed"
             class="flex h-9 w-9 items-center justify-center rounded-lg border border-[var(--border-default)] text-[var(--text-tertiary)] transition-colors hover:border-[var(--border-strong)] hover:text-[var(--text-secondary)] focus-ring"
           >
             <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" class="h-5 w-5">
