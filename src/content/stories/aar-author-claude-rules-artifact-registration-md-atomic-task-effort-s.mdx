@@ -1,0 +1,143 @@
+---
+title: "AAR \u2014 Author .claude/rules/artifact-registration.md (atomic_task, effort\
+  \ s)"
+excerpt: A field note from the Agentic OS build loop.
+date: '2026-08-13'
+readTime: 6 min read
+status: draft
+storyType: after-action
+tags:
+- agent-ready-repos
+- human-ai-workflow
+- artifact-first
+automated: true
+whyItMatters: The work shows how agentic systems turn operational evidence into reusable
+  practice.
+leaderTakeaway: Treat after-action reports as publication-ready raw material, but
+  keep the safety gate explicit.
+sourceAar: "AAR \u2014 Author .claude/rules/artifact-registration.md (atomic_task,\
+  \ effort s)"
+---
+
+## AAR — Artifact-registration rule
+
+One `effort_size: s` node, run through `/itt:run` → lane `quick`. Authored the rule that had existed
+only as verbal doctrine since 2026-08-07, indexed it, and mirrored it into `AGENTS.md`. Landed
+`5d35e83` on `main` via PR #254, 3 files, +110/−1. Outcome: **succeeded**, all 4 ACs met.
+
+## What shipped
+
+| AC | Result |
+|---|---|
+| AC1 | `.claude/rules/artifact-registration.md`, 86 lines, three clauses, thin-index look-first/save-after shape |
+| AC2 | one-line row in `aos-operating-rules.md` (23 lines against its own ~40 cap) |
+| AC3 | `check_agents_md_parity.py` exit 0 in **both** normal and `--staged` mode, with no allowlist entry |
+| AC4 | save-after says `advisory only`; clause 3 marked target-state inline; no enforcement claimed |
+
+Validation at close: parity ×2 · `check_spine_staleness.py` (1118 files) · 175 tests across
+`test_agents_md_parity` / `test_rule_file_refs` / `test_command_skill_refs` /
+`test_global_artifact_drift` / `test_provision_artifacts` · 10/10 markdown links resolved by path
+resolution · both strings quoted from the drift gate verified verbatim in its source.
+
+---
+
+## Lessons
+
+### L1 — `dedup-check` returned a true duplicate at 0.25, and the *reason* is not what I first wrote. A node's own verbatim title scores 0.143 against it.
+
+The rule needed to flag that `check_global_artifact_drift.py` still advises *"Prefer a SYMLINK"*,
+contradicting the 2026-08-10 hardening. Dedup-check returned `match: null` plus one `weak_candidates`
+row — `node_01KZPY6XKSQ4EEWV5QSVG09N9H`, the same finding — at **0.25**, below the 0.9 threshold.
+Reading the row rather than the verdict is the only reason no duplicate was filed.
+
+**My first explanation here was wrong, and traced to the source it does not survive.** I wrote that
+the two titles "share almost no stemmed tokens" — i.e. that paraphrase was the cause. It is not.
+`services/dedup.py:319` scores `jaccard(query_bag, candidate_title ∪ candidate_description)`, and
+Jaccard is **size-symmetric**: `|A∩B| / |A∪B|`. So the score is capped by `|query| / |candidate|`
+however completely the query is contained in the candidate. Measured against that node's 70-token bag:
+
+| query | tokens | containment | jaccard | surfaced? |
+|---|---|---|---|---|
+| **its own verbatim title**, title-only | 10 | **1.000** | **0.143** | **no** — below the 0.2 floor |
+| verbatim title + 12 words of its own description | 20 | 1.000 | 0.286 | yes |
+| verbatim title + 60 words of its own description | 41 | 1.000 | 0.586 | yes |
+
+Recall is a function of **how much of the stored node's own text you happen to retype** — nothing to
+do with paraphrase. At floor `f`, surfacing needs `|query| ≥ f·|candidate|`; at `f = 0.2` a 10-token
+title can never reach a 70-token node. And it is **anti-correlated with our own doctrine**:
+`finding-capture.md` mandates a detail floor on every filed node, and every mandated sentence enlarges
+the denominator. The better a node is documented, the less findable it becomes.
+
+Filed as `node_01KZS3T3QT7BJGHF3Q6JH6QM7H` (high, `s`), linked `relates_to` the completed
+`node_01KZ4EB650XQX5N52HMT0MVQGG` whose fix introduced this lane — the same false-all-clear class,
+one layer in.
+
+*Apply, two things:* (1) read the `weak_candidates` rows whenever the list is non-empty, regardless of
+score — and treat an **empty** list as unmeasured, not as absence, especially when querying with a
+short title. (2) The standing memory on this exact defect says *"corrected premise, twice — trace the
+source before designing the fix."* I read that memory, wrote a plausible cause from the symptom
+anyway, and only got the real one by reading `dedup.py`. A lesson that names the wrong mechanism is
+worse than no lesson: it is confidently unactionable.
+
+### L2 — I wrote a pointer to measured facts, and the target did not contain them. Verify a pointer's destination, not just its existence.
+
+The rule's "where the detail lives" section cited the parent WP body for two measurements (catalog
+`total_deployments = 0`; `skillmeat system show` → *"No system project registered"*). The WP body is
+2305 chars and carries **neither**. The facts lived on two different nodes —
+`node_01KZEVTGQ060XHWSS158GG1WNS` and `node_01KZEWF9N4ZCPBSQFHJC97AKY8` — and I had read both numbers
+out of a *memory file*, then attributed them to the node that felt like their home.
+
+The pointer would have passed every gate in the repo: the node id is real, the link resolves, no
+checker reads node bodies. It would have failed only when a future agent followed it and found
+nothing — which is precisely the dangling-reference class `tests/test_rule_file_refs.py` exists to
+prevent for *files*, with no equivalent for *node bodies*.
+
+*Apply:* when citing a node or doc as the home of a specific fact, grep the destination for that fact
+before shipping the pointer. "The link resolves" and "the link contains what I said it does" are
+different claims, and only the second is the one a reader will rely on.
+
+### L3 — A rule that ships alongside a gate advising the opposite of it is worse than no rule.
+
+Clause 1 forbids symlinks. `check_global_artifact_drift.py`, live in the same repo, documents symlink
+as *"the preferred deployment"* and prints *"Prefer a SYMLINK to the upstream over refreshing a
+copy"* on every finding. A reader hitting the gate's hint mid-task has no way to know it predates the
+doctrine.
+
+Fixing the gate was out of this node's four ACs and belongs to a filed sibling, so the in-scope move
+was to make the contradiction **explicit in the rule itself** — name the gate, quote the hint, say
+*do not follow it*, and cite the tracker. Silently shipping a rule that the tooling argues against
+would have trained exactly the ignore-the-rules reflex the doctrine's own history warns about
+(the earlier "don't write an unsatisfiable rule" note in the same doctrine record).
+
+*Apply:* before landing a rule, grep the repo for tooling that advises against it. Where the fix is
+out of scope, name the contradiction in the rule and cite the tracker — never leave the reader to
+discover it from a hint.
+
+### L4 — The advisory/enforced distinction needed defending three times in one 86-line file.
+
+AC4 asked only that the save-after row say `advisory only`. It did, from the first draft. But an audit
+of every `enforc*`/`gate` mention found clause 3 — *"Compliance gates scan all projects"* — reading as
+present-tense fact. Nick's doctrine states it that way as an aim; transcribed into a rule file it
+becomes a claim about today. It now carries an inline *"⚠️ This clause is the target state, not a
+description of today"*.
+
+*Apply:* an `advisory only` heading does not immunize the body. Grep your own draft for
+enforcement-shaped verbs and check the tense of each one; a rule about false assurance is the worst
+possible place to leak some.
+
+---
+
+## Process notes (not lessons — mechanics worth recording)
+
+- **The governance gate worked as designed and cost one turn.** `.claude/rules/**` is fenced by
+  `.githooks/pre-commit` behind `METIS_IDENTITY_CHANGE_APPROVED=1`. The agent authored and verified
+  everything, then stopped and asked with the diff rather than self-authorizing. Worth noting the
+  fence is *only* that hook plus `core.hooksPath` — this repo has no `.git/hooks` installed, so the
+  guard is one `git config` away from being inert.
+- **`main` was checked out in another worktree** (`hop-claim-actor-identity`), so `git checkout main`
+  failed and the squash-merge went through `gh pr merge --squash` instead. Same result on
+  `origin/main`, and it matches the repo's own PR protocol — but a session assuming it can always
+  reach local `main` in a multi-worktree checkout will hit this.
+- **The Bash safety classifier was unavailable twice mid-run** (`claude-sonnet-5[1m]` temporarily
+  down). Evidence writes completed through the IntentTree MCP tools, which need no classifier. A run
+  whose closeout depends solely on shelling out has a single point of failure the MCP lane does not.
