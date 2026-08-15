@@ -3,6 +3,8 @@ import { site } from '../../data/site';
 import ThemeToggle from './ThemeToggle';
 import ModeToggle from './ModeToggle';
 import SearchBox from './SearchBox';
+
+const { pathname } = Astro.url;
 ---
 
 <header
@@ -34,7 +36,13 @@ import SearchBox from './SearchBox';
         site.nav.map((item) => (
           <a
             href={item.href}
-            class="rounded-md px-3 py-1.5 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)] focus-ring"
+            class:list={[
+              'rounded-md px-3 py-1.5 text-sm font-medium transition-colors focus-ring nav-underline',
+              pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href))
+                ? 'text-[var(--text-primary)]'
+                : 'text-[var(--text-secondary)] hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)]',
+            ]}
+            aria-current={pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href)) ? 'page' : undefined}
           >
             {item.label}
           </a>
@@ -101,8 +109,14 @@ import SearchBox from './SearchBox';
           <li>
             <a
               href={item.href}
-              class="block rounded-md px-3 py-2 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)] focus-ring"
-            >
+              class:list={[
+              'block rounded-md px-3 py-2 text-sm font-medium transition-colors focus-ring',
+              pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href))
+                ? 'bg-[var(--bg-muted)] text-[var(--text-primary)]'
+                : 'text-[var(--text-secondary)] hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)]',
+            ]}
+            aria-current={pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href)) ? 'page' : undefined}
+          >
               {item.label}
             </a>
           </li>
