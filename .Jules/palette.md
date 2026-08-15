@@ -8,3 +8,6 @@
 ## 2024-08-07 - Accessible Multi-step Indicators
 **Learning:** Using `aria-hidden="true"` on a container holding interactive elements (like slide indicators) hides them from screen readers but leaves them focusable via keyboard, causing confusion and a WCAG violation. Furthermore, multi-step progress controls need a semantic way to identify the current step.
 **Action:** Use `role="group"` and a descriptive `aria-label` on the container instead of hiding it. For the individual indicators, use `aria-current="step"` on the active item rather than just styling it differently.
+## 2026-08-15 - Interactive Component ARIA and Type Polish
+**Learning:** React components acting as tab switches or expanding/collapsing sections need proper ARIA roles (`role="tablist"`, `role="tab"`, `role="tabpanel"`) and state properties (`aria-selected`, `aria-controls`, `aria-expanded`) for screen reader access. Additionally, generic action buttons inside these components should explicitly define `type="button"` to prevent accidental form submission side effects.
+**Action:** When building or modifying interactive tab switchers or expand/collapse toggles, strictly enforce ARIA accessibility standards: use `role="tablist"`, `role="tab"`, `aria-selected`, and `aria-controls` for tab elements, and `aria-expanded` for toggling sections.
