@@ -1,0 +1,220 @@
+---
+title: "AAR \u2014 the hooksPath re-flip race, and what a six-minute gate costs in\
+  \ a hot shared checkout"
+excerpt: A field note from the Agentic OS build loop.
+date: '2026-08-14'
+readTime: 6 min read
+status: draft
+storyType: after-action
+tags:
+- agent-ready-repos
+- human-ai-workflow
+- artifact-first
+automated: true
+whyItMatters: The work shows how agentic systems turn operational evidence into reusable
+  practice.
+leaderTakeaway: Treat after-action reports as publication-ready raw material, but
+  keep the safety gate explicit.
+sourceAar: "AAR \u2014 the hooksPath re-flip race, and what a six-minute gate costs\
+  \ in a hot shared checkout"
+---
+
+## AAR — the hooksPath re-flip race (2026-08-14)
+
+Two nodes closed: `node_01KZYDXJDCQNAS9BYN33QRH042` (fix the re-flip) and
+`node_01KZYF3QX15F4HATZW6ZQ9WC1D` (close once a real push is observed). Both
+`result_class: succeeded`. Shipped as `cc5a74d` + `312c3c8` on `origin/main`.
+
+## What shipped
+
+The pre-push suite gate now re-arms `core.hooksPath` via `scripts/install_githooks.py`
+**immediately before** running the suite — under the same env scrub as pytest, best-effort and
+never fatal, announced only when a repair actually fired. Plus a reintroduction guard:
+`test_no_tracked_source_writes_an_absolute_hookspath` refuses any tracked non-test file that
+writes a non-relative value.
+
+## Lesson 1 — a stale artifact's PRINTED advice is a writer
+
+The node's premise said stale `githooks.py` copies *wrote* the absolute value. They don't.
+`install_command` is **never executed** — only interpolated into report text (`cli.py:2233`,
+`githooks.py:366`). Twenty-one live worktrees predate PR #311 and print an **absolute**
+remediation; a human or agent reads that failure report and copy-pastes it, flipping the shared
+`.git/config`. That is why the flip was caught live at 16:56:08 with **no matching candidate
+process** — the writer is a one-shot paste, not a daemon.
+
+> A stale copy does not need to execute to cause damage. It only needs to print wrong advice
+> that a downstream actor trusts. That is a *misinformation* surface, and no staleness gate
+> models it.
+
+Filed: `node_01M00KEEGS4J697Q6RNWPEE521`.
+
+## Lesson 2 — ambient shared state must be repaired at measurement time, not once
+
+`.git/config` is one file shared by 31 linked worktrees. Any one-shot repair is stale the moment
+a peer flips it back, which is why the narrower `node_01KZYC5CG673ZX77X7QFAE19K7` was superseded
+rather than retried. Since the writer cannot be fenced off, the only shape that survives is
+repair *at the point of measurement*. Generalizes: **any gate that measures ambient shared state
+must re-arm that state immediately before measuring it.**
+
+That doctrine is worth applying beyond this one gate, and it has not been. Filed
+`node_01M00N06W7SA95Q5EP91GAA91X` to audit the candidates — `pre-commit`'s eight gates,
+`provision-artifacts.sh` and the skillmeat edition/auth state a peer can change, `sdlc-sync.sh` /
+`itt-claim.sh` reading live claim state, the `aos-attest` probes that read live git config by design,
+and the workflow/hooks-sync reporters, which compare against a **mutable upstream working tree** and
+already emit `UPSTREAM DIRTY` — the same class, surfacing as advisory noise nobody acts on. The
+hooksPath instance was only caught because it reddened a push four times; the same shape elsewhere
+reads as ordinary flake and gets a retry.
+
+## Lesson 3 — the gate's duration is the race window
+
+Four consecutive pushes failed, none on the merits: 3× `cannot lock ref`, 1× non-fast-forward.
+Origin advanced during the gate's own ~6-minute suite every single time — six merges in ~90
+minutes with six concurrently busy sessions. `aos-git lease` cannot help: it is a **local** mutex
+and does not reserve `refs/heads/main`. On a hot day a push can be structurally unable to land
+under its own steam.
+
+Filed: `node_01M00KCZEDQ3X5E6NGJT3KGGYP`. Cheapest candidate: re-check fast-forward immediately
+before the ref write and retry the *write* without re-running the suite when the tree is unchanged.
+
+## Lesson 4 — "my push failed" ≠ "my work didn't land"
+
+I initially recorded that the `cannot lock ref` errors were race artifacts whose writes landed.
+**That was wrong**, and I corrected it in the node's evidence. Re-derived: `cc5a74d` is not an
+ancestor of `58b9a7b` (#327), so none of my pushes landed. My commits reached origin because
+**another session pushed the shared local `main`**, and PR #332's body states it cherry-picked
+`312c3c8` "from local" — a peer was actively harvesting my local commits.
+
+> In a shared checkout, the push client's verdict is about *your ref write*, not about whether
+> your work reached origin. Verify at the destination, by hash.
+
+This is `claim-verification.md`'s "verify propagation at the destination" rule — and I violated it
+in the direction nobody warns about. Every example in that rule is a **false success**: a deploy or
+sync command exiting 0 having done nothing. This is the mirror, a **false failure**: the client
+correctly reports that your ref write lost a race, while the content arrived by another route.
+`shared-checkout-safety.md` is the natural home — the mechanism is co-tenancy, peers share
+`refs/heads/main` — and it currently has no clause about push outcomes at all.
+
+Filed `node_01M00N0TZZ3ZNYFE94FGSTC69T` proposing that clause, with the by-hash check named
+(`git fetch && git merge-base --is-ancestor <sha> origin/main`). Not landed by me: editing
+`.claude/rules/` is governance-gated (`METIS_IDENTITY_CHANGE_APPROVED=1`), so it is Nick's to approve.
+
+## Lesson 5 — the claim mutex protects the lane, not the node
+
+I held a valid claim. A second session was simultaneously live and busy in a worktree named
+`hookspath-reflip-race` — the same finding. Its worktree was empty, so nothing was lost, but
+`itt-claim.sh` is only consulted by lanes that *call* it; a hand-rolled worktree never touches the
+claim endpoint. Residual hole from `node_01KZP8EVS63MEEF12YK6Z70C5N`'s fix.
+
+Filed: `node_01M00KDT3D9JJ6JNDZSNRH9CNW`.
+
+## Lesson 6 — "commits ahead of main" is not a safe deletion predicate
+
+Surveyed all 35 live worktrees to see whether the 18 stale printers could be bulk-repaired.
+**Every one of the 18 reports "commits ahead of main" by SHA — even when fully squash-merged**,
+because a squash merge puts the *content* in main without making the branch's commits ancestors.
+Deleting or overwriting on that signal would destroy shipped work.
+
+The safe predicate is the **content** diff (`git diff --stat main...HEAD`). Applying it: of 16
+clean, non-live candidates, exactly **one** is fully absorbed; the other 15 hold 2–56 lines of
+unique content (`exec-reviewer-gate-validation-scope-hardening` 56, `attention-contract-v1-exec`
+25, `paradigm-flip-reconciler` 18, …) — the `local-ahead`/`divergent` class
+`aos-operating-rules.md` refuses to overwrite.
+
+**Decision: no bulk action.** Rebase-on-rejoin is confirmed as the correct policy, and severity is
+now low because `cc5a74d` makes the gate self-heal regardless of who flips the value. The single
+absorbed candidate was left alone too — its branch `verify-main` is purpose-named and may be
+expected by another process, so removing it buys one fewer latent printer against nonzero risk.
+
+Recorded on `node_01M00KEEGS4J697Q6RNWPEE521`.
+
+## Lesson 7 — a stash is repo-wide, so a diagnostic `git stash` can strand a peer's work
+
+Mid-investigation I ran `git stash -u` to unblock a rebase. Stashes live in `.git/refs/stash`,
+which is **shared across every linked worktree**, and what I stashed was a peer's 191-line
+routing-audit work in progress across three workflow files. It sat there for the rest of the
+session while I worked, and I only found it incidentally while inspecting an unrelated worktree.
+
+It turned out safe — all three files were byte-identical to the (clean) working tree, so #326 had
+already committed the content, and I dropped only my own entry while leaving `stash@{1}` alone.
+But that was luck, not method. In a shared checkout `git stash` is a *mutation of shared state*,
+not a local scratch operation.
+
+Sharpest part: `node_01KZVJT6N2Q7Q7CDEKYB2611TX` (completed) **recommends** a manual `git stash -u`
+as the recovery step when two lanes dirty the same main checkout. That advice isn't wrong, but it
+never says the stash is shared, so following it is how you'd reproduce this. And `aos-git` guards
+mutating git ops on HEAD drift but does **not** classify `stash` as mutating — so nothing warned me.
+
+Filed: `node_01M00KXTX9RP1NQ1FK43P3B5X5`, linked `informs` at that node so the advice gets amended.
+
+## Lesson 8 — the dedup check paid for itself by finding a sibling I could answer
+
+Dedup-checking before filing (per `finding-capture.md`) surfaced
+`node_01KZY8R9CZQ3YYT320GZNJRH8H` — *"amd `core.hooksPath` silently reverted … writer
+unidentified"*, same repo, filed the day before, `not_started`, **zero evidence rows**. Its stated
+next step was literally *"identify the writer before adding more repair paths."*
+
+That is what Lesson 1 resolved. Its author had searched `~/.claude`, `~/.dotfiles`, `skillmeat`,
+`MeatySkills`, `~/.aos`, `~/bin` and found only transcripts and docs — and concluded, correctly and
+carefully, *"WRITER NOT IDENTIFIED — do not assume."* The reason that search came up empty is that
+**there is no automatic writer to find**: the absolute value is a *printed string* a person pastes.
+
+So I attached two evidence rows there rather than filing a fifth duplicate: the writer class, and
+the fact that `cc5a74d` now mitigates the practical harm it described as *"a guard that silently
+disarms itself."* I deliberately did **not** close it — its second next-step clause (make the value
+observable over time via a periodic probe) is still open, and it has no ACs to assert against.
+
+The generalizable bit: dedup is usually framed as *avoiding* a duplicate. Here its real value was
+routing an **answer** to a question already on the board. Findings arrive in clusters; so do their
+resolutions.
+
+## Lesson 9 — capturing this AAR duplicated it, because a path is not an identity
+
+Filing the lessons above produced one more. I captured this file twice — first as
+`docs/project_plans/aars/…`, then as `docs/project_plans/AARs/…`. **Same physical file**: macOS is
+case-insensitive, the tracked directory is `AARs`, and my `Write` to `aars/` landed in it. But
+`source_key` is derived from the supplied path verbatim and compared **case-sensitively**, so the
+second capture reported `created … (new)` and minted a second pointer with an identical title.
+
+Two pointers for one lesson means two triage passes and potentially two draft PRs. Repaired with
+`op story archive` — the verb that exists because of `node_01KZ2K1TGR3V1N5PW9H1R7FCVZ`, which fixed
+*"capture dedups on aar_path and never refreshes."* Refresh does work now — but only when the caller
+spells the path identically, which is the residue this finding names. `new=3` → `new=2`.
+
+Same class as `node_01KZVJ8YBM5460754A5VV7CWH7` (artifact tree hashes fold the native path separator
+into the digest unnormalized): **an identity key derived from a filesystem path, without normalizing
+what the filesystem itself treats as equivalent.** Case here, separator there.
+
+Filed: `node_01M00N83CNCFCCNT0R6986AHTM`. Note the fix must not be a blanket lowercase — that would
+break genuinely case-sensitive hosts; resolve through the repo's tracked casing or use content identity.
+
+## Gates that worked — evidence they are not decoration
+
+Worth recording, because this repo's doctrine is "configured is not enforced" and these were all
+observed firing on real conditions:
+
+| Gate | Fired on | Outcome |
+|---|---|---|
+| pre-push suite gate | a **genuine** red — `delegation-router` undeclared in `node-artifacts.yaml` after #328 merged | refused the push; caught a real defect a peer's merge introduced. Fixed in `312c3c8`, which PR #332 then cherry-picked |
+| the new re-arm | first real push, flip seeded deliberately | printed `core.hooksPath had been flipped — repaired before measuring`, suite then passed. On a later push it stayed **silent** because a peer had already repaired it — the idempotent no-op path, as designed |
+| shared-checkout git guard | HEAD moved under me 3× | denied the mutating op, named both SHAs and the commits, cleared by `pin --repin`. Also correctly **distinguished** self-moves (absorbed, fast-forward) from peer moves (blocked) |
+| worktree isolation guard | a compound command it could not verify stayed in-worktree; a `git` op targeting `/tmp` | refused both — correct, and pushed me to the sanctioned in-repo sandbox harness instead |
+| `node_artifacts.py --check` | a real new artifact within minutes of landing | second time this detector has caught a genuine new artifact (`campaign`, now `delegation-router`) |
+| merge guard | untracked files that a merge would overwrite | refused; the pair turned out byte-identical to origin, verified by `diff` **before** removing |
+
+The re-arm's silence on the second push deserves emphasis: a gate that announces only when it
+*changed* something is the difference between a useful log line and one people learn to skim.
+
+## What I'd do differently
+
+- **Verify the destination before narrating the source.** Four "push failed" reports in a row
+  should have prompted `git log origin/main | grep <my-sha>` far earlier than it did.
+- **Check `aos-git who` before starting, not at the merge.** The duplicate session was
+  discoverable at minute one.
+- **A merge, not `rebase --autostash`, in a shared checkout with live peers.** Autostash would
+  have briefly stashed workflow files another session was editing. This one I got right — and then
+  did the same damage by hand with a plain `git stash -u` ten minutes later (Lesson 7). Getting the
+  reasoning right in one place does not generalize it; the rule has to be *"stash is shared state"*,
+  not *"avoid autostash"*.
+- **Treat `git stash` in a shared checkout as a mutation requiring the same care as a merge** —
+  check what is dirty and whose it is before stashing, and restore or drop deliberately rather than
+  leaving it for the next session to find.
