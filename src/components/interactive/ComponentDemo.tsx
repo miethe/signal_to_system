@@ -77,13 +77,28 @@ export default function ComponentDemo({
         </div>
 
         {/* Tab switcher */}
-        <div className="flex rounded-lg border border-zinc-200 dark:border-zinc-700 overflow-hidden text-xs">
+        <div className="flex rounded-lg border border-zinc-200 dark:border-zinc-700 overflow-hidden text-xs" role="tablist" aria-label={`Tabs for ${componentName} demo`}>
           {(["preview", "info"] as const).map((t) => (
             <button
               key={t}
+              id={`tab-${componentName}-${t}`}
+              role="tab"
+              aria-selected={tab === t}
+              aria-controls={`panel-${componentName}-${t}`}
+              tabIndex={tab === t ? 0 : -1}
               onClick={() => setTab(t)}
+              onKeyDown={(e) => {
+                if (e.key === "ArrowRight" || e.key === "ArrowLeft") {
+                  e.preventDefault();
+                  const targetTab = e.key === "ArrowRight"
+                    ? (t === "preview" ? "info" : "preview")
+                    : (t === "preview" ? "info" : "preview");
+                  setTab(targetTab);
+                  document.getElementById(`tab-${componentName}-${targetTab}`)?.focus();
+                }
+              }}
               className={[
-                "px-3 py-1 capitalize transition-colors",
+                "px-3 py-1 capitalize transition-colors focus-ring",
                 tab === t
                   ? "bg-white text-zinc-800 dark:bg-zinc-800 dark:text-zinc-100"
                   : "bg-transparent text-zinc-500 hover:text-zinc-700 dark:text-zinc-500 dark:hover:text-zinc-300",
@@ -96,9 +111,14 @@ export default function ComponentDemo({
       </div>
 
       {/* Preview panel */}
-      {tab === "preview" && (
-        <div className="flex min-h-32 items-center justify-center bg-white p-8 dark:bg-zinc-950">
-          {renderer ? (
+      <div
+        id={`panel-${componentName}-preview`}
+        role="tabpanel"
+        aria-labelledby={`tab-${componentName}-preview`}
+        className={`flex min-h-32 items-center justify-center bg-white p-8 dark:bg-zinc-950 ${tab !== "preview" ? "hidden" : ""}`}
+      >
+        {tab === "preview" && (
+          renderer ? (
             renderer()
           ) : (
             <div className="text-center">
@@ -111,26 +131,33 @@ export default function ComponentDemo({
                   : "No demo registered for this component"}
               </p>
             </div>
-          )}
-        </div>
-      )}
+          )
+        )}
+      </div>
 
       {/* Info panel */}
-      {tab === "info" && (
-        <div className="bg-white p-6 dark:bg-zinc-950">
-          <h3 className="mb-2 text-sm font-semibold text-zinc-800 dark:text-zinc-200">
-            {componentName}
-          </h3>
-          {description && (
-            <p className="text-sm text-zinc-600 dark:text-zinc-400">{description}</p>
-          )}
-          <p className="mt-3 text-xs text-zinc-400 dark:text-zinc-500">
-            {renderer
-              ? "Live demo available above."
-              : "Register this component in the DEMO_REGISTRY to enable live preview."}
-          </p>
-        </div>
-      )}
+      <div
+        id={`panel-${componentName}-info`}
+        role="tabpanel"
+        aria-labelledby={`tab-${componentName}-info`}
+        className={`bg-white p-6 dark:bg-zinc-950 ${tab !== "info" ? "hidden" : ""}`}
+      >
+        {tab === "info" && (
+          <>
+            <h3 className="mb-2 text-sm font-semibold text-zinc-800 dark:text-zinc-200">
+              {componentName}
+            </h3>
+            {description && (
+              <p className="text-sm text-zinc-600 dark:text-zinc-400">{description}</p>
+            )}
+            <p className="mt-3 text-xs text-zinc-400 dark:text-zinc-500">
+              {renderer
+                ? "Live demo available above."
+                : "Register this component in the DEMO_REGISTRY to enable live preview."}
+            </p>
+          </>
+        )}
+      </div>
     </div>
   );
 }

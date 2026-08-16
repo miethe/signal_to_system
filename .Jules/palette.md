@@ -11,3 +11,6 @@
 ## 2026-05-18 - Semantic Active States
 **Learning:** Using purely visual active states via background classes (e.g. `bg-muted` on mobile) or visual pseudo-element indicators (e.g. underline on desktop) is insufficient for screen readers. The active state must be represented semantically.
 **Action:** Use `aria-current="page"` on links that represent the currently active page in global navigations. Ensure `aria-current` gets dynamically populated based on the current `pathname`.
+## 2025-02-18 - ARIA Tabs and Keyboard Navigation
+**Learning:** When using `tabIndex={-1}` on inactive tabs to comply with the ARIA tablist pattern (which expects users to tab into the tablist and then use arrow keys to navigate within it), you MUST implement the `onKeyDown` listeners to actually handle the arrow key navigation. Without this, inactive tabs become completely unreachable to keyboard-only users.
+**Action:** When implementing ARIA tabs, if you implement the roving tabindex pattern (`tabIndex={0}` on active, `tabIndex={-1}` on inactive), always pair it with the corresponding arrow key event handlers to ensure full accessibility.
