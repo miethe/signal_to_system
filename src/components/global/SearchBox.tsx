@@ -198,6 +198,7 @@ export default function SearchBox() {
               type="button"
               onClick={close}
               aria-label="Close search"
+              title="Close search"
               className="flex h-6 w-6 items-center justify-center rounded text-[var(--text-disabled)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-secondary)]"
             >
               <X className="h-3.5 w-3.5" aria-hidden="true" />

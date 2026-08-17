@@ -59,6 +59,7 @@ export default function WorkflowMetrics({ metrics }: WorkflowMetricsProps) {
         className="ws-metrics__dismiss"
         onClick={handleDismiss}
         aria-label="Dismiss metrics overlay"
+        title="Dismiss metrics overlay"
       >
         <span aria-hidden="true">&#x2715;</span>
       </button>

@@ -11,3 +11,7 @@
 ## 2026-05-18 - Semantic Active States
 **Learning:** Using purely visual active states via background classes (e.g. `bg-muted` on mobile) or visual pseudo-element indicators (e.g. underline on desktop) is insufficient for screen readers. The active state must be represented semantically.
 **Action:** Use `aria-current="page"` on links that represent the currently active page in global navigations. Ensure `aria-current` gets dynamically populated based on the current `pathname`.
+
+## 2024-08-17 - Missing Tooltips on Icon-Only Buttons
+**Learning:** Icon-only buttons (like modals, search dialogs, nav hamburger toggles) across various interactive components in Astro/React often lack `title` attributes, which are crucial for sighted users' native tooltips even when `aria-label`s are correctly implemented for screen readers.
+**Action:** Always verify and enforce the presence of `title` attributes mirroring `aria-label`s for all icon-only buttons to enhance the experience for sighted pointer users.
