@@ -11,3 +11,6 @@
 ## 2026-05-18 - Semantic Active States
 **Learning:** Using purely visual active states via background classes (e.g. `bg-muted` on mobile) or visual pseudo-element indicators (e.g. underline on desktop) is insufficient for screen readers. The active state must be represented semantically.
 **Action:** Use `aria-current="page"` on links that represent the currently active page in global navigations. Ensure `aria-current` gets dynamically populated based on the current `pathname`.
+## 2026-05-20 - Standardize Custom Tab Components
+**Learning:** Custom tab switchers (like in `ComponentDemo.tsx`) lack implicit accessibility semantics. Without explicit ARIA roles (`tablist`, `tab`, `tabpanel`) and relationships (`aria-controls`, `aria-labelledby`, `aria-selected`), screen readers cannot announce the structure or current state to users.
+**Action:** When building or enhancing interactive custom tab components, explicitly enforce standard ARIA tab interfaces and ensure focus rings are visible for keyboard navigation.
