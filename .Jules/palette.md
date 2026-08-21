@@ -11,3 +11,11 @@
 ## 2026-05-18 - Semantic Active States
 **Learning:** Using purely visual active states via background classes (e.g. `bg-muted` on mobile) or visual pseudo-element indicators (e.g. underline on desktop) is insufficient for screen readers. The active state must be represented semantically.
 **Action:** Use `aria-current="page"` on links that represent the currently active page in global navigations. Ensure `aria-current` gets dynamically populated based on the current `pathname`.
+
+## 2026-08-21 - Accessible Stretched Links
+**Learning:** When using the "stretched link" CSS pattern on cards (e.g., `before:absolute before:inset-0` on a nested `<a>` tag to make the whole card clickable), default browser focus outlines are often obscured, ugly, or hidden, rendering the card inaccessible to keyboard users.
+**Action:** Always explicitly bind keyboard focus states (like `focus-visible:outline-none focus-ring`) directly to the stretched link element (`<a>`) wrapping the card content so that the entire card properly shows an accessible focus ring when tabbed into.
+
+## 2025-02-13 - Stretched Link Focus Rings
+**Learning:** Standard outline-based focus rings (like custom `.focus-ring`) fail visually when applied to absolute pseudo-elements used for "stretched link" patterns (e.g., `before:inset-0` on an `<a>` inside a relative card container). The outline only wraps the inline text, not the entire click area, causing an accessibility regression if the default outline is suppressed.
+**Action:** For stretched link card patterns, apply `focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-[var(--accent)]` (or equivalent Tailwind ring classes) to the parent relative container (e.g., `<article>`), while keeping `focus-visible:outline-none` on the inner anchor tag to prevent double focus indicators.
