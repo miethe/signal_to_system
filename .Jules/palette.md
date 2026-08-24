@@ -19,3 +19,6 @@
 ## 2025-02-13 - Stretched Link Focus Rings
 **Learning:** Standard outline-based focus rings (like custom `.focus-ring`) fail visually when applied to absolute pseudo-elements used for "stretched link" patterns (e.g., `before:inset-0` on an `<a>` inside a relative card container). The outline only wraps the inline text, not the entire click area, causing an accessibility regression if the default outline is suppressed.
 **Action:** For stretched link card patterns, apply `focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-[var(--accent)]` (or equivalent Tailwind ring classes) to the parent relative container (e.g., `<article>`), while keeping `focus-visible:outline-none` on the inner anchor tag to prevent double focus indicators.
+## 2024-08-24 - Tooltips via Title Attributes
+**Learning:** Native `title` attributes are a simple but highly effective micro-UX improvement for sighted desktop pointer users when dealing with icon-only buttons (like social links or mobile menus), as they provide a built-in hover tooltip without altering screen reader behavior.
+**Action:** Always include a `title` attribute mirroring the `aria-label` for icon-only interactive elements. When these elements have JavaScript-managed states (like a toggle menu), ensure the `title` is synchronized alongside the `aria-label`.
