@@ -1,0 +1,219 @@
+---
+title: "The Contract Is the Work"
+excerpt: "How contract-as-spec turns agentic execution from a chain of plausible outputs into governed, inspectable work whose decisions can be reconstructed."
+date: 2026-08-25
+readTime: "13 min"
+contentType: essay
+category: "Agentic SDLC"
+tags:
+  - "governance"
+  - "human-ai-workflow"
+  - "artifact-first"
+  - "context-engineering"
+  - "delivery-systems"
+status: published
+relatedSlugs:
+  - "contract-as-spec-worked-example"
+---
+import Callout from '../../components/content/Callout';
+
+A product leader asks an agent to investigate a reliability problem. The agent produces a sharp analysis and hands it to an implementation agent. That agent makes a change, summarizes what it did, and passes the result to a reviewer. The reviewer checks the visible output, finds it reasonable, and approves it.
+
+Every step looks competent. The result can still be wrong.
+
+**[Observed, 2026-08-24 overnight cycle]** A delegate was instructed to hand a bounded task to a cheaper executor. It never made the dispatch. Instead, it spent its budget writing a competent status report about the work, then did the same thing again later that night. The durable overnight receipts showed two descriptions of execution and no execution. Read separately, each report looked responsible. Read against the contract, the missing handoff was obvious.
+
+The research agent may have answered a subtly different question. The implementation agent may have interpreted "fixed" as "the test passes," while the product leader meant "the failure mode cannot recur." The reviewer may have examined the change without seeing the evidence behind the diagnosis. Nobody may know which source supported which claim, which acceptance criteria were binding, or who had authority to decide that the work was complete.
+
+This is a characteristic failure mode of a discrete, unauthenticated handoff.
+
+"Unauthenticated" here does not mean that the agents lacked cryptographic identities. It means that the handoff did not carry an authoritative relationship among intent, claims, evidence, acceptance criteria, and decision rights. Each participant received a description of the work, but no durable object proved what the work was supposed to accomplish.
+
+The problem is not weak generation. It is broken continuity. Naming this failure mode is not a claim that contract-as-spec solves every failure mode: bad evidence, mistaken reasoning, and a blind spot shared across a chain of verifiers are real, separate risks that a contract does not by itself remove.
+
+Contract-as-spec is a method for preserving that continuity. It makes a Feature Contract, not a prompt, ticket, plan, or final summary, the binding document for the work. The contract states the intended outcome, defines what completion means, names the evidence required to support it, and records who may accept the result. Specialists can interpret and execute the contract, but they do not silently redefine it.
+
+The contract is not documentation produced after the work. It is the work's source of authority.
+
+<Callout type="info" title="Provenance convention">
+**[Observed]** marks findings from a bounded landscape review or direct operating evidence. **[Proposed]** marks a method, interpretation, or product direction whose value should be validated in use.
+</Callout>
+
+## Completion should be visible before execution begins
+
+Most agentic workflows begin with an instruction and end with an answer. The middle may contain planning, delegation, tool use, evaluation, and approval, but the definition of "done" often remains implicit.
+
+That leaves completion vulnerable to substitution. A successful tool call substitutes for a correct outcome. A passing test substitutes for complete coverage. A polished report substitutes for verified claims. An approval substitutes for informed decision authority.
+
+Contract-as-spec reverses the order. Before execution begins, the Feature Contract establishes four things:
+
+- **Intent:** What change in the world is the work meant to produce?
+- **Acceptance criteria:** What observable conditions must be true before the work can be called complete?
+- **Evidence obligations:** What must be inspected, tested, reproduced, or independently verified?
+- **Decision authority:** Who or what may accept the evidence and close the work?
+
+These elements bind the stages together. A specialist does not merely receive a task; it receives a task whose relationship to the intended outcome is explicit. A verifier does not merely review an output; it evaluates named claims against named evidence. A decision-maker does not merely approve a summary; it accepts or rejects a contract with a visible evidentiary state.
+
+**[Proposed]** A strong Feature Contract should remain stable in purpose while permitting controlled refinement. Specialists may discover that an acceptance criterion is impossible, incomplete, or aimed at the wrong mechanism. They should be able to propose an amendment, but the amendment should be visible as a change to the contract, not smuggled into an implementation choice. One invariant holds regardless of who proposes the change: the party executing against a contract cannot unilaterally weaken the contract used to judge its own execution. An amendment is only real once it is visible to, and accepted by, someone other than the executor.
+
+This distinction matters because agentic systems are very good at producing coherent local interpretations. Without a binding contract, every handoff becomes an opportunity for the objective to drift while the prose remains persuasive. This is a different risk from a contract with wrong or incomplete acceptance criteria: satisfying a criterion's letter while defeating its intent is not objective drift, since nothing drifted, and a Feature Contract does not exempt itself from that failure mode — it can institutionalize the same substitution problem it was written to prevent. The design implication follows directly: a contract needs a named party whose obligation is to challenge criteria that can be satisfied without achieving the intent.
+
+Here is the shape, stripped to its essentials. It is invented for illustration, not a real run:
+
+```
+Feature Contract: fc-example-041
+Intent: Reduce checkout-timeout errors for a specific request class to near zero.
+Acceptance criteria:
+  1. The failure mode does not recur under the documented repro conditions.
+  2. The existing test suite passes with no reduction in coverage.
+  3. The fix is traceable to a specific root cause, not a symptom suppression.
+  4. A rollback path exists and is documented.
+Evidence obligations:
+  - Root-cause analysis, with the failing and passing runs both attached.
+  - Independent verification that criterion 1 holds outside the original repro environment.
+Decision authority: the on-call engineering lead accepts or rejects the completed contract.
+```
+
+Nothing here is exotic. A planner can produce this shape in minutes. What changes is that
+specialists, verifiers, and decision-makers now share one document instead of three separate
+descriptions of it.
+
+A complete populated instance — claims bound to evidence, verifier status, a visible amendment, and the acceptance decision — is available as a [companion example](/essays/contract-as-spec-worked-example).
+
+**[Proposed]** This raises a question the method does not get to skip: who writes the contract,
+and what happens when the contract itself is wrong? A hallucinated or careless contract is a real
+failure mode, and pretending otherwise would be its own kind of overclaim. Our answer is that
+contract authorship is not exempt from the discipline it imposes on everything downstream. It is
+itself a claim, and it goes through the same gated, adversarial review as any other consequential
+claim before specialists execute against it. A wrong contract is a missing-verification failure at
+an earlier stage of the same chain, not evidence that the chain does not apply to itself.
+
+## From sources to decision authority
+
+The conceptual core of contract-as-spec is a maturity model for evidence and authority. It distinguishes workflows that merely produce outputs from workflows that can justify decisions.
+
+A practical version has six stages. These stages are dimensions more than they are a strict ladder: reuse, verification, and governance can each advance separately, and a workflow does not have to clear every earlier stage before gaining more of a later one.
+
+### 1. Output
+
+The system produces an answer, artifact, recommendation, or change.
+
+This is useful, but weakly governed. The output may be excellent; its relationship to the original intent remains largely implicit.
+
+### 2. Traceable source
+
+The output points back to the material used to produce it.
+
+Traceability makes inspection possible, but a pile of sources is not yet an argument. Readers still have to infer which source supports which conclusion.
+
+### 3. Explicit claim
+
+The workflow separates claims from narrative and binds each consequential claim to supporting evidence.
+
+This is where provenance becomes operational. A reviewer can inspect the actual unit of belief rather than reverse-engineering it from a polished report.
+
+### 4. Verification
+
+A verifier tests whether the evidence genuinely supports the claim, whether contradictory evidence was considered, and whether the stated scope matches what was examined.
+
+Verification is not the same as agreement. It records the status of a claim: supported, contradicted, unresolved, or limited by an evidence gap.
+
+### 5. Decision authority
+
+Verified claims are presented to the person or policy authorized to make the relevant decision.
+
+This prevents a common category error: treating technical confidence as organizational authority. An agent can verify that a change meets a criterion without possessing the authority to accept its operational risk.
+
+### 6. Reusable capability
+
+The accepted method becomes a versioned, discoverable artifact that another team can use with its provenance, assumptions, validators, and decision boundaries intact.
+
+At this stage, the organization is no longer reusing only prompts or outputs. It is reusing governed capability.
+
+**[Proposed]** This maturity taxonomy is valuable because it exposes missing stages without insisting that every task use the highest level. A low-risk exploratory question may stop at a traceable answer. A production change may require explicit claims, independent verification, and named decision authority. The taxonomy lets governance scale with consequence.
+
+**[Observed]** Stages four through six are still frontier territory at organizational scale. They are not imaginary, though. As of 2026-08-25, we run a small version at home every day: three different LLM vendors and deterministic scripts operate under one contract boundary, with durable daily run records showing the handoffs. That is lived practice at modest scale, not evidence that the institutional problem is solved.
+
+**[Observed, bounded internal review — see note]** In a bounded review of 41 current open-source agent-tooling sources, we did not identify a direct equivalent to the complete source-to-claim-to-verification-to-decision-authority model. Individual stages are well represented. The uncommon part is preserving their relationships as one durable lifecycle. This is a bounded finding, not proof that no equivalent exists anywhere. If a competing system preserves that complete chain, I would like to see the counterexample and test this taxonomy against it.
+
+<Callout type="info" title="Method note">
+Reviewed 2026-08-24. Method: a structured comparative review across open-source agentic frameworks and orchestration tools, scored against the six stages above. Scope: bounded, not exhaustive — 41 sources, not a survey of the field. Caveat: internal review; sources not independently audited.
+</Callout>
+
+## Integration completeness beats primitive novelty
+
+Nothing in contract-as-spec requires a magical new primitive.
+
+The ecosystem already contains capable planners, agent routers, workflow engines, evaluation frameworks, provenance stores, approval steps, artifact registries, and observability tools. Most technical teams can assemble most of those components.
+
+The harder question is whether the components agree about the identity and state of the work.
+
+Can the planner point to the same acceptance criteria the verifier later evaluates? Can a claim be traced to its sources after the originating agent has disappeared? Does an approval identify exactly which evidence state was accepted? If an artifact is reused six months later, can its consumer determine which assumptions, validators, and contract version produced it? If a gate is deferred, can another operator resume it without reconstructing the decision from chat history?
+
+These are integration questions, not generation questions.
+
+**[Proposed, grounded in observed landscape coverage]** The meaningful differentiation of a governed agentic system lies in integration completeness rather than primitive technical novelty. Its value comes from closing the seams among intent, execution, evidence, verification, authority, and reuse.
+
+This is easy to underestimate because each seam appears small. A task identifier is "just metadata." A claim ledger is "just structured output." An approval record is "just workflow state." An artifact manifest is "just packaging."
+
+But durability lives in those relationships. Remove them and the system falls back to institutional memory: somebody remembers why the task existed, what the reviewer checked, or which version was trusted. That arrangement works until the original participants leave, the model changes, the tool is replaced, or an incident requires reconstruction.
+
+A durable workflow should survive all four.
+
+## Gates should validate completeness, not ceremony
+
+Governance often becomes unpopular because teams experience it as added procedure. Contract-as-spec is not a waterfall gate reinserted into an agentic pipeline: it should not require a meeting at every handoff or human approval for every agent action.
+
+A gate earns its place when it tests a meaningful transition.
+
+Before specialist execution, a gate can ask whether the contract is sufficiently clear to begin. Before accepting research, it can ask whether important claims have evidence and verification states. Before operational change, it can ask whether the acceptance criteria and risk boundaries have been met. Before reuse, it can ask whether the capability includes enough provenance to behave predictably outside its original context.
+
+The gate is not there to bless activity. It is there to detect missing obligations.
+
+**[Observed, August 2026 five-day operational follow-up]** One remediation was declared verified because the cause had been removed. The check read the mechanism, not the resulting state. The state created by that mechanism continued running for five more days, as shown by the follow-up operational receipts. The simplest contradictory signal was also the cheapest: spend did not fall when the remediation said it should. A completeness gate would have asked both questions: Is the cause closed, and has the state it already produced been swept or explicitly accepted?
+
+This is where gates can stay lightweight. They do not need to reproduce the whole investigation. They need to inspect the few observations that distinguish activity from outcome. In this case, one result-level metric would have exposed the incomplete remediation immediately.
+
+This also changes the meaning of "blocked." A blocked agent is not merely an agent that failed to continue. It can identify the exact contract obligation it cannot satisfy: unavailable evidence, ambiguous authority, contradictory acceptance criteria, or a task too large for the current specialist. That is useful state. It allows the work to be decomposed or escalated without erasing what has already been learned.
+
+## The artifact supply chain is the scalable unit
+
+**[Observed]** Many organizations begin by saving successful prompts. That is understandable, but prompts are a fragile unit of reuse. Their behavior depends on models, tools, context, permissions, surrounding instructions, and unstated operator knowledge.
+
+The stronger unit is a reusable operational artifact: a versioned package containing the method, required context, contract shape, specialist roles, validation obligations, and provenance needed to execute it responsibly.
+
+**[Proposed]** The reusable-artifact supply chain is a strong candidate for productization within the contract-as-spec approach. It converts isolated agent successes into governed capabilities that can be discovered, evaluated, deployed, updated, and retired.
+
+The contract states the demand — what must be true for the work to count as done; the artifact is the supply — a versioned means of satisfying that demand again without re-deriving it from scratch. The supply-chain framing matters. Reuse is not copying. It is maintaining lineage.
+
+A reusable artifact should answer: Where did this capability come from? What contract does it satisfy? Which evidence supported its acceptance? Which version is running? What changed between versions? What assumptions travel with it? Who may promote or retire it?
+
+Without those answers, an artifact library becomes a prompt folder with better search.
+
+## Heterogeneous teams need a shared boundary, not a shared tool
+
+Contract-as-spec scales because the contract sits above the execution environment.
+
+One team may use a commercial agent platform. Another may use local models and command-line workflows. A third may combine human analysts, deterministic services, and several specialized agents. They do not need the same orchestration engine. They need compatible expectations at the boundary.
+
+The contract gives them that boundary.
+
+**[Observed, daily run records through 2026-08-25]** This is not only a theory about future organizations. In our small home operation, work crosses three LLM vendors and deterministic scripts every day. The tools have different context limits, prices, strengths, failure modes, and interfaces. The shared contract is what lets one executor stop and another resume without treating the previous agent's prose as authority. The operating receipts show a heterogeneous team held together by a common boundary, not a common platform.
+
+A research team can return claims with provenance. An engineering team can turn accepted claims into implementation criteria. A security team can add verification obligations and decision boundaries. An operator can inspect the evidence state without replaying the entire execution. A future team can reproduce the decision even if the original tools no longer exist.
+
+This does require discipline. Acceptance criteria must describe outcomes rather than activity. Evidence must be durable enough to inspect later. Verification must be distinguishable from self-report. Decision authority must be explicit. Derived records must identify their authoritative source.
+
+But the method does not demand maximal ceremony. Teams can begin with a small contract containing intent, three or four acceptance criteria, required evidence, and one named decision authority. They can add claim-level verification and reusable artifacts as the consequences of the work increase.
+
+The goal is proportional governance, not a rigid pipeline: enough structure to make completion and authority visible, without forcing every task through the same machinery.
+
+## Build the chain, not another agent
+
+The next generation of reliable agentic systems will not be defined only by models that reason longer or agents that call more tools. Those improvements matter, but they do not solve discontinuity between stages.
+
+A plausible answer is not yet a verified claim. A verified claim is not yet an authorized decision. An authorized decision is not yet a reusable capability.
+
+Contract-as-spec makes those transitions explicit. It binds intent to acceptance criteria, routes bounded work through specialists, validates completeness at meaningful gates, and preserves the evidence needed to inspect or reproduce the result.
+
+That is how agentic work becomes durable: not when the agent appears autonomous, but when the organization can see exactly what was promised, what was proven, who accepted it, and what may safely be reused.
