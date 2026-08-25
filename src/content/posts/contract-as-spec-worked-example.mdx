@@ -1,0 +1,107 @@
+---
+title: "Companion Example: A Fully Populated Feature Contract"
+excerpt: "Extends the inline fc-example-041 sketch in \"The Contract Is the Work\" into a complete worked instance — claims bound to evidence, verifier status, a visible amendment, and the final acceptance decision."
+date: 2026-08-25
+readTime: "4 min"
+contentType: field-note
+category: "Agentic SDLC"
+tags:
+  - "governance"
+  - "artifact-first"
+  - "context-engineering"
+status: published
+relatedSlugs:
+  - "the-contract-is-the-work"
+---
+
+*This extends the inline `fc-example-041` sketch in ["The Contract Is the Work"](/essays/the-contract-is-the-work) into a complete
+worked instance — claims bound to evidence, verifier status, a visible amendment, and the final
+acceptance decision. It is entirely synthetic: no real identifiers, no real dollar figures, no
+real names or paths. It exists to show the shape a completed contract-as-spec artifact actually
+takes, not to document a real incident.*
+
+```
+Feature Contract: fc-example-041
+Status: accepted
+
+Intent:
+  Reduce checkout-timeout errors for a specific request class to near zero.
+
+Acceptance criteria:
+  1. The failure mode does not recur under the documented repro conditions.
+  2. The existing test suite passes with no reduction in coverage.
+  3. The fix is traceable to a specific root cause, not a symptom suppression.
+  4. A rollback path exists and is documented.
+
+Evidence obligations:
+  - Root-cause analysis, with the failing and passing runs both attached.
+  - Independent verification that criterion 1 holds outside the original repro environment.
+
+Decision authority: the on-call engineering lead accepts or rejects the completed contract.
+```
+
+## Claims bound to evidence
+
+A contract this small has one consequential claim: that the change satisfies criterion 1
+(the failure mode does not recur) for the reason stated in criterion 3 (a root cause, not a
+suppression). The claim and its evidence are recorded together, not left to be inferred from a
+narrative summary:
+
+```
+Claim: The timeout no longer recurs under the documented repro conditions, because
+       the retry logic no longer double-acquires the connection-pool lock.
+
+Bound evidence:
+  - ev-01  root-cause-trace.log        kind: reproduction     verifier: pending
+  - ev-02  fixed-run-repro.log         kind: reproduction     verifier: verified
+  - ev-03  independent-repro-env.log   kind: independent_run   verifier: verified
+  - ev-04  pool-lock-diff.patch        kind: root_cause_link   verifier: verified
+
+Verifier status: 3 of 4 evidence items verified; ev-01 pending an independent read
+of the trace against the stated root cause.
+```
+
+The claim is not "the fix works" — that sentence has no evidence obligation attached to it and
+could mean almost anything. The claim states the specific mechanism, and each evidence item is
+tied to which acceptance criterion it supports, so a reviewer can check the claim against the
+evidence directly rather than against the surrounding prose.
+
+## A visible amendment
+
+Partway through execution, the assigned specialist found that criterion 2 as written ("no
+reduction in coverage") could not distinguish a genuine regression from an unrelated flaky test
+already failing on `main`. The specialist did not quietly reinterpret the criterion. It proposed
+an amendment, and someone other than the specialist accepted it:
+
+```
+Amendment 1
+  Proposed by: specialist (fc-example-041, implementation leg)
+  Proposed change: criterion 2 becomes "the existing test suite passes with no reduction in
+    coverage, excluding tests already failing on the base commit before this change began"
+  Reason: the unqualified criterion could not be satisfied or refuted — a pre-existing flake
+    made "no reduction" undecidable as originally worded.
+  Accepted by: on-call engineering lead
+  Accepted: yes — the amendment narrows the criterion's ambiguity without weakening its intent
+```
+
+The amendment is visible as a dated, attributed change to the contract itself, not as a footnote
+in a completion report. The party proposing it and the party accepting it are different people —
+the specialist executing against the contract cannot also be the one who decides the contract now
+reads differently.
+
+## Final acceptance decision
+
+```
+Decision: accepted
+Decided by: on-call engineering lead
+Basis: all four acceptance criteria met under the amended contract; 3 of 4 bound evidence
+  items independently verified; ev-01 accepted as pending-but-non-blocking because ev-03
+  (an independent reproduction in a separate environment) already carries the load criterion 1
+  requires.
+Reusable artifact: not promoted — this fix was scoped to one request class and is not yet
+  a candidate for stage 6 (reusable capability).
+```
+
+The decision names what was checked, what remained unresolved, and why the unresolved item did
+not block acceptance. A reader six months later does not have to trust that judgment — they can
+see the same evidence and reach their own.
