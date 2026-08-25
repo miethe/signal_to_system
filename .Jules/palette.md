@@ -19,3 +19,6 @@
 ## 2025-02-13 - Stretched Link Focus Rings
 **Learning:** Standard outline-based focus rings (like custom `.focus-ring`) fail visually when applied to absolute pseudo-elements used for "stretched link" patterns (e.g., `before:inset-0` on an `<a>` inside a relative card container). The outline only wraps the inline text, not the entire click area, causing an accessibility regression if the default outline is suppressed.
 **Action:** For stretched link card patterns, apply `focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-[var(--accent)]` (or equivalent Tailwind ring classes) to the parent relative container (e.g., `<article>`), while keeping `focus-visible:outline-none` on the inner anchor tag to prevent double focus indicators.
+## 2026-09-02 - Accessible Tab Switching
+**Learning:** While building tab switchers (like in `ComponentDemo`), simply swapping out state strings is visually effective but leaves screen reader users stranded without proper relationships.
+**Action:** Always explicitly implement ARIA tab roles (`role="tablist"`, `role="tab"`, `role="tabpanel"`) and explicitly bind tabs to panels using `id`, `aria-controls`, and `aria-labelledby`.
