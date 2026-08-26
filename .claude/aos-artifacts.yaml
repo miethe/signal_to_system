@@ -1,0 +1,70 @@
+# .claude/aos-artifacts.yaml — per-project artifact manifest
+#
+# A durable, machine-readable JOIN/STATE table over SkillMeat's catalog. It is NOT a competing
+# artifact-of-record — SkillMeat's collection stays canonical. This file records, per project:
+#   • which artifacts are LINKED to this project,
+#   • whether each is PERMANENT (durable set) or EPHEMERAL (epic/plan-scoped, torn down on completion),
+#   • whether each is ACTIVE (deployed) or INACTIVE (linked + kept in sync, NOT deployed until activated),
+#   • the source, any project-tuning, the deploy-time version, and a note.
+#
+# Schema + design: agentic_meta_dev PRD docs/project_plans/PRDs/dynamic-artifact-provisioning.md
+# §6.1; rule agentic_meta_dev/.claude/rules/artifact-provisioning.md +
+# agentic_meta_dev/.claude/rules/artifact-registration.md.
+#
+# These four editorial skills are authored IN this repo (signal_to_system is both upstream and
+# consumer): their SKILL.md files under .claude/skills/<name>/ ARE the upstream edit point. They
+# were registered into the SkillMeat enterprise catalog from the merged content of PR #130
+# (2adbbaa, "skills: encode essay review pipeline + corpus-egress guardrails (postreview) (#130)")
+# on 2026-08-26, with the deployment LINK recorded via `skillmeat deploy <name> --inactive`
+# (registers the project<->artifact relationship without materializing/overwriting the working
+# tree, since the primary checkout was on a different branch with unrelated uncommitted work at
+# registration time). status: active here means "linked and expected on disk", which is already
+# true independent of SkillMeat — edit at the path in each entry's `note`, never through a
+# SkillMeat pull, so the repo stays the source of truth for its own skills.
+
+schema_version: 1
+project: "signal_to_system"
+
+policy:
+  mode: auto            # auto | sign-off | off   (provisioning-gate default; env AOS_ARTIFACT_PROVISION / --mode override)
+
+artifacts:
+  - name: blog-drafter
+    type: skill
+    lifecycle: permanent
+    status: active
+    source: project-local
+    tuned: false
+    scope: null
+    version: null
+    note: "upstream edit point: .claude/skills/blog-drafter/ (this repo); registered in SkillMeat enterprise from origin/main@2adbbaa (PR #130)"
+
+  - name: voice-writer
+    type: skill
+    lifecycle: permanent
+    status: active
+    source: project-local
+    tuned: false
+    scope: null
+    version: null
+    note: "upstream edit point: .claude/skills/voice-writer/ (this repo); registered in SkillMeat enterprise from origin/main@2adbbaa (PR #130)"
+
+  - name: humanizer
+    type: skill
+    lifecycle: permanent
+    status: active
+    source: project-local
+    tuned: false
+    scope: null
+    version: null
+    note: "upstream edit point: .claude/skills/humanizer/ (this repo); registered in SkillMeat enterprise from origin/main@2adbbaa (PR #130)"
+
+  - name: dev-story-editor
+    type: skill
+    lifecycle: permanent
+    status: active
+    source: project-local
+    tuned: false
+    scope: null
+    version: null
+    note: "upstream edit point: .claude/skills/dev-story-editor/ (this repo); registered in SkillMeat enterprise from origin/main@2adbbaa (PR #130)"
