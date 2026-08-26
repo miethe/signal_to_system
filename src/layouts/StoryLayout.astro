@@ -3,9 +3,11 @@ import BaseLayout from './BaseLayout.astro';
 import Figure from '../components/content/Figure.astro';
 import AutomatedDisclaimer from '../components/content/AutomatedDisclaimer.astro';
 import StoryMetaHeader from '../components/content/StoryMetaHeader.astro';
+import RelatedContent from '../components/content/RelatedContent.astro';
 import { generateJsonLd, buildCanonicalUrl } from '../lib/seo';
 import { formatDate, formatDateISO } from '../lib/utils';
 import { site } from '../data/site';
+import type { Article } from '../lib/content';
 
 interface Workflow {
   version?: string;
@@ -46,9 +48,12 @@ interface Props {
   };
   prevPost?: { title: string; slug: string };
   nextPost?: { title: string; slug: string };
+  // Optional: related posts/stories from getRelatedArticles(), resolved on
+  // the page (where the content collection entry is in scope).
+  relatedItems?: Article[];
 }
 
-const { frontmatter, prevPost, nextPost } = Astro.props;
+const { frontmatter, prevPost, nextPost, relatedItems = [] } = Astro.props;
 
 const {
   title,
@@ -255,6 +260,9 @@ const jsonLd = generateJsonLd('article', {
           </nav>
         )
       }
+
+      <!-- Related reading -->
+      <RelatedContent items={relatedItems} />
 
       <div class="flex flex-wrap items-center gap-4 text-sm">
         <a

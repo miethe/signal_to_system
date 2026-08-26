@@ -13,7 +13,7 @@ const posts = defineCollection({
     excerpt: z.string(),
     date: z.coerce.date(),
     readTime: z.string(),
-    contentType: z.enum(["essay", "field-note"]),
+    contentType: z.enum(["essay", "field-note", "companion"]),
     category: z.enum([
       "AI Agents",
       "Agentic SDLC",

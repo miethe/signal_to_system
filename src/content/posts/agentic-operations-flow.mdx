@@ -25,6 +25,7 @@ draftNotes: "First interactive AI Workflows post based on meaty_agents_operation
 import Callout from '../../components/content/Callout';
 import Figure from '../../components/content/Figure.astro';
 import AgenticOperationsFlow from '../../components/interactive/AgenticOperationsFlow';
+import Term from '../../components/content/Term.astro';
 import '../../styles/agentic-operations-flow.css';
 
 Most AI work does not fail because the model was too weak. It fails earlier, at the moment the work gets routed.
@@ -74,7 +75,7 @@ The transcript is useful as an interaction surface. It is a terrible source of t
 
 It has no native notion of ownership, dependency, review intensity, or completion evidence. It does not know that a feasibility question should stop before implementation. It does not know that a high-risk migration should trigger a hard boundary before edits. It does not know which facts should become reusable context and which are just scaffolding from the current run.
 
-The <dfn>**artifact graph**</dfn> is the opposite: a typed set of durable objects that the workflow can resume from and reviewers can validate against. In my current system, that graph includes exploration charters, feasibility briefs, feature contracts, PRDs, implementation plans, decision blocks, progress files, validation records, run evidence, and knowledge handoffs.
+The <Term id="artifact-graph">**artifact graph**</Term> is the opposite: a typed set of durable objects that the workflow can resume from and reviewers can validate against. In my current system, that graph includes exploration charters, feasibility briefs, feature contracts, PRDs, implementation plans, decision blocks, progress files, validation records, run evidence, and knowledge handoffs.
 
 That can sound like process overhead until you watch the alternative happen a few times. A session makes a correct discovery, fixes something locally, and then the discovery dies when the session closes. The next agent repeats the same reasoning. The next reviewer has to reconstruct intent from diff shape. The next planning pass cannot tell what was deferred and what was deliberately rejected.
 
@@ -162,7 +163,7 @@ This is also why I do not like "autonomous agent" as a blanket phrase. Autonomou
 
 For Tier 2 and Tier 3 work, a linear task list is not enough.
 
-The shape I use is an <dfn>**ExecutionGraph**</dfn>:
+The shape I use is an <Term id="executiongraph">**ExecutionGraph**</Term>:
 
 ```text
 ExecutionGraph

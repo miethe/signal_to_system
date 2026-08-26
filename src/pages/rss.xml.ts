@@ -6,7 +6,7 @@ export async function GET(context: { site: URL }) {
   const posts = await getCollection('posts');
   const stories = await getCollection('stories');
 
-  const publishedPosts = posts.filter((p) => p.data.status !== 'draft');
+  const publishedPosts = posts.filter((p) => p.data.status !== 'draft' && p.data.contentType !== 'companion');
   const publishedStories = stories.filter((s) => s.data.status !== 'draft');
 
   const items = [

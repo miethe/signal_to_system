@@ -1,0 +1,58 @@
+---
+import { getCollection } from 'astro:content';
+import { GLOSSARY } from '../../data/glossary';
+
+// ---------------------------------------------------------------------------
+// <Term id="contract-as-spec" /> or <Term id="contract-as-spec">label</Term>
+//
+// Renders a coined term as a <dfn> with a hover/focus/tap tooltip carrying
+// its definition, instead of a navigating link. CSS-only — no client JS.
+// ---------------------------------------------------------------------------
+
+interface Props {
+  id: string;
+}
+
+const { id } = Astro.props;
+const entry = GLOSSARY[id];
+
+if (!entry) {
+  throw new Error(
+    `<Term id="${id}" /> does not match any entry in src/data/glossary.ts. Add the term there or fix the id.`
+  );
+}
+
+const label = await Astro.slots.render('default');
+const displayText = label && label.trim().length > 0 ? label : entry.term;
+
+// Resolve the defining post, if any, and only link to it when it exists, is
+// published, and is NOT the page the reader is already on — otherwise the
+// tooltip omits the "Read more" link entirely. Every term is coined in the
+// post that defines it, so without the self-link guard the link would send a
+// reader from a post straight back to that same post.
+const normalize = (path: string) => path.replace(/\/+$/, '');
+
+let readMoreHref: string | undefined;
+if (entry.definedIn) {
+  const posts = await getCollection('posts');
+  const definingPost = posts.find((p) => p.id === entry.definedIn);
+  if (definingPost && definingPost.data.status !== 'draft') {
+    const href = `/essays/${definingPost.id}/`;
+    if (normalize(href) !== normalize(Astro.url.pathname)) {
+      readMoreHref = href;
+    }
+  }
+}
+
+const tooltipId = `glossary-tooltip-${id}`;
+---
+
+<span class="glossary-term">
+  <dfn tabindex="0" aria-describedby={tooltipId} set:html={displayText} />
+  <span role="tooltip" id={tooltipId} class="glossary-tooltip">
+    <span class="glossary-tooltip-definition">{entry.definition}</span>
+    {readMoreHref && (
+      <a href={readMoreHref} class="glossary-tooltip-link">Read more &rarr;</a>
+    )}
+  </span>
+</span>

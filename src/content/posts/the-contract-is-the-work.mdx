@@ -21,6 +21,7 @@ relatedSlugs:
   - "governed-agentic-sdlc-01-productivity-paradox"
 ---
 import Callout from '../../components/content/Callout';
+import Term from '../../components/content/Term.astro';
 
 A product leader asks an agent to investigate a reliability problem. The agent produces a sharp analysis and hands it to an implementation agent. That agent makes a change, summarizes what it did, and passes the result to a reviewer. The reviewer checks the visible output, finds it reasonable, and approves it.
 
@@ -34,9 +35,9 @@ This is a characteristic failure mode of a discrete, unauthenticated handoff.
 
 "Unauthenticated" here does not mean that the agents lacked cryptographic identities. It means that the handoff did not carry an authoritative relationship among intent, claims, evidence, acceptance criteria, and decision rights. Each participant received a description of the work, but no durable object proved what the work was supposed to accomplish.
 
-The problem is not weak generation. It is broken continuity. Naming this failure mode is not a claim that <a href="/tags/artifact-first/"><dfn>**contract-as-spec**</dfn></a> solves every failure mode: bad evidence, mistaken reasoning, and a blind spot shared across a chain of verifiers are real, separate risks that a contract does not by itself remove.
+The problem is not weak generation. It is broken continuity. Naming this failure mode is not a claim that <Term id="contract-as-spec">**contract-as-spec**</Term> solves every failure mode: bad evidence, mistaken reasoning, and a blind spot shared across a chain of verifiers are real, separate risks that a contract does not by itself remove.
 
-Contract-as-spec is a method for preserving that continuity. It makes a <a href="/tags/governance/"><dfn>**Feature Contract**</dfn></a>, not a prompt, ticket, plan, or final summary, the binding document for the work. The contract states the intended outcome, defines what completion means, names the evidence required to support it, and records who may accept the result. Specialists can interpret and execute the contract, but they do not silently redefine it.
+Contract-as-spec is a method for preserving that continuity. It makes a <Term id="feature-contract">**Feature Contract**</Term>, not a prompt, ticket, plan, or final summary, the binding document for the work. The contract states the intended outcome, defines what completion means, names the evidence required to support it, and records who may accept the result. Specialists can interpret and execute the contract, but they do not silently redefine it.
 
 The contract is not documentation produced after the work. It is the work's source of authority.
 
@@ -54,8 +55,8 @@ Contract-as-spec reverses the order. Before execution begins, the Feature Contra
 
 - **Intent:** What change in the world is the work meant to produce?
 - **Acceptance criteria:** What observable conditions must be true before the work can be called complete?
-- <a href="/tags/evaluation/"><dfn>**Evidence obligations:**</dfn></a> What must be inspected, tested, reproduced, or independently verified?
-- <a href="/tags/governance/"><dfn>**Decision authority:**</dfn></a> Who or what may accept the evidence and close the work?
+- <Term id="evidence-obligations">**Evidence obligations:**</Term> What must be inspected, tested, reproduced, or independently verified?
+- <Term id="decision-authority">**Decision authority:**</Term> Who or what may accept the evidence and close the work?
 
 These elements bind the stages together. A specialist does not merely receive a task; it receives a task whose relationship to the intended outcome is explicit. A verifier does not merely review an output; it evaluates named claims against named evidence. A decision-maker does not merely approve a summary; it accepts or rejects a contract with a visible evidentiary state.
 

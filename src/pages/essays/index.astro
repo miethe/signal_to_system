@@ -13,7 +13,7 @@ import { CATEGORIES } from '../../data/taxonomy';
 const allPosts = await getCollection('posts');
 
 const published = allPosts
-  .filter((p) => p.data.status !== 'draft')
+  .filter((p) => p.data.status !== 'draft' && p.data.contentType !== 'companion')
   .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 
 // Optional category filter from query param

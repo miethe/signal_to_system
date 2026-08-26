@@ -1,0 +1,61 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { GLOSSARY } from '../data/glossary';
+
+// ---------------------------------------------------------------------------
+// /glossary — index of every coined term, its definition, and (when
+// available) a link to the published post that defines it.
+// ---------------------------------------------------------------------------
+
+const posts = await getCollection('posts');
+const postsById = new Map(posts.map((p) => [p.id, p]));
+
+const entries = Object.entries(GLOSSARY)
+  .map(([id, entry]) => {
+    const definingPost = entry.definedIn ? postsById.get(entry.definedIn) : undefined;
+    const href =
+      definingPost && definingPost.data.status !== 'draft' ? `/essays/${definingPost.id}/` : undefined;
+    return {
+      id,
+      term: entry.term,
+      definition: entry.definition,
+      postTitle: definingPost?.data.title,
+      href,
+    };
+  })
+  .sort((a, b) => a.term.localeCompare(b.term));
+---
+
+<BaseLayout
+  title="Glossary"
+  description="Definitions for the terms coined across Signal to System essays."
+>
+  <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+    <header class="mb-12 border-b border-zinc-200 dark:border-zinc-800 pb-10">
+      <h1 class="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl mb-4">
+        Glossary
+      </h1>
+      <p class="text-xl text-zinc-600 dark:text-zinc-400 leading-relaxed">
+        {entries.length} terms coined across essays on Signal to System. Each links to the post where it was introduced.
+      </p>
+    </header>
+
+    <ul class="space-y-6">
+      {entries.map(({ id, term, definition, postTitle, href }) => (
+        <li id={id} class="rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-5">
+          <h2 class="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-2">{term}</h2>
+          <p class="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed mb-3">{definition}</p>
+          {href && (
+            <a
+              href={href}
+              class="text-sm font-medium text-indigo-600 dark:text-indigo-400 hover:underline"
+            >
+              Read in &ldquo;{postTitle}&rdquo; &rarr;
+            </a>
+          )}
+        </li>
+      ))}
+    </ul>
+  </div>
+</BaseLayout>

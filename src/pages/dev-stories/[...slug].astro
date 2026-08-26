@@ -1,7 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
 import StoryLayout from '../../layouts/StoryLayout.astro';
-import { getStoriesBySeries } from '../../lib/content';
+import { getStoriesBySeries, getRelatedArticles } from '../../lib/content';
 
 export async function getStaticPaths() {
   const stories = await getCollection('stories');
@@ -13,6 +13,7 @@ export async function getStaticPaths() {
 
 const { story } = Astro.props;
 const { Content } = await render(story);
+const relatedItems = await getRelatedArticles(story);
 
 // Series navigation — computed from the published stories in the same series,
 // ordered by seriesOrder (mirrors how a series would be wired for essays).
@@ -55,6 +56,7 @@ if (story.data.series) {
   }}
   prevPost={prevPost}
   nextPost={nextPost}
+  relatedItems={relatedItems}
 >
   <Content />
 </StoryLayout>

@@ -1,6 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
 import PostLayout from '../../layouts/PostLayout.astro';
+import { getRelatedArticles } from '../../lib/content';
 
 export async function getStaticPaths() {
   const posts = await getCollection('posts');
@@ -12,6 +13,7 @@ export async function getStaticPaths() {
 
 const { post } = Astro.props;
 const { Content } = await render(post);
+const relatedItems = await getRelatedArticles(post);
 ---
 
 <PostLayout
@@ -31,6 +33,7 @@ const { Content } = await render(post);
     seriesPart: post.data.seriesOrder,
     draft: post.data.status === 'draft',
   }}
+  relatedItems={relatedItems}
 >
   <Content />
 </PostLayout>
