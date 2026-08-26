@@ -114,6 +114,37 @@ blog-drafter (draft the story shape)  →  voice-writer (calibrate to Nick's voi
 - Interactively, invoke `/blog-drafter`, `/voice-writer`, `/humanizer` directly instead of shelling
   to ICA; the chain is the same, only the driver differs.
 
+**Local-only corpus guardrail (required reading before using the delegation line above).**
+The delegation line above routes the `blog-drafter` first-draft pass, and (when large) the
+`voice-writer` pass, to `~/ica-claude.sh` (an external, ICA-hosted model). This is permitted
+**only for the mechanical drafting/rewriting work**, on input that does not include corpus-sourced
+material.
+
+The moment `voice-writer` or `humanizer` is upgraded to read from a real local corpus store (per
+those skills' Local-Only Corpus Boundary sections), the following becomes binding and must be
+checked before every delegation:
+
+- **Never** route a `voice-writer` or `humanizer` pass through `~/ica-claude.sh` (or any other
+  external-gateway call: Codex, Gemini, or otherwise) if that pass will touch corpus-sourced
+  material: a real story, a real opinion, a real technical detail, or any lookup against the
+  corpus store.
+- Any corpus-backed voice-calibration or humanization step **must run locally**, either
+  in-session or via a local (non-gateway) model, never through this skill's existing ICA
+  delegation line, and never through a new delegation line added later without this same
+  annotation.
+- If a Dev Story's voice/humanize pass needs to be delegated for cost or context-size reasons
+  (the stated reason for the existing line), **split the work**: resolve the corpus-sourced
+  material locally first, then delegate only the corpus-free formatting/rewriting step externally.
+- This guardrail does not relax when the delegation is "just for the draft pass": `blog-drafter`'s
+  first-draft pass is in scope for this same check the moment it starts consulting corpus material
+  for tone/example selection, not only once `voice-writer`/`humanizer` explicitly do.
+
+This is not a hypothetical caveat: it is the specific reason the corpus-egress boundary
+(`.claude/rules/aos-operating-rules.md` § CHCW corpus, in `agentic_meta_dev`) exists at the
+launchpad level, and this skill is the one place in the current editorial-skill set where an
+external delegation line and a corpus-touching voice-calibration pass are already documented as
+capable of colliding.
+
 ## Enrichment Sources
 
 Gather before drafting, not after: these fill the `workflow{}` block and the wins/losses/AOS-arc

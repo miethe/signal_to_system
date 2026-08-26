@@ -1,11 +1,13 @@
 ---
 name: humanizer
 description: >
-  Apply a naturalness and humanization pass to blog drafts to reduce AI-detectable patterns.
+  Apply a corpus-sourced idiosyncrasy pass to blog drafts to reduce AI-detectable patterns.
   Use after /voice-writer has produced a draft, or on any content that reads too much like
-  polished AI output. Preserves Nick Miethe's voice characteristics while adding sentence
-  variation, unexpected word choices, natural imperfections, and conversational flow. Works
-  best when applied to drafts that are already technically sound and voice-calibrated.
+  polished AI output. Preserves Nick Miethe's voice characteristics by retrieving and inserting
+  verified, corpus-sourced personal material (a real story, a real technical detail, a real
+  opinion) rather than manufacturing imperfection. Works best when applied to drafts that are
+  already technically sound and voice-calibrated. Never sources or delegates corpus material to
+  an external model; see the Local-Only Corpus Boundary below.
 ---
 
 # humanizer
@@ -29,11 +31,12 @@ Do NOT use this skill on:
 
 ## Mandatory First Step: Preserve the Voice
 
-Before applying any humanization techniques, read these sources in order:
+Before running the Idiosyncrasy Insertion pass (below), read these sources in order:
 
 1. **Voice spec** — `/Users/miethe/Documents/Other/PKM/MeatyBrain/Blogs/My Voice.md`
-   Read this completely. The humanizer must NOT override Nick's established voice — it enhances
-   naturalness within his existing patterns.
+   Read this completely. The humanizer must NOT override Nick's established voice: it enhances
+   naturalness within his existing patterns by inserting corpus-sourced material, not by
+   manufacturing it.
 
 2. **The draft being humanized** — Read it in full before making any edits.
 
@@ -41,82 +44,55 @@ The humanizer is an enhancement layer, not a rewrite. Preserve the core voice, s
 point of view. You are making it sound more naturally written, not changing it into something
 different.
 
-## Humanization Techniques
+## Idiosyncrasy Insertion (replaces "Humanization Techniques")
 
-### Perplexity & Vocabulary Control
-- Replace predictable word choices with slightly unexpected but accurate alternatives
-- Vary vocabulary across sentences (avoid repeating the same technical terms immediately)
-- Include colloquialisms and natural speech patterns where they fit Nick's voice
-- Add subtle imperfections that humans naturally make (minor redundancies, false starts that
-  get corrected, natural speech cadence)
+This skill no longer manufactures naturalness. It never invents a hedge, a false start, a
+minor redundancy, or a "slightly unexpected but accurate" word substitution as a mechanical
+technique. Per the site's own reviewed doctrine: manufactured imperfection is the "AI humanizer"
+pattern, and it is explicitly the wrong fix. LLMs write expository prose well enough now that
+*good* expository writing itself can read as AI-generated, so degrading it on purpose is both
+counterfeit and, per external review, easy to spot as counterfeit.
 
-Examples:
-- Instead of "The key consideration is X" → "X is really what matters here"
-- Instead of "It is important to understand" → "You need to grasp"
-- Instead of "Specifically" → "For example" or "Concretely" (vary these throughout)
+**What this pass does instead:** pull specific, verifiable idiosyncrasy material from the local
+corpus store (see Local-Only Corpus Boundary below) and use it verbatim or near-verbatim:
 
-### Burstiness & Sentence Variation
-- Mix very short sentences (3-5 words) with longer, complex ones (25+ words)
-- Alternate sentence structures: vary between simple, compound, complex, and compound-complex
-- Start sentences with different elements: adverbs, questions, dependent clauses, prepositional phrases
-- Use parenthetical asides for authentic flow (Nick's voice already supports this)
-- **Do NOT use emdashes (—)** for asides or interruptions; replace with parentheses, colons, semicolons, or commas (emdashes are a strong AI-writing tell)
-- Include occasional sentence fragments where natural
+- A real story only Nick could tell (an actual incident, dated if the corpus has a date for it).
+- A real, specific technical detail that reveals firsthand knowledge (not a generic technical
+  aside; a detail that could only come from having actually built the thing).
+- A real stated opinion, in Nick's actual vocabulary as attested by the corpus, not a paraphrase.
+- A real place where Nick was genuinely uncertain, if the corpus attests one relevant to this
+  post's claim.
 
-Examples:
-- "This matters. Why? Because..." (short, question, explanation)
-- "While X is technically true, Y actually changes how you should think about it." (long with pivot)
-- "Performance. Reliability. Cost. Pick two." (fragment list)
+**What this pass never does:**
+- Insert a hedge word, a false start, or a "redundancy" that is not corpus-attested.
+- Substitute a "slightly unexpected but accurate" synonym as a naturalness technique.
+- Run as a context-free checklist against the draft's prose alone, with no corpus lookup.
+- Treat the static voice-spec file (`My Voice.md`) as a substitute for corpus material. The
+  voice-spec file describes register and tone; it is not a source of verifiable specific
+  material, and using it alone for this pass reproduces the manufactured-imperfection problem one
+  layer removed (a *learned style* rather than a *retrieved fact*).
 
-### Emotional Intelligence & Human Touch
-- Add personal qualifiers and hesitations where authentic: "I think," "arguably," "probably," "it seems"
-- Use contractions naturally throughout ("it's," "don't," "that's") — Nick's voice supports this
-- Include direct reader address: "If you're in this situation..." or "Consider..."
-- Add subtle humor or personality where appropriate (not forced)
-- Mix formal and informal vocabulary within the same passage (not jarring, but natural)
+If the corpus has nothing relevant to insert for a given section, **this pass does nothing to that
+section.** Leaving a section un-"humanized" is the correct outcome, not a failure to complete the
+pass.
 
-Examples:
-- Instead of "The correct approach is..." → "I'd probably reach for..."
-- Instead of "It is recommended..." → "You're better off..."
-- Add a conversational aside: "Which, frankly, is why most people get this wrong."
+### Local-Only Corpus Boundary
 
-### Structural Pattern Disruption
-- Avoid overly formulaic introduction-body-conclusion flow within sections
-- Include tangential thoughts or natural digressions that tie back to the main point
-- Use irregular paragraph lengths (some very short, others longer)
-- Break conventional transitions with more conversational ones
-- Occasionally start mid-thought or with an observation rather than a formal topic sentence
-
-Examples:
-- Instead of formal transition: "Now let's examine..." → "Here's where it gets tricky..."
-- Vary paragraph structure: one-sentence paragraphs next to multi-paragraph blocks
-- Start a section with an observation rather than a question or topic sentence
-
-### Contextual Authenticity
-- Replace generic statements with concrete details and specific examples
-- Use personal metaphors and analogies that feel chosen (not generic)
-- Reference lived experience or actual patterns observed
-- Use conversational transitional phrases: "In practice," "From what I've seen," "It turns out"
-- Ground abstract concepts in real-world trade-offs
-
-Examples:
-- Instead of "Teams often struggle with this" → "In every org I've worked with..."
-- Instead of generic example → specific tool, framework, or concrete scenario
-- Ground concepts: "This matters in practice because X actually changes how you..."
-
-### Detection-Specific Counters
-- Remove or replace AI-era reduction phrases: "delve into," "unlock," "journey," "landscape,"
-  "game-changer" (unless used intentionally for specific effect)
-- Avoid empty universals: "in today's fast-paced world," "more important than ever"
-- Replace fake certainty with qualified statements where evidence is thin
-- Vary sentence openers to avoid patterns (don't start many sentences with "This" or "The")
-- Add natural imperfections: self-corrections that feel authentic, minor word choices that
-  show thinking rather than polish
-
-Examples:
-- Instead of "Game-changing approach..." → "Actually useful approach..."
-- Instead of "In today's world..." → "Right now, what I'm seeing is..."
-- Add self-correction: "The key metric (or really, the one that matters most) is..."
+The corpus this pass reads from (personal chat history, journals, prior writing, or any other
+store of verifiable idiosyncratic material) is **local-only, always**. This constraint holds
+regardless of how this skill is invoked:
+- No corpus content may be sent as input to any external-gateway model call: ICA
+  (`~/ica-claude.sh`), Codex, Gemini, or any other non-local provider, under any circumstance,
+  including when this pass is itself delegated for cost or speed reasons.
+- If a future revision of this skill wires it to a real corpus store and that store is queried by
+  a subagent or delegate, the delegate must run against a **local model only**, or the corpus
+  query and the drafting/formatting step must be split so the corpus material is resolved locally
+  and only the corpus-free output is handed to any external step.
+- This mirrors the CHCW corpus egress rule at the launchpad level
+  (`docs/policies/corpus-access-policy.md` and `.claude/rules/aos-operating-rules.md` § CHCW
+  corpus, in `agentic_meta_dev`): reads are consented; egress and influence on an external party
+  are not, absent explicit per-item sign-off, which this skill has no mechanism to obtain and
+  should not attempt to obtain in an automated pass.
 
 ## Critical Constraints
 
@@ -137,22 +113,18 @@ established voice, do not make it.
 
 2. **Read the draft in full** — Understand its argument, structure, and current voice before editing
 
-3. **Identify AI-detectable patterns** — Mark sections that:
-   - Use predictable word choices or phrasing
-   - Have overly polished transitions
-   - Sound formulaic or mechanically structured
-   - Lack conversational flow or natural qualification
+3. **Identify sections that would benefit from real idiosyncrasy**: Mark sections that:
+   - Sound formulaic or mechanically structured, and could carry a real story, opinion, or
+     technical detail instead
    - Contain reduction-list phrases used excessively
    - Use emdashes (—) for asides, qualifiers, or interruptions
 
-4. **Apply humanization selectively** — Do NOT rewrite everything. Target:
-   - Sentence-level word choice and structure variation
-   - Transitions and connectors (make them more conversational)
-   - Phrasing of recommendations (add qualifiers, personal voice)
-   - Paragraph structure (vary length, break up dense blocks)
-   - Opening and closing sentences (avoid formula)
+4. **Query the local corpus store and insert only what it attests** (see Idiosyncrasy Insertion
+   above). Do NOT rewrite everything. Target only the sections marked in step 3, and only where
+   the corpus has genuinely relevant material. A section with nothing corpus-attested to insert
+   is left untouched.
 
-5. **Output revised draft** — Complete, humanized MDX with all frontmatter intact
+5. **Output revised draft**: complete draft with all frontmatter intact
 
 6. **Summarize changes** — List substantive shifts in voice, structure, or phrasing, and why
 
@@ -169,7 +141,9 @@ Before delivering output, verify:
 - [ ] Changes improve readability without introducing errors
 - [ ] Reduction-list phrases are removed or used intentionally (rarely)
 - [ ] No emdashes (—); all asides use parentheses, colons, semicolons, or commas
-- [ ] Sentence variation and conversational flow have improved
+- [ ] Every inserted idiosyncrasy is corpus-attested; nothing was manufactured to *read as* personal
+- [ ] A section with no relevant corpus material was left untouched, not "humanized" anyway
+- [ ] No corpus content was sent to any external-gateway model call (see Local-Only Corpus Boundary)
 - [ ] Frontmatter is complete and untouched
 - [ ] Output is valid MDX
 
