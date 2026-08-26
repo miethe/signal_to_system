@@ -1,6 +1,6 @@
 ---
 title: "Companion Example: A Fully Populated Feature Contract"
-excerpt: "Extends the inline fc-example-041 sketch in \"The Contract Is the Work\" into a complete worked instance — claims bound to evidence, verifier status, a visible amendment, and the final acceptance decision."
+excerpt: "Extends the inline fc-example-041 sketch in \"The Contract Is the Work\" into a complete worked instance: claims bound to evidence, verifier status, a visible amendment, and the final acceptance decision."
 date: 2026-08-25
 readTime: "4 min"
 contentType: companion
@@ -15,8 +15,8 @@ relatedSlugs:
 ---
 
 *This extends the inline `fc-example-041` sketch in ["The Contract Is the Work"](/essays/the-contract-is-the-work) into a complete
-worked instance — claims bound to evidence, verifier status, a visible amendment, and the final
-acceptance decision. It is entirely synthetic: no real identifiers, no real dollar figures, no
+worked instance: claims bound to evidence, verifier status, a visible amendment, and the final
+acceptance decision. It is entirely synthetic, with no real identifiers, no real dollar figures, no
 real names or paths. It exists to show the shape a completed contract-as-spec artifact actually
 takes, not to document a real incident.*
 
@@ -61,9 +61,9 @@ Verifier status: 3 of 4 evidence items verified; ev-01 pending an independent re
 of the trace against the stated root cause.
 ```
 
-The claim is not "the fix works" — that sentence has no evidence obligation attached to it and
-could mean almost anything. The claim states the specific mechanism, and each evidence item is
-tied to which acceptance criterion it supports, so a reviewer can check the claim against the
+The claim is not "the fix works": that sentence has no evidence obligation attached to it and
+could mean almost anything. The claim states the specific mechanism, and each evidence item
+ties to the acceptance criterion it supports, so a reviewer can check the claim against the
 evidence directly rather than against the surrounding prose.
 
 ## A visible amendment
@@ -78,14 +78,14 @@ Amendment 1
   Proposed by: specialist (fc-example-041, implementation leg)
   Proposed change: criterion 2 becomes "the existing test suite passes with no reduction in
     coverage, excluding tests already failing on the base commit before this change began"
-  Reason: the unqualified criterion could not be satisfied or refuted — a pre-existing flake
+  Reason: the unqualified criterion could not be satisfied or refuted; a pre-existing flake
     made "no reduction" undecidable as originally worded.
   Accepted by: on-call engineering lead
-  Accepted: yes — the amendment narrows the criterion's ambiguity without weakening its intent
+  Accepted: yes, the amendment narrows the criterion's ambiguity without weakening its intent
 ```
 
 The amendment is visible as a dated, attributed change to the contract itself, not as a footnote
-in a completion report. The party proposing it and the party accepting it are different people —
+in a completion report. The party proposing it and the party accepting it are different people:
 the specialist executing against the contract cannot also be the one who decides the contract now
 reads differently.
 
@@ -98,10 +98,10 @@ Basis: all four acceptance criteria met under the amended contract; 3 of 4 bound
   items independently verified; ev-01 accepted as pending-but-non-blocking because ev-03
   (an independent reproduction in a separate environment) already carries the load criterion 1
   requires.
-Reusable artifact: not promoted — this fix was scoped to one request class and is not yet
+Reusable artifact: not promoted, since this fix was scoped to one request class and is not yet
   a candidate for stage 6 (reusable capability).
 ```
 
 The decision names what was checked, what remained unresolved, and why the unresolved item did
-not block acceptance. A reader six months later does not have to trust that judgment — they can
+not block acceptance. A reader six months later does not have to trust that judgment; they can
 see the same evidence and reach their own.
