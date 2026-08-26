@@ -42,7 +42,7 @@ Contract-as-spec is a method for preserving that continuity. It makes a <Term id
 The contract is not documentation produced after the work; it's the work's source of authority.
 
 <Callout type="info" title="Provenance convention">
-**[Observed]** marks findings from a bounded landscape review or direct operating evidence. **[Proposed]** marks a method, interpretation, or product direction whose value should be validated in use.
+**[Observed]** marks findings from a bounded landscape review or direct operating evidence. **[Proposed]** marks a method, interpretation, or product direction whose value should be validated in use. I did not invent this convention for the essay. It is the same instruction I give every agent I run, written down plainly: do not make things up; if you don't see it, don't say it.
 </Callout>
 
 ## Completion should be visible before execution begins
@@ -94,6 +94,13 @@ itself a claim, and it goes through the same gated, adversarial review as any ot
 claim before specialists execute against it. A wrong contract is a missing-verification failure at
 an earlier stage of the same chain, not proof that the chain does not apply to itself.
 
+I get this exact objection on my own system at work, not as a hypothetical. The pushback on
+SkillMeat, the artifact-governance layer this method comes out of, is that it's too complex and
+monolithic and that there are solutions we could buy that would be simpler. The modular point
+doesn't land in the room where I'm making it. It lands later, when someone has to reconstruct why
+a decision was made and there's a contract to point to instead of a chat log nobody can find. That
+is the same gap this section is describing, just aimed at me instead of at the reader.
+
 ## From sources to decision authority
 
 The conceptual core of contract-as-spec is a maturity model for evidence and authority. It distinguishes workflows that just produce outputs from workflows that can justify decisions.
@@ -132,9 +139,9 @@ This prevents a common category error: treating technical confidence as organiza
 
 ### 6. Reusable capability
 
-The accepted method becomes a versioned, discoverable artifact that another team can use with its provenance, assumptions, validators, and decision boundaries intact.
+The point of this stage is not the artifact. It's whether the artifact still holds up once the person who accepted it is out of the loop. A skill that only works while I'm reviewing every output isn't reusable; a skill that a cheaper session can run on its own, at my standard, because the provenance, assumptions, validators, and decision boundaries travel with it, is. That's the bar: not "did we package it," but "does it still hold when I'm not watching."
 
-At this stage, the organization reuses governed capability, not just prompts or outputs.
+At this stage, the organization is no longer reusing only prompts or outputs. It is reusing governed capability.
 
 **[Proposed]** This maturity taxonomy is valuable because it exposes missing stages without insisting that every task use the highest level. A low-risk exploratory question can stop at a traceable answer. A production change needs explicit claims, independent verification, and named decision authority. The taxonomy lets governance scale with consequence.
 
@@ -156,9 +163,11 @@ The harder question is whether the components agree about the identity and state
 
 Can the planner point to the same acceptance criteria the verifier later evaluates? Can a claim be traced to its sources after the originating agent has disappeared? Does an approval identify exactly which evidence state was accepted? If an artifact is reused six months later, can its consumer determine which assumptions, validators, and contract version produced it? If a gate is deferred, can another operator resume it without reconstructing the decision from chat history?
 
-These are integration questions, not generation questions.
+These are integration questions, not generation questions: whether the planner that wrote a contract like fc-example-041 and the verifier that checks it three weeks later are looking at the same acceptance criteria, not whether either one can produce fluent prose about them.
 
 **[Proposed, grounded in observed landscape coverage]** The meaningful differentiation of a governed agentic system lies in integration completeness rather than primitive technical novelty. Its value comes from closing the seams among intent, execution, evidence, verification, authority, and reuse.
+
+Control planes manage agents. The artifact supply chain governs the intent-to-outcome work: the part that decides whether what got produced was ever the right thing to produce. Those are different jobs, and conflating them is exactly how a governance layer gets mistaken for one more orchestration tool competing on the same axis. No single module in a system like this is meant to be the whole solution. The approach is the thing: the fact that a planner, a verifier, and a decision record all answer to the same contract, not any one component of it.
 
 This is easy to underestimate because each seam appears small. A task identifier is "just metadata," a claim ledger "just structured output." An approval record is "just workflow state." Even an artifact manifest gets waved off as "just packaging."
 
@@ -214,12 +223,20 @@ But the method does not demand maximal ceremony. Teams can begin with a small co
 
 The goal is proportional governance, not a rigid pipeline: enough structure to make completion and authority visible, without forcing every task through the same machinery.
 
+I don't actually know whether anyone outside my own household would pay for this. The receipts in this essay prove the mechanism holds at home scale; they don't prove a market, and I'm not going to pretend this essay settles that question. What I do have some confidence in, because I've watched it happen both ways, is what a chain of agents does without this discipline versus what it can do with it. The doubt is about who pays. The confidence is about what the mechanism does when you run it for real.
+
 ## Build the chain, not another agent
 
 The next generation of reliable agentic systems will not be defined only by models that reason longer or agents that call more tools. Those improvements matter, but they do not solve discontinuity between stages.
 
-A plausible answer is not yet a verified claim, and a verified claim is not yet an authorized decision. Even an authorized decision still falls short of a reusable capability.
+A plausible answer is not yet a verified claim. Run the checkout-timeout example back through the six stages and the gap is concrete rather than abstract: fixing the failure mode is stage one, tracing it to the failing and passing runs is stage three, an on-call lead accepting the contract is stage five, and none of those stages substitutes for the one after it. A verified claim is not yet an authorized decision, and an authorized decision is not yet a reusable capability the next team can pick up cold.
 
 Contract-as-spec makes those transitions explicit. It binds intent to acceptance criteria, routes bounded work through specialists, validates completeness at meaningful gates, and preserves the evidence needed to inspect or reproduce the result.
 
-That is how agentic work becomes durable: not when the agent appears autonomous, but when the organization can see exactly what was promised, what was proven, who accepted it, and what can safely be reused.
+The instruction underneath all of it is the one I give every agent I run, and it predates this essay by years: do not make things up. If you don't see it, don't say it. A Feature Contract is that instinct codified into a document instead of left as something I have to keep repeating out loud. That is how agentic work becomes durable: not when the agent appears autonomous, but when the organization can see exactly what was promised, what was proven, who accepted it, and what can safely be reused.
+
+---
+
+### Research and authorship note
+
+The ideas and system described here come from Nick Miethe's architecture work and operating observations in the Agentic OS. AI systems assisted with research, adversarial review, and drafting. The 41-source landscape review was AI-assisted; its scope and limits are described in the essay. Nick reviewed the claims and accepts responsibility for the argument.
