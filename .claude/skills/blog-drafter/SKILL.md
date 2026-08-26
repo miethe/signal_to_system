@@ -103,6 +103,34 @@ This step bridges Phase 3 and Phase 4 — the spec frames the story; the forensi
 
 **Proceed to Phase 6** when ready (minor polish or voice integration remaining)
 
+### Phase 5b: Editorial Review Sequence (the "review board")
+
+Before a draft is treated as revision-complete, run these checks in this order. Each check may
+be skipped only if it genuinely does not apply (e.g. no lived-experience claim in the piece), and
+a skip must be stated, not silent.
+
+1. **Taste pass**: a whole-piece editorial read against this site's conventions (voice, the
+   nugget-mosaic convention of dated/receipt-backed moments over generic essay prose). Verdict is
+   either "publish-worthy" or a named, bounded structural fix. If the fix requires adding
+   real vignettes/receipts, flag Step 4 (egress check) as now REQUIRED, not optional (a taste
+   pass that adds specifics is exactly the trigger that makes an egress check load-bearing).
+2. **Weakest-claims pass**: enumerate every claim a skeptical reader would attack, phrased as
+   "a skeptic will ask X." Each claim gets a fix: a citation, a scope qualifier, a softened
+   framing, or an explicit "this is [Proposed], not [Observed]" tag.
+3. **(When available) ARC council pass**: route the draft through the Agent Review Council
+   (`council-review` skill / `arc` CLI) for a structured, role-based adversarial read (skeptic,
+   evidence-auditor, market-realist), producing Evidence Gaps, Overclaimed Statements, Internal
+   Consistency Issues, Missing Context, Tone & Positioning Issues, and a scored Weakest Claims
+   table. **Note the target-document discipline**: ARC must run against *this post's own current
+   draft*, not a sibling document; a review of related-but-different material does not discharge
+   this step, even where its findings happen to overlap.
+4. **Egress check**: a narrow, binary check for identifier/PII/employer/dollar-figure leakage.
+   REQUIRED whenever any prior step (1-3) introduced or referenced concrete receipts, dates,
+   vignettes, or examples drawn from real work. Record a pass/fail and a session id for audit.
+
+Revision may interleave with these steps (a taste-pass fix can be applied before a weakest-claims
+pass runs, or vice versa); this sequence names the *checks*, not a rigid waterfall order.
+
 ### Phase 5.5: Stage Authoring (Workflow Showcase)
 
 **Triggered by**: Post is part of the Governed Agentic SDLC series and corresponds to a Showcase stage (post-to-stage mapping in `docs/specs/workflow-showcase/blog-metadata-sync.md`).
@@ -160,6 +188,53 @@ This step bridges Phase 3 and Phase 4 — the spec frames the story; the forensi
   - Voice: match Nick's direct, practitioner tone — no marketing, no hype. Grounded in data and lived experience.
   - Delegate writing to a subagent with full context from the post
 - **Optional polish**: Offer `/humanizer` for final pass reducing AI-detectable patterns
+
+### Phase 6c: AI-Involvement Disclosure Classification
+
+Before finalizing frontmatter, classify this post's AI involvement against the four-level
+standard below, and let the level determine what ships in the post itself.
+
+| Level | AI involvement | Disclosure |
+|---|---|---|
+| 1 | Proofreading, wording, editing | Usually none |
+| 2 | Outlining/drafting an established argument | Standing sitewide disclosure covers it |
+| 3 | Substantive synthesis, adversarial reasoning, research assistance | Yes: a per-post Method/Provenance note (below) |
+| 4 | AI develops thesis, evidence, and conclusions with minimal human intellectual contribution | Absolutely, and reconsider whether this should publish under Nick's byline at all |
+
+The discriminating question is not "who wrote each sentence" but "where did the epistemic
+contribution come from": who noticed the phenomenon, formulated the hypothesis, decided what
+mattered, supplied the observations, challenged the argument, verified the evidence, and is
+willing to defend the conclusion. A post that used AI heavily for drafting/editing (Level 1-2)
+but whose thesis and evidence are Nick's own operating observations is NOT Level 3 or 4 merely
+because a model wrote most of the sentences.
+
+### Phase 6d: Method/Provenance Note (Level 3+ only)
+
+For any post classified Level 3 or above, add a short Method/Provenance note near the top or
+bottom of the post (site convention TBD, see the top-level `docs/` notes on this gap). Suggested
+per-post text (adapt per post):
+
+> The ideas and system described here derive from my own architecture work and operating
+> observations. AI systems assisted with research, analysis, adversarial review, and drafting.
+> [Where a bounded research artifact underlies a claim:] The N-source landscape review was
+> conducted using an AI-assisted research workflow; its scope and limitations are described
+> above. I reviewed the resulting claims and take responsibility for the final argument.
+
+### Phase 6e: Provenance Block (Level 3+ only)
+
+Append a small structured Provenance block. Treat this as **part of the piece's thesis, not a
+disclaimer bolted on for liability cover**: for a piece arguing that agents can participate in
+producing a governed, evidence-backed artifact without hiding that fact, an honest provenance
+block is confirming evidence, not an admission.
+
+> **Provenance**
+> Author: Nick Miethe. Thesis: Human-originated. Evidence: operating observations plus linked
+> research. AI roles: research, adversarial review, drafting, editing. Human verification:
+> final claim and source review. Research artifact: `<artifact-slug>`. Version: `<n.n>`.
+
+Adapt the `AI roles` / `Research artifact` fields to what actually happened per Phase 5b's log;
+do not default to the template if this post's process differed (e.g. no ARC pass ran, say so by
+omission or an explicit "N/A").
 
 ## PKM Folder Structure
 
@@ -249,6 +324,13 @@ Post N/
 - Gaps flagged with `[NEEDS INPUT]`
 - Top revisions suggested with rationale
 
+**Phase 5b (Editorial Review Sequence)**
+- Taste pass run; verdict recorded (publish-worthy, or a named bounded fix)
+- Weakest-claims pass run; every flagged claim has a fix or a provenance tag
+- ARC council pass run when available, against this post's own current draft (not a sibling document); explicitly skipped and stated when unavailable
+- Egress check run and recorded (pass/fail plus session id) whenever any prior step introduced concrete receipts, dates, vignettes, or real-work examples
+- Any skipped step is stated, not silent
+
 **Phase 5.5 (Stage Authoring, Governed Agentic SDLC only)**
 - Post-to-stage mapping confirmed via `docs/specs/workflow-showcase/blog-metadata-sync.md`
 - Manifest authored at `demo/demos/stage-N-<slug>/manifest.yaml` per template
@@ -267,6 +349,9 @@ Post N/
 - Final MDX copied to PKM `final/` directory
 - Social summary generated in PKM `final/social-summary.md`
 - PKM post folder organized per convention (drafts/, notes/, final/)
+- AI-involvement level classified (Phase 6c) against the four-level standard
+- For Level 3+: a Method/Provenance note is present (Phase 6d)
+- For Level 3+: a Provenance block is present and its fields reflect what actually happened, not the unmodified template (Phase 6e)
 
 ---
 

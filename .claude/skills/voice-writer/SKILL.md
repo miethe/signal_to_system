@@ -212,6 +212,32 @@ When given a draft to edit for voice:
   Run `/humanizer` after `/voice-writer` when content needs additional idiomatic
   smoothing beyond what this skill produces.
 
+## Corpus-Sourced Idiosyncrasy Check (required before handoff)
+
+A voice pass is not complete on "does this sound like Nick" alone. Before handing off, confirm:
+
+- [ ] At least one piece of genuinely verifiable personal material is present where the piece
+      calls for it: a concrete story only Nick could tell, a real technical detail that reveals
+      firsthand knowledge, a real stated opinion, or an explicit place where Nick is genuinely
+      unsure, sourced from the local corpus store (see Local-Only Corpus Boundary below), not
+      invented to *read as* personal.
+- [ ] No inserted "humanizing" artifact (a hedge, a false start, a minor redundancy) that is not
+      traceable to something Nick actually does; see `humanizer`'s Local-Only Corpus Boundary.
+      This skill and `humanizer` share the same constraint and must not work around each other.
+- [ ] The post's AI-involvement level (per `blog-drafter` Phase 6c) is consistent with how much of
+      the "voice" in this draft is genuinely corpus-sourced vs. house-style approximation. If the
+      gap is large, flag it back to `blog-drafter` rather than silently smoothing it over.
+
+### Local-Only Corpus Boundary
+
+Where this skill's voice calibration draws on corpus-sourced material (a real story, a real
+opinion, a real idiosyncrasy, once a corpus store exists; a lookup path existing is not evidence
+a corpus exists to look up), that material is sourced and applied **locally only**. If any future
+version of this skill's voice-calibration pass is delegated to an external model (ICA, Codex,
+Gemini, or any other non-local gateway), corpus content must never be included in that call's
+input. Delegate only the mechanical rewriting/formatting task, on already-corpus-free text, never
+the retrieval or selection of corpus material itself.
+
 ## Quality Check Before Handing Off
 
 Before delivering any output, verify:
@@ -235,3 +261,4 @@ Before delivering any output, verify:
 - [ ] First-person constructions preferred over impersonal ones
 - [ ] Frontmatter is complete and uses valid taxonomy values
 - [ ] Output is valid MDX
+- [ ] Corpus-Sourced Idiosyncrasy Check (above) has been run
