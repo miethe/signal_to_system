@@ -11,6 +11,7 @@
     "preview": "astro preview",
     "astro": "astro",
     "check": "astro check",
+    "check:prose": "node scripts/check-prose.mjs",
     "demo:doctor": "node demo/tools/demo-foundry.mjs doctor",
     "demo:capture": "playwright test demo/demos/**/*.spec.ts",
     "demo:review": "node demo/tools/demo-foundry.mjs review"
