@@ -112,6 +112,8 @@ export default function ContextVisualizer({
 
                   {isLong && mode === "rich" && (
                     <button
+                      type="button"
+                      aria-expanded={isExpanded}
                       onClick={() => toggle(i)}
                       className="mt-1 text-xs text-indigo-600 hover:underline dark:text-indigo-400 focus-ring"
                     >

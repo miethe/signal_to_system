@@ -77,10 +77,18 @@ export default function ComponentDemo({
         </div>
 
         {/* Tab switcher */}
-        <div className="flex rounded-lg border border-zinc-200 dark:border-zinc-700 overflow-hidden text-xs">
+        <div
+          className="flex rounded-lg border border-zinc-200 dark:border-zinc-700 overflow-hidden text-xs"
+          role="tablist"
+        >
           {(["preview", "info"] as const).map((t) => (
             <button
               key={t}
+              type="button"
+              role="tab"
+              id={`tab-${t}`}
+              aria-selected={tab === t}
+              aria-controls={`panel-${t}`}
               onClick={() => setTab(t)}
               className={[
                 "px-3 py-1 capitalize transition-colors",
@@ -97,7 +105,12 @@ export default function ComponentDemo({
 
       {/* Preview panel */}
       {tab === "preview" && (
-        <div className="flex min-h-32 items-center justify-center bg-white p-8 dark:bg-zinc-950">
+        <div
+          id="panel-preview"
+          role="tabpanel"
+          aria-labelledby="tab-preview"
+          className="flex min-h-32 items-center justify-center bg-white p-8 dark:bg-zinc-950"
+        >
           {renderer ? (
             renderer()
           ) : (
@@ -117,7 +130,12 @@ export default function ComponentDemo({
 
       {/* Info panel */}
       {tab === "info" && (
-        <div className="bg-white p-6 dark:bg-zinc-950">
+        <div
+          id="panel-info"
+          role="tabpanel"
+          aria-labelledby="tab-info"
+          className="bg-white p-6 dark:bg-zinc-950"
+        >
           <h3 className="mb-2 text-sm font-semibold text-zinc-800 dark:text-zinc-200">
             {componentName}
           </h3>

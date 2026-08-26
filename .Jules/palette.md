@@ -19,3 +19,6 @@
 ## 2025-02-13 - Stretched Link Focus Rings
 **Learning:** Standard outline-based focus rings (like custom `.focus-ring`) fail visually when applied to absolute pseudo-elements used for "stretched link" patterns (e.g., `before:inset-0` on an `<a>` inside a relative card container). The outline only wraps the inline text, not the entire click area, causing an accessibility regression if the default outline is suppressed.
 **Action:** For stretched link card patterns, apply `focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-[var(--accent)]` (or equivalent Tailwind ring classes) to the parent relative container (e.g., `<article>`), while keeping `focus-visible:outline-none` on the inner anchor tag to prevent double focus indicators.
+## 2026-08-26 - Added type=button to ContextVisualizer and ComponentDemo tab switcher
+**Learning:** Ensure that when building tab switchers and expand/collapse toggles, the interactive elements are configured correctly for screen readers via aria-selected and aria-expanded, and that type=button is present.
+**Action:** Add type=button and correct ARIA states to avoid unexpected form submissions and provide proper context to AT users.
