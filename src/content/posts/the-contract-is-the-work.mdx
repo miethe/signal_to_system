@@ -35,7 +35,7 @@ This is a characteristic failure mode of a discrete, unauthenticated handoff.
 
 "Unauthenticated" here does not mean that the agents lacked cryptographic identities. It means that the handoff did not carry an authoritative relationship among intent, claims, evidence, acceptance criteria, and decision rights. Each participant received a description of the work, but no durable object proved what the work was supposed to accomplish.
 
-Not weak generation. Broken continuity. Naming this failure mode is not a claim that <Term id="contract-as-spec">**contract-as-spec**</Term> solves every failure mode: bad evidence, mistaken reasoning, and a blind spot shared across a chain of verifiers stay real risks a contract does not by itself remove.
+The problem here isn't weak generation: it's broken continuity. Naming this failure mode is not a claim that <Term id="contract-as-spec">**contract-as-spec**</Term> solves every failure mode: bad evidence, mistaken reasoning, and a blind spot shared across a chain of verifiers stay real risks a contract does not by itself remove.
 
 Contract-as-spec is a method for preserving that continuity. It makes a <Term id="feature-contract">**Feature Contract**</Term>, not a prompt, ticket, plan, or final summary, the binding document for the work. The contract states the intended outcome, defines what completion means, and names the evidence required to support it, plus who can accept the result. Specialists can interpret and execute the contract, but they do not silently redefine it.
 
@@ -81,7 +81,7 @@ Decision authority: the on-call engineering lead accepts or rejects the complete
 ```
 
 Nothing here is exotic. A planner can produce this shape in minutes. What changes is that
-specialists and verifiers now share one document with decision-makers, instead of three separate
+specialists, verifiers, and decision-makers now share one document instead of three separate
 descriptions of it.
 
 A complete populated instance (claims bound to evidence, verifier status, a visible amendment, and the acceptance decision) is available as a [companion example](/essays/contract-as-spec-worked-example).
@@ -98,7 +98,7 @@ an earlier stage of the same chain, not proof that the chain does not apply to i
 
 The conceptual core of contract-as-spec is a maturity model for evidence and authority. It distinguishes workflows that just produce outputs from workflows that can justify decisions.
 
-A practical version has six stages. These stages are dimensions more than they are a strict ladder: reuse, verification, governance, each can advance on its own, and a workflow does not have to clear every earlier stage before gaining more of a later one.
+A practical version has six stages. These stages are dimensions more than they are a strict ladder: each of reuse, verification, and governance can advance on its own, and a workflow does not have to clear every earlier stage before gaining more of a later one.
 
 ### 1. Output
 
@@ -150,7 +150,7 @@ Reviewed 2026-08-24. Method: a structured comparative review across open-source 
 
 Nothing in contract-as-spec requires a magical new primitive.
 
-The ecosystem already contains capable planners, agent routers, workflow engines, evaluation frameworks, provenance stores, approval steps, artifact registries, observability tools. Most technical teams can assemble most of those components.
+The ecosystem already contains capable planners, agent routers, workflow engines, evaluation frameworks, provenance stores, approval steps, artifact registries, and observability tools. Most technical teams can assemble most of those components.
 
 The harder question is whether the components agree about the identity and state of the work.
 
@@ -158,7 +158,7 @@ Can the planner point to the same acceptance criteria the verifier later evaluat
 
 These are integration questions, not generation questions.
 
-**[Proposed, grounded in observed landscape coverage]** The meaningful differentiation of a governed agentic system lies in integration completeness rather than primitive technical novelty. Its value comes from closing the seams among intent, execution, evidence, verification, authority, reuse.
+**[Proposed, grounded in observed landscape coverage]** The meaningful differentiation of a governed agentic system lies in integration completeness rather than primitive technical novelty. Its value comes from closing the seams among intent, execution, evidence, verification, authority, and reuse.
 
 This is easy to underestimate because each seam appears small. A task identifier is "just metadata," a claim ledger "just structured output." An approval record is "just workflow state." Even an artifact manifest gets waved off as "just packaging."
 
