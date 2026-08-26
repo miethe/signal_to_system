@@ -35,7 +35,7 @@ And yet, when I look at the aggregate output across teams, the numbers tell a di
 
 I'm not alone in this. GitClear's 2024 *Coding on Copilot* report analyzed 150M+ lines of changed code and found that *code churn* (lines written then reverted or rewritten within two weeks) was projected to roughly double by 2024 against the pre-AI 2021 baseline, while net productive output didn't show a corresponding spike.[^gitclear] Google's internal studies suggest AI tools save measurable time on specific microtasks (code completion, test scaffolding, documentation) while leaving end-to-end delivery timelines largely flat. The most optimistic credible number I've seen for sustained team-level productivity improvement is around 20-30%, and that's in carefully structured environments. Most teams land well below that.
 
-The METR 2025 randomized controlled trial on AI-assisted programming captures it precisely: experienced open-source developers using AI tools completed tasks 19% *slower*, despite self-reporting a perceived 20% speedup.[^metr] That's a 39-point perception gap between how fast they felt and how fast they actually were. They felt faster but delivered less. The tools compress time-to-first-draft while inflating time-to-verified-solution. That gap — subjective speed up, objective slowdown — isn't evidence that AI tools don't work. It's evidence of something more specific:
+The METR 2025 randomized controlled trial on AI-assisted programming captures it precisely: experienced open-source developers using AI tools completed tasks 19% *slower*, despite self-reporting a perceived 20% speedup.[^metr] That's a 39-point perception gap between how fast they felt and how fast they actually were. They felt faster but delivered less. The tools compress time-to-first-draft while inflating time-to-verified-solution. That gap (subjective speed up, objective slowdown) isn't evidence that AI tools don't work. It's evidence of something more specific:
 
 > Something structural is eating the gains between individual productivity and team-level outcomes.
 
@@ -55,7 +55,7 @@ AI tools compress *execution* time on tasks where the specification is clear and
 
 These tiers aren't fixed. With proper governance (context injection, structured constraints, proactive guardrails), tasks that currently fall into the "negligible" bucket can move up. That's exactly what this series is about.
 
-McKinsey's 2023 developer productivity research (the source of the "up to 50% faster" headline) breaks this down in the fine print: the largest gains were on code generation and documentation, while design, testing strategy, and cross-team coordination showed minimal improvement.[^mckinsey] DORA's 2025 *State of AI-Assisted Software Development* report is consistent: elite performers separate from the pack not on raw coding speed, but on deployment frequency, lead time, change failure rate, and recovery time — system-level metrics, not individual ones.[^dora] AI tools, as currently deployed, mostly target the individual layer.
+McKinsey's 2023 developer productivity research (the source of the "up to 50% faster" headline) breaks this down in the fine print: the largest gains were on code generation and documentation, while design, testing strategy, and cross-team coordination showed minimal improvement.[^mckinsey] DORA's 2025 *State of AI-Assisted Software Development* report is consistent: elite performers separate from the pack not on raw coding speed, but on deployment frequency, lead time, change failure rate, and recovery time: system-level metrics, not individual ones.[^dora] AI tools, as currently deployed, mostly target the individual layer.
 
 ## Why the Gains Don't Compound
 
@@ -75,12 +75,12 @@ These patterns recur across teams regardless of which AI tools they use. The fai
   src="/assets/posts/governed-agentic-sdlc-01/diagram-four-failures.jpeg"
   alt="Four icons in a grid representing the four failure modes: an overflowing funnel, a book dissolving into fragments, a signature line trailing off, and a figure stepping through a doorway."
   number="01"
-  caption="The four failure modes of ungoverned AI adoption — volume trap, context collapse, accountability gap, shadow AI."
+  caption="The four failure modes of ungoverned AI adoption: volume trap, context collapse, accountability gap, shadow AI."
 />
 
 ### 1. The Volume Trap
 
-The most common failure, and the most insidious. The team adopts AI tools, individual output increases, more code enters the pipeline, but review capacity, test infrastructure, and deployment processes were sized for the old throughput. Larger PRs. Longer review queues. More integration conflicts. Eventually *slower* delivery, even though everyone feels busier. Adding AI to a team with existing process bottlenecks is like hooking a band up to an amplifier — it doesn't make the music better, it just makes the existing problems louder.
+The most common failure, and the most insidious. The team adopts AI tools, individual output increases, more code enters the pipeline, but review capacity, test infrastructure, and deployment processes were sized for the old throughput. Larger PRs. Longer review queues. More integration conflicts. Eventually *slower* delivery, even though everyone feels busier. Adding AI to a team with existing process bottlenecks is like hooking a band up to an amplifier; it doesn't make the music better, it just makes the existing problems louder.
 
 **What it looks like:** PR size creeps up 2-3x. Faros AI's Q4 2025 Engineering Impact Report, which analyzed 50,000+ pull requests, found review cycle times jumped roughly 91% in AI-heavy teams; nearly double the pre-AI baseline.[^faros] Merge conflicts spike. DORA's 2025 research statistically correlated AI adoption levels with delivery instability: a 7.2% increase in instability for every 25% bump in adoption, which compounds fast.[^dora] The team ships the same number of features per sprint but each one takes more rework.
 
@@ -100,9 +100,9 @@ Multiply that across five teams with five agents operating from different implic
 
 ### 3. The Accountability Gap
 
-Who owns AI-generated code? In theory: the developer who prompted the agent. In practice: the accountability model dissolves fast. Developers rubber-stamp output they don't fully understand. Reviewers defer to "well, the AI wrote it and the tests pass." When something breaks in production, the post-mortem reveals that nobody actually *decided* the code should work that way — it was generated, accepted, merged, and deployed through a process that assumed human authorship at every step.
+Who owns AI-generated code? In theory: the developer who prompted the agent. In practice: the accountability model dissolves fast. Developers rubber-stamp output they don't fully understand. Reviewers defer to "well, the AI wrote it and the tests pass." When something breaks in production, the post-mortem reveals that nobody actually *decided* the code should work that way; it was generated, accepted, merged, and deployed through a process that assumed human authorship at every step.
 
-**What it looks like:** Post-mortems trace root causes to AI-generated code that nobody meaningfully reviewed. Rewire.it's 2026 *Case for Formal Verification in the Agentic Era* found at least 62% of AI-generated code contains security vulnerabilities — OWASP Top 10 exposure throughout, substantially worse than human baselines — and most of it sails through review unchallenged.[^rewire] Developers can't explain why their own PRs work. Knowledge of the codebase becomes shallow because understanding wasn't required to produce the code.
+**What it looks like:** Post-mortems trace root causes to AI-generated code that nobody meaningfully reviewed. Rewire.it's 2026 *Case for Formal Verification in the Agentic Era* found at least 62% of AI-generated code contains security vulnerabilities (OWASP Top 10 exposure throughout, substantially worse than human baselines), and most of it sails through review unchallenged.[^rewire] Developers can't explain why their own PRs work. Knowledge of the codebase becomes shallow because understanding wasn't required to produce the code.
 
 In Skillmeat, the same FastAPI bug was fixed three times, in three separate sessions, at three separate layers (API, web, tests), between February and March 2026. Each agent correctly identified the issue: FastAPI 204 No Content responses have no body, but calling `response.json()` on them throws a SyntaxError. Each agent fixed it in their layer. None of them knew the fix already existed somewhere else in the codebase. The commits are still there: `a29acda2`, `74f49e3f`, `669cda07`. Three agents, one bug, zero shared memory. That's the accountability gap: not malice or laziness, just a system with no mechanism for one session's fix to survive into the next.
 
@@ -134,10 +134,10 @@ We are now in the middle of a third transition:
   src="/assets/posts/governed-agentic-sdlc-01/diagram-transitions.jpeg"
   alt="Four-stage horizontal progression of architectural eras: a solid monolithic cube, a cluster of distributed service cubes, a layered platform of distributed infrastructure, and a cloud of networked autonomous agent nodes."
   number="02"
-  caption="Three infrastructure transitions: monolith, distributed services, distributed infrastructure — and now distributed intelligence."
+  caption="Three infrastructure transitions: monolith, distributed services, distributed infrastructure, and now distributed intelligence."
 />
 
-It took me embarrassingly long to see the pattern for what it was. Multiple agents, running in parallel, making decisions and generating artifacts across a codebase simultaneously — and we're all racking our brains trying to govern it with tooling designed for the second transition (assuming the company even made it that far). IBM and Arthur AI have started calling this emerging model the <Term id="adlc">**Agent Development Lifecycle (ADLC)**</Term> — the premise being that developing *with* agents requires different processes than developing *for* AI features.[^adlc] I agree with the diagnosis. What this series offers is the operator's version of the same shift: less framework branding, more of the specific patterns that have held up under real workloads.
+It took me embarrassingly long to see the pattern for what it was. Multiple agents, running in parallel, making decisions and generating artifacts across a codebase simultaneously, and we're all racking our brains trying to govern it with tooling designed for the second transition (assuming the company even made it that far). IBM and Arthur AI have started calling this emerging model the <Term id="adlc">**Agent Development Lifecycle (ADLC)**</Term>: the premise being that developing *with* agents requires different processes than developing *for* AI features.[^adlc] I agree with the diagnosis. What this series offers is the operator's version of the same shift: less framework branding, more of the specific patterns that have held up under real workloads.
 
 <Callout type="why-it-matters" title="The Infrastructure Gap">
 We have Git for code, CI/CD for delivery, and Backstage for services. We have **zero** Platform Engineering for our cognitive infrastructure. No versioned context management. No agent observability. No trust tiers for AI-generated artifacts. No memory that persists across sessions. We have built elaborate infrastructure for everything except the thing we're now asking to generate the infrastructure.
@@ -169,10 +169,10 @@ What's needed isn't more or faster gates. It's governance that's *proactive*, em
 I'll lay out the full framework across this series, but the core idea deserves to be stated plainly up front:
 
 <Callout type="leader-takeaway" title="The Thesis">
-Governed agentic development treats AI agents as first-class participants in the SDLC, with explicit roles, constraints, and accountability boundaries — rather than treating them as invisible accelerators behind a human interface.
+Governed agentic development treats AI agents as first-class participants in the SDLC, with explicit roles, constraints, and accountability boundaries, rather than treating them as invisible accelerators behind a human interface.
 </Callout>
 
-Let me be direct about what this series is *not*: it's not about <Term id="vibe-coding">**Vibe Coding**</Term> — non-engineers prompting LLMs without regard for what the code actually does or how it holds up in production. That's a different activity for a different audience. What I'm describing is <Term id="agentic-engineering">**Agentic Engineering**</Term>: professional engineers operating AI agents within a deliberate, governed framework. If you're accountable for software that runs in production, this series is for you.
+Let me be direct about what this series is *not*: it's not about <Term id="vibe-coding">**Vibe Coding**</Term>: non-engineers prompting LLMs without regard for what the code actually does or how it holds up in production. That's a different activity for a different audience. What I'm describing is <Term id="agentic-engineering">**Agentic Engineering**</Term>: professional engineers operating AI agents within a deliberate, governed framework. If you're accountable for software that runs in production, this series is for you.
 
 The central concept is what I call the <Term id="harness-engineering-control-plane">**Harness Engineering Control Plane**</Term> for agentic development. Just as Kubernetes introduced a control plane to manage distributed workloads, separating the "what should run" from the "how it runs," a governed agentic SDLC needs a layer that manages cognitive workloads: what context agents receive, what constraints they operate under, how their outputs are verified, and how knowledge persists across sessions.
 
@@ -216,7 +216,7 @@ The structural problem diagnosed here is real, and I've watched it break teams t
 
 [^metr]: METR (2025). [*Measuring the Impact of Early-2025 AI on Experienced Open-Source Developer Productivity*](https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study/). Randomized controlled trial documenting the divergence between perceived and actual developer speed. Preprint: [arXiv:2507.09089](https://arxiv.org/abs/2507.09089).
 
-[^mckinsey]: McKinsey Digital (2023). [*Unleashing developer productivity with generative AI*](https://www.mckinsey.com/capabilities/mckinsey-digital/our-insights/unleashing-developer-productivity-with-generative-ai). Productivity breakdowns by task type — code generation, documentation, refactoring, and design.
+[^mckinsey]: McKinsey Digital (2023). [*Unleashing developer productivity with generative AI*](https://www.mckinsey.com/capabilities/mckinsey-digital/our-insights/unleashing-developer-productivity-with-generative-ai). Productivity breakdowns by task type: code generation, documentation, refactoring, and design.
 
 [^dora]: DORA (2025). [*State of AI-Assisted Software Development Report*](https://dora.dev/research/2025/dora-report/). Google Cloud / DORA research. Found that for every 25% increase in AI adoption, delivery instability rose by an estimated 7.2% and throughput dropped an estimated 1.5%.
 
@@ -224,7 +224,7 @@ The structural problem diagnosed here is real, and I've watched it break teams t
 
 [^qiao]: Qiao, Y., Hundhausen, C., Haque, M. U., & Shihab, E. (2025). [*Comprehension-Performance Gap in GenAI-Assisted Brownfield Programming: A Replication and Extension*](https://arxiv.org/abs/2511.02922). arXiv:2511.02922.
 
-[^rewire]: Richardson, T. (2026, February 4). [*When AI Writes the Code, Verification Becomes the Job*](https://rewire.it/blog/when-ai-writes-the-code-verification-becomes-the-job/). Rewire.it Blog. Finds that while 80%+ of developers now use AI assistants for code generation, at least 62% of AI-generated code contains vulnerabilities — shifting the engineer's primary job from writing code to formally verifying it.
+[^rewire]: Richardson, T. (2026, February 4). [*When AI Writes the Code, Verification Becomes the Job*](https://rewire.it/blog/when-ai-writes-the-code-verification-becomes-the-job/). Rewire.it Blog. Finds that while 80%+ of developers now use AI assistants for code generation, at least 62% of AI-generated code contains vulnerabilities, shifting the engineer's primary job from writing code to formally verifying it.
 
 [^ibm-governance]: IBM (2025). [*Ethics and governance of agentic AI*](https://www.ibm.com/think/insights/ethics-governance-agentic-ai). Plus IBM's [agentic governance platform launch](https://newsroom.ibm.com/2025-06-18-ibm-introduces-industry-first-software-to-unify-agentic-governance-and-security).
 
