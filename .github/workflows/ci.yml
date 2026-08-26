@@ -19,5 +19,7 @@ jobs:
         run: npm run build
       - name: Type check (astro check)
         run: npx astro check || true
+      - name: Editorial gate (em dash check)
+        run: npm run check:prose
       - name: Lint
         run: echo "Lint step placeholder — configure eslint/prettier as needed"
