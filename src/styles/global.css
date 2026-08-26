@@ -467,6 +467,82 @@ pre code {
   text-decoration-thickness: 2px;
 }
 
+/* --- Glossary terms (dfn) --- */
+/* Visually distinct from .prose-custom a: dotted underline, no color shift,
+   help cursor, so readers can tell "definition" from "link" at a glance. */
+.prose-custom dfn {
+  font-style: normal;
+  cursor: help;
+  border-bottom: 1px dashed var(--text-secondary);
+  text-decoration: none;
+}
+
+.glossary-term {
+  position: relative;
+  display: inline-block;
+}
+
+.glossary-tooltip {
+  position: absolute;
+  z-index: 30;
+  left: 0;
+  bottom: calc(100% + 0.5rem);
+  width: max-content;
+  max-width: min(20rem, calc(100vw - 2.5rem));
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.5rem;
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.16);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(4px);
+  transition: opacity 120ms ease, transform 120ms ease, visibility 120ms;
+  pointer-events: none;
+}
+
+.glossary-term:hover .glossary-tooltip,
+.glossary-term:focus-within .glossary-tooltip,
+.glossary-term dfn:focus-visible ~ .glossary-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.glossary-tooltip-definition {
+  display: block;
+  color: var(--text-primary);
+}
+
+.glossary-tooltip-link {
+  display: inline-block;
+  margin-top: 0.5rem;
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-weight: 500;
+  border-bottom: none;
+}
+
+/* Keep the tooltip on-screen on narrow viewports instead of overflowing */
+@media (max-width: 480px) {
+  .glossary-tooltip {
+    left: 50%;
+    transform: translate(-50%, 4px);
+    max-width: calc(100vw - 2rem);
+  }
+
+  .glossary-term:hover .glossary-tooltip,
+  .glossary-term:focus-within .glossary-tooltip,
+  .glossary-term dfn:focus-visible ~ .glossary-tooltip {
+    transform: translate(-50%, 0);
+  }
+}
+
 /* --- Lists --- */
 .prose-custom ul,
 .prose-custom ol {
