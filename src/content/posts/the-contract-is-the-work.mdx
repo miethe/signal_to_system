@@ -153,7 +153,7 @@ At this stage, the organization is no longer reusing only prompts or outputs. It
 
 **[Observed]** Stages four through six are still frontier territory at organizational scale. They are not imaginary, though. As of 2026-08-25, we run a small version at home every day: three different LLM vendors and deterministic scripts operate under one contract boundary, with durable daily run records showing the handoffs. That is lived practice at modest scale, not evidence that the institutional problem is solved.
 
-**[Observed, bounded internal review (see note)]** In a bounded review of 41 current open-source agent-tooling sources, we did not identify a direct equivalent to the complete source-to-claim-to-verification-to-decision-authority model. Individual stages are well represented. The uncommon part is preserving their relationships as one durable lifecycle. This is a bounded finding, not proof that no equivalent exists anywhere. If a competing system preserves that complete chain, I would like to see the counterexample and test this taxonomy against it.
+**[Observed, bounded internal review ([sources listed below](#sources-the-landscape-review))]** In a bounded review of 41 current open-source agent-tooling sources, we did not identify a direct equivalent to the complete source-to-claim-to-verification-to-decision-authority model. Individual stages are well represented. The uncommon part is preserving their relationships as one durable lifecycle. This is a bounded finding, not proof that no equivalent exists anywhere. If a competing system preserves that complete chain, I would like to see the counterexample and test this taxonomy against it.
 
 <Callout type="info" title="Method note">
 Reviewed 2026-08-24. Method: a structured comparative review across open-source agentic frameworks and orchestration tools, scored against the six stages above. Scope: bounded, not exhaustive; 41 sources, not a survey of the field. Caveat: internal review; sources not independently audited.
@@ -247,14 +247,77 @@ Contract-as-spec makes those transitions explicit. It binds intent to acceptance
 
 The instruction underneath all of it is the one I give every agent I run, and it predates this essay by years: do not make things up. If you don't see it, don't say it. A Feature Contract is that instinct codified into a document instead of left as something I have to keep repeating out loud. That is how agentic work becomes durable: not when the agent appears autonomous, but when the organization can see exactly what was promised, what was proven, who accepted it, and what can safely be reused.
 
+## Sources: the landscape review
+
+This is the recovered source record for the bounded review cited above: 35 public primary sources and six non-public working materials. Inclusion records what the review considered, not a claim that every source independently establishes this essay's argument.
+
+### Review inputs not publicly linkable
+
+- *Sanitized AOS Capability and Maturity Matrix* (internal sponsor-supplied working material, not publicly linkable)
+- *Comparison Rubric and Falsification Benchmark* (internal sponsor-supplied working material, not publicly linkable)
+- *Competitor and Source Discovery Seeds* (internal sponsor-supplied working material, not publicly linkable)
+- *Falsification and Uncertainty Register* (internal sponsor-supplied working material, not publicly linkable)
+- *Deep Research Output Contract* (internal sponsor-supplied working material, not publicly linkable)
+- *Act as a technical competitive-intelligence researcher* (2026; supplied research output, not publicly linkable)
+
+### Governance frameworks and approval workflows
+
+- [*Agent Governance Toolkit*](https://github.com/microsoft/agent-governance-toolkit)
+- [*Known Limitations & Design Boundaries*](https://github.com/microsoft/agent-governance-toolkit/blob/main/docs/LIMITATIONS.md) (2026)
+- [*AGT Audit and Compliance Specification*](https://github.com/microsoft/agent-governance-toolkit/blob/main/docs/specs/AUDIT-COMPLIANCE-1.0.md) (2026)
+- [*Releases: microsoft/agent-governance-toolkit*](https://github.com/microsoft/agent-governance-toolkit/releases) (2026)
+- [*feat: language parity for require_approval approval chains*](https://github.com/microsoft/agent-governance-toolkit/issues/3083) (2026)
+- [*Releases: microsoft/agent-framework*](https://github.com/microsoft/agent-framework/releases) (2026)
+- [*Microsoft Agent Framework overview*](https://learn.microsoft.com/en-us/agent-framework/overview/)
+- [*Agent Framework workflow checkpoints*](https://learn.microsoft.com/en-us/agent-framework/workflows/checkpoints)
+- [*Agent Framework human-in-the-loop workflows*](https://learn.microsoft.com/en-us/agent-framework/workflows/human-in-the-loop)
+- [*Python: Approval-gated tool re-executes a second time on later unrelated turn*](https://github.com/microsoft/agent-framework/issues/6851) (2026)
+
+### Durable orchestration and runtime records
+
+- [*langchain-ai/langgraph*](https://github.com/langchain-ai/langgraph)
+- [*LangGraph durability sync ordering issue*](https://github.com/langchain-ai/langgraph/issues/8234) (2026)
+- [*LangGraph scalar resume/interrupt issue*](https://github.com/langchain-ai/langgraph/issues/8579) (2026)
+- [*Temporal Python SDK*](https://github.com/temporalio/sdk-python)
+- [*Workflow ID and Run ID*](https://github.com/temporalio/documentation/blob/main/docs/encyclopedia/workflow/workflow-execution/workflowid-runid.mdx)
+- [*Activity Execution*](https://github.com/temporalio/documentation/blob/main/docs/encyclopedia/activities/activity-execution.mdx)
+- [*Retry Policies*](https://github.com/temporalio/documentation/blob/main/docs/encyclopedia/retry-policies.mdx)
+
+### Agentic SDLC and operating surfaces
+
+- [*OpenHands/OpenHands*](https://github.com/OpenHands/OpenHands)
+- [*Fission-AI/OpenSpec*](https://github.com/Fission-AI/OpenSpec)
+- [*obra/superpowers*](https://github.com/obra/superpowers)
+- [*BMAD-METHOD*](https://github.com/bmad-code-org/BMAD-METHOD)
+- [*GitHub Spec Kit*](https://github.com/github/spec-kit) (2026)
+- [*MeisnerDan/mission-control*](https://github.com/MeisnerDan/mission-control)
+- [*RunDiffusion-Agents*](https://github.com/rundiffusion/RunDiffusion-Agents)
+
+### Observability and work management
+
+- [*langfuse/langfuse*](https://github.com/langfuse/langfuse)
+- [*Arize-ai/phoenix*](https://github.com/Arize-ai/phoenix)
+- [*GenAI Agent Spans*](https://github.com/open-telemetry/semantic-conventions-genai/blob/main/docs/gen-ai/gen-ai-agent-spans.md)
+- [*Logical grouping of spans into task/skill/phase*](https://github.com/open-telemetry/semantic-conventions-genai/issues/94) (2026)
+- [*Releases: opf/openproject*](https://github.com/opf/openproject/releases) (2026)
+
+### Supply-chain provenance and adjacent systems
+
+- [*oras-project/oras*](https://github.com/oras-project/oras) (2026)
+- [*SLSA v1.2 Specification*](https://slsa.dev/spec/v1.2/)
+- [*in-toto Attestation*](https://github.com/in-toto/attestation)
+- [*Releases: sigstore/cosign*](https://github.com/sigstore/cosign/releases) (2026)
+- [*agentcontrol/agent-control*](https://github.com/agentcontrol/agent-control)
+- [*KbWen/agentic-os*](https://github.com/KbWen/agentic-os)
+
 ---
 
 ### Research and authorship note
 
-The ideas and system described here come from Nick Miethe's architecture work and operating observations in the Agentic OS. AI systems assisted with research, adversarial review, and drafting. The 41-source landscape review was AI-assisted; its scope and limits are described in the essay. Nick reviewed the claims and accepts responsibility for the argument.
+The ideas and system described here come from Nick Miethe's architecture work and operating observations in the Agentic OS. AI systems assisted with research, adversarial review, and drafting. The 41-source landscape review was AI-assisted; its scope, limits, and recovered source record are described in this essay. Nick reviewed the claims and accepts responsibility for the argument.
 
 **Provenance**
-Author: Nick Miethe. Thesis: human-originated. Evidence: operating observations plus a bounded internal landscape review (41 sources, scope and caveats stated above). AI roles: research assistance, adversarial review, drafting. Human verification: final claim and source review by Nick. Research artifact: contract-as-spec landscape review. Version: rev5. AI-involvement level: 3 (substantive synthesis and adversarial reasoning, thesis and evidence Nick's own operating observations).
+Author: Nick Miethe. Thesis: human-originated. Evidence: operating observations plus a bounded internal landscape review (41 sources: 35 publicly linked primary sources and six non-public working materials; scope and caveats stated above). AI roles: research assistance, adversarial review, drafting. Human verification: final claim and source review by Nick. Research artifact: contract-as-spec landscape review, with its recovered source record listed above. Version: rev5. AI-involvement level: 3 (substantive synthesis and adversarial reasoning, thesis and evidence Nick's own operating observations).
 
 [^dijkstra]: Edsger W. Dijkstra (1972). [*The Humble Programmer* (EWD 340)](https://www.cs.utexas.edu/~EWD/transcriptions/EWD03xx/%21SV-EWD340.html). The original formulation that testing can demonstrate bugs but not their absence.
 
