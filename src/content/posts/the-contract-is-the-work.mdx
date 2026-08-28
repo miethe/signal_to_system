@@ -31,7 +31,7 @@ Every step looks competent. The result can still be wrong.
 
 The research agent might have answered a subtly different question. The implementation agent might have interpreted "fixed" as "the test passes," while the product leader meant "the failure mode cannot recur." The reviewer could have examined the change without seeing the evidence behind the diagnosis. Nobody may know which source supported which claim, which acceptance criteria were binding, or who had authority to decide that the work was complete.
 
-This is a characteristic failure mode of a discrete, unauthenticated handoff.
+**[Proposed]** This is a characteristic failure mode of a discrete, unauthenticated handoff, in my operating experience, not a claim that every unauthenticated handoff fails this way.
 
 "Unauthenticated" here does not mean that the agents lacked cryptographic identities. It means that the handoff did not carry an authoritative relationship among intent, claims, evidence, acceptance criteria, and decision rights. Each participant received a description of the work, but no durable object proved what the work was supposed to accomplish.
 
@@ -223,11 +223,11 @@ But the method does not demand maximal ceremony. Teams can begin with a small co
 
 The goal is proportional governance, not a rigid pipeline: enough structure to make completion and authority visible, without forcing every task through the same machinery.
 
-I don't actually know whether anyone outside my own household would pay for this. The receipts in this essay prove the mechanism holds at home scale; they don't prove a market, and I'm not going to pretend this essay settles that question. What I do have some confidence in, because I've watched it happen both ways, is what a chain of agents does without this discipline versus what it can do with it. The doubt is about who pays. The confidence is about what the mechanism does when you run it for real.
+I don't actually know whether anyone outside my own household would pay for this. The receipts in this essay show the mechanism operating in my home environment: specific handoffs, evidence states, and corrections I can point to; they don't prove a market, and I'm not going to pretend this essay settles that question. What I do have some confidence in, because I've watched it happen both ways, is what a chain of agents does without this discipline versus what it can do with it. The doubt is about who pays. The confidence is about what the mechanism does when you run it for real.
 
 ## Build the chain, not another agent
 
-The next generation of reliable agentic systems will not be defined only by models that reason longer or agents that call more tools. Those improvements matter, but they do not solve discontinuity between stages.
+**[Proposed]** My bet is that the next generation of reliable agentic systems will not be defined only by models that reason longer or agents that call more tools. Those improvements matter, but they do not solve discontinuity between stages.
 
 A plausible answer is not yet a verified claim. Run the checkout-timeout example back through the six stages and the gap is concrete rather than abstract: fixing the failure mode is stage one, tracing it to the failing and passing runs is stage three, an on-call lead accepting the contract is stage five, and none of those stages substitutes for the one after it. A verified claim is not yet an authorized decision, and an authorized decision is not yet a reusable capability the next team can pick up cold.
 
@@ -240,3 +240,6 @@ The instruction underneath all of it is the one I give every agent I run, and it
 ### Research and authorship note
 
 The ideas and system described here come from Nick Miethe's architecture work and operating observations in the Agentic OS. AI systems assisted with research, adversarial review, and drafting. The 41-source landscape review was AI-assisted; its scope and limits are described in the essay. Nick reviewed the claims and accepts responsibility for the argument.
+
+**Provenance**
+Author: Nick Miethe. Thesis: human-originated. Evidence: operating observations plus a bounded internal landscape review (41 sources, scope and caveats stated above). AI roles: research assistance, adversarial review, drafting. Human verification: final claim and source review by Nick. Research artifact: contract-as-spec landscape review. Version: rev5. AI-involvement level: 3 (substantive synthesis and adversarial reasoning, thesis and evidence Nick's own operating observations).
