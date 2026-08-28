@@ -16,6 +16,109 @@ leaderTakeaway: Treat after-action reports as publication-ready raw material, bu
   keep the safety gate explicit.
 ---
 
+The plan for the shipped-work-ledger opened with a wrong assumption, and it opened that way on
+purpose: better to find out on day one that a skill the plan called "net-new" already existed,
+just undeployed, than to spend a milestone rebuilding it from scratch.
+
+## What we set out to do
+
+Give the Agentic OS one trustworthy answer to "what shipped," across four milestones: a linter that
+enforces a single canonical status vocabulary across the whole plan corpus (M1); a mechanism that
+binds IntentTree tracker nodes to the plan files and feature slugs they represent, in both
+directions (M2); a query that proves what actually shipped, with real commit and PR evidence
+attached, not an inferred guess (M3); and a folder-layout simplification plus an authoring-time gate
+so the whole structure doesn't drift again (M4).
+
+## What happened
+
+M1 started by correcting its own premise: the "missing" skill was real and rich, just never
+deployed locally, so the milestone became "deploy and add the one genuinely missing script," not a
+rebuild. It landed a linter that normalized 128 files across the corpus to a single valid status
+vocabulary, plus a `planning_maturity` field, byte-preserving and additive.
+
+M2 built the node-side and file-side stamping that connects a tracker node to the plan file it
+represents. The first real defect showed up immediately: the CLI's own metadata-write path silently
+turned nested data into flattened text on write, a genuine corruption risk for the exact nodes the
+milestone needed to touch. The write path moved to a verified HTTP call instead, and a second defect
+surfaced right behind it: one of the "slugs" the resolver was about to stamp turned out to be
+leftover residue from a bad import, not a real feature at all. A shape guard closed that gap before
+anything got written. Two more resolution paths (a tag-based match, and a fallback file reference)
+closed the remaining acceptance criterion.
+
+M3 built the evidence layer across four parallel legs, and every one of the milestone's real defects
+followed the same shape: invisible to a fully green offline test suite, and only visible once the
+code ran against live data. A field name the write path used didn't match the field the read path
+actually returned. Evidence was landing on the wrong node in a shared subtree. A repo-inference
+routine that looked fixed on the first pass was silently wrong on the second. And a citation that
+looked shape-valid (a plausible-looking commit reference) pointed at a commit that didn't exist. Each
+was found, fixed, and covered with a regression test pinned to the real shape, not the assumed one.
+The milestone closed on an honest number: six of eight features with a resolvable evidence link
+carry one, and twenty-six of thirty-four completed nodes in this repo have no join key at all,
+because the underlying data has nothing to join on, not because the logic is too strict.
+
+M4 carried the most risk: an authoring-time advisory gate, a stamp applied at node-creation time so
+the gap M3 measured stops reopening, and a corpus-wide folder move touching hundreds of files and
+their cross-references. Its own thirty-nine-test suite was green and still missed three real
+defects, all caught only by running the tool against the real repository: an unhandled edge case
+that aborted a migration mid-run, a phase that gave different answers depending on the order it ran
+in, and a class of relative links inside the moved files themselves that nothing had been checking.
+The orchestrator also caught a fourth problem the plan hadn't scoped at all: dozens of authoring
+templates across the skill docs still pointed at the old folder layout, which would have silently
+rebuilt the very structure this milestone just removed. One process failure happened along the way:
+a `git reset --hard` was run on the assumption an earlier commit had already succeeded, discarding
+four legs of work in one command. It was recovered in full, byte for byte, from git's own
+dangling-object store.
+
+## Wins
+
+- A single canonical status vocabulary is now enforced across the plan corpus, continuously, not as
+  a one-time cleanup.
+- Node-to-plan and plan-to-node binding both work, verified live on real trees in two repositories,
+  with zero metadata lost or silently retyped along the way.
+- A real "what shipped" query exists, with evidence traced to actual commits and pull requests, not
+  inferred or fuzzy-matched.
+- The folder simplification landed with every reference accounted for: zero unexplained skips, zero
+  dangling links left unexplained.
+- A discarded commit was recovered in full from git internals rather than lost.
+
+## Losses
+
+- Coverage is honestly partial. Twenty-six of thirty-four completed nodes in this repo carry no
+  feature identity at all, and no amount of heuristic matching invents a join key that doesn't
+  exist in the underlying data.
+- Nearly every real defect across all four milestones was invisible to a green, fully passing
+  offline test suite, and only surfaced once the code ran against a live server or a real
+  repository. That pattern repeated often enough to name: a test double that is more permissive
+  than the thing it stands in for will certify broken behavior as correct.
+- One avoidable process failure: a destructive git operation was run without confirming the
+  operation before it had actually succeeded.
+
+## What it changed (meta-findings)
+
+The recurring lesson across every milestone was the same lesson in a new costume: a green offline
+suite proves the code matches a model of its dependency, not the dependency itself. Every serious
+defect in this program (the metadata write path, the evidence field mismatch, the CLI flag
+ordering elsewhere in this same family of work, the folder-move ordering bug) was caught only by
+running the real thing, never by the tests written in advance of running it. A second, related
+lesson: "shape-valid" and "real" are different claims, worth checking separately (a plausible commit
+reference, a plausible feature slug, a plausible node id can all be wrong in ways that only a live
+check catches). And a third, procedural one: never run a destructive command on the assumption a
+prior command already succeeded; check that the state actually moved.
+
+## How it fits the AOS arc
+
+This closes a structural gap the Agentic OS has needed for a while: a queryable, evidence-backed
+answer to what actually shipped, joining the task graph to the plan corpus to real git history,
+instead of requiring a human to reconstruct that story by hand after the fact. It also reinforces a
+lesson this family of programs keeps re-learning in different shapes (the same "fake stood in for a
+live dependency and both looked fine until the real thing ran" failure appears again in a sibling
+delivery program run around the same time). The structural fix each time is the same: stamp
+identity at the moment something is created, not as a backfill later, so the next ledger query
+doesn't inherit the same gap.
+
+<details>
+<summary>Raw AAR (unedited)</summary>
+
 ## Implementation Notes — Shipped Work Ledger
 
 Execution ledger per plan §"Execution ledger". Deviations + conservative choices logged with
@@ -98,7 +201,7 @@ citation in `plan-frontmatter-schema.md` — a PRD that was never created) IS ge
 - **AC met:** linter exits 0 on repo; all 162 top-level statuses ∈ the 15 NodeStatus; stale doc
   claims handled (FR-14 claim-2 fixed; claim-1 verified-true, not inverted).
 - **PAUSED here per operator (2026-07-31): M2/M3/M4 deferred.** Worktree/branch preserved.
-  M1-node (node_01KYTBQPYKHP73AE2W0YDYW7S3) status marking deferred to M2 (node-write mechanism).
+  The M1 milestone's tracker node had its status marking deferred to M2 (node-write mechanism).
 
 **M2 consequence (de-risk):** the plan's scary cross-repo *file-side* dependency
 (`itt-sync-frontmatter-stampback`) is ALREADY LANDED on `../intenttree` main. M2's net-new residue is
@@ -218,7 +321,7 @@ restructuring was needed or made.
 
 Reviewing the dry-run output (60 stamps across 3 slugs) surfaced a defect: one of the three
 "slugs" the resolver produced, `srcart_01KXHQR6F69Y80GX1B6VF4FZFB`, is not a feature slug at
-all — it is a source-artifact id. Its origin: `node_01KXHQR6GESD7R3178ZAT707YD` (type
+all — it is a source-artifact id. Its origin: the affected work_package node (type
 `work_package`, `meta.origin: "imported_plan"`) has its `title` field literally set to the
 string `"srcart_01KXHQR6F69Y80GX1B6VF4FZFB"`. This is residue from an earlier bad import: some
 plan file carried no `feature_slug` in its frontmatter, and whatever ran the import fell back to
@@ -270,7 +373,7 @@ Re-ran the dry-run against `tree_01KVTH95ETM8YRYCV2ENHVR124` (still no `--apply`
 now drives the same non-zero exit as a conflict would). This matches the operator's expectation
 exactly (`would_stamp=59`, `rejected_slug_shape=1`).
 
-**Out of scope, logged for a separate cleanup:** `node_01KXHQR6GESD7R3178ZAT707YD` is pre-existing
+**Out of scope, logged for a separate cleanup:** that same work_package node is pre-existing
 bad-import residue in the live tree — its title is literally the source-artifact id string and it
 carries no real feature_slug anywhere. It is **not touched by this fix** (the guard only prevents
 a bad *stamp*; it does not repair the node's title or reconcile it against whatever the correct
@@ -979,7 +1082,7 @@ back to `default_repo`. Regression tests pin all four real misfire strings.
 
 **F2 (high) — shape-valid is not the same as real.** `[REDACTED].md` cites
 `7a85dc3`, which is not a valid git object here (the real commit is `92ad8b7`); a matching dangling
-`ExternalLink` has sat on `node_01KVTHBSAAXX5ZF28B6V0W8XXS` since **2026-06-24**. Added
+`ExternalLink` has sat on the affected node since **2026-06-24**. Added
 `verify_local_commits()` — a local, offline `git cat-file -t` check. This is *verification*, not the
 git-log **mining** FR-10 forbids: we never search history for commits to attribute to a feature, we
 only confirm a sha the plan file already named exists. It is deliberately scoped: PR refs are not
@@ -997,7 +1100,7 @@ fixed; it now correctly matches. The finding still stands on its merits.
 — idempotent, no wrong URLs, the dangling sha reported rather than linked. 255 tests pass.
 
 **Open follow-up (deliberately NOT auto-fixed):** the pre-existing dangling row
-`extlink_01KVVKDRED28YGBTKRKFTH49AR` (`7a85dc3` on `node_01KVTHBSAAXX5ZF28B6V0W8XXS`) is still live.
+the dangling external-link row (`7a85dc3` on that same node) is still live.
 Deleting evidence rows is a destructive action this run did not create and will not take
 unilaterally; `DELETE /api/v1/external-links/{id}` exists when the operator wants it. The correct
 data fix is to update that plan file's `commit_refs` to the real sha (`92ad8b7`) and re-run.
@@ -1485,3 +1588,5 @@ machine `RoutingRecord` was emitted this run; routing was recorded by policy per
 (§7 of `m4-contract.md`). Worth closing separately. Also: the first L2 fix dispatch died with a bare
 "Execution error" on an over-long inline prompt — moving the brief to a file
 (`m4-L2-defects.md`) and sending a short pointer worked first try. Prefer file-based briefs for ICA.
+
+</details>

@@ -1,5 +1,5 @@
 ---
-title: "AAR \u2014 PF-3 Delivery-Report Hosting & Linking (Tier 2, 8 pts)"
+title: "AAR: PF-3 Delivery-Report Hosting & Linking (Tier 2, 8 pts)"
 excerpt: A field note from the Agentic OS build loop.
 date: '2026-08-02'
 readTime: 6 min read
@@ -14,11 +14,124 @@ whyItMatters: The work shows how agentic systems turn operational evidence into 
   practice.
 leaderTakeaway: Treat after-action reports as publication-ready raw material, but
   keep the safety gate explicit.
-sourceAar: "AAR \u2014 PF-3 Delivery-Report Hosting & Linking (Tier 2, 8 pts)"
+sourceAar: "AAR: PF-3 Delivery-Report Hosting & Linking (Tier 2, 8 pts)"
 ---
 
-Third and final leg of a 3-repo initiative (PF-1 `artifact_atlas` host → PF-2 `intenttree` link
-actuator → PF-3 launchpad wiring). Landed `8555cf0` on `main` via PR #87, 13 commits squashed.
+The plan looked straightforward on paper: wire the third and final leg of a three-repo delivery
+chain so that a finished feature's evidence gets hosted, scoped, and linked back to its tracker
+node without a human stitching the pieces together by hand. PF-1 had already built the host
+(`artifact_atlas`); PF-2 had already built the actuator (`intenttree`'s link verb). PF-3's job was
+just the wiring: read a manifest, resolve where it belongs, attach it, and defer the whole thing
+to a hook so it happens automatically after a merge.
+
+## What we set out to do
+
+Land the launchpad side of the chain (8 points, Tier 2): an atlas export target with stable
+identity fields, a publisher that ingests the export and calls the sibling repo's link verb, a
+post-merge hook that fires the publisher without a human remembering to, and documentation across
+nine surfaces reconciled to match. Nine acceptance criteria in total, one of them (U5) gated behind
+an operator-only governance flag because it touches identity-sensitive rules.
+
+## What happened
+
+Four milestones (M1 through M4) shipped in sequence: the export target with `instance_key` and
+`link_identity` fields; `publish_report.py`, which resolves scope and runs a misattribution
+guardrail before ever calling `itt link report`; a default-on, binding-gated hook that always exits
+0 and defers to the live dossier manifest; and a documentation sweep that reconciled eight of the
+nine named surfaces (the ninth, U5, stayed held). The work landed as commit `8555cf0` on `main` via
+PR #87, thirteen commits squashed into one. At the close of the pre-merge work, the suite read
+clean: 93 delivery-report tests, 20 plus 18 plus 5 hook tests, two smoke suites, 685 repo tests, and
+the plan-frontmatter linter exiting 0.
+
+That was the state going into merge. It was not the whole story: the CLI the publisher depends on
+had been sitting on a stale, frozen build the entire time, and the first real run against a fresh
+one found two defects the green suite had certified as fine.
+
+## Wins
+
+- All four milestones shipped and verified: the export stays pure, the guardrail rejects a wrong
+  scope, the hook is genuinely non-fatal, and eight of nine documentation surfaces now match the
+  shipped behavior.
+- A chain of identity risks was caught and fixed before merge, not after: an open question that
+  looked blocking turned out to already be answered in a sibling repo's decisions; two open
+  questions that looked contradictory turned out to be one field doing two jobs; a tempting identity
+  key turned out to be a field nobody actually maintains; and an enum the guardrail depended on was
+  pinned to its real source rather than inferred from a narrative.
+- A governance gate held exactly as designed: the implementing agent declined to self-approve a
+  change gated behind `METIS_IDENTITY_CHANGE_APPROVED=1`, the orchestrator declined too, and the
+  work was preserved rather than forced through.
+
+## Losses
+
+- The completion claim is 8 of 9, not 9 of 9. U5 stayed behind its governance gate; nobody
+  manufactured the missing approval to close the number out.
+- Two live defects surfaced the moment the CLI was refreshed after merge, both of them invisible to
+  93 passing tests: a global `--json` flag placed in the wrong position on every call (so every node
+  read silently returned nothing, and the guardrail rejected every link rather than the wrong ones),
+  and a route resolver that only recognized one shape of anchor node, which happened to exclude the
+  exact shape all three repos in this initiative actually use. Both failed the same way a broken
+  guardrail always fails: safely, and always, which looks identical to a working one from the
+  outside.
+- Those two defects were avoidable. The stale CLI was a known, recorded risk during pre-flight,
+  deliberately parked as someone else's follow-up. Parking it meant the entire link half of the
+  feature shipped having never once run against its real dependency.
+
+## What it changed (meta-findings)
+
+The individual defects mattered less than the pattern connecting them, and the pattern is the real
+output of this run:
+
+- **A stale open question is a liability, not a neutral placeholder.** Before treating a
+  cross-repo question as unresolved, check whether a sibling repo already answered it; an
+  open question left sitting in one repo can quietly diverge from a decision already shipped in
+  another.
+- **A contradiction between two requirements is usually a missing concept, not a trade-off to
+  negotiate.** When two rules can't both hold on the same field, look for the unnamed thing they're
+  both actually trying to say before picking a side.
+- **A field's presence and its maintenance are different claims.** Before keying identity off a
+  field, find out who actually writes to it; a field nobody updates is not a safe anchor no matter
+  how convenient it looks.
+- **A second review finding in the same defect class means the guard is on the wrong layer.** The
+  fix at that point is a design change (canonicalize once, at the boundary), not a third
+  patch in the same spot.
+- **A test fixture that can only produce valid input can never catch a missing-validation bug.**
+  If the thing under test is a guard, the fixture has to be able to emit something malformed.
+- **Verifying that the installed binary has ended up with a shipped verb is a different check
+  than confirming the verb merged to main.** Fleet CLIs drift; treat a missing verb as an offline
+  case to probe, not a crash to fix blindly.
+- **A test double that is more permissive than the real dependency will certify a broken
+  integration as working.** A fake needs to be at least as strict as the thing it stands in for,
+  and an integration is not actually verified until it has run once against the real dependency.
+- **When a dependency is deliberately left unavailable, ask whether making it available is itself
+  the cheapest next step**, not just whether the deferral is honestly recorded. Refreshing the CLI
+  here took one command and immediately paid for itself twice over.
+- **Sequencing documentation last, once, removed a whole category of drift**: writing the docs
+  after the hook they describe already exists meant there was nothing to invent and nothing to
+  re-edit later.
+
+A few smaller frictions surfaced along the way, outside PF-3's own scope but worth naming: a
+field-write helper refused to run on an unrelated schema gap and had to be worked around by hand; a
+session-link step in a shared hook failed against a CLI signature that had moved on without it; a
+completion-recording step defaulted to an overclaiming "no issues noted" summary on a run that had
+two real findings and a held item; and a provisioning check reported a deliberate absence in a way
+that reads identically to a real gap.
+
+## How it fits the AOS arc
+
+This is the closing leg of a pattern the Agentic OS keeps re-learning in different shapes: a green
+test suite proves the code matches the tester's model of its dependency, not the dependency
+itself. The same family of failure (a fake standing in for a live system, more forgiving than the
+real thing) has shown up before across this program's sibling repos, and it showed up again here,
+in a different corner, on the very last leg. The fix each time is the same: run against the real
+thing at least once, treat "shipped upstream" and "callable here" as separate facts, and if a
+dependency is being deliberately deferred, ask first whether deferring it is actually the expensive
+choice.
+
+<details>
+<summary>Raw AAR (unedited)</summary>
+
+Third and final leg of a 3-repo initiative (PF-1 `artifact_atlas` host -> PF-2 `intenttree` link
+actuator -> PF-3 launchpad wiring). Landed `8555cf0` on `main` via PR #87, 13 commits squashed.
 Outcome: **succeeded with one held item** (U5, behind an operator-only governance gate).
 
 ## What shipped
@@ -188,3 +301,5 @@ merely postpones polish.
 - The provisioning gate reported an in-catalog gap for `skill:intenttree-cli` with
   `enterprise.deploy.overlay_refused`. Correct by design (U7: no local copy here), but the gap
   presentation makes a deliberate absence look like a defect.
+
+</details>
