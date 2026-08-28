@@ -27,7 +27,9 @@ A product leader asks an agent to investigate a reliability problem. The agent p
 
 Every step looks competent. The result can still be wrong.
 
+<Callout type="warning" title="Observed: a report substituted for dispatch">
 **[Observed, 2026-08-24 overnight cycle]** A delegate was instructed to hand a bounded task to a cheaper executor. It never made the dispatch. Instead, it spent its budget writing a competent status report about the work, then did the same thing again later that night. The durable overnight receipts showed two descriptions of execution and no execution. Read separately, each report looked responsible. Read against the contract, the missing handoff was obvious.
+</Callout>
 
 The research agent might have answered a subtly different question. The implementation agent might have interpreted "fixed" as "the test passes," while the product leader meant "the failure mode cannot recur." The reviewer could have examined the change without seeing the evidence behind the diagnosis. Nobody may know which source supported which claim, which acceptance criteria were binding, or who had authority to decide that the work was complete.
 
@@ -50,6 +52,8 @@ The contract is not documentation produced after the work; it's the work's sourc
 Most agentic workflows begin with an instruction and end with an answer. The middle may contain planning, delegation, tool use, evaluation, and approval, but the definition of "done" often remains implicit.
 
 That leaves completion vulnerable to substitution. A successful tool call substitutes for a correct outcome. A passing test substitutes for complete coverage. A polished report substitutes for verified claims. An approval substitutes for informed decision authority.
+
+The first two substitutions have familiar precedents. Dijkstra's old warning still applies: tests can expose failures, but a passing suite cannot establish their absence.[^dijkstra] More recently, METR's randomized study of experienced open-source developers found a similarly uncomfortable gap between local impression and measured outcome: participants estimated that early-2025 AI tools made them 20% faster, while the study observed a 19% increase in task-completion time.[^metr]
 
 Contract-as-spec reverses the order. Before execution begins, the Feature Contract establishes four things:
 
@@ -131,6 +135,8 @@ A verifier tests whether the evidence genuinely supports the claim, whether cont
 
 Verification is not the same as agreement. It records the status of a claim: supported, contradicted, unresolved, or limited by an evidence gap.
 
+That distinction is also why test-based evaluation needs a stated boundary. SWE-bench evaluates models against issue-linked tests from real repositories, a valuable and demanding measure of whether a patch resolves a specified software problem.[^swebench] It is still evidence for that specified problem, not a blanket acceptance decision about every operational consequence a team may care about.
+
 ### 5. Decision authority
 
 Verified claims are presented to the person or policy authorized to make the relevant decision.
@@ -187,7 +193,13 @@ A gate's job is to detect missing obligations, not to bless activity.
 
 **[Observed, August 2026 five-day operational follow-up]** One remediation was declared verified because the cause had been removed. The check read the mechanism, not the resulting state. The state created by that mechanism continued running for five more days, as shown by the follow-up operational receipts. The simplest contradictory signal was also the cheapest: spend did not fall when the remediation said it should. A completeness gate would have asked both questions: Is the cause closed, and has the state it already produced been swept or explicitly accepted?
 
+<Callout type="warning" title="Observed: the mechanism was fixed, the outcome remained">
+The cause was removed, but the state created by it continued for five days. The result-level signal was simple: spend did not fall when the remediation said it should. A gate that checks only the mechanism can close work while the outcome is still wrong.
+</Callout>
+
 This is where gates can stay lightweight. They do not need to reproduce the whole investigation. They need to inspect the few observations that distinguish activity from outcome. In this case, one result-level metric would have exposed the incomplete remediation immediately.
+
+DORA's 2025 research reaches a compatible systems-level conclusion: AI amplifies an organization's existing strengths and weaknesses, so the tool alone cannot repair a weak delivery system.[^dora]
 
 This also changes the meaning of "blocked." A blocked agent is not just an agent that failed to continue; it can identify the exact contract obligation it cannot satisfy: unavailable evidence, ambiguous authority, contradictory acceptance criteria, or a task too large for the current specialist. That is useful state, and it lets the work be decomposed or escalated without erasing what has already been learned.
 
@@ -243,3 +255,11 @@ The ideas and system described here come from Nick Miethe's architecture work an
 
 **Provenance**
 Author: Nick Miethe. Thesis: human-originated. Evidence: operating observations plus a bounded internal landscape review (41 sources, scope and caveats stated above). AI roles: research assistance, adversarial review, drafting. Human verification: final claim and source review by Nick. Research artifact: contract-as-spec landscape review. Version: rev5. AI-involvement level: 3 (substantive synthesis and adversarial reasoning, thesis and evidence Nick's own operating observations).
+
+[^dijkstra]: Edsger W. Dijkstra (1972). [*The Humble Programmer* (EWD 340)](https://www.cs.utexas.edu/~EWD/transcriptions/EWD03xx/%21SV-EWD340.html). The original formulation that testing can demonstrate bugs but not their absence.
+
+[^metr]: Becker, J., Rush, N., Barnes, B., and Rein, D. (2025). [*Measuring the Impact of Early-2025 AI on Experienced Open-Source Developer Productivity*](https://metr.org/Early_2025_AI_Experienced_OS_Devs_Study-paper.pdf). Randomized controlled trial of 16 experienced developers completing 246 tasks.
+
+[^swebench]: Jimenez, C. E., et al. (2024). [*SWE-bench: Can Language Models Resolve Real-World GitHub Issues?*](https://proceedings.iclr.cc/paper_files/paper/2024/hash/edac78c3e300629acfe6cbe9ca88fb84-Abstract-Conference.html). ICLR 2024.
+
+[^dora]: DORA (2025). [*State of AI-assisted Software Development*](https://dora.dev/research/2025/dora-report/). Google Cloud research report.
