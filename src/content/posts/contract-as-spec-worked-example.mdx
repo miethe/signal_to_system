@@ -42,29 +42,35 @@ Decision authority: the on-call engineering lead accepts or rejects the complete
 
 ## Claims bound to evidence
 
-A contract this small has one consequential claim: that the change satisfies criterion 1
-(the failure mode does not recur) for the reason stated in criterion 3 (a root cause, not a
-suppression). The claim and its evidence are recorded together, not left to be inferred from a
+The contract has one consequential claim, criterion 1 (the failure mode does not recur), for
+the reason stated in criterion 3 (a root cause, not a suppression). Criteria 2 and 4 are
+checklist obligations rather than mechanism claims: they get a pass/fail evidence item each,
+not a full claim-binding treatment, because there is no mechanism to explain, only a state to
+confirm. The claim and its evidence are recorded together, not left to be inferred from a
 narrative summary:
 
 ```
 Claim: The timeout no longer recurs under the documented repro conditions, because
        the retry logic no longer double-acquires the connection-pool lock.
+       (supports: criterion 1, criterion 3)
 
 Bound evidence:
-  - ev-01  root-cause-trace.log        kind: reproduction     verifier: pending
-  - ev-02  fixed-run-repro.log         kind: reproduction     verifier: verified
-  - ev-03  independent-repro-env.log   kind: independent_run   verifier: verified
-  - ev-04  pool-lock-diff.patch        kind: root_cause_link   verifier: verified
+  - ev-01  root-cause-trace.log        kind: reproduction      verifier: pending   supports: criterion 3
+  - ev-02  fixed-run-repro.log         kind: reproduction      verifier: verified  supports: criterion 1
+  - ev-03  independent-repro-env.log   kind: independent_run   verifier: verified  supports: criterion 1
+  - ev-04  pool-lock-diff.patch        kind: root_cause_link   verifier: verified  supports: criterion 3
+  - ev-05  test-suite-run.log          kind: checklist         verifier: verified  supports: criterion 2
+  - ev-06  rollback-runbook.md         kind: checklist         verifier: verified  supports: criterion 4
 
-Verifier status: 3 of 4 evidence items verified; ev-01 pending an independent read
-of the trace against the stated root cause.
+Verifier status: 5 of 6 evidence items verified; ev-01 pending an independent read
+of the trace, corroborating (not blocking) the root cause already established by ev-04.
 ```
 
 The claim is not "the fix works": that sentence has no evidence obligation attached to it and
 could mean almost anything. The claim states the specific mechanism, and each evidence item
-ties to the acceptance criterion it supports, so a reviewer can check the claim against the
-evidence directly rather than against the surrounding prose.
+carries an explicit `supports:` field naming the criterion it ties to, so a reviewer can check
+the claim against the evidence directly rather than against the surrounding prose or trust that
+an unlabeled item happens to cover the criterion it is invoked for.
 
 ## A visible amendment
 
@@ -75,12 +81,14 @@ an amendment, and someone other than the specialist accepted it:
 
 ```
 Amendment 1
-  Proposed by: specialist (fc-example-041, implementation leg)
+  Date: 2026-06-14 (synthetic)
+  Proposed by: specialist-implementation-leg-1 (fc-example-041)
   Proposed change: criterion 2 becomes "the existing test suite passes with no reduction in
     coverage, excluding tests already failing on the base commit before this change began"
-  Reason: the unqualified criterion could not be satisfied or refuted; a pre-existing flake
-    made "no reduction" undecidable as originally worded.
-  Accepted by: on-call engineering lead
+  Reason: the unqualified criterion could not be satisfied or refuted; a pre-existing flake on
+    the base commit made "no reduction" undecidable as originally worded (base-commit test
+    result attached alongside ev-05 as amendment-supporting evidence, not a numbered claim item).
+  Accepted by: on-call-lead-1
   Accepted: yes, the amendment narrows the criterion's ambiguity without weakening its intent
 ```
 
@@ -93,15 +101,17 @@ reads differently.
 
 ```
 Decision: accepted
-Decided by: on-call engineering lead
-Basis: all four acceptance criteria met under the amended contract; 3 of 4 bound evidence
-  items independently verified; ev-01 accepted as pending-but-non-blocking because ev-03
-  (an independent reproduction in a separate environment) already carries the load criterion 1
-  requires.
+Decided by: on-call-lead-1
+Basis: all four acceptance criteria met under the amended contract (ev-02/ev-03 satisfy
+  criterion 1; ev-04 independently satisfies criterion 3's root-cause claim; ev-05 satisfies
+  criterion 2 under the amendment; ev-06 satisfies criterion 4); 5 of 6 bound evidence items
+  independently verified; ev-01 is corroborating, not required to close criterion 3, since ev-04
+  already establishes the root cause on its own.
 Reusable artifact: not promoted, since this fix was scoped to one request class and is not yet
   a candidate for stage 6 (reusable capability).
 ```
 
 The decision names what was checked, what remained unresolved, and why the unresolved item did
 not block acceptance. A reader six months later does not have to trust that judgment; they can
-see the same evidence and reach their own.
+see the same evidence record (each item's kind, verifier status, and the criterion it supports)
+and reach their own.
