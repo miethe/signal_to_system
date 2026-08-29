@@ -11,7 +11,7 @@
  *   />
  */
 
-import { useState } from "react";
+import { useState, useId } from "react";
 import { useStore } from "@nanostores/react";
 import { $performanceMode } from "../../store/performanceStore";
 
@@ -46,6 +46,7 @@ export default function ContextVisualizer({
 }: ContextVisualizerProps) {
   const mode = useStore($performanceMode);
   const [expanded, setExpanded] = useState<Set<number>>(new Set());
+  const id = useId();
 
   function toggle(i: number) {
     setExpanded((prev) => {
@@ -106,13 +107,19 @@ export default function ContextVisualizer({
                   </div>
 
                   {/* Value */}
-                  <p className="mt-1 font-mono text-xs leading-relaxed text-zinc-500 dark:text-zinc-400 whitespace-pre-wrap break-words">
+                  <p
+                    id={`ctx-text-${id}-${i}`}
+                    className="mt-1 font-mono text-xs leading-relaxed text-zinc-500 dark:text-zinc-400 whitespace-pre-wrap break-words"
+                  >
                     {isExpanded || !isLong ? ctx.value : truncate(ctx.value, 120)}
                   </p>
 
                   {isLong && mode === "rich" && (
                     <button
                       onClick={() => toggle(i)}
+                      aria-expanded={isExpanded}
+                      aria-controls={`ctx-text-${id}-${i}`}
+                      aria-label={isExpanded ? `Show less of ${ctx.label}` : `Show more of ${ctx.label}`}
                       className="mt-1 text-xs text-indigo-600 hover:underline dark:text-indigo-400 focus-ring"
                     >
                       {isExpanded ? "Show less" : "Show more"}
