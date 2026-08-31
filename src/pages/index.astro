@@ -5,6 +5,7 @@ import EssayCard from '../components/cards/EssayCard.astro';
 import ProjectCard from '../components/cards/ProjectCard.astro';
 import SeriesCard from '../components/cards/SeriesCard.astro';
 import StoryCard from '../components/cards/StoryCard.astro';
+import AuthorProfile from '../components/content/AuthorProfile.astro';
 import Button from '../components/ui/Button.astro';
 import InteractiveNetwork from '../components/interactive/InteractiveNetwork';
 import { site } from '../data/site';
@@ -93,38 +94,46 @@ const topicIconColors: Record<string, string> = {
     <div class="absolute inset-0 z-10 bg-gradient-to-b from-[var(--bg-base)]/30 via-[var(--bg-base)]/70 to-[var(--bg-base)]" aria-hidden="true" />
 
     <!-- Content (hero is always light-on-dark regardless of theme) -->
-    <div class="relative z-20 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pt-28 pb-24 sm:pt-40 sm:pb-36">
-      <!-- Eyebrow -->
-      <p class="font-mono mb-6 inline-flex items-center gap-2 rounded-full border border-[var(--border-subtle)] bg-[var(--accent-subtle)] px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[var(--accent-text)]">
-        <span class="h-1.5 w-1.5 rounded-full bg-[var(--accent)] animate-pulse" aria-hidden="true" />
-        Technical Publication
-      </p>
+    <div class="relative z-20 mx-auto max-w-6xl px-4 pb-24 pt-28 sm:px-6 sm:pb-36 sm:pt-40 lg:px-8">
+      <div class="grid items-start gap-12 lg:grid-cols-[minmax(0,1fr)_20rem] xl:gap-16">
+        <div>
+          <!-- Eyebrow -->
+          <p class="font-mono mb-6 inline-flex items-center gap-2 rounded-full border border-[var(--border-subtle)] bg-[var(--accent-subtle)] px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[var(--accent-text)]">
+            <span class="h-1.5 w-1.5 rounded-full bg-[var(--accent)] animate-pulse" aria-hidden="true" />
+            Technical Publication
+          </p>
 
-      <h1 class="font-serif text-5xl font-bold tracking-tight text-[var(--text-primary)] sm:text-7xl lg:text-[5rem] mb-8 max-w-4xl leading-[1.05]">
-        Signal to
-        <span class="italic text-[var(--accent)]"> System</span>
-      </h1>
+          <h1 class="font-serif mb-8 max-w-4xl text-5xl font-bold leading-[1.05] tracking-tight text-[var(--text-primary)] sm:text-7xl lg:text-[4.5rem] xl:text-[5rem]">
+            Signal to
+            <span class="italic text-[var(--accent)]"> System</span>
+          </h1>
 
-      <p class="text-xl text-[var(--text-secondary)] max-w-2xl leading-relaxed mb-4">
-        {site.subtitle}
-      </p>
-      <p class="text-base text-[var(--text-tertiary)] max-w-xl leading-relaxed mb-12">
-        Long-form essays and practical frameworks for technical executives, architects, and builders navigating the agent-era shift in software delivery.
-      </p>
+          <p class="mb-4 max-w-2xl text-xl leading-relaxed text-[var(--text-secondary)]">
+            {site.subtitle}
+          </p>
+          <p class="mb-12 max-w-xl text-base leading-relaxed text-[var(--text-tertiary)]">
+            Long-form essays and practical frameworks for technical executives, architects, and builders navigating the agent-era shift in software delivery.
+          </p>
 
-      <div class="flex flex-wrap gap-4">
-        <Button href="/essays/" variant="primary" size="lg">
-          Read the Essays
-        </Button>
-        <Button href="/start-here/" variant="secondary" size="lg">
-          Start Here
-        </Button>
-        <Button href="/rss.xml" variant="ghost" size="lg">
-          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/>
-          </svg>
-          RSS Feed
-        </Button>
+          <div class="flex flex-wrap gap-4">
+            <Button href="/essays/" variant="primary" size="lg">
+              Read the Essays
+            </Button>
+            <Button href="/start-here/" variant="secondary" size="lg">
+              Start Here
+            </Button>
+            <Button href="/rss.xml" variant="ghost" size="lg">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/>
+              </svg>
+              RSS Feed
+            </Button>
+          </div>
+        </div>
+
+        <div class="lg:sticky lg:top-24">
+          <AuthorProfile variant="featured" />
+        </div>
       </div>
     </div>
   </section>
@@ -402,57 +411,5 @@ const topicIconColors: Record<string, string> = {
       </div>
     </section>
   )}
-
-  <!-- =========================================================
-       AUTHOR BIO
-       ========================================================= -->
-  <section class="animate-on-scroll bg-[var(--bg-base)]">
-    <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-20">
-      <div class="rounded-3xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-8 sm:p-12 lg:flex lg:items-center lg:gap-12 shadow-ambient">
-        <!-- Avatar initials -->
-        <div class="mb-8 lg:mb-0 lg:shrink-0">
-          <div class="flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 text-2xl font-bold text-white overflow-hidden">
-            <img src="/assets/1M.png" alt={site.author.name} class="h-full w-full object-cover" />
-          </div>
-        </div>
-
-        <!-- Bio -->
-        <div class="flex-1">
-          <p class="text-xs font-semibold uppercase tracking-widest text-[var(--text-tertiary)] mb-2">The author</p>
-          <h2 class="text-2xl font-bold text-[var(--text-primary)] mb-3">{site.author.name}</h2>
-          <p class="text-[var(--text-secondary)] leading-relaxed mb-6 max-w-2xl">
-            Technical executive and architect with deep experience across AI systems, platform engineering, and enterprise software delivery. Former Red Hat solutions architect. Writing at the intersection of agentic AI, system design, and the organizational challenges of building great software.
-          </p>
-          <div class="flex flex-wrap gap-3">
-            <Button href="/about/" variant="secondary" size="sm">Full bio</Button>
-            <a
-              href={site.author.social.github}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors"
-            >
-              GitHub
-            </a>
-            <a
-              href={site.author.social.linkedin}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors"
-            >
-              LinkedIn
-            </a>
-            <a
-              href={site.author.social.twitter}
-              target="_blank"
-              rel="noopener noreferrer"
-              class="inline-flex items-center gap-2 rounded-lg px-3 py-1.5 text-sm text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors"
-            >
-              Twitter / X
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
 
 </BaseLayout>

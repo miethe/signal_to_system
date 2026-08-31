@@ -2,6 +2,7 @@
 import BaseLayout from './BaseLayout.astro';
 import Figure from '../components/content/Figure.astro';
 import RelatedContent from '../components/content/RelatedContent.astro';
+import AuthorProfile from '../components/content/AuthorProfile.astro';
 import { generateJsonLd, buildCanonicalUrl } from '../lib/seo';
 import { formatDate, formatDateISO } from '../lib/utils';
 import { site } from '../data/site';
@@ -86,9 +87,9 @@ const jsonLd = generateJsonLd('article', {
     aria-hidden="true"
   ></div>
 
-  <article class="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
+  <article class="mx-auto grid w-full max-w-[72ch] items-start px-4 py-12 sm:px-6 lg:px-8 xl:max-w-7xl xl:grid-cols-[minmax(0,72ch)_18rem] xl:justify-center xl:gap-x-12">
     <!-- Article header -->
-    <header class="mb-16 space-y-6 pb-4">
+    <header class="mb-16 min-w-0 space-y-6 pb-4 xl:col-start-1 xl:row-start-1">
       {
         series && (
           <div class="flex items-center gap-2 text-xs font-mono font-medium text-[var(--accent)]">
@@ -162,6 +163,18 @@ const jsonLd = generateJsonLd('article', {
         )
       }
     </header>
+
+    <!-- Desktop byline follows the header in source order and spans the article rail. -->
+    <div class="hidden xl:col-start-2 xl:row-span-2 xl:row-start-1 xl:block xl:self-start xl:sticky xl:top-24">
+      <AuthorProfile variant="sidebar" headingLevel="h2" />
+    </div>
+
+    <div class="min-w-0 xl:col-start-1 xl:row-start-2">
+
+    <!-- Compact author context remains in the reading flow below desktop. -->
+    <div class="mb-10 xl:hidden">
+      <AuthorProfile variant="compact" headingLevel="h2" />
+    </div>
 
     <!-- Hero illustration (engineering plate) -->
     {
@@ -264,6 +277,7 @@ const jsonLd = generateJsonLd('article', {
         }
       </div>
     </footer>
+  </div>
   </article>
 
   <!-- Scroll to top button -->

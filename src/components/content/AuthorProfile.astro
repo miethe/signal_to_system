@@ -1,0 +1,126 @@
+---
+import { site } from '../../data/site';
+
+interface Props {
+  variant?: 'featured' | 'sidebar' | 'compact';
+  headingLevel?: 'h2' | 'h3';
+  showSocials?: boolean;
+}
+
+const { variant = 'compact', headingLevel: Heading = 'h2', showSocials } = Astro.props;
+const isFeatured = variant === 'featured';
+const isSidebar = variant === 'sidebar';
+const shouldShowSocials = showSocials ?? isFeatured;
+const normalizePath = (path: string) => path.replace(/\/+$/, '') || '/';
+const currentPath = normalizePath(Astro.url.pathname);
+const profileLinks = site.author.profileLinks.filter((link) => normalizePath(link.href) !== currentPath);
+const socialLinks = [
+  { label: 'GitHub', href: site.author.social.github },
+  { label: 'LinkedIn', href: site.author.social.linkedin },
+  { label: 'Twitter / X', href: site.author.social.twitter },
+];
+---
+
+<aside
+  aria-label={`About the author, ${site.author.name}`}
+  class:list={[
+    'author-profile relative overflow-hidden border border-[var(--border-subtle)] bg-[var(--bg-surface)] shadow-ambient',
+    isFeatured && 'rounded-2xl p-6 sm:p-7',
+    isSidebar && 'rounded-xl p-5',
+    variant === 'compact' && 'rounded-xl p-5 sm:p-6',
+  ]}
+>
+  {isFeatured && (
+    <div
+      class="pointer-events-none absolute -right-10 -top-14 h-36 w-36 rounded-full bg-[var(--accent-subtle)] opacity-60 blur-2xl"
+      aria-hidden="true"
+    />
+  )}
+
+  <div class:list={['relative', variant === 'compact' && 'sm:flex sm:items-center sm:gap-5']}>
+    <div class:list={['flex items-center gap-4', variant === 'compact' && 'sm:min-w-64']}>
+      <img
+        src={site.author.avatar.src}
+        alt=""
+        width={site.author.avatar.width}
+        height={site.author.avatar.height}
+        loading={isFeatured ? 'eager' : 'lazy'}
+        decoding="async"
+        class:list={[
+          'shrink-0 rounded-full border border-[var(--border)] bg-[var(--bg-muted)] object-cover object-top ring-2 ring-[var(--bg-surface)]',
+          isFeatured ? '!m-0 !h-20 !w-20 !rounded-full' : '!m-0 !h-14 !w-14 !rounded-full',
+        ]}
+      />
+      <div class="min-w-0">
+        <p class="font-mono mb-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--accent)]">
+          {isSidebar ? 'Written by' : 'The author'}
+        </p>
+        <Heading class:list={['font-serif font-bold text-[var(--text-primary)]', isFeatured ? 'text-2xl' : 'text-lg']}>
+          {site.author.name}
+        </Heading>
+        <p class="mt-1 text-xs leading-relaxed text-[var(--text-tertiary)]">{site.author.role}</p>
+      </div>
+    </div>
+
+    <div class:list={['border-[var(--border-subtle)]', variant === 'compact' ? 'mt-5 border-t pt-5 sm:mt-0 sm:border-l sm:border-t-0 sm:pl-5 sm:pt-0' : 'mt-5 border-t pt-5']}>
+      <p class:list={['leading-relaxed text-[var(--text-secondary)]', isSidebar ? 'text-sm' : 'text-sm sm:text-[15px]']}>
+        {isFeatured ? site.author.bioLong : site.author.bioShort}
+      </p>
+
+      {profileLinks.length > 0 && (
+      <nav aria-label="Author links" class="mt-4 flex flex-wrap items-center gap-1">
+        {profileLinks.map((link, index) => (
+          <a
+            href={link.href}
+            class:list={[
+              'focus-ring inline-flex min-h-11 items-center gap-1.5 rounded-md px-2 text-sm font-medium underline-offset-4 hover:underline',
+              index === 0 ? 'text-[var(--accent)] hover:text-[var(--accent-hover)]' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]',
+            ]}
+          >
+            {link.label}
+            <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14" /><path d="m13 6 6 6-6 6" />
+            </svg>
+          </a>
+        ))}
+      </nav>
+      )}
+
+      {shouldShowSocials && (
+        <nav aria-label="Author social profiles" class:list={['flex flex-wrap items-center gap-1', profileLinks.length > 0 ? 'border-t border-[var(--border-subtle)] pt-1' : 'mt-4']}>
+          {socialLinks.map((link) => (
+            <a
+              href={link.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="focus-ring inline-flex min-h-11 items-center gap-1.5 rounded-md px-2 text-xs font-medium text-[var(--text-tertiary)] underline-offset-4 hover:text-[var(--text-primary)] hover:underline"
+            >
+              {link.label}
+              <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M7 17 17 7" /><path d="M7 7h10v10" />
+              </svg>
+            </a>
+          ))}
+        </nav>
+      )}
+    </div>
+  </div>
+</aside>
+
+<style>
+  /* Keep the card's compact rhythm when embedded inside `.prose-custom`. */
+  .author-profile {
+    margin: 0;
+    border-color: var(--border-subtle);
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    font-style: normal;
+  }
+
+  .author-profile :global(h2),
+  .author-profile :global(h3),
+  .author-profile :global(p) {
+    margin: 0;
+    border: 0;
+  }
+</style>

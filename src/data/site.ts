@@ -7,8 +7,18 @@ export const site = {
 
   author: {
     name: "Nick Miethe",
-    bio: "Technical executive, architect, and builder. Writing about AI agents, agentic SDLC, and the systems that shape modern software delivery.",
-    avatar: "/brand/avatar.jpg",
+    role: "Technical executive · Architect · Builder",
+    bioShort: "Technical executive, architect, and builder writing about AI agents, governed delivery, and the systems that shape modern software development.",
+    bioLong: "Technical executive and architect with deep experience across AI systems, platform engineering, and enterprise software delivery. Former Red Hat solutions architect. Writing at the intersection of agentic AI, system design, and the organizational challenges of building great software.",
+    avatar: {
+      src: "/assets/nick-miethe-portrait.webp",
+      width: 240,
+      height: 263,
+    },
+    profileLinks: [
+      { label: "About Nick", href: "/about/" },
+      { label: "Portfolio", href: "/portfolio/" },
+    ],
     social: {
       github: "https://github.com/miethe",
       linkedin: "https://linkedin.com/in/nickmiethe",
