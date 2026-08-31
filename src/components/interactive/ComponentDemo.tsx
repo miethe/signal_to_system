@@ -9,7 +9,7 @@
  *   <ComponentDemo client:visible componentName="Badge" />
  */
 
-import { useState } from "react";
+import { useState, useId } from "react";
 import { useStore } from "@nanostores/react";
 import { $performanceMode } from "../../store/performanceStore";
 
@@ -56,6 +56,7 @@ export default function ComponentDemo({
 }: ComponentDemoProps) {
   const mode = useStore($performanceMode);
   const [tab, setTab] = useState<"preview" | "info">("preview");
+  const id = useId();
 
   const hasRenderer = Object.prototype.hasOwnProperty.call(DEMO_REGISTRY, componentName);
   const renderer: DemoRenderer | undefined = hasRenderer ? DEMO_REGISTRY[componentName as keyof typeof DEMO_REGISTRY] : undefined;
@@ -77,13 +78,21 @@ export default function ComponentDemo({
         </div>
 
         {/* Tab switcher */}
-        <div className="flex rounded-lg border border-zinc-200 dark:border-zinc-700 overflow-hidden text-xs">
+        <div
+          className="flex rounded-lg border border-zinc-200 dark:border-zinc-700 overflow-hidden text-xs"
+          role="tablist"
+          aria-label={`${componentName} demo tabs`}
+        >
           {(["preview", "info"] as const).map((t) => (
             <button
               key={t}
+              role="tab"
+              aria-selected={tab === t}
+              aria-controls={`demo-panel-${id}-${t}`}
+              id={`demo-tab-${id}-${t}`}
               onClick={() => setTab(t)}
               className={[
-                "px-3 py-1 capitalize transition-colors",
+                "px-3 py-1 capitalize transition-colors focus-ring focus-visible:outline-none",
                 tab === t
                   ? "bg-white text-zinc-800 dark:bg-zinc-800 dark:text-zinc-100"
                   : "bg-transparent text-zinc-500 hover:text-zinc-700 dark:text-zinc-500 dark:hover:text-zinc-300",
@@ -97,7 +106,12 @@ export default function ComponentDemo({
 
       {/* Preview panel */}
       {tab === "preview" && (
-        <div className="flex min-h-32 items-center justify-center bg-white p-8 dark:bg-zinc-950">
+        <div
+          id={`demo-panel-${id}-preview`}
+          role="tabpanel"
+          aria-labelledby={`demo-tab-${id}-preview`}
+          className="flex min-h-32 items-center justify-center bg-white p-8 dark:bg-zinc-950"
+        >
           {renderer ? (
             renderer()
           ) : (
@@ -117,7 +131,12 @@ export default function ComponentDemo({
 
       {/* Info panel */}
       {tab === "info" && (
-        <div className="bg-white p-6 dark:bg-zinc-950">
+        <div
+          id={`demo-panel-${id}-info`}
+          role="tabpanel"
+          aria-labelledby={`demo-tab-${id}-info`}
+          className="bg-white p-6 dark:bg-zinc-950"
+        >
           <h3 className="mb-2 text-sm font-semibold text-zinc-800 dark:text-zinc-200">
             {componentName}
           </h3>
