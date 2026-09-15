@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="520" viewBox="0 0 1200 520" role="img" aria-labelledby="title desc">
+  <title id="title">Intent to outcome chain</title>
+  <desc id="desc">A chain from human intent through governed context, approved artifacts, agent sessions, produced work, shipped change, and evidence.</desc>
+  <rect width="1200" height="520" fill="#f8fafc"/>
+  <text x="72" y="72" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="700" fill="#0f172a">The enterprise unit is intent to outcome</text>
+  <text x="72" y="112" font-family="Inter, Arial, sans-serif" font-size="18" fill="#475569">A useful control plane links the artifacts an agent used to the evidence and outcomes the work produced.</text>
+
+  <g font-family="Inter, Arial, sans-serif" font-size="16" font-weight="700" text-anchor="middle">
+    <g transform="translate(54 208)">
+      <rect width="132" height="92" rx="8" fill="#ffffff" stroke="#0f172a" stroke-width="2"/>
+      <text x="66" y="42" fill="#0f172a">Human</text>
+      <text x="66" y="65" fill="#0f172a">intent</text>
+    </g>
+    <g transform="translate(218 208)">
+      <rect width="132" height="92" rx="8" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
+      <text x="66" y="38" fill="#1d4ed8">Governed</text>
+      <text x="66" y="61" fill="#1d4ed8">context</text>
+    </g>
+    <g transform="translate(382 208)">
+      <rect width="132" height="92" rx="8" fill="#ffffff" stroke="#059669" stroke-width="2"/>
+      <text x="66" y="38" fill="#047857">Approved</text>
+      <text x="66" y="61" fill="#047857">artifacts</text>
+    </g>
+    <g transform="translate(546 208)">
+      <rect width="132" height="92" rx="8" fill="#ffffff" stroke="#d97706" stroke-width="2"/>
+      <text x="66" y="38" fill="#b45309">Agent</text>
+      <text x="66" y="61" fill="#b45309">session</text>
+    </g>
+    <g transform="translate(710 208)">
+      <rect width="132" height="92" rx="8" fill="#ffffff" stroke="#7c3aed" stroke-width="2"/>
+      <text x="66" y="38" fill="#6d28d9">Code / docs</text>
+      <text x="66" y="61" fill="#6d28d9">/ tests</text>
+    </g>
+    <g transform="translate(874 208)">
+      <rect width="132" height="92" rx="8" fill="#ffffff" stroke="#0f766e" stroke-width="2"/>
+      <text x="66" y="38" fill="#0f766e">PR / release</text>
+      <text x="66" y="61" fill="#0f766e">/ change</text>
+    </g>
+    <g transform="translate(1038 208)">
+      <rect width="132" height="92" rx="8" fill="#ffffff" stroke="#be123c" stroke-width="2"/>
+      <text x="66" y="38" fill="#be123c">Evidence</text>
+      <text x="66" y="61" fill="#be123c">/ outcome</text>
+    </g>
+  </g>
+
+  <g stroke="#64748b" stroke-width="3" fill="none">
+    <path d="M190 254h24"/><path d="M214 254l-10-7v14z" fill="#64748b" stroke="none"/>
+    <path d="M354 254h24"/><path d="M378 254l-10-7v14z" fill="#64748b" stroke="none"/>
+    <path d="M518 254h24"/><path d="M542 254l-10-7v14z" fill="#64748b" stroke="none"/>
+    <path d="M682 254h24"/><path d="M706 254l-10-7v14z" fill="#64748b" stroke="none"/>
+    <path d="M846 254h24"/><path d="M870 254l-10-7v14z" fill="#64748b" stroke="none"/>
+    <path d="M1010 254h24"/><path d="M1034 254l-10-7v14z" fill="#64748b" stroke="none"/>
+  </g>
+</svg>
