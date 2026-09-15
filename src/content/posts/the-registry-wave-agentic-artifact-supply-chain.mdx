@@ -13,6 +13,7 @@ tags:
   - "delivery-systems"
 status: published
 heroImage: "/assets/posts/the-registry-wave-agentic-artifact-supply-chain/diagram-market-wave.svg"
+interactiveElement: "registry-wave-control-plane"
 whyItMatters: "The reusable files that shape agent behavior are becoming operational assets. Treating them as copied prompts will not survive contact with enterprise scale, security, or audit requirements."
 leaderTakeaway: "Registries answer where an agentic capability lives. The next platform layer must answer whether it should be trusted, where it can run, what it depends on, and what outcomes it produced."
 relatedSlugs:
@@ -25,10 +26,13 @@ draftNotes: "Created from 2026-07-01 SkillMeat and agentic artifact thesis hando
 ---
 import Callout from '../../components/content/Callout';
 import Figure from '../../components/content/Figure.astro';
+import ArtifactTaxonomy from '../../components/interactive/ArtifactTaxonomy';
+import ArtifactControlPlane from '../../components/interactive/ArtifactControlPlane';
+import '../../styles/registry-wave.css';
 
 Over the last several months, I have become increasingly convinced that one of the most important missing layers in agentic AI is not another model, another chat surface, or even another agent framework.
 
-It is the artifact layer. {Should probably define artifact here using our native functionality.}
+It is the artifact layer. In SkillMeat's terms, an **agentic artifact** is a reusable, versioned unit such as a skill, command, agent, memory item, or context pack that can be collected and deployed into a project or deployment profile.
 
 The reusable pieces that shape agent behavior -- skills, prompts, commands, tools, MCP servers, workflows, context packs, policies, evals, and deployment bindings -- are becoming the operational substrate of agentic systems. That is why I started building SkillMeat last year: first as a practical way to manage and reuse skills, and then increasingly as a reference implementation for a broader idea I now think is inevitable.
 
@@ -65,7 +69,7 @@ Eventually it became obvious that they were something larger: agentic artifacts.
 
 The hard part was not getting an agent to do something useful once. The hard part was making that behavior repeatable across projects, machines, teams, and runtimes. Good agent behavior was a bundle: instructions, context, assumptions, examples, tools, permissions, and review expectations. When that bundle lived in one chat transcript or one local folder, it was fragile. When another project needed it, the answer was usually copy and paste.
 
-{We could also mention ablation here for auditing, governance, etc.}
+Ablation is part of the governance story too. AOSBench can generate SystemCards and Mk variants that remove one mechanism at a time, making the audit question concrete: what evidence, safety boundary, or delivery quality disappears when a capability is absent?
 
 Copy and paste is fine for discovery, but it will never be a lifecycle.
 
@@ -81,10 +85,9 @@ They are discrete. Developers can understand them. They can be moved between pro
 
 That can't be overstated. A skill is small enough to install and large enough to carry intent. It can tell an agent how to perform a task, when to use supporting scripts, which references matter, and which constraints should shape execution. We're talking about more than just a prompt; it is a capability bundle.
 
-But once I started managing skills, the broader pattern became impossible to ignore. We already knew prompts had the same lifecycle problem from my earlier work with MeatyPromtps. But so did commands, hooks, plugins, MCP servers, context packs, policy bundles, eval sets, deployment profiles, workflow definitions, and generated outputs with provenance.
-{Perhaps also call-out the more unique artifacts which then were added, or generally unique ways using skillmeat for our AOS overall.}
+But once I started managing skills, the broader pattern became impossible to ignore. We already knew prompts had the same lifecycle problem from my earlier work with MeatyPromtps. But so did commands, hooks, plugins, MCP servers, context packs, policy bundles, eval sets, deployment profiles, workflow definitions, and generated outputs with provenance. In the AOS work, memory items, deployment profiles, signed bundles, and the provisioning gate make that less abstract: each gives a reusable capability a distinct way to be carried, placed, and checked.
 
-SkillMeat started with as a local skill manager for reusable agent capabilities. It then broadened into artifact records, source acquisition, collection curation, project deployment, context packaging, and governance/provenance work. That evolution is illustrative because it matches the underlying pattern: agent capabilities are not just files to copy. They are supply-chain artifacts that get acquired from sources, curated into collections, materialized into runtimes, and governed with policy and evidence.
+SkillMeat started as a local skill manager for reusable agent capabilities. It then broadened into artifact records, source acquisition, collection curation, project deployment, context packaging, and governance/provenance work. That evolution is illustrative because it matches the underlying pattern: agent capabilities are not just files to copy. They are supply-chain artifacts that get acquired from sources, curated into collections, materialized into runtimes, and governed with policy and evidence.
 
 The deeper bet is that agentic systems need an artifact management layer: something closer to a supply-chain control plane than a folder sync tool. Local-first workflows, project sync, artifact versioning, import and discovery, and deployment into agent runtimes are the first moves. Governance, federation, context, policy, evidence, and outcome linkage are where the problem gets interesting.
 
@@ -139,11 +142,11 @@ The supply-chain questions start one layer deeper:
 
 A registry tells you where the artifact is.
 
-A control plane tells you whether it should be used, where it can run, what it depends on, what evidence supports it, and what outcomes it produced.
-{Let's just review this language to determine if we've changed our verbiage or such here any since was written.}
+A control plane, when it is actually operational, routes governed work across those surfaces and writes receipts back to canonical stores. A configured integration is not enforcement; an advisory registration is not a gate.
 
-That distinction is loadbearing (an inside joke for the Claude 5 model-family users) because agentic artifacts do not behave like passive files. A prompt can change a decision path; a skill can run scripts; an MCP server can bridge an agent into an enterprise system. A context pack can make stale assumptions look authoritative. A policy bundle can constrain action, or fail to. An eval set can create confidence or false confidence. A generated output can become a PR, a release, a support response, or an operational change.
-{Maybe change the above list into an interactive diagram or something to make it more visual.}
+That distinction is loadbearing because agentic artifacts do not behave like passive files. Explore the surfaces below: each can shape a decision or action, and each needs an appropriate form of review.
+
+<ArtifactTaxonomy client:visible />
 
 Thus the enterprise question isn't "do we have a place to store these things?", as that's essentially a solved problem.
 
@@ -161,19 +164,8 @@ That includes skills, but it doesn't end there; not even close.
   src="/assets/posts/the-registry-wave-agentic-artifact-supply-chain/diagram-artifact-taxonomy.svg"
   alt="A taxonomy of agentic artifacts: instruction, tool, context, governance, execution, and evidence artifacts."
   number="03"
-  caption="The artifact surface spans instruction, tool, context, governance, execution, and evidence layers."
+  caption="The static taxonomy is retained as a printable reference; the interactive above adds the governance question for each layer."
 />
-
-The taxonomy I find useful looks like this:
-
-| Artifact category | Examples |
-| --- | --- |
-| Instruction artifacts | prompts, skills, commands, hooks |
-| Tool artifacts | MCP servers, tool declarations, API adapters |
-| Context artifacts | context packs, memory bundles, domain packs, ADR packs |
-| Governance artifacts | policies, approvals, eval sets, permissions |
-| Execution artifacts | workflows, agent definitions, sessions, traces |
-| Evidence artifacts | provenance records, run manifests, audit events, outcome links |
 
 The lifecycle is starting to look familiar:
 
@@ -187,16 +179,15 @@ The lifecycle is starting to look familiar:
 
 Now we're moving the conversation beyond skills registries.
 
-The enterprise will not accept ten different governance models for ten kinds of agentic artifacts. Skills in one place, MCP servers in another, prompts in a third, evals in a fourth, context packs in a wiki, policies in a security tool, generated outputs in Git, and evidence in whatever transcript happened to survive.
-{Great place to allude to future posts going deeper on mechanizing evidence, context fabrics, etc from AOS.}
+The enterprise will not accept ten different governance models for ten kinds of agentic artifacts. Skills in one place, MCP servers in another, prompts in a third, evals in a fourth, context packs in a wiki, policies in a security tool, generated outputs in Git, and evidence in whatever transcript happened to survive. I will go deeper on the context and evidence seams in the planned AOS living-analysis and RF release-prep pieces.
 
 That fragmentation is exactly how Shadow AI becomes more operational debt.
 
 ## The Control Plane Enterprises Will Need
 
-The control plane I think enterprises will need has several layers.
+The enterprise control plane I think enterprises will need has several layers. In my own system, that remains a direction, not a completed product: the Operator routes work today, while a unified cross-tool control plane is still emerging.
 
-{Would make another good visual, interactive or otherwise. Also again should review the control plane phrase vs our latest verbiage.}
+<ArtifactControlPlane client:visible />
 
 It needs a registry core, because artifacts need identity, versioning, metadata, search, install semantics, and update paths.
 
@@ -220,7 +211,8 @@ And it needs runtime adapters, because the control plane has to connect to the r
 />
 
 This is the broader space SkillMeat is building toward: reusable agentic artifacts and their lifecycle across projects, teams, and runtimes. The implementation will keep changing. The thesis has been stable for me: the artifacts that shape agent behavior need to become governed assets.
-{We've focused on skillmeat, but other projects of ours could be valid to be referenced here as allusions to future posts, ie MeatyWiki, ResearchFoundry, etc.}
+
+SkillMeat is one layer, not the whole system. MeatyWiki is the living knowledge base and Research Foundry is the evidence-first research control plane; both are useful examples of why context and evidence cannot remain incidental files beside the registry.
 
 ## Why This Matters for Enterprises
 
@@ -245,14 +237,16 @@ The pain points are predictable:
 
 This is why I do not think the winning metric will be tokens, sessions, or number of agents.
 
-The winning metric will be accepted outcomes with evidence. {Link/allude to other posts in the blog.}
+The winning metric will be accepted outcomes with evidence, not activity. I have written more about durable workflow state in [The Work Is a Graph](/essays/agentic-operations-flow/), acceptance evidence in [The Contract Is the Work](/essays/the-contract-is-the-work/), the operating gap in [The Productivity Paradox](/essays/governed-agentic-sdlc-01-productivity-paradox/), and a concrete contract in [Contract-as-Spec: A Worked Example](/essays/contract-as-spec-worked-example/).
 
-How many changes made it to production? Which ones were accepted by reviewers? Which incidents were resolved? Which documents were approved? Which customer workflows improved? Which artifacts contributed to those outcomes? Which ones should be reused, retired, or blocked? {Determine if any edits here from most recent updates.}
+How many changes made it to production? Which ones were accepted by reviewers? Which incidents were resolved? Which documents were approved? Which customer workflows improved? Which artifacts contributed to those outcomes? Which ones should be reused, retired, or blocked?
 
-That is the control-plane question. {Again, validate naming.}
+That is the agentic control-plane question: route the work, preserve the seams, and retain receipts that can support a decision later.
 
 ## My Bet
-{Spend some good time sitting here, ensuring we tie everything together very clearly and succintly, and updated with the current status of our theses and the system.}
+
+The thesis is no longer only a sketch. SkillMeat has a working artifact supply chain across source, collection, and project deployment. MeatyWiki and Research Foundry make knowledge and evidence durable in their own domains. The Operator gives the system a real routing surface. What is measured is uneven, and the unified cross-tool control plane is still doctrine and design work, not something I can honestly claim is finished.
+
 My bet is that the next several years will look like this:
 
 Skills become package-manager-native. Every major agent runtime will support installable skills or equivalent capability packs.
@@ -273,7 +267,7 @@ The registry wave is here, and I think that is worth celebrating. It means the i
 
 But registries are only the first visible layer. The real enterprise challenge is larger: governing the artifacts, context, policies, runtimes, evidence, and outcomes that turn agentic AI from impressive demos into trusted delivery capacity.
 
-That is the space I am building toward with SkillMeat, and I believe it is where the next several years of enterprise agentic architecture will be defined.
+That is the space I am building toward with SkillMeat and the surrounding system: not an agent registry alone, but a set of durable seams between reusable capability, governed context, evidence, and accepted outcomes.
 
 ## Sources
 
