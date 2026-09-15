@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="620" viewBox="0 0 1200 620" role="img" aria-labelledby="title desc">
+  <title id="title">Registry versus control plane</title>
+  <desc id="desc">A comparison between registry mechanics and control plane responsibilities for agentic artifacts.</desc>
+  <rect width="1200" height="620" fill="#f8fafc"/>
+  <text x="72" y="70" font-family="Inter, Arial, sans-serif" font-size="34" font-weight="700" fill="#0f172a">A registry is not the same thing as a control plane</text>
+  <text x="72" y="110" font-family="Inter, Arial, sans-serif" font-size="18" fill="#475569">The first tells you where the artifact is. The second decides whether, where, and how it should run.</text>
+
+  <g font-family="Inter, Arial, sans-serif">
+    <g transform="translate(84 172)">
+      <rect width="456" height="340" rx="8" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
+      <text x="228" y="48" text-anchor="middle" font-size="28" font-weight="700" fill="#1d4ed8">Registry</text>
+      <text x="228" y="86" text-anchor="middle" font-size="16" fill="#475569">package and discovery semantics</text>
+      <g font-size="21" fill="#0f172a">
+        <text x="64" y="148">discover</text>
+        <text x="64" y="198">install</text>
+        <text x="64" y="248">update</text>
+        <text x="64" y="298">publish</text>
+      </g>
+      <g stroke="#94a3b8" stroke-width="2" fill="none">
+        <path d="M178 142h150"/>
+        <path d="M178 192h150"/>
+        <path d="M178 242h150"/>
+        <path d="M178 292h150"/>
+      </g>
+      <g fill="#2563eb">
+        <circle cx="350" cy="142" r="6"/>
+        <circle cx="350" cy="192" r="6"/>
+        <circle cx="350" cy="242" r="6"/>
+        <circle cx="350" cy="292" r="6"/>
+      </g>
+    </g>
+
+    <g transform="translate(660 172)">
+      <rect width="456" height="340" rx="8" fill="#ffffff" stroke="#059669" stroke-width="2"/>
+      <text x="228" y="48" text-anchor="middle" font-size="28" font-weight="700" fill="#047857">Control Plane</text>
+      <text x="228" y="86" text-anchor="middle" font-size="16" fill="#475569">governance, runtime, and evidence semantics</text>
+      <g font-size="21" fill="#0f172a">
+        <text x="54" y="132">approve</text>
+        <text x="54" y="174">certify</text>
+        <text x="54" y="216">deploy</text>
+        <text x="54" y="258">observe</text>
+        <text x="54" y="300">revoke</text>
+      </g>
+      <g stroke="#94a3b8" stroke-width="2" fill="none">
+        <path d="M160 126h168"/>
+        <path d="M160 168h168"/>
+        <path d="M160 210h168"/>
+        <path d="M160 252h168"/>
+        <path d="M160 294h168"/>
+      </g>
+      <g fill="#059669">
+        <circle cx="350" cy="126" r="6"/>
+        <circle cx="350" cy="168" r="6"/>
+        <circle cx="350" cy="210" r="6"/>
+        <circle cx="350" cy="252" r="6"/>
+        <circle cx="350" cy="294" r="6"/>
+      </g>
+    </g>
+  </g>
+</svg>
