@@ -32,7 +32,7 @@ import '../../styles/registry-wave.css';
 
 Over the last several months, I have become increasingly convinced that one of the most important missing layers in agentic AI is not another model, another chat surface, or even another agent framework.
 
-It is the artifact layer. In SkillMeat's terms, an **agentic artifact** is a reusable, versioned unit such as a skill, command, agent, memory item, or context pack that can be collected and deployed into a project or deployment profile.
+It is the artifact layer. Give it a concrete shape for a second: a skill, a command, an agent definition, a memory item, a context pack, any reusable, versioned unit you can collect and deploy into a project.
 
 The reusable pieces that shape agent behavior -- skills, prompts, commands, tools, MCP servers, workflows, context packs, policies, evals, and deployment bindings -- are becoming the operational substrate of agentic systems. That is why I started building SkillMeat last year: first as a practical way to manage and reuse skills, and then increasingly as a reference implementation for a broader idea I now think is inevitable.
 
@@ -85,7 +85,7 @@ They are discrete. Developers can understand them. They can be moved between pro
 
 That can't be overstated. A skill is small enough to install and large enough to carry intent. It can tell an agent how to perform a task, when to use supporting scripts, which references matter, and which constraints should shape execution. We're talking about more than just a prompt; it is a capability bundle.
 
-But once I started managing skills, the broader pattern became impossible to ignore. We already knew prompts had the same lifecycle problem from my earlier work with MeatyPromtps. But so did commands, hooks, plugins, MCP servers, context packs, policy bundles, eval sets, deployment profiles, workflow definitions, and generated outputs with provenance. In the AOS work, memory items, deployment profiles, signed bundles, and the provisioning gate make that less abstract: each gives a reusable capability a distinct way to be carried, placed, and checked.
+But once I started managing skills, the broader pattern became impossible to ignore. We already knew prompts had the same lifecycle problem from my earlier work with MeatyPrompts. But so did commands, hooks, plugins, MCP servers, context packs, policy bundles, eval sets, deployment profiles, workflow definitions, and generated outputs with provenance. In the AOS work, memory items, deployment profiles, signed bundles, and the provisioning gate make that less abstract: each gives a reusable capability a distinct way to be carried, placed, and checked.
 
 SkillMeat started as a local skill manager for reusable agent capabilities. It then broadened into artifact records, source acquisition, collection curation, project deployment, context packaging, and governance/provenance work. That evolution is illustrative because it matches the underlying pattern: agent capabilities are not just files to copy. They are supply-chain artifacts that get acquired from sources, curated into collections, materialized into runtimes, and governed with policy and evidence.
 
@@ -185,7 +185,7 @@ That fragmentation is exactly how Shadow AI becomes more operational debt.
 
 ## The Control Plane Enterprises Will Need
 
-The enterprise control plane I think enterprises will need has several layers. In my own system, that remains a direction, not a completed product: the Operator routes work today, while a unified cross-tool control plane is still emerging.
+The control plane I think enterprises will need has several layers. In my own system, that remains a direction, not a completed product: the Operator routes work today, while a unified cross-tool control plane is still emerging.
 
 <ArtifactControlPlane client:visible />
 
@@ -222,7 +222,7 @@ But at enterprise scale, they become risk.
 
 One team installs a public skill because it saves time. Another forks it and changes the assumptions. A third copies the prompt into an internal repo. Someone adds a script. Someone else points an MCP server at a production system. A context pack drifts out of date. An eval set gets treated as proof even though it no longer matches the runtime. A generated output turns into a PR, and nobody can reconstruct which instructions, tools, context, and policies shaped it.
 
-That is not a hypothetical edge case. It's the normal failure mode of unmanaged reuse. It's Shadow IT rearing it's head in the agentic era. It's the same problem that has plagued software supply chains for decades, now amplified by the fact that agentic artifacts can execute, reason, and act on their own.
+That is not a hypothetical edge case. It's the normal failure mode of unmanaged reuse. It's Shadow IT rearing its head in the agentic era. It's the same problem that has plagued software supply chains for decades, now amplified by the fact that agentic artifacts can execute, reason, and act on their own.
 
 The pain points are predictable:
 
@@ -245,7 +245,7 @@ That is the agentic control-plane question: route the work, preserve the seams, 
 
 ## My Bet
 
-The thesis is no longer only a sketch. SkillMeat has a working artifact supply chain across source, collection, and project deployment. MeatyWiki and Research Foundry make knowledge and evidence durable in their own domains. The Operator gives the system a real routing surface. What is measured is uneven, and the unified cross-tool control plane is still doctrine and design work, not something I can honestly claim is finished.
+The thesis is no longer only a sketch. SkillMeat has a working artifact supply chain across source, collection, and project deployment. MeatyWiki and Research Foundry make knowledge and evidence durable in their own domains. The Operator gives the system a real routing surface. What is measured is uneven, and the unified cross-tool control plane is still doctrine and design work, not a finished system.
 
 My bet is that the next several years will look like this:
 
