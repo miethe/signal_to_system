@@ -1,0 +1,70 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import pathsData from '../../data/reading-paths.json';
+
+const path = pathsData.paths.find((p) => p.pageSlug === 'agentic-systems-engineering');
+
+if (!path) {
+  throw new Error('src/data/reading-paths.json has no path with pageSlug "agentic-systems-engineering".');
+}
+---
+
+<BaseLayout
+  title={path.umbrellaTerm}
+  description={path.rationale}
+>
+  <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
+    <header class="mb-12">
+      <p class="mb-3 text-xs font-medium uppercase tracking-widest text-[var(--text-disabled)]">
+        Reading path
+      </p>
+      <h1 class="font-serif text-4xl font-bold tracking-tight text-[var(--text-primary)] sm:text-5xl mb-6">
+        {path.umbrellaTerm}
+      </h1>
+      <p class="text-lg leading-relaxed text-[var(--text-secondary)]">
+        {path.rationale}
+      </p>
+    </header>
+
+    <ol class="space-y-4">
+      {path.steps.map((step, i) => {
+        const isPublished = step.state === 'published' && step.slug;
+        return (
+          <li class="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6">
+            <div class="flex flex-wrap items-center gap-3">
+              <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-violet-100 text-sm font-semibold text-violet-700 dark:bg-violet-900/40 dark:text-violet-300">
+                {i + 1}
+              </span>
+              {isPublished ? (
+                <a
+                  href={`/essays/${step.slug}/`}
+                  class="text-lg font-semibold text-[var(--text-primary)] hover:text-violet-600 dark:hover:text-violet-400"
+                >
+                  {step.title}
+                </a>
+              ) : (
+                <span class="text-lg font-semibold text-[var(--text-primary)]">{step.title}</span>
+              )}
+              {!isPublished && (
+                <span class="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">
+                  Next, in progress
+                </span>
+              )}
+            </div>
+            <p class="mt-2 pl-10 text-sm leading-relaxed text-[var(--text-secondary)]">
+              {step.whatItAnswers}
+            </p>
+          </li>
+        );
+      })}
+    </ol>
+
+    <p class="mt-12 text-sm leading-relaxed text-[var(--text-tertiary)]">
+      This path runs through several series that continue on their own, in parallel:{' '}
+      <a href="/series/governed-agentic-sdlc/" class="text-violet-600 hover:underline dark:text-violet-400">Governed Agentic SDLC</a>,{' '}
+      <a href="/series/ai-workflows/" class="text-violet-600 hover:underline dark:text-violet-400">AI Workflows</a>,{' '}
+      Attention Is All We Have, and the Dev Stories execution log. Each of those is worth reading for its own depth.
+      This page is one throughline across them, not a replacement for any of them.
+    </p>
+  </div>
+</BaseLayout>

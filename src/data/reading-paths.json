@@ -1,0 +1,43 @@
+{
+  "paths": [
+    {
+      "id": "agentic-systems-engineering-core",
+      "pageSlug": "agentic-systems-engineering",
+      "title": "Agentic Systems Engineering: the core reading path",
+      "umbrellaTerm": "Agentic Systems Engineering",
+      "rationale": "This site runs several series in parallel, each working one thesis on its own timeline. This is the one throughline across them: five essays, read in order, that build a single argument about how agentic delivery actually has to work. Read each series for its own depth. Read this path when you want the throughline instead.",
+      "steps": [
+        {
+          "slug": "governed-agentic-sdlc-01-productivity-paradox",
+          "title": "The AI Productivity Paradox",
+          "whatItAnswers": "Why task-level AI gains stop compounding the moment work leaves one developer's machine.",
+          "state": "published"
+        },
+        {
+          "slug": "agentic-operations-flow",
+          "title": "The Work Is a Graph",
+          "whatItAnswers": "The operating model that routes agentic work end to end instead of trapping it in one chat transcript.",
+          "state": "published"
+        },
+        {
+          "slug": "the-registry-wave-agentic-artifact-supply-chain",
+          "title": "The Registry Wave Is Here",
+          "whatItAnswers": "Why the reusable artifacts agents run on need a supply chain, not just a registry.",
+          "state": "published"
+        },
+        {
+          "slug": "the-contract-is-the-work",
+          "title": "The Contract Is the Work",
+          "whatItAnswers": "Who is accountable when execution spans multiple agents and handoffs.",
+          "state": "published"
+        },
+        {
+          "slug": null,
+          "title": "The Deterministic Envelope",
+          "whatItAnswers": "How much of this can run unattended, and where the line has to hold.",
+          "state": "next"
+        }
+      ]
+    }
+  ]
+}

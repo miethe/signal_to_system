@@ -62,6 +62,26 @@ const completeSeries = sortedSeries.filter((s) => s.data.status === 'complete');
     </header>
 
     <div class="space-y-16">
+      <!-- Reading paths -->
+      <section>
+        <div class="flex items-center gap-3 mb-6">
+          <span class="h-2 w-2 rounded-full bg-violet-500" aria-hidden="true" />
+          <h2 class="font-mono text-xs font-bold uppercase tracking-widest text-[var(--text-disabled)]">
+            Reading Paths
+          </h2>
+        </div>
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <SeriesCard
+            title="Agentic Systems Engineering"
+            excerpt="One guided path through five essays across several parallel series: the throughline argument for how agentic delivery actually has to work."
+            status="active"
+            slug="agentic-systems-engineering"
+            postCount={5}
+            featured
+          />
+        </div>
+      </section>
+
       <!-- Active -->
       {activeSeries.length > 0 && (
         <section>
