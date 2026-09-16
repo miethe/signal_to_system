@@ -47,7 +47,7 @@ The registry was right. The use was wrong. Nothing said so, because nothing comp
 
 What exactly did the approval attach to?
 
-**Trusted artifact ≠ trusted use.** That distinction is loadbearing (an inside joke for the Claude 5 model-family users). Approval attaches to an artifact; use happens in a context the approval never saw. Even after I correct the copy, I still need to know who may use it, with which tools and context, what actually ran, and whether the review met its purpose.
+**Trusted artifact ≠ trusted use.** Approval attaches to an artifact; use happens in a context the approval never saw. Even after I correct the copy, I still need to know who may use it, with which tools and context, what actually ran, and whether the review met its purpose. That distinction is loadbearing (an inside joke for the Claude 5 model-family users).
 
 That is the supply-chain problem this essay is about.
 
@@ -130,11 +130,10 @@ The lifecycle starts with **authoring**: the reviewer lives in one source reposi
 
 <Figure
   src="/assets/posts/the-registry-wave-agentic-artifact-supply-chain/diagram-market-wave.svg"
-  alt="Editorial diagram standing in for a pending SkillMeat version and deployment screenshot."
+  alt="Editorial diagram of SkillMeat separating a registered artifact version from its project deployment."
   number="01"
-  caption="Implemented mechanism; screenshot pending: SkillMeat separates the registered artifact version from its project deployment. This diagram is a placeholder, not a receipt."
+  caption="Diagram: the registered artifact version and its project deployment are separate objects in SkillMeat."
 />
-{/* Capture spec: show the real SkillMeat version/deploy view for the reviewer with registered revision and deployed destination state; redact machine paths and identifiers. */}
 
 The remedy is a recorded, registry-driven deployment. No hand copy. No symlink as a shortcut around the record. A symlink would follow the source checkout as branches changed, creating an unrecorded deployment that drifts with the branch instead of leaving stale bytes behind. Either way, “it's the same skill” conceals the state that matters.
 
@@ -142,17 +141,26 @@ At **use**, the project loads the deployed copy in its own context. The supply-c
 
 At **drift**, declared and actual state separate. The fix stayed in the source repository while every project outside it kept loading the pre-fix reviewer. For five days, “fixed” described one location.
 
-<Figure
-  src="/assets/posts/the-registry-wave-agentic-artifact-supply-chain/diagram-registry-control-plane.svg"
-  alt="Editorial diagram standing in for a pending diff of registered and deployed reviewer state."
-  number="02"
-  caption="Proposed evidence view; screenshot pending: a manifest diff should expose the registered revision and the stale deployed copy. This diagram is a placeholder, not a captured manifest."
-/>
-{/* Capture spec: capture a real manifest/deployment diff showing the reviewer guard present upstream and absent in the deployed copy; label any replay as a reconstruction and redact paths/identifiers. */}
+The manifest driving that gate classifies each deployed path into exactly one bucket: a diffed tracked copy, a never-diffed allowed copy, or an undeclared hard failure. Two real entries, redacted:
 
-At **detection**, a gate compares deployed state with its source. The September 11 drift check classifies deployed entries, distinguishing tracked copies, justified copies, and drift; it also identifies symlinks. Drift fails the check.[^drift] A justified copy needs an explicit reason to differ. Otherwise exceptions become another way to lose the deployment record.
+```yaml
+# scripts/global-artifact-manifest.yaml
+  - path: ~/.claude/hooks/finding_filing_check.sh
+    tracks: agentic_meta_dev/infra/hooks/finding_filing_check.sh
+    reason: >-
+      PostToolUse write-time nudge for unfiled findings. Migrated off a symlink to a plain
+      copy per the no-new-symlinks doctrine; now diffed against upstream instead of going
+      untracked.
 
-The next correction handles **missing dependencies**. An artifact absent locally is *unprovisioned, not non-existent*. The September 14 provisioning rule directs the agent back to the registry. Its failure hook suggests the deploy command; it doesn't write the artifact itself.[^provisioning] Hand-rolling a replacement would recreate the problem under a new name.
+  - path: ~/.claude/skills/building-readmes
+    reason: No repo upstream anywhere under development/. Global is the only instance.
+```
+
+*From the drift gate's own manifest, redacted. One tracked copy, diffed against its upstream on every run. One allowed copy, never diffed, because no upstream exists to diff against.*
+
+At **detection**, a gate compares deployed state with its source. The August 6 drift check classifies deployed entries, distinguishing tracked copies, justified copies, and drift; it also identifies symlinks. Drift fails the check.[^drift] A justified copy needs an explicit reason to differ. Otherwise exceptions become another way to lose the deployment record.
+
+The next correction handles **missing dependencies**. An artifact absent locally is *unprovisioned, not non-existent*. The August 4 provisioning rule directs the agent back to the registry. Its failure hook suggests the deploy command; it doesn't write the artifact itself.[^provisioning] Hand-rolling a replacement would recreate the problem under a new name.
 
 Keep this loose and fast locally. I want to experiment with a skill before promoting it, much as I can edit a branch before CI checks a shared change. The gates belong at promotion and use boundaries where another project starts depending on the result. Automate the comparison and make a failed check explain the repair. A meeting to approve every local prompt edit would solve a different problem: ensuring nobody uses the system.
 
@@ -207,26 +215,40 @@ The winning metric will be accepted outcomes with evidence, not activity. For th
 
 ## Where the system lied to us
 
-**[Observed, September 11, 2026]** The drift-gate receipt records why the check was written: the deployed reviewer had spent five days without a mandatory guard. “The fix exists” had stood in for “the projects received the fix.” My own artifact-management workflow let that substitution pass.[^drift]
+**[Observed, August 6, 2026]** The drift-gate receipt records why the check was written: the deployed reviewer had spent five days without a mandatory guard. “The fix exists” had stood in for “the projects received the fix.” My own artifact-management workflow let that substitution pass.[^drift]
 
-The related September 10 parity gate followed six weeks of stale doctrine reaching one class of agent harness. A harness is the software that loads instructions and runs the agent. Updating one harness-specific instruction file hadn't updated its sibling.[^parity] The staleness check from the same date searches live documents for assertions naming a superseded model as the operating “spine,” while exempting dated historical records.[^staleness]
+The related August 5 parity gate followed six weeks of stale doctrine reaching one class of agent harness. A harness is the software that loads instructions and runs the agent. Updating one harness-specific instruction file hadn't updated its sibling.[^parity] The staleness check, two days later, searches live documents for assertions naming a superseded model as the operating “spine,” while exempting dated historical records.[^staleness]
 
 These are detection mechanisms with different boundaries. Byte comparison catches the stale reviewer. Parity catches divergence between sibling instructions. The staleness check catches a particular outdated claim even when the files aren't supposed to be identical. But none proves that every remaining instruction is correct.
 
-<Figure
-  src="/assets/posts/the-registry-wave-agentic-artifact-supply-chain/diagram-intent-outcome-chain.svg"
-  alt="Editorial diagram standing in for pending output from the deployed-artifact drift gate."
-  number="03"
-  caption="Implemented mechanism; screenshot pending: the deployed-artifact gate fails on drift. This diagram is a placeholder, not evidence of a passing or failing run."
-/>
-{/* Capture spec: capture actual drift-gate output identifying a stale reviewer copy and a nonzero exit, then the result after recorded deployment; label replayed evidence and redact paths/identifiers. */}
+Run again today, the same gate still exits nonzero, on a different and unrelated class of finding:
+
+```
+$ python3 scripts/check_global_artifact_drift.py
+[global-artifact-drift] legacy symlinked deployments: 0 across 5 root(s); pre-existing
+only, the doctrine forbids creating new ones. 108 real file/dir deployment(s) (tracked +
+allowed copies + any undeclared, reported separately below).
+[global-artifact-drift] PENDING DEPLOYMENT (tracked): ~/.claude/hooks/precompact_handoff_seam.sh
+      declared in `watch:` as a KNOWN pending deployment; inert until it is registered
+      and deployed. Not a bug to fix here.
+
+Global artifact drift (deployed artifact vs repo upstream vs origin/main):
+
+  UNDECLARED COPY: ~/.claude/agents/agent-expert.md
+      neither a symlink, a tracked copy, nor an allowed copy; candidate upstream in
+      another project's checkout.
+      fix: register it via SkillMeat and/or declare it in the manifest, never symlink it.
+exit 1
+```
+
+*A live run, redacted, September 15, 2026. The task-completion-validator drift this section describes is recorded in the receipt below (August 6, 2026), not replayed here; today's nonzero exit is a different, unrelated undeclared-copy finding.*
 
 <Callout type="info" title="What this looks like in my lab">
 **Implemented:** SkillMeat manages artifact registration and deployment. The Operator, my work-routing surface, sits over the subsystems. That is one implementation of coordination, not a requirement that enterprises adopt one router.
 
 **Implemented:** MeatyWiki, my durable knowledge store, and Research Foundry, my evidence-oriented research system, give context and evidence homes beyond the registry. MeatyPrompts, my earlier prompt-management experiment, was part of the path here.
 
-**Proposed:** complete cross-system linkage from loaded artifact version to accepted outcome. Local checks are implemented; fleet-wide compliance remains a target state in the registry's own September 10 rules.[^coverage]
+**Proposed:** complete cross-system linkage from loaded artifact version to accepted outcome. Local checks are implemented; fleet-wide compliance remains a target state in the registry's own August 11 rules.[^coverage]
 
 **Proposed:** controlled comparisons of pinned artifacts and context are how I intend to test the broader claim that these mechanisms improve outcomes.
 </Callout>
@@ -235,10 +257,10 @@ These are detection mechanisms with different boundaries. Byte comparison catche
 
 These are dated implementation records, summarized as methods. They establish the checks described here, not enterprise-wide effectiveness.
 
-- **September 11: deployed-copy drift.** A stale reviewer prompted a gate comparing deployed artifacts with their sources.[^drift]
-- **September 10: instruction parity.** A commit gate refuses an update to one harness's instructions without its required sibling.[^parity]
-- **September 10: stale operating claims.** A check finds superseded model assertions in live documents, preserving dated history.[^staleness]
-- **September 14: provisioning.** Missing local capability triggers registry discovery and a suggested deployment command.[^provisioning]
+- **August 6: deployed-copy drift.** A stale reviewer prompted a gate comparing deployed artifacts with their sources.[^drift]
+- **August 5: instruction parity.** A commit gate refuses an update to one harness's instructions without its required sibling.[^parity]
+- **August 7: stale operating claims.** A check finds superseded model assertions in live documents, preserving dated history.[^staleness]
+- **August 4: provisioning.** Missing local capability triggers registry discovery and a suggested deployment command.[^provisioning]
 
 <Callout type="info" title="Evidence labels">
 **Observed** means bounded operating evidence. **Externally reported** identifies a claim from an outside source, not a lab result. **Proposed synthesis** marks my architecture interpretation or an unvalidated extension. **Measured** is reserved for a defined measurement with a stated method; this essay reports no measured outcome improvement.
@@ -252,14 +274,14 @@ The reviewer didn't need a better name or another catalog. It needed the fix to 
 
 ## Sources
 
-External claims below are carried forward for the September verification pass. Their scope and availability still need confirmation before this edition is published. Lab references identify supplied implementation receipts; the screenshots above remain pending.
+External claims below are carried forward for the September verification pass. Their scope and availability still need confirmation before this edition is published. Lab references identify supplied implementation receipts.
 
 [^github]: GitHub Changelog, [Manage agent skills with GitHub CLI](https://github.blog/changelog/2026-04-16-manage-agent-skills-with-github-cli/). Verification pending for this edition.
 [^jfrog]: JFrog, [Agent Skills Registry](https://jfrog.com/ai-catalog/skills-registry/) and [Skills Repositories](https://docs.jfrog.com/artifactory/docs/skills-repositories). Verification pending for this edition.
 [^redhat]: Red Hat, [agentic catalog](https://catalog.redhat.com/en/ai) and [MCP catalog: discover, deploy, and connect](https://www.redhat.com/en/blog/mcp-catalog-here-discover-deploy-and-connect-red-hat-openshift-ai). Verification pending, including preview boundaries.
 [^mcp]: Model Context Protocol, [The MCP Registry](https://modelcontextprotocol.io/registry/about). Verification pending for this edition.
-[^drift]: Lab implementation receipt, September 11, 2026: global artifact-drift check, following a reviewer deployed five days behind its source. Method summarized from the supplied receipt; no claim of a measured reduction in review failures. Internal identifiers withheld; method only.
-[^parity]: Lab implementation receipt, September 10, 2026: sibling instruction parity gate, following six weeks of stale instructions reaching one harness class. Internal identifiers withheld; method only.
-[^staleness]: Lab implementation receipt, September 10, 2026: live-document scan for superseded operating-model assertions, with dated historical records exempted. Internal identifiers withheld; method only.
-[^provisioning]: Lab provisioning receipt, September 14, 2026: missing local artifacts are treated as unprovisioned; a tool-failure hook probes the registry and supplies a deployment command without writing the artifact itself. Internal identifiers withheld; method only.
-[^coverage]: Registry implementation receipt, September 10, 2026: fleet-wide compliance scanning explicitly labelled target state. A local registration scan exists (August 24); that doesn't establish fleet-wide enforcement. Internal identifiers withheld; method only.
+[^drift]: Lab implementation receipt, August 6, 2026: global artifact-drift check, following a reviewer deployed five days behind its source. Method summarized from the supplied receipt; no claim of a measured reduction in review failures. Internal identifiers withheld; method only.
+[^parity]: Lab implementation receipt, August 5, 2026: sibling instruction parity gate, following six weeks of stale instructions reaching one harness class. Internal identifiers withheld; method only.
+[^staleness]: Lab implementation receipt, August 7, 2026: live-document scan for superseded operating-model assertions, with dated historical records exempted. Internal identifiers withheld; method only.
+[^provisioning]: Lab provisioning receipt, August 4, 2026: missing local artifacts are treated as unprovisioned; a tool-failure hook probes the registry and supplies a deployment command without writing the artifact itself. Internal identifiers withheld; method only.
+[^coverage]: Registry implementation receipt, August 11, 2026: fleet-wide compliance scanning explicitly labelled target state. A local registration scan exists (August 24); that doesn't establish fleet-wide enforcement. Internal identifiers withheld; method only.
