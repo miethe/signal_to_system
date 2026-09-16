@@ -1,12 +1,12 @@
 import { useState } from "react";
 
 const artifacts = [
-  ["Instruction", "Prompts, skills, commands, hooks", "Does the reusable behavior say what it is allowed to do?"],
-  ["Tool", "MCP servers, tool declarations, API adapters", "What system boundary and permission does it cross?"],
-  ["Context", "Context packs, memory bundles, domain packs", "Is the context current, scoped, and attributable?"],
+  ["Instruction", "Prompts, skills, commands, rules (non-executable instructions; bundles may include code)", "Are the instructions and bundled executable dependencies versioned and reviewed?"],
+  ["Tool", "MCP servers, scripts, API adapters (executable code), and tool declarations", "What system boundary and permission does the runtime cross when it executes this code?"],
+  ["Context", "Context packs, memories, domain references (non-executable runtime inputs)", "Are these versioned inputs current, scoped, and attributable?"],
   ["Governance", "Policies, approvals, eval sets, permissions", "Which constraint is enforced, and which is only advisory?"],
-  ["Execution", "Workflows, agent definitions, sessions, traces", "Can the run be reconstructed without relying on chat history?"],
-  ["Evidence", "Provenance, manifests, audit events, outcome links", "Can a reviewer connect this work to an accepted result?"],
+  ["Execution", "Workflows, agent definitions, deployment bindings", "Which instructions, tools, and runtime conditions does this configuration select?"],
+  ["Evidence", "Manifests, run records, verification results, outcome links", "Can a reviewer connect the observed execution to an accepted result?"],
 ] as const;
 
 export default function ArtifactTaxonomy() {

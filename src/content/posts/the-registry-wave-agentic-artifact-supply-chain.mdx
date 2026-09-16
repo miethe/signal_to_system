@@ -1,8 +1,9 @@
 ---
 title: "The Registry Wave Is Here. The Agentic Artifact Supply Chain Comes Next."
-excerpt: "Skills registries validate the first layer of the agentic artifact thesis, but enterprises will need a broader control plane for artifacts, context, policy, execution, evidence, and outcomes."
+excerpt: "The registry showed the fixed skill. Every other project loaded an old copy. Trusted artifacts still need governed deployment, use, execution, and outcome evidence."
 date: 2026-07-01T12:00:00-04:00
-readTime: "15 min"
+updatedDate: 2026-09-15T21:30:00-04:00
+readTime: "14 min"
 contentType: essay
 category: "AI Agents"
 tags:
@@ -14,270 +15,251 @@ tags:
 status: published
 heroImage: "/assets/posts/the-registry-wave-agentic-artifact-supply-chain/diagram-market-wave.svg"
 interactiveElement: "registry-wave-control-plane"
-whyItMatters: "The reusable files that shape agent behavior are becoming operational assets. Treating them as copied prompts will not survive contact with enterprise scale, security, or audit requirements."
-leaderTakeaway: "Registries answer where an agentic capability lives. The next platform layer must answer whether it should be trusted, where it can run, what it depends on, and what outcomes it produced."
+whyItMatters: "Approval attaches to an artifact. Its use happens in a context that approval never saw. A current registry can coexist with stale deployed instructions and unacceptable outcomes."
+leaderTakeaway: "Require four separate assurances: pinned artifact identity, authorized conditions of use, evidence of actual execution, and an accepted outcome. Connect the systems responsible for each."
 relatedSlugs:
   - "agentic-operations-flow"
+  - "the-contract-is-the-work"
   - "governed-agentic-sdlc-01-productivity-paradox"
-  - "dev-stories-b2-enterprise-multi-tenancy"
-seoTitle: "Agentic Artifact Supply Chain: Why Skills Registries Are Only the First Layer"
-seoDescription: "A thesis essay on why agent skills, prompts, MCP servers, context packs, policies, evals, and evidence need a governed artifact supply chain beyond basic registries."
-draftNotes: "Created from 2026-07-01 SkillMeat and agentic artifact thesis handoff packet. PKM vault was unavailable in this environment, so working artifacts were saved under docs/blog-work/."
+seoTitle: "Trusted Artifact, Trusted Use: The Agentic Artifact Supply Chain"
+seoDescription: "A stale reviewer skill exposes why registries need a supply chain connecting artifact identity, conditions of use, execution evidence, and accepted outcomes."
+draftNotes: |
+  Created from 2026-07-01 SkillMeat and agentic artifact thesis handoff packet. PKM vault was unavailable in this environment, so working artifacts were saved under docs/blog-work/.
+  September 2026 edition, full rewrite after external reviews
 ---
 import Callout from '../../components/content/Callout';
 import Figure from '../../components/content/Figure.astro';
+import Term from '../../components/content/Term.astro';
 import ArtifactTaxonomy from '../../components/interactive/ArtifactTaxonomy';
 import ArtifactControlPlane from '../../components/interactive/ArtifactControlPlane';
 import '../../styles/registry-wave.css';
 
-Over the last several months, I have become increasingly convinced that one of the most important missing layers in agentic AI is not another model, another chat surface, or even another agent framework.
+<Callout type="info" title="September 2026 edition">
+First published July 2026; re-published September 15, 2026. This full September rewrite follows two external reviews and a failure in my own deployment process. The July argument centered on registries becoming supply chains. This edition sharpens the boundary: approving an artifact doesn't establish that a particular use is trustworthy. The distinction below is the September argument, not a claim about what the July essay already said.
+</Callout>
 
-It is the artifact layer. Give it a concrete shape for a second: a skill, a command, an agent definition, a memory item, a context pack, any reusable, versioned unit you can collect and deploy into a project.
+**[Observed]** A reviewer skill used across my projects was missing a mandatory guard. I fixed the source. The personal registry showed the fixed version. Inside the source repository, the reviewer had the new instruction. Every other project on the machine loaded a deployed file copy, and that copy sat five days without the fix.[^drift]
 
-The reusable pieces that shape agent behavior -- skills, prompts, commands, tools, MCP servers, workflows, context packs, policies, evals, and deployment bindings -- are becoming the operational substrate of agentic systems. That is why I started building SkillMeat last year: first as a practical way to manage and reuse skills, and then increasingly as a reference implementation for a broader idea I now think is inevitable.
+Same skill name. Different instructions reaching the runtime.
 
-Agentic work is going to need a supply chain.
+The registry was right. The use was wrong. Nothing said so, because nothing compared the deployed bytes to the registered ones.
 
-That claim sounded a little abstract when skills were mostly local folders, copied prompt files, and scattered project conventions. It sounds less abstract now. GitHub has added [`gh skill`](https://github.blog/changelog/2026-04-16-manage-agent-skills-with-github-cli/) to the GitHub CLI for discovering, installing, managing, and publishing agent skills from repositories. JFrog now has [Artifactory Skills repositories](https://docs.jfrog.com/artifactory/docs/skills-repositories) and an [Agent Skills Registry](https://jfrog.com/ai-catalog/skills-registry/) with versioning, scanning, signing, and access-control language. Red Hat is publishing a [catalog of skills, agents, and MCP servers](https://catalog.redhat.com/en/ai), and OpenShift AI is adding an [MCP catalog](https://www.redhat.com/en/blog/mcp-catalog-here-discover-deploy-and-connect-red-hat-openshift-ai) that moves from discovery into deployment and runtime connectivity. The [official MCP Registry](https://modelcontextprotocol.io/registry/about) is formalizing metadata and sub-registry infrastructure for MCP servers.
+What exactly did the approval attach to?
 
-That is not a threat to the thesis. It is validation of the first layer.
+**Trusted artifact ≠ trusted use.** Approval attaches to an artifact; use happens in a context the approval never saw. Even after I correct the copy, I still need to know who may use it, with which tools and context, what actually ran, and whether the review met its purpose.
 
-The important point is not that these efforts are the same as SkillMeat, because they aren't. Rather, it's that the industry is independently reaching the same conclusion: agentic capabilities need package and registry semantics.
-
-The registry wave is real. It is also only the beginning.
-
-<Figure
-  src="/assets/posts/the-registry-wave-agentic-artifact-supply-chain/diagram-market-wave.svg"
-  alt="A progression from copied prompts to local skills, skill and MCP registries, governed artifact supply chains, and intent-to-outcome control planes."
-  number="01"
-  caption="The first wave makes agentic capabilities discoverable and installable. The next layer has to govern their full lifecycle."
-/>
-
-## Before Skills Were Products, They Were Reusable Behavior
+That is the supply-chain problem this essay is about.
 
 I didn't begin this journey by defining a new category. Like most good (engineering) stories, it started with an annoyance, and the desire to be lazy.
 
-It was mid-late 2025, I was using AI coding agents heavily and the idea of codifying agentic behaviors into skills was quickly gaining traction. The most valuable behaviors from AI agents were no longer locked in the models, they were "emerging" from the surrounding environment and systems. They lived in reusable instruction files, project prompts, shell scripts, context snippets, tool configs, examples, guardrails, and workflow conventions.
-
-Earlier in the year, those looked like helper prompts, which led to my initial expirement into MeatyPrompts.
-
-Then they looked like local conventions, structured context files, etc.
-
-Then they looked like reusable skills.
-
-Eventually it became obvious that they were something larger: agentic artifacts.
-
-The hard part was not getting an agent to do something useful once. The hard part was making that behavior repeatable across projects, machines, teams, and runtimes. Good agent behavior was a bundle: instructions, context, assumptions, examples, tools, permissions, and review expectations. When that bundle lived in one chat transcript or one local folder, it was fragile. When another project needed it, the answer was usually copy and paste.
-
-Ablation is part of the governance story too. AOSBench can generate SystemCards and Mk variants that remove one mechanism at a time, making the audit question concrete: what evidence, safety boundary, or delivery quality disappears when a capability is absent?
+It was mid-late 2025 when I started building SkillMeat, my registry and deployment tool for reusable agent capabilities. The hard part was not getting an agent to do something useful once. The hard part was making that behavior repeatable across projects, machines, teams, and runtimes. Good agent behavior was a bundle: instructions, context, assumptions, examples, tools, permissions, and review expectations. When that bundle lived in one chat transcript or one local folder, it was fragile. When another project needed it, the answer was usually copy and paste.
 
 Copy and paste is fine for discovery, but it will never be a lifecycle.
 
-Once teams start copying these pieces, they immediately need the boring software questions: where did this come from, what version is it, who owns it, what does it depend on, who approved it, where can it run, and what breaks if we change it?
+<Callout type="info" title="The question this essay carries">
+**Prior question:** How does work survive the session? **This thesis:** artifact approval and trusted use require different evidence. **Next question:** what preserves the authoritative meaning of the work?
 
-That is the origin insight behind SkillMeat.
-
-## Why SkillMeat Started With Skills
-
-Skills were the natural first artifact type because they had the right shape.
-
-They are discrete. Developers can understand them. They can be moved between projects. They are often expressed as Markdown plus supporting files. They encode procedural knowledge. Most importantly, they make agent behavior packageable.
-
-That can't be overstated. A skill is small enough to install and large enough to carry intent. It can tell an agent how to perform a task, when to use supporting scripts, which references matter, and which constraints should shape execution. We're talking about more than just a prompt; it is a capability bundle.
-
-But once I started managing skills, the broader pattern became impossible to ignore. We already knew prompts had the same lifecycle problem from my earlier work with MeatyPrompts. But so did commands, hooks, plugins, MCP servers, context packs, policy bundles, eval sets, deployment profiles, workflow definitions, and generated outputs with provenance. In the AOS work, memory items, deployment profiles, signed bundles, and the provisioning gate make that less abstract: each gives a reusable capability a distinct way to be carried, placed, and checked.
-
-SkillMeat started as a local skill manager for reusable agent capabilities. It then broadened into artifact records, source acquisition, collection curation, project deployment, context packaging, and governance/provenance work. That evolution is illustrative because it matches the underlying pattern: agent capabilities are not just files to copy. They are supply-chain artifacts that get acquired from sources, curated into collections, materialized into runtimes, and governed with policy and evidence.
-
-The deeper bet is that agentic systems need an artifact management layer: something closer to a supply-chain control plane than a folder sync tool. Local-first workflows, project sync, artifact versioning, import and discovery, and deployment into agent runtimes are the first moves. Governance, federation, context, policy, evidence, and outcome linkage are where the problem gets interesting.
-
-<Callout type="info" title="Scope note">
-I am intentionally staying at the thesis and architecture-pattern level here. There are deeper implementation questions around provenance, federation, packaging, and evidence that I am still working through carefully.
+**Built and tested in:** my personal lab, using SkillMeat and local deployment checks. **Related external work:** the registry and catalog sources below. **Status:** observed drift and implemented local checks; the complete relationship from version to accepted outcome remains proposed synthesis.
 </Callout>
 
-## The Market Is Catching the First Wave
-
-The current market movement is useful because it makes the category visible.
-
-GitHub's `gh skill` brings agent skills into a package-manager-shaped workflow: discover, install, update, publish, pin to tags or commits, target multiple agent hosts, and carry source-tracking metadata in frontmatter. The docs are explicit about the supply-chain problem: skills are executable instructions that shape agent behavior, and silent changes between installs create risk.
-
-JFrog is coming at the same problem from the software supply-chain side. Its Skills repositories make skills a package type in Artifactory, with CLI flows for publish, install, search, update, list, and delete. Its Agent Skills Registry language is even more direct: versioned, scanned, signed, access-controlled skills managed alongside other AI assets. Skill scanning extracts metadata from `SKILL.md`, applies artifact properties, and indexes through Xray.
-
-Red Hat is validating the enterprise platform angle. Its agentic skills catalog presents skills, agents, and MCP servers as curated building blocks backed by a subscription. Its OpenShift AI MCP catalog goes further than a static listing: the catalog is tied to discovery, deployment, lifecycle management, runtime connectivity, identity-aware routing, and per-tool metrics, with some components still in preview.
-
-The MCP Registry validates the server-discovery layer. It is an official centralized metadata repository for publicly accessible MCP servers, with namespace verification, a REST API for clients and aggregators, standardized install/configuration metadata, and an OpenAPI spec that downstream and private registries can implement.
-
-The research and security ecosystem is making the risk visible too. Recent work on [`SKILL.md` supply-chain attacks](https://arxiv.org/abs/2605.11418) argues that skill metadata is not passive documentation; it affects discovery, selection, and governance outcomes. [Snyk's ToxicSkills research](https://snyk.io/blog/toxicskills-malicious-ai-agent-skills-clawhub/) and [Unit 42's OpenClaw marketplace analysis](https://unit42.paloaltonetworks.com/openclaw-ai-supply-chain-risk/) both frame agent skills as a live supply-chain attack surface, not a theoretical future concern.
-
-Taken together, the pattern is hard to miss.
-
-Skills are already becoming installable packages. MCP servers are becoming registry-managed tool surfaces. Security teams are starting to treat agent capabilities like software supply-chain objects. Platform vendors are adding catalog, deployment, and governance language around agentic assets.
-
-That is the first wave.
-
-## A Registry Is Not a Supply Chain
+## What the registry wave solved
 
 A registry solves important problems.
 
 Where do I find this skill? How do I install it? What version am I using? Where did it come from? Can I update it? Can I publish it?
 
-Those are real questions which demand good answers. But they are not the whole enterprise problem.
+Those are real questions which demand good answers. For my reviewer, the registry preserved the corrected artifact while the deployed copy fell behind. Having a source of truth made the discrepancy diagnosable.
 
-<Figure
-  src="/assets/posts/the-registry-wave-agentic-artifact-supply-chain/diagram-registry-control-plane.svg"
-  alt="A side-by-side comparison of registry actions and control-plane responsibilities."
-  number="02"
-  caption="Registries manage package and discovery semantics. Control planes manage trust, deployment, runtime, revocation, and proof."
-/>
+**[Externally reported]** GitHub's skill-management workflow brings discovery, installation, and publishing into its CLI.[^github]
+{/* <!-- (to verify) GitHub skill discovery, installation, and publishing availability as of September 2026. --> */}
+JFrog describes versioned, scanned, signed, access-controlled skills in its registry offering.[^jfrog]
+{/* <!-- (to verify) JFrog skills versioning, scanning, signing, and access-control scope. --> */}
+Red Hat's catalogs connect discovery of agentic building blocks with deployment and runtime connectivity.[^redhat]
+{/* <!-- (to verify) Red Hat catalog deployment/connectivity scope and preview status. --> */}
+The official MCP Registry supplies metadata for discovering MCP servers.[^mcp]
+{/* <!-- (to verify) Official MCP Registry metadata/discovery scope. --> */}
 
-The supply-chain questions start one layer deeper:
+I read these as validation of the package-management problem that sent me into this work. They also make a simple “registry now, governance later” distinction less useful: the cited offerings already describe responsibilities beyond listing packages. September's question is which assurances survive the handoff from one system to another. Product labels don't answer that.
 
-| Registry question | Supply-chain question |
-| --- | --- |
-| Where is this skill? | Should this skill be trusted? |
-| What version is installed? | What policy, context, evals, and permissions govern it? |
-| How do I publish it? | How does it move across teams, runtimes, and approval gates? |
-| How do I update it? | What breaks if I revoke or replace it? |
-| What repo did it come from? | What outcomes did it help produce? |
+## Four assurances, four places to lose the thread
 
-A registry tells you where the artifact is.
+**[Proposed synthesis]** I use “Wave 1” and “Wave 2” here to distinguish responsibilities, not to rank vendors or predict a release sequence. A registry can participate in every row. It can't establish every answer from its own artifact record.
 
-A control plane, when it is actually operational, routes governed work across those surfaces and writes receipts back to canonical stores. A configured integration is not enforcement; an advisory registration is not a gate.
+| Assurance | Wave 1: registry record | Wave 2: supply-chain obligation |
+| --- | --- | --- |
+| **Identity** | Names the artifact, version, source, and approval. Doesn't establish which bytes the runtime loaded. | Pins the artifact and dependencies; compares the deployed and loaded identity with the approved one. |
+| **Conditions of use** | Records declared compatibility and approval scope. Doesn't establish whether this caller, context, or permission state still qualifies. | Binds use to a project, actor, context, tools, policy, and risk boundary; rechecks when those conditions change. |
+| **Execution** | Records availability or deployment intent. Doesn't establish what actually ran. | Captures the loaded artifacts, runtime/model state, permitted actions, and observed tool activity within an execution envelope. |
+| **Outcome** | Preserves evaluations or prior acceptance. Doesn't establish that this run fulfilled this request. | Connects output to intent, verification evidence, and the authority accepting or rejecting the result. |
 
-That distinction is loadbearing because agentic artifacts do not behave like passive files. Explore the surfaces below: each can shape a decision or action, and each needs an appropriate form of review.
-
-<ArtifactTaxonomy client:visible />
+The reviewer failed the first handoff: registered identity never reached the loaded copy. Fixing that closes one gap. A correctly deployed reviewer could still receive stale project context, have inappropriate permissions, skip its guard, or approve the wrong thing.
 
 Thus the enterprise question isn't "do we have a place to store these things?", as that's essentially a solved problem.
 
 Rather, the question is "can we govern the lifecycle of the things that shape agent behavior?"
 
-## Agentic Artifacts Are Bigger Than Skills
+## What counts as an artifact
 
-Here is the public definition I use with clients and in my own lab:
+Give it a concrete shape for a second: a skill, a command, an agent definition, a memory item, a context pack, any reusable, versioned unit you can collect and deploy into a project.
 
-> An agentic artifact is any reusable, versionable unit that shapes how an agent reasons, acts, accesses tools, applies context, follows policy, or produces work.
+{/* Editor: add agentic-artifact to the glossary, then wrap the definition label in the native Term component. The current glossary has no matching entry. */}
+An **agentic artifact** is any reusable, versionable unit that shapes how an agent reasons, acts, accesses tools, applies context, follows policy, or produces work.
 
-That includes skills, but it doesn't end there; not even close.
+The runtime executes. A skill shapes its behavior. Markdown instructions don't reason on their own, and a signed context pack doesn't enforce the permissions it describes.
+
+| Artifact family | Examples | What needs versioning and review |
+| --- | --- | --- |
+| Instruction | Prompts, skills, commands, rules | Non-executable instructions and any bundled executable dependencies |
+| Tool | MCP servers, scripts, API adapters | Executable implementation, tool declarations, and permission boundaries |
+| Context | Context packs, memories, domain references | Non-executable inputs, provenance, freshness, and scope |
+| Governance | Policies, approvals, evaluation sets | Declared constraints and the mechanisms that enforce or test them |
+| Execution | Workflows, agent definitions, deployment bindings | The configuration selecting instructions, tools, and runtime conditions |
+| Evidence | Manifests, run records, verification results | Retained observations and their links to artifacts and accepted work |
+
+Both executable code and non-executable context are versioned dependencies. Changing either can change runtime behavior. Freezing both makes the inputs inspectable; it doesn't freeze the model's reasoning.
+
+<ArtifactTaxonomy client:visible />
+
+A skill is small enough to install and large enough to carry intent. It can tell an agent how to perform a task, when to use supporting scripts, which references matter, and which constraints should shape execution. We're talking about more than just a prompt; it is a capability bundle.
+
+## Follow the reviewer out of the registry
+
+The lifecycle starts with **authoring**: the reviewer lives in one source repository, and a fix adds the missing guard. **Registration** makes that revision discoverable. **Approval** needs to attach to an exact revision and state its permitted use. The incident doesn't give me evidence of a complete approval record; it gives me a corrected source and a registry entry that didn't match deployment.
+
+**Deployment** is where I lost the thread. A file copy is a separate object. Updating its source doesn't update it, and a successful registration says nothing about the copy another project loads.
 
 <Figure
-  src="/assets/posts/the-registry-wave-agentic-artifact-supply-chain/diagram-artifact-taxonomy.svg"
-  alt="A taxonomy of agentic artifacts: instruction, tool, context, governance, execution, and evidence artifacts."
-  number="03"
-  caption="The static taxonomy is retained as a printable reference; the interactive above adds the governance question for each layer."
+  src="/assets/posts/the-registry-wave-agentic-artifact-supply-chain/diagram-market-wave.svg"
+  alt="Editorial diagram standing in for a pending SkillMeat version and deployment screenshot."
+  number="01"
+  caption="Implemented mechanism; screenshot pending: SkillMeat separates the registered artifact version from its project deployment. This diagram is a placeholder, not a receipt."
 />
+{/* Capture spec: show the real SkillMeat version/deploy view for the reviewer with registered revision and deployed destination state; redact machine paths and identifiers. */}
 
-The lifecycle is starting to look familiar:
+The remedy is a recorded, registry-driven deployment. No hand copy. No symlink as a shortcut around the record. A symlink would follow the source checkout as branches changed, creating an unrecorded deployment that drifts with the branch instead of leaving stale bytes behind. Either way, “it's the same skill” conceals the state that matters.
 
-1. Prompt reuse: people copy and paste prompts because the behavior worked once.
-2. Skill packaging: reusable capabilities become installable units.
-3. Registry semantics: skills and MCP servers become discoverable, versioned, and updatable.
-4. Governance semantics: approval, policy, trust, access, scanning, and revocation arrive.
-5. Context supply chain: reusable context becomes managed infrastructure instead of tribal knowledge.
-6. Execution evidence: sessions link back to artifacts, policies, tools, outputs, and outcomes.
-7. Artifact control plane: organizations manage the lifecycle across runtimes, teams, registries, IDEs, and platforms.
+At **use**, the project loads the deployed copy in its own context. The supply-chain obligation is to check that binding: the approved artifact, the expected context, and the allowed tools. The guard's presence is a prerequisite for the intended review, not evidence that the guard was followed.
 
-Now we're moving the conversation beyond skills registries.
+At **drift**, declared and actual state separate. The fix stayed in the source repository while every project outside it kept loading the pre-fix reviewer. For five days, “fixed” described one location.
 
-The enterprise will not accept ten different governance models for ten kinds of agentic artifacts. Skills in one place, MCP servers in another, prompts in a third, evals in a fourth, context packs in a wiki, policies in a security tool, generated outputs in Git, and evidence in whatever transcript happened to survive. I will go deeper on the context and evidence seams in the planned AOS living-analysis and RF release-prep pieces.
+<Figure
+  src="/assets/posts/the-registry-wave-agentic-artifact-supply-chain/diagram-registry-control-plane.svg"
+  alt="Editorial diagram standing in for a pending diff of registered and deployed reviewer state."
+  number="02"
+  caption="Proposed evidence view; screenshot pending: a manifest diff should expose the registered revision and the stale deployed copy. This diagram is a placeholder, not a captured manifest."
+/>
+{/* Capture spec: capture a real manifest/deployment diff showing the reviewer guard present upstream and absent in the deployed copy; label any replay as a reconstruction and redact paths/identifiers. */}
 
-That fragmentation is exactly how Shadow AI becomes more operational debt.
+At **detection**, a gate compares deployed state with its source. The September 11 drift check classifies deployed entries, distinguishing tracked copies, justified copies, and drift; it also identifies symlinks. Drift fails the check.[^drift] A justified copy needs an explicit reason to differ. Otherwise exceptions become another way to lose the deployment record.
 
-## The Control Plane Enterprises Will Need
+The next correction handles **missing dependencies**. An artifact absent locally is *unprovisioned, not non-existent*. The September 14 provisioning rule directs the agent back to the registry. Its failure hook suggests the deploy command; it doesn't write the artifact itself.[^provisioning] Hand-rolling a replacement would recreate the problem under a new name.
 
-The control plane I think enterprises will need has several layers. In my own system, that remains a direction, not a completed product: the Operator routes work today, while a unified cross-tool control plane is still emerging.
+Keep this loose and fast locally. I want to experiment with a skill before promoting it, much as I can edit a branch before CI checks a shared change. The gates belong at promotion and use boundaries where another project starts depending on the result. Automate the comparison and make a failed check explain the repair. A meeting to approve every local prompt edit would solve a different problem: ensuring nobody uses the system.
+
+Replacement and revocation also need a destination list. If I retire the reviewer, I need to find its deployed copies and prevent further use. Deleting the registry entry alone would leave those copies behind.
+
+## A control fabric across many systems
+
+“Control plane” is the familiar shorthand. But an enterprise will run many governance systems, with different owners and enforcement mechanisms. I use **control fabric** for the shared identity, evidence, and explicit handoffs connecting four responsibilities:
+
+| Responsibility | What it owes the reviewer workflow |
+| --- | --- |
+| **Supply chain** | Artifact identity, dependencies, recorded deployment, promotion, replacement, and revocation |
+| **Runtime control** | Caller identity, current authorization, tool permissions, budgets, and enforcement during use |
+| **Orchestration** | Routing the review, carrying its scope across handoffs, retries, and human decision points |
+| **Evidence** | What ran, what it produced, what was verified, and who accepted it |
+
+Shared identity means the deployment record and run record can refer to the same exact artifact. Shared evidence means the next system can inspect what the previous one established. An explicit handoff says who checks the next condition and what happens when it fails.
+
+A configured integration is not enforcement; an advisory registration is not a gate.
+
+The interactive below retains the earlier control-plane vocabulary as a map of participating surfaces. Read it across the four responsibilities above: registry and distribution serve the supply chain; governance, context, and adapters meet runtime and orchestration boundaries; evidence connects the result. It isn't a stack that one product must own. The Agentic OS (AOS) named in the map is my personal lab system.
 
 <ArtifactControlPlane client:visible />
 
-It needs a registry core, because artifacts need identity, versioning, metadata, search, install semantics, and update paths.
+*Proposed synthesis: these surfaces form a control fabric only when their handoffs carry identity and evidence. The map doesn't establish that those connections are implemented.*
 
-It needs a governance layer, because some artifacts are low-risk helpers and others carry production permissions, security assumptions, or regulated context.
+## From deployed artifact to delivered outcome
 
-It needs a context layer, because agent performance depends heavily on current, governed, domain-specific context. Context is not just documentation. It is runtime input.
+**[Observed]** The lab receipts establish narrower facts: a stale reviewer copy, a drift detector, and related checks for instruction parity and stale operating guidance. They don't establish a complete artifact-version-to-outcome measurement system.
 
-It needs a marketplace and federation layer, because no one vendor will own every runtime, IDE, cloud, model, registry, package system, and enterprise agent platform. GitHub, JFrog, Red Hat, MCP registries, internal catalogs, IDEs, and agent runtimes will all be part of the terrain.
+**[Proposed synthesis]** Closing that loop requires a run record that identifies which reviewer version was loaded, alongside the model, context, tools, and policy state. Join that record to the review's findings, verification, and acceptance decision. Then ask which runs used the old copy and which outputs need re-review. Where the loaded identity wasn't captured, mark the run's version unknown. Don't reconstruct certainty from the current registry.
 
-It needs a deployment and distribution layer, because an artifact that works in one host may need different placement, permissions, packaging, or compatibility metadata in another.
+Failure rate needs a denominator and a definition: failed reviews among comparable review tasks, with failure determined by an explicit acceptance criterion. A lower rate after deploying the guard would be useful evidence. It wouldn't isolate the guard's effect if the model or task mix changed too.
 
-It needs an evidence and provenance layer, because the important executive question is not how many agents ran. It is which accepted delivery outcomes were produced, with what evidence, by which artifacts, tools, contexts, policies, models, and sessions.
+Drift can also happen against a frozen skill. Keep its bytes unchanged and change the runtime or context; the same instructions may produce different behavior. Compare those runs separately from an artifact-version change. Otherwise the registry gets blamed for degradation it didn't cause, or credit for an improvement it didn't produce.
 
-And it needs runtime adapters, because the control plane has to connect to the real places agents run.
+The winning metric will be accepted outcomes with evidence, not activity. For this reviewer, that means a review that meets the request, with evidence of the required guard and an authorized acceptance decision. A <Term id="feature-contract">**Feature Contract**</Term> makes those obligations explicit; [The Contract Is the Work](/essays/the-contract-is-the-work/) takes up that boundary.
+
+<Callout type="info" title="Four things that are not equivalent">
+**Authenticity ≠ safety:** a known source can supply a harmful artifact.
+
+**Authorization ≠ correctness:** permitted work can still be wrong.
+
+**Traceability ≠ causal attribution:** a run using a skill doesn't establish that the skill caused its result.
+
+**Pinned inputs ≠ determinism:** fixed dependencies don't make probabilistic reasoning deterministic.
+
+*The Deterministic Envelope*, the planned, unpublished destination of this reading path, asks which surrounding controls can be deterministic and where fresh judgment still belongs.
+</Callout>
+
+## Where the system lied to us
+
+**[Observed, September 11, 2026]** The drift-gate receipt records why the check was written: the deployed reviewer had spent five days without a mandatory guard. “The fix exists” had stood in for “the projects received the fix.” My own artifact-management workflow let that substitution pass.[^drift]
+
+The related September 10 parity gate followed six weeks of stale doctrine reaching one class of agent harness. A harness is the software that loads instructions and runs the agent. Updating one harness-specific instruction file hadn't updated its sibling.[^parity] The staleness check from the same date searches live documents for assertions naming a superseded model as the operating “spine,” while exempting dated historical records.[^staleness]
+
+These are detection mechanisms with different boundaries. Byte comparison catches the stale reviewer. Parity catches divergence between sibling instructions. The staleness check catches a particular outdated claim even when the files aren't supposed to be identical. None proves that every remaining instruction is correct.
 
 <Figure
   src="/assets/posts/the-registry-wave-agentic-artifact-supply-chain/diagram-intent-outcome-chain.svg"
-  alt="A chain from human intent to governed context, approved artifacts, an agent session, produced work, a shipped change, and outcome evidence."
-  number="04"
-  caption="The durable enterprise unit is not an agent session. It is the intent-to-outcome chain the session participates in."
+  alt="Editorial diagram standing in for pending output from the deployed-artifact drift gate."
+  number="03"
+  caption="Implemented mechanism; screenshot pending: the deployed-artifact gate fails on drift. This diagram is a placeholder, not evidence of a passing or failing run."
 />
+{/* Capture spec: capture actual drift-gate output identifying a stale reviewer copy and a nonzero exit, then the result after recorded deployment; label replayed evidence and redact paths/identifiers. */}
 
-This is the broader space SkillMeat is building toward: reusable agentic artifacts and their lifecycle across projects, teams, and runtimes. The implementation will keep changing. The thesis has been stable for me: the artifacts that shape agent behavior need to become governed assets.
+<Callout type="info" title="What this looks like in my lab">
+**Implemented:** SkillMeat manages artifact registration and deployment. The Operator, my work-routing surface, sits over the subsystems. That is one implementation of coordination, not a requirement that enterprises adopt one router.
 
-SkillMeat is one layer, not the whole system. MeatyWiki is the living knowledge base and Research Foundry is the evidence-first research control plane; both are useful examples of why context and evidence cannot remain incidental files beside the registry.
+**Implemented:** MeatyWiki, my durable knowledge store, and Research Foundry, my evidence-oriented research system, give context and evidence homes beyond the registry. MeatyPrompts, my earlier prompt-management experiment, was part of the path here.
 
-## Why This Matters for Enterprises
+**Proposed:** complete cross-system linkage from loaded artifact version to accepted outcome. Local checks are implemented; fleet-wide compliance remains a target state in the registry's own September 10 rules.[^coverage]
 
-When you're working as an individual, or perhaps a small team, unmanaged agentic artifacts look like inconvenience, or even potentially "agile". Especially when working on just a small handful of projects, all with the same general stack.
+**Proposed:** controlled comparisons of pinned artifacts and context are how I intend to test the broader claim that these mechanisms improve outcomes.
+</Callout>
 
-But at enterprise scale, they become risk.
+## Receipts behind the argument
 
-One team installs a public skill because it saves time. Another forks it and changes the assumptions. A third copies the prompt into an internal repo. Someone adds a script. Someone else points an MCP server at a production system. A context pack drifts out of date. An eval set gets treated as proof even though it no longer matches the runtime. A generated output turns into a PR, and nobody can reconstruct which instructions, tools, context, and policies shaped it.
+These are dated implementation records, summarized as methods. They establish the checks described here, not enterprise-wide effectiveness.
 
-That is not a hypothetical edge case. It's the normal failure mode of unmanaged reuse. It's Shadow IT rearing its head in the agentic era. It's the same problem that has plagued software supply chains for decades, now amplified by the fact that agentic artifacts can execute, reason, and act on their own.
+- **September 11: deployed-copy drift.** A stale reviewer prompted a gate comparing deployed artifacts with their sources.[^drift]
+- **September 10: instruction parity.** A commit gate refuses an update to one harness's instructions without its required sibling.[^parity]
+- **September 10: stale operating claims.** A check finds superseded model assertions in live documents, preserving dated history.[^staleness]
+- **September 14: provisioning.** Missing local capability triggers registry discovery and a suggested deployment command.[^provisioning]
 
-The pain points are predictable:
+<Callout type="info" title="Evidence labels">
+**Observed** means bounded operating evidence. **Externally reported** identifies a claim from an outside source, not a lab result. **Proposed synthesis** marks my architecture interpretation or an unvalidated extension. **Measured** is reserved for a defined measurement with a stated method; this essay reports no measured outcome improvement.
+</Callout>
 
-- Shadow AI: capabilities installed outside platform visibility.
-- Prompt injection and semantic manipulation: natural-language instructions become part of the attack surface.
-- Stale context: agents confidently act on old assumptions.
-- Duplicate artifacts: teams solve the same problem with subtly different behavior.
-- No approval trail: nobody can tell who allowed a capability into the environment.
-- No revocation path: replacing a risky artifact becomes a scavenger hunt.
-- Vendor fragmentation: each host has its own artifact format and governance story.
-- No outcome linkage: agent usage cannot be connected to accepted delivery value.
+<Callout type="info" title="Where this sits">
+[The Productivity Paradox](/essays/governed-agentic-sdlc-01-productivity-paradox/) opens this reading path. Prior: [The Work Is a Graph](/essays/agentic-operations-flow/). This: **The Registry Wave**. Next: [The Contract Is the Work](/essays/the-contract-is-the-work/). Destination: **The Deterministic Envelope** (planned, unpublished).
 
-This is why I do not think the winning metric will be tokens, sessions, or number of agents.
+I call the umbrella **Agentic Systems Engineering**. Agentic SDLC is its application to software delivery. This reading path connects the questions; it isn't a one-to-one map of architecture layers.
+</Callout>
 
-The winning metric will be accepted outcomes with evidence, not activity. I have written more about durable workflow state in [The Work Is a Graph](/essays/agentic-operations-flow/), acceptance evidence in [The Contract Is the Work](/essays/the-contract-is-the-work/), the operating gap in [The Productivity Paradox](/essays/governed-agentic-sdlc-01-productivity-paradox/), and a concrete contract in [Contract-as-Spec: A Worked Example](/essays/contract-as-spec-worked-example/).
-
-How many changes made it to production? Which ones were accepted by reviewers? Which incidents were resolved? Which documents were approved? Which customer workflows improved? Which artifacts contributed to those outcomes? Which ones should be reused, retired, or blocked?
-
-That is the agentic control-plane question: route the work, preserve the seams, and retain receipts that can support a decision later.
-
-## My Bet
-
-The thesis is no longer only a sketch. SkillMeat has a working artifact supply chain across source, collection, and project deployment. MeatyWiki and Research Foundry make knowledge and evidence durable in their own domains. The Operator gives the system a real routing surface. What is measured is uneven, and the unified cross-tool control plane is still doctrine and design work, not a finished system.
-
-My bet is that the next several years will look like this:
-
-Skills become package-manager-native. Every major agent runtime will support installable skills or equivalent capability packs.
-
-MCP registries become enterprise infrastructure. MCP servers will need discovery, deployment, authorization, scoring, revocation, and runtime policy.
-
-Registries fragment by artifact class first. Skills, MCP servers, prompts, agents, workflows, evals, and context packs will each get their own registries, catalogs, and marketplaces before the enterprise pushes for unification.
-
-Context becomes infrastructure. Reusable context packs will matter as much as skill packages because agent performance depends on governed, current, domain-specific context.
-
-Provenance moves beyond code. SBOM-style thinking will extend into agentic execution: which skills, prompts, tools, context, policies, models, and sessions produced a change?
-
-Outcome evidence becomes the executive metric. The board-level conversation will not be "how many agents did we deploy?" It will be "which trusted outcomes did this operating model produce, and can we prove it?"
-
-The control plane becomes federated. The enterprise layer has to integrate across registries, runtimes, clouds, IDEs, internal catalogs, and security systems. Single-vendor purity is not a serious operating assumption.
-
-The registry wave is here, and I think that is worth celebrating. It means the industry is beginning to recognize that agentic capabilities need package semantics, versioning, distribution, and governance.
-
-But registries are only the first visible layer. The real enterprise challenge is larger: governing the artifacts, context, policies, runtimes, evidence, and outcomes that turn agentic AI from impressive demos into trusted delivery capacity.
-
-That is the space I am building toward with SkillMeat and the surrounding system: not an agent registry alone, but a set of durable seams between reusable capability, governed context, evidence, and accepted outcomes.
+The reviewer didn't need a better name or another catalog. It needed the fix to reach the place that loaded it, a check that noticed when it hadn't, and evidence that the resulting review did what was asked. That's the bar I want the supply chain to meet when I'm no longer watching every project myself.
 
 ## Sources
 
-- GitHub Changelog, [*Manage agent skills with GitHub CLI*](https://github.blog/changelog/2026-04-16-manage-agent-skills-with-github-cli/), April 16, 2026.
-- GitHub CLI Manual, [`gh skill install`](https://cli.github.com/manual/gh_skill_install) and [`gh skill publish`](https://cli.github.com/manual/gh_skill_publish).
-- JFrog Docs, [*Skills Repositories*](https://docs.jfrog.com/artifactory/docs/skills-repositories), [*JFrog CLI for Skills*](https://docs.jfrog.com/artifactory/docs/jf-skills), and [*Scanning AI Agent Skills*](https://docs.jfrog.com/security/docs/skill-scanning).
-- JFrog, [*Agent Skills Registry*](https://jfrog.com/ai-catalog/skills-registry/).
-- Red Hat Ecosystem Catalog, [*Red Hat agentic skills*](https://catalog.redhat.com/en/ai).
-- Red Hat Blog, [*The MCP catalog is here: Discover, deploy, and connect on Red Hat OpenShift AI*](https://www.redhat.com/en/blog/mcp-catalog-here-discover-deploy-and-connect-red-hat-openshift-ai).
-- Model Context Protocol, [*The MCP Registry*](https://modelcontextprotocol.io/registry/about) and [*Introducing the MCP Registry*](https://blog.modelcontextprotocol.io/posts/2025-09-08-mcp-registry-preview/).
-- Saha, Faghih, and Feizi, [*Under the Hood of SKILL.md: Semantic Supply-chain Attacks on AI Agent Skill Registry*](https://arxiv.org/abs/2605.11418), arXiv, May 2026.
-- Snyk Research, [*ToxicSkills Study of Agent Skills Supply Chain Compromise*](https://snyk.io/blog/toxicskills-malicious-ai-agent-skills-clawhub/).
-- Palo Alto Networks Unit 42, [*OpenClaw's Skill Marketplace and the Emerging AI Supply Chain Threat*](https://unit42.paloaltonetworks.com/openclaw-ai-supply-chain-risk/), June 2026.
+External claims below are carried forward for the September verification pass. Their scope and availability still need confirmation before this edition is published. Lab references identify supplied implementation receipts; the screenshots above remain pending.
+
+[^github]: GitHub Changelog, [Manage agent skills with GitHub CLI](https://github.blog/changelog/2026-04-16-manage-agent-skills-with-github-cli/). Verification pending for this edition.
+[^jfrog]: JFrog, [Agent Skills Registry](https://jfrog.com/ai-catalog/skills-registry/) and [Skills Repositories](https://docs.jfrog.com/artifactory/docs/skills-repositories). Verification pending for this edition.
+[^redhat]: Red Hat, [agentic catalog](https://catalog.redhat.com/en/ai) and [MCP catalog: discover, deploy, and connect](https://www.redhat.com/en/blog/mcp-catalog-here-discover-deploy-and-connect-red-hat-openshift-ai). Verification pending, including preview boundaries.
+[^mcp]: Model Context Protocol, [The MCP Registry](https://modelcontextprotocol.io/registry/about). Verification pending for this edition.
+[^drift]: Lab implementation receipt, September 11, 2026, revision `9a430766`: global artifact-drift check, following a reviewer deployed five days behind its source. Method summarized from the supplied receipt; no claim of a measured reduction in review failures.
+[^parity]: Lab implementation receipt, September 10, 2026, revision `4c1850e8`: sibling instruction parity gate, following six weeks of stale instructions reaching one harness class.
+[^staleness]: Lab implementation receipt, September 10, 2026, revision `cc0fda2e`: live-document scan for superseded operating-model assertions, with dated historical records exempted.
+[^provisioning]: Lab provisioning receipt, September 14, 2026: missing local artifacts are treated as unprovisioned; a tool-failure hook probes the registry and supplies a deployment command without writing the artifact itself. Internal identifiers withheld; method only.
+[^coverage]: Registry implementation receipt, September 10, 2026, revision `78d0aa78`: fleet-wide compliance scanning explicitly labelled target state. A local registration scan exists (August 24, revision `885b1b07`); that doesn't establish fleet-wide enforcement.
