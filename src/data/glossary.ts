@@ -90,6 +90,18 @@ export const GLOSSARY: Record<string, GlossaryEntry> = {
       "A typed set of durable objects (exploration charters, feasibility briefs, feature contracts, PRDs, implementation plans, decision blocks, progress files, validation records, run evidence, knowledge handoffs) that a workflow can resume from and reviewers can validate against.",
     definedIn: "agentic-operations-flow",
   },
+  "agentic-artifact": {
+    term: "agentic artifact",
+    definition:
+      "A reusable, versionable unit that shapes how an agent reasons, acts, accesses tools, applies context, follows policy, or produces work: a skill, command, agent definition, memory item, or context pack.",
+    definedIn: "the-registry-wave-agentic-artifact-supply-chain",
+  },
+  "control-fabric": {
+    term: "control fabric",
+    definition:
+      "The shared identity, evidence, and explicit handoffs connecting the systems responsible for an agentic artifact's supply chain, runtime control, orchestration, and evidence.",
+    definedIn: "the-registry-wave-agentic-artifact-supply-chain",
+  },
 };
 
 export type GlossaryTermId = keyof typeof GLOSSARY;
