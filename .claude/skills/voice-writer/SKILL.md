@@ -27,16 +27,16 @@ is publication-ready MDX with correct frontmatter for the Astro content collecti
 
 Before generating any content, read these two sources in order:
 
-1. **Voice spec** — `/Users/miethe/Documents/Other/PKM/MeatyBrain/Blogs/My Voice.md`
+1. **Voice spec**: `/Users/miethe/Documents/Other/PKM/MeatyBrain/Blogs/My Voice.md`
    This is the canonical, observed-pattern document. Read it completely. It is not aspirational;
    it describes patterns actually present in Nick's writing.
 
-2. **Published posts** — `src/content/posts/` (glob `*.mdx`)
+2. **Published posts**: `src/content/posts/` (glob `*.mdx`)
    Read at least one published post in full to calibrate sentence rhythm, heading density,
    and structural pacing before generating anything. If multiple posts exist, prefer the most
    recent one.
 
-3. **Extract specific patterns** — After reading both sources, identify 5+ specific rhetorical
+3. **Extract specific patterns**: After reading both sources, identify 5+ specific rhetorical
    moves from the published post that are relevant to the draft being written. Name them
    explicitly (e.g., "forensic specificity with commit hashes," "data embedded in argument
    rather than dumped as lists," "earned blockquotes after evidence"). This extraction step
@@ -44,6 +44,12 @@ Before generating any content, read these two sources in order:
    that technically follows the rules but lacks texture.
 
 Do not begin drafting until all three steps are complete.
+
+## Evidence
+
+Evidence file: `docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/voice/nick-voice-rules.md`
+
+This update is grounded in genuine hand-edit commits `bca1cd5f` and `9925c9a`, against baseline `90de9d4`.
 
 ## Voice Summary (Quick Reference: Do Not Substitute for Reading the Spec)
 
@@ -77,7 +83,7 @@ examples -> recommendation.
 - Long-to-medium sentences with internal pivots using: however, while, rather than, especially,
   additionally, that said, of course, for example
 - Define by contrast: "while X is true, Y matters more"
-- Parenthetical qualifiers (parentheses, colons, semicolons, commas) to add nuance without derailing the sentence. **Do NOT use emdashes (—)** for this purpose; they are a strong AI-writing tell. Use parentheses for asides, colons for setup-payoff, semicolons for linked thoughts, commas for light interruptions.
+- Parenthetical qualifiers (parentheses, colons, semicolons, commas) to add nuance without derailing the sentence. **Do NOT use emdashes** for this purpose; they are a strong AI-writing tell. Use parentheses for asides, colons for setup-payoff, semicolons for linked thoughts, commas for light interruptions.
 - Direct reader address, used sparingly: "If you're running X...", "Consider...", "Whether you're..."
 - Concession before assertion, practical narrowing, misconception correction
 - Fragment sentences for rhythmic emphasis: "Not equivalent. Better.", "Not even close.", "Not hypothetical. Current state."
@@ -86,12 +92,17 @@ examples -> recommendation.
 - Semicolons to connect related thoughts that AI drafts would split into two sentences
 - First-person over impersonal: "Before I diagnose" not "Before diagnosing"
 - Anecdotes with forensic detail: commit hashes, exact file counts, named projects/components, specific dates
+- Split a sentence carrying two claims into two declaratives, often ending on a fragment: "The accepted method becomes a versioned, discoverable artifact..." → "The point of this stage is not the artifact. It's whether the artifact still holds up..." This corrects the long-to-medium default above, not replaces it: split when a sentence starts carrying more than one claim.
+- Elaborate a short, flat claim with a colon instead of leaving it bare: "These are integration questions, not generation questions." → "...not generation questions: whether the planner that wrote a contract like fc-example-041 and the verifier that checks it three weeks later... are looking at the same acceptance criteria."
+- "Rather," "But," and "Thus" open corrective or contrasting sentences, often paired with a contraction: "They are not. The important point is..." → "...because they aren't. Rather, it's that..."
+- Contractions increase under a real editing pass, not decrease (aren't, can't, doesn't, isn't, it's, didn't). Un-contracted formal phrasing throughout body prose is a machine-draft tell.
 
 ### Phrase patterns to use naturally (not to force)
 "Of course...", "That said...", "In short...", "The key is...", "I personally...",
 "I generally recommend...", "Rather than...", "While...", "This is because...",
 "Especially if...", "Not equivalent. Better." (fragment-for-emphasis pattern),
-colon-beat constructions, semicolon connectors
+colon-beat constructions, semicolon connectors, "...because they aren't. Rather, it's...",
+"But at [larger] scale...", "That can't be overstated."
 
 ### What to reduce
 - Generic AI transition phrases: "delve into", "unlock", "journey", "landscape", "game-changer"
@@ -99,50 +110,60 @@ colon-beat constructions, semicolon connectors
 - Fake certainty where evidence is thin
 - Overly polished motivational transitions
 - Excessive summary that restates the obvious
-- "In this post, we'll explore/cover/discuss..." preview paragraphs — start arguing, not announcing
-- Standalone metrics blocks or results sections — embed data in argument
-- Decorative transitions between sections — use direct claims or questions instead
-- Over-smoothed prose — preserve the roughness; it's part of the voice
+- "In this post, we'll explore/cover/discuss..." preview paragraphs: start arguing, not announcing
+- Standalone metrics blocks or results sections: embed data in argument
+- Decorative transitions between sections: use direct claims or questions instead
+- Over-smoothed prose: preserve the roughness; it's part of the voice
 - Anecdotes framed as stories rather than evidence; present exhibits, not narratives
-- Emdashes (—) for asides, qualifiers, or interruptions; use parentheses, colons, semicolons, or commas instead (emdashes are a strong AI-writing tell)
+- Emdashes for asides, qualifiers, or interruptions; use parentheses, colons, semicolons, or commas instead (emdashes are a strong AI-writing tell)
 - Declarative thesis openers: "The pattern is clear", "The answer is..."
 - False-certainty assertions: "This isn't theoretical", "The missing layer is obvious once you see it"
 - Meta-commentary on own honesty: "Worth being direct", "Let me be frank"
-- The "The answer isn't X. It's Y." template — replace with reasoning chains that show the logic
+- The "The answer isn't X. It's Y." template: replace with reasoning chains that show the logic
 - Impersonal constructions where first-person is more natural ("Before diagnosing" → "Before I diagnose")
-- Uniformly polished cadence — every 4-5 paragraphs should include a cadence break (a line that sounds discovered, not assembled)
+- Uniformly polished cadence: every 4-5 paragraphs should include a cadence break (a line that sounds discovered, not assembled)
+- A hedge stacked on a hedge ("not something I can honestly claim is finished"): cut to one plain qualifier ("not a finished system")
+- Exact-word repetition across adjacent sentences ("The enterprise control plane... enterprises will need" → "The control plane... enterprises will need")
+
+### Structural instincts (apply during an editing pass, not first drafting)
+- Currency-check terminology against current system/product naming before calling a pass done: don't just polish prose that uses a term the system has since renamed.
+- Where a section is list-heavy or compares several abstract things, consider whether a described visual (a `Figure`, an interactive component) would carry the comparison better than prose or bullets: Nick reads visually and metaphorically over enumerating.
+- Seed forward-links: an allusion to a future post or an adjacent system, rather than closing every thread inside one essay.
+- The closing section gets more editorial effort than the opening, not less: a thesis that trails off at the end reads as unfinished even when the body is strong.
+- Ground an abstract capability claim in the author's own concrete, native functionality early, before generalizing.
+- Don't let every example in a general claim come from a single product if the claim is meant to generalize across the author's systems.
 
 ## Common Voice Failure Modes
 
 These are the specific ways voice revision goes wrong. Check for all of them before handing off.
 
-**Smoothing instead of sharpening** — The most common failure. The agent reads "long-to-medium
+**Smoothing instead of sharpening**: The most common failure. The agent reads "long-to-medium
 sentences with internal pivots" and produces polished, flowing prose. But Nick's voice has
-*texture* — forensic detail, owned mistakes, embedded caveats that interrupt the flow, data
+*texture*: forensic detail, owned mistakes, embedded caveats that interrupt the flow, data
 woven mid-sentence. Smoothness is the enemy.
 
-**Generic example substitution** — The agent reads "concrete examples" and adds illustrative
-scenarios. Nick doesn't illustrate — he *exhibits*. Commit hashes, specific file counts,
+**Generic example substitution**: The agent reads "concrete examples" and adds illustrative
+scenarios. Nick doesn't illustrate: he *exhibits*. Commit hashes, specific file counts,
 component names, dates. If the detail isn't specific enough to verify in git history, it's
 not specific enough.
 
-**Metrics dumps** — The agent creates a "Results" section with bulleted numbers. Nick never
+**Metrics dumps**: The agent creates a "Results" section with bulleted numbers. Nick never
 does this. Every number lives inside a sentence that explains what it means and why it matters.
 "23 endpoints, all working on day one" is a claim with evidence, not a line item.
 
-**Preview/summary framing** — "In this post, we'll explore..." and "In summary, we covered..."
+**Preview/summary framing**: "In this post, we'll explore..." and "In summary, we covered..."
 are absent from Nick's published work. The post argues from sentence one and closes with
 stakes, not a recap.
 
-**Transition-for-transition's-sake** — "Now let's turn to..." "With that in mind..." Nick's
+**Transition-for-transition's-sake**: "Now let's turn to..." "With that in mind..." Nick's
 section openers are direct claims or questions, not connective tissue from the previous section.
 
-**Anecdotes as stories instead of evidence** — "Story time" framing where an anecdote is set
+**Anecdotes as stories instead of evidence**: "Story time" framing where an anecdote is set
 up as a narrative. Nick presents anecdotes as forensic exhibits: "The same FastAPI bug was
 fixed three times, in three separate sessions... The commits are still there: a29acda2,
 74f49e3f, 669cda07." Evidence, not entertainment.
 
-**Emdash overuse** — AI models heavily default to emdashes (—) for asides, qualifiers, and
+**Emdash overuse**: AI models heavily default to emdashes for asides, qualifiers, and
 interruptions. Nick prefers parentheses, colons, semicolons, and commas for the same purpose.
 Replace every emdash with the appropriate alternative: parentheses for asides, colons for
 setup-payoff, semicolons for linked thoughts, commas for light interruptions. Even when the
@@ -205,10 +226,10 @@ When given a draft to edit for voice:
 
 ## Integration with Other Skills
 
-- `/blog-drafter` — handles research, competitive context, and structural outlining.
+- `/blog-drafter`: handles research, competitive context, and structural outlining.
   Use that skill first when the topic needs significant research before writing. Then
   hand the outline to this skill for voice-calibrated drafting.
-- `/humanizer` — applies a final naturalness pass after this skill produces a draft.
+- `/humanizer`: applies a final naturalness pass after this skill produces a draft.
   Run `/humanizer` after `/voice-writer` when content needs additional idiomatic
   smoothing beyond what this skill produces.
 
@@ -249,11 +270,11 @@ Before delivering any output, verify:
 - [ ] Recommendations include rationale or trade-offs, not just verdicts
 - [ ] Reduction-list phrases are absent or flagged for review
 - [ ] No preview/roadmap paragraphs ("In this post, we'll...")
-- [ ] No standalone metrics dumps — all data embedded in argument
+- [ ] No standalone metrics dumps: all data embedded in argument
 - [ ] Anecdotes include forensic detail (commits, counts, dates, component names) or are flagged [NEEDS INPUT]
 - [ ] Blockquotes arrive after evidence, not before
 - [ ] Section openers are direct claims or questions, not transitions
-- [ ] No emdashes (—); all asides use parentheses, colons, semicolons, or commas
+- [ ] No emdashes; all asides use parentheses, colons, semicolons, or commas
 - [ ] At least 2-3 cadence-breaking lines present (lines that sound like thinking aloud, not thesis statements)
 - [ ] Fragment sentences used for emphasis at least once
 - [ ] Anecdotes include forensic detail (specific names, numbers, dates) rather than abstract illustrations
