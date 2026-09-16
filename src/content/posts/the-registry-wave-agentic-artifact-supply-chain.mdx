@@ -32,6 +32,7 @@ import Figure from '../../components/content/Figure.astro';
 import Term from '../../components/content/Term.astro';
 import ArtifactTaxonomy from '../../components/interactive/ArtifactTaxonomy';
 import ArtifactControlPlane from '../../components/interactive/ArtifactControlPlane';
+import WhereThisSits from '../../components/content/WhereThisSits.astro';
 import '../../styles/registry-wave.css';
 
 <Callout type="info" title="September 2026 edition">
@@ -159,7 +160,7 @@ Replacement and revocation also need a destination list. If I retire the reviewe
 
 ## A control fabric across many systems
 
-“Control plane” is the familiar shorthand. But an enterprise will run many governance systems, with different owners and enforcement mechanisms. I use **control fabric** for the shared identity, evidence, and explicit handoffs connecting four responsibilities:
+“Control plane” is the familiar shorthand. But an enterprise will run many governance systems, with different owners and enforcement mechanisms. I use <Term id="control-fabric">**control fabric**</Term> for the shared identity, evidence, and explicit handoffs connecting four responsibilities:
 
 | Responsibility | What it owes the reviewer workflow |
 | --- | --- |
@@ -172,9 +173,11 @@ Shared identity means the deployment record and run record can refer to the same
 
 A configured integration is not enforcement; an advisory registration is not a gate.
 
-The interactive below retains the earlier control-plane vocabulary as a map of participating surfaces. Read it across the four responsibilities above: registry and distribution serve the supply chain; governance and context carry runtime control, enforcing caller identity, permissions, and budgets during use; adapters carry orchestration, the routing and handoffs across systems and decision points; evidence connects the result to what was verified and accepted. It isn't a stack that one product must own. The Agentic OS (AOS) named in the map is my personal lab system.
+The interactive below retains the earlier control-plane vocabulary as a map of participating surfaces. It isn't a stack that one product must own. The Agentic OS (AOS) named in the map is my personal lab system.
 
 <ArtifactControlPlane client:visible />
+
+Each of the six layers above serves exactly one of the four responsibilities: Registry and Distribution serve the supply chain; Governance and Context serve runtime control, enforcing caller identity, permissions, and budgets during use; Adapters serve orchestration, the routing and handoffs across systems and decision points; Evidence serves evidence, connecting the result to what was verified and accepted.
 
 *Proposed synthesis: these surfaces form a control fabric only when their handoffs carry identity and evidence. The map doesn't establish that those connections are implemented.*
 
@@ -241,11 +244,9 @@ These are dated implementation records, summarized as methods. They establish th
 **Observed** means bounded operating evidence. **Externally reported** identifies a claim from an outside source, not a lab result. **Proposed synthesis** marks my architecture interpretation or an unvalidated extension. **Measured** is reserved for a defined measurement with a stated method; this essay reports no measured outcome improvement.
 </Callout>
 
-<Callout type="info" title="Where this sits">
-[The Productivity Paradox](/essays/governed-agentic-sdlc-01-productivity-paradox/) opens this reading path. Prior: [The Work Is a Graph](/essays/agentic-operations-flow/). This: **The Registry Wave**. Next: [The Contract Is the Work](/essays/the-contract-is-the-work/). Destination: **The Deterministic Envelope** (planned, unpublished).
+<WhereThisSits slug="the-registry-wave-agentic-artifact-supply-chain" />
 
 I call the umbrella **Agentic Systems Engineering**. Agentic SDLC is its application to software delivery. This reading path connects the questions; it isn't a one-to-one map of architecture layers.
-</Callout>
 
 The reviewer didn't need a better name or another catalog. It needed the fix to reach the place that loaded it, a check that noticed when it hadn't, and evidence that the resulting review did what was asked. That's the bar I want the supply chain to meet when I'm no longer watching every project myself.
 
