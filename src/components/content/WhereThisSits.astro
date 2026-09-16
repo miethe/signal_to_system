@@ -1,0 +1,83 @@
+---
+/**
+ * WhereThisSits (cross-series "reading path" locator for MDX essays).
+ *
+ * Looks up the current essay by slug in src/data/reading-paths.json and
+ * renders prior -> this -> next within that guided path, plus a link to
+ * the path's own page. Distinct from ReadingPathNav (which navigates
+ * within a single content-collection `series`): a reading path spans
+ * several parallel series on purpose.
+ *
+ * Usage in MDX:
+ *   <WhereThisSits slug="agentic-operations-flow" />
+ */
+import pathsData from '../../data/reading-paths.json';
+
+interface Step {
+  slug: string | null;
+  title: string;
+  whatItAnswers: string;
+  state: 'published' | 'next';
+}
+
+interface ReadingPath {
+  id: string;
+  pageSlug: string;
+  title: string;
+  umbrellaTerm: string;
+  rationale: string;
+  steps: Step[];
+}
+
+interface Props {
+  slug: string;
+}
+
+const { slug } = Astro.props;
+
+const paths = (pathsData as { paths: ReadingPath[] }).paths;
+const path = paths.find((p) => p.steps.some((s) => s.slug === slug));
+
+if (!path) {
+  throw new Error(
+    `<WhereThisSits slug="${slug}" /> does not match any step in src/data/reading-paths.json. Add this essay's slug to a path's steps, or fix the slug.`
+  );
+}
+
+const index = path.steps.findIndex((s) => s.slug === slug);
+const prev = index > 0 ? path.steps[index - 1] : null;
+const current = path.steps[index];
+const next = index < path.steps.length - 1 ? path.steps[index + 1] : null;
+
+const hrefFor = (step: Step) => (step.slug ? `/essays/${step.slug}/` : undefined);
+---
+
+<aside class="where-this-sits my-10 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-5">
+  <p class="mb-3 text-xs font-medium uppercase tracking-wider text-[var(--text-tertiary)]">
+    Part of the <span class="text-[var(--text-primary)]">{path.umbrellaTerm}</span> reading path
+    (<a href={`/series/${path.pageSlug}/`} class="text-violet-600 hover:underline dark:text-violet-400">see the full path</a>)
+  </p>
+  <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-2">
+    <span class="text-sm text-[var(--text-tertiary)]">
+      {prev ? (
+        <a href={hrefFor(prev)} class="hover:text-violet-600 hover:underline dark:hover:text-violet-400">{prev.title}</a>
+      ) : (
+        'Start of the path'
+      )}
+    </span>
+    <span class="hidden text-[var(--text-disabled)] sm:inline" aria-hidden="true">&rarr;</span>
+    <span class="font-medium text-[var(--text-primary)]">{current.title} (you are here)</span>
+    <span class="hidden text-[var(--text-disabled)] sm:inline" aria-hidden="true">&rarr;</span>
+    <span class="text-sm text-[var(--text-tertiary)]">
+      {next ? (
+        next.state === 'published' ? (
+          <a href={hrefFor(next)} class="hover:text-violet-600 hover:underline dark:hover:text-violet-400">{next.title}</a>
+        ) : (
+          <span>{next.title} <span class="italic text-[var(--text-disabled)]">(next, in progress)</span></span>
+        )
+      ) : (
+        'End of the path'
+      )}
+    </span>
+  </div>
+</aside>
