@@ -46,7 +46,7 @@ The registry was right. The use was wrong. Nothing said so, because nothing comp
 
 What exactly did the approval attach to?
 
-**Trusted artifact ≠ trusted use.** Approval attaches to an artifact; use happens in a context the approval never saw. Even after I correct the copy, I still need to know who may use it, with which tools and context, what actually ran, and whether the review met its purpose.
+**Trusted artifact ≠ trusted use.** That distinction is loadbearing (an inside joke for the Claude 5 model-family users). Approval attaches to an artifact; use happens in a context the approval never saw. Even after I correct the copy, I still need to know who may use it, with which tools and context, what actually ran, and whether the review met its purpose.
 
 That is the supply-chain problem this essay is about.
 
@@ -92,7 +92,7 @@ I read these as validation of the package-management problem that sent me into t
 | **Execution** | Records availability or deployment intent. Doesn't establish what actually ran. | Captures the loaded artifacts, runtime/model state, permitted actions, and observed tool activity within an execution envelope. |
 | **Outcome** | Preserves evaluations or prior acceptance. Doesn't establish that this run fulfilled this request. | Connects output to intent, verification evidence, and the authority accepting or rejecting the result. |
 
-The reviewer failed the first handoff: registered identity never reached the loaded copy. Fixing that closes one gap. A correctly deployed reviewer could still receive stale project context, have inappropriate permissions, skip its guard, or approve the wrong thing.
+The reviewer failed the first handoff: registered identity never reached the loaded copy. Fixing that closes one gap. But a correctly deployed reviewer could still receive stale project context, have inappropriate permissions, skip its guard, or approve the wrong thing.
 
 Thus the enterprise question isn't "do we have a place to store these things?", as that's essentially a solved problem.
 
@@ -102,8 +102,7 @@ Rather, the question is "can we govern the lifecycle of the things that shape ag
 
 Give it a concrete shape for a second: a skill, a command, an agent definition, a memory item, a context pack, any reusable, versioned unit you can collect and deploy into a project.
 
-{/* Editor: add agentic-artifact to the glossary, then wrap the definition label in the native Term component. The current glossary has no matching entry. */}
-An **agentic artifact** is any reusable, versionable unit that shapes how an agent reasons, acts, accesses tools, applies context, follows policy, or produces work.
+Call that the <Term id="agentic-artifact">**agentic artifact**</Term>: whatever reusable, versionable unit shapes how the agent reasons, acts, accesses tools, applies context, follows policy, or produces work.
 
 The runtime executes. A skill shapes its behavior. Markdown instructions don't reason on their own, and a signed context pack doesn't enforce the permissions it describes.
 
@@ -173,7 +172,7 @@ Shared identity means the deployment record and run record can refer to the same
 
 A configured integration is not enforcement; an advisory registration is not a gate.
 
-The interactive below retains the earlier control-plane vocabulary as a map of participating surfaces. Read it across the four responsibilities above: registry and distribution serve the supply chain; governance, context, and adapters meet runtime and orchestration boundaries; evidence connects the result. It isn't a stack that one product must own. The Agentic OS (AOS) named in the map is my personal lab system.
+The interactive below retains the earlier control-plane vocabulary as a map of participating surfaces. Read it across the four responsibilities above: registry and distribution serve the supply chain; governance and context carry runtime control, enforcing caller identity, permissions, and budgets during use; adapters carry orchestration, the routing and handoffs across systems and decision points; evidence connects the result to what was verified and accepted. It isn't a stack that one product must own. The Agentic OS (AOS) named in the map is my personal lab system.
 
 <ArtifactControlPlane client:visible />
 
@@ -209,7 +208,7 @@ The winning metric will be accepted outcomes with evidence, not activity. For th
 
 The related September 10 parity gate followed six weeks of stale doctrine reaching one class of agent harness. A harness is the software that loads instructions and runs the agent. Updating one harness-specific instruction file hadn't updated its sibling.[^parity] The staleness check from the same date searches live documents for assertions naming a superseded model as the operating “spine,” while exempting dated historical records.[^staleness]
 
-These are detection mechanisms with different boundaries. Byte comparison catches the stale reviewer. Parity catches divergence between sibling instructions. The staleness check catches a particular outdated claim even when the files aren't supposed to be identical. None proves that every remaining instruction is correct.
+These are detection mechanisms with different boundaries. Byte comparison catches the stale reviewer. Parity catches divergence between sibling instructions. The staleness check catches a particular outdated claim even when the files aren't supposed to be identical. But none proves that every remaining instruction is correct.
 
 <Figure
   src="/assets/posts/the-registry-wave-agentic-artifact-supply-chain/diagram-intent-outcome-chain.svg"
@@ -258,8 +257,8 @@ External claims below are carried forward for the September verification pass. T
 [^jfrog]: JFrog, [Agent Skills Registry](https://jfrog.com/ai-catalog/skills-registry/) and [Skills Repositories](https://docs.jfrog.com/artifactory/docs/skills-repositories). Verification pending for this edition.
 [^redhat]: Red Hat, [agentic catalog](https://catalog.redhat.com/en/ai) and [MCP catalog: discover, deploy, and connect](https://www.redhat.com/en/blog/mcp-catalog-here-discover-deploy-and-connect-red-hat-openshift-ai). Verification pending, including preview boundaries.
 [^mcp]: Model Context Protocol, [The MCP Registry](https://modelcontextprotocol.io/registry/about). Verification pending for this edition.
-[^drift]: Lab implementation receipt, September 11, 2026, revision `9a430766`: global artifact-drift check, following a reviewer deployed five days behind its source. Method summarized from the supplied receipt; no claim of a measured reduction in review failures.
-[^parity]: Lab implementation receipt, September 10, 2026, revision `4c1850e8`: sibling instruction parity gate, following six weeks of stale instructions reaching one harness class.
-[^staleness]: Lab implementation receipt, September 10, 2026, revision `cc0fda2e`: live-document scan for superseded operating-model assertions, with dated historical records exempted.
+[^drift]: Lab implementation receipt, September 11, 2026: global artifact-drift check, following a reviewer deployed five days behind its source. Method summarized from the supplied receipt; no claim of a measured reduction in review failures. Internal identifiers withheld; method only.
+[^parity]: Lab implementation receipt, September 10, 2026: sibling instruction parity gate, following six weeks of stale instructions reaching one harness class. Internal identifiers withheld; method only.
+[^staleness]: Lab implementation receipt, September 10, 2026: live-document scan for superseded operating-model assertions, with dated historical records exempted. Internal identifiers withheld; method only.
 [^provisioning]: Lab provisioning receipt, September 14, 2026: missing local artifacts are treated as unprovisioned; a tool-failure hook probes the registry and supplies a deployment command without writing the artifact itself. Internal identifiers withheld; method only.
-[^coverage]: Registry implementation receipt, September 10, 2026, revision `78d0aa78`: fleet-wide compliance scanning explicitly labelled target state. A local registration scan exists (August 24, revision `885b1b07`); that doesn't establish fleet-wide enforcement.
+[^coverage]: Registry implementation receipt, September 10, 2026: fleet-wide compliance scanning explicitly labelled target state. A local registration scan exists (August 24); that doesn't establish fleet-wide enforcement. Internal identifiers withheld; method only.
