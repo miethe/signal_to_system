@@ -2,7 +2,7 @@
 // Glossary Registry
 // ---------------------------------------------------------------------------
 //
-// Coined terms used across Signal to System essays, with inline definitions
+// Terms used across Signal to System essays, with inline definitions
 // sourced from the post that first defines them. Rendered via the <Term />
 // component (src/components/content/Term.astro) as a hover/focus tooltip
 // rather than a navigating link.
@@ -99,7 +99,37 @@ export const GLOSSARY: Record<string, GlossaryEntry> = {
   "control-fabric": {
     term: "control fabric",
     definition:
-      "The shared identity, evidence, and explicit handoffs connecting the systems responsible for an agentic artifact's supply chain, runtime control, orchestration, and evidence.",
+      "Established terminology, including BCG's federated agent-control framing. Here it names independently operated systems that preserve compatible identity, authority, policy-decision and evidence records across handoffs.",
+    definedIn: "the-registry-wave-agentic-artifact-supply-chain",
+  },
+  "skillbom": {
+    term: "SkillBOM",
+    definition:
+      "SkillBOM already appears in research on skill identity, dependencies and run provenance. Here it names this implementation's manifest for artifact composition and provenance; assembly evidence alone does not establish runtime use.",
+    definedIn: "the-registry-wave-agentic-artifact-supply-chain",
+  },
+  "skill-bom": {
+    term: "Skill-BOM",
+    definition:
+      "Skill-BOM appears in Xia and colleagues' skill-harnessing architecture as run-scoped evidence. This site uses SkillBOM for its implementation's artifact composition and provenance manifest, with runtime binding requiring separate evidence.",
+    definedIn: "the-registry-wave-agentic-artifact-supply-chain",
+  },
+  "agentic-artifact-supply-chain": {
+    term: "agentic artifact supply chain",
+    definition:
+      "An organizing label for the managed lifecycle of reusable instructions, context, tools, policies and related assets, alongside existing work on agent supply chains and governed agent primitives.",
+    definedIn: "the-registry-wave-agentic-artifact-supply-chain",
+  },
+  "deterministic-envelope": {
+    term: "deterministic envelope",
+    definition:
+      "An existing description of constraints around probabilistic systems. Here the emphasis is on controls outside model judgment, evidence that they mediate execution, and validation before promoting or withdrawing reusable automation.",
+    definedIn: "the-registry-wave-agentic-artifact-supply-chain",
+  },
+  "agentic-systems-engineering": {
+    term: "Agentic Systems Engineering",
+    definition:
+      "An emerging discipline already named in academic and enterprise work. This series examines a particular cross-system architecture for capability, authority, evidence and reuse through implementation records and failures.",
     definedIn: "the-registry-wave-agentic-artifact-supply-chain",
   },
   "skillmeat": {
