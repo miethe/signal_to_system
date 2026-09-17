@@ -4,7 +4,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { GLOSSARY } from '../data/glossary';
 
 // ---------------------------------------------------------------------------
-// /glossary — index of every coined term, its definition, and (when
+// /glossary — index of every defined term, its definition, and (when
 // available) a link to the published post that defines it.
 // ---------------------------------------------------------------------------
 
@@ -29,7 +29,7 @@ const entries = Object.entries(GLOSSARY)
 
 <BaseLayout
   title="Glossary"
-  description="Definitions for the terms coined across Signal to System essays."
+  description="Definitions for terms used across Signal to System essays."
 >
   <div class="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
     <header class="mb-12 border-b border-zinc-200 dark:border-zinc-800 pb-10">
@@ -37,7 +37,7 @@ const entries = Object.entries(GLOSSARY)
         Glossary
       </h1>
       <p class="text-xl text-zinc-600 dark:text-zinc-400 leading-relaxed">
-        {entries.length} terms coined across essays on Signal to System. Each links to the post where it was introduced.
+        {entries.length} terms defined across essays on Signal to System. Each links to the post where it was first defined.
       </p>
     </header>
 
