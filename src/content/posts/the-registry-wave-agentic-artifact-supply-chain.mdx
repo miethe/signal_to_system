@@ -34,11 +34,16 @@ import ArtifactTaxonomy from '../../components/interactive/ArtifactTaxonomy';
 import ArtifactControlPlane from '../../components/interactive/ArtifactControlPlane';
 import WhereThisSits from '../../components/content/WhereThisSits.astro';
 import ThreadBeat from '../../components/content/ThreadBeat.astro';
+import Evidence from '../../components/content/Evidence.astro';
+import EvidenceLegend from '../../components/content/EvidenceLegend.astro';
+import EditionBanner from '../../components/content/EditionBanner.astro';
 import '../../styles/registry-wave.css';
 
-<Callout type="info" title="September 2026 edition">
-First published July 2026; re-published September 15, 2026. This full September rewrite follows two external reviews and a failure in my own deployment process. The July argument centered on registries becoming supply chains. This edition sharpens the boundary: approving an artifact doesn't establish that a particular use is trustworthy. The distinction below is the September argument, not a claim about what the July essay already said.
-</Callout>
+<EditionBanner
+  edition="September 2026 edition"
+  revisedDate="2026-09-17"
+  note="First published July 2026; re-published September 15, 2026. This full September rewrite follows two external reviews and a failure in my own deployment process. The July argument centered on registries becoming supply chains. This edition sharpens the boundary: approving an artifact doesn't establish that a particular use is trustworthy. The distinction below is the September argument, not a claim about what the July essay already said."
+/>
 
 The reviewer was supposed to check the work. First I had to check the reviewer.
 
@@ -61,6 +66,7 @@ Some copies must change. Some differences must survive. Keeping track of which i
   alt="Schematic diagram showing the reviewer skill's guard restored at the source and reflected in the registry, while deployed copies remain unchanged."
   number="01"
   caption="Schematic of the recorded incident: the fix lands at the source and reaches the registry immediately; the deployed copies haven't caught up yet."
+  credit="Diagram: Nick Miethe, 2026-09"
 />
 
 I didn't begin this journey by defining a new category. Like most good (engineering) stories, it started with an annoyance, and the desire to be lazy.
@@ -155,6 +161,7 @@ The remedy is a recorded, registry-driven deployment. No manual copy/paste, no s
   alt="Schematic diagram contrasting the registry's corrected reviewer skill against three deployed project copies still missing the guard, under the same skill name."
   number="02"
   caption="Illustrative project copies: the registry and the deployed copies now disagree about what the same skill name means."
+  credit="Diagram: Nick Miethe, 2026-09"
 />
 
 <ThreadBeat slug="the-registry-wave-agentic-artifact-supply-chain" beat="use" />
@@ -168,6 +175,7 @@ At **use**, the project loads the deployed copy in its own context. The supply-c
   alt="Schematic diagram showing an agent session loading a deployed copy, with a broken link between the guard instruction being present in the file and the guard actually being followed."
   number="03"
   caption="Diagram: the guard's presence in a file isn't evidence the guard was followed."
+  credit="Diagram: Nick Miethe, 2026-09"
 />
 
 <ThreadBeat slug="the-registry-wave-agentic-artifact-supply-chain" beat="drift" />
@@ -198,6 +206,7 @@ See below two real entries, redacted:
   alt="Schematic diagram showing five days on a timeline where the registry stays correct and the deployed copies stay stale, simultaneously and without change."
   number="04"
   caption="Diagram: for five days, 'fixed' described one location; the registry and the deployment disagreed the whole time."
+  credit="Diagram: Nick Miethe, 2026-09"
 />
 
 <ThreadBeat slug="the-registry-wave-agentic-artifact-supply-chain" beat="detection" />
@@ -209,6 +218,7 @@ At **detection**, a gate compares deployed state with its source. The August 6 d
   alt="Schematic diagram of an August 6 byte-comparison check between the registry and deployed copies, outputting a drift-detected alert."
   number="05"
   caption="Diagram: a byte comparison is what finally noticed the gap no one else was checking."
+  credit="Diagram: Nick Miethe, 2026-09"
 />
 
 A content hash answers whether bytes match a recorded revision. An ancestry record answers which base a local change came from. Neither tells me whether that change is useful, approved or compatible. I need the base to understand the patch, the current bytes to identify it, and review and tests to decide what should happen next.
@@ -269,6 +279,7 @@ Drift can also happen against a frozen skill. Keep its bytes unchanged and chang
   alt="Schematic diagram of a run record table showing which reviewer version an agent session actually loaded, contrasted with earlier runs where that version was never captured."
   number="06"
   caption="Proposed run-evidence model, not captured runtime data: record the loaded reviewer version, and keep earlier unknown versions unknown."
+  credit="Diagram: Nick Miethe, 2026-09"
 />
 
 I want to measure accepted outcomes with evidence. For this reviewer, that means a review that meets the request, with evidence of the required guard and an authorized acceptance decision. A <Term id="feature-contract">**Feature Contract**</Term> makes those obligations explicit; [The Contract Is the Work](/essays/the-contract-is-the-work/) takes up that boundary.
@@ -339,19 +350,19 @@ exit 1
 
 These are dated implementation records, summarized as methods. The August commits establish when checks entered the repository; the September audit establishes what that later inspection found. Neither date silently becomes the incident date or an attestation of today's runtime state.
 
-**[Observed]** **The reviewer copy.** The drift-check source records a deployed reviewer missing its mandatory establish-the-diff step while the upstream copy contained it. The incident was filed August 5; the check was committed August 6. Its five-day interval describes the stale deployment. Comparing deployed bytes with the source makes that discrepancy visible, but doesn't recover a per-session loading history or count incorrect reviews.[^drift]
+<Evidence kind="observed" /> **The reviewer copy.** The drift-check source records a deployed reviewer missing its mandatory establish-the-diff step while the upstream copy contained it. The incident was filed August 5; the check was committed August 6. Its five-day interval describes the stale deployment. Comparing deployed bytes with the source makes that discrepancy visible, but doesn't recover a per-session loading history or count incorrect reviews.[^drift]
 
-**[Observed]** **Sibling instructions.** One harness-specific instruction file carried superseded doctrine for six weeks after its canonical sibling changed. The parity gate committed August 5 checks a declared relationship between those files. It doesn't require every document to be identical. The separate live-document staleness check catches a named obsolete assertion outside that pair; it leaves dated historical records alone.[^parity][^staleness]
+<Evidence kind="observed" /> **Sibling instructions.** One harness-specific instruction file carried superseded doctrine for six weeks after its canonical sibling changed. The parity gate committed August 5 checks a declared relationship between those files. It doesn't require every document to be identical. The separate live-document staleness check catches a named obsolete assertion outside that pair; it leaves dated historical records alone.[^parity][^staleness]
 
-**[Observed]** **Workflow copies that needed different repairs.** The synchronization source records both missing upstream review checks and local copies with stricter conditional-verdict handling. The August 11 implementation preserves per-project rosters and refuses local-ahead overwrites. That refusal protects the difference from erasure; it doesn't certify the difference as correct or promote it into shared policy.[^workflow]
+<Evidence kind="observed" /> **Workflow copies that needed different repairs.** The synchronization source records both missing upstream review checks and local copies with stricter conditional-verdict handling. The August 11 implementation preserves per-project rosters and refuses local-ahead overwrites. That refusal protects the difference from erasure; it doesn't certify the difference as correct or promote it into shared policy.[^workflow]
 
-**[Measured]** **Ancestry versus released content.** The retained maintenance record reports negative commit-ancestry and tag-containment checks, followed by direct inspection of the release's file, which found the fix. The repository's squash-merge history explains the discrepancy. This measures presence in the tagged source, not presence in a deployed process, and supplies no outcome comparison.[^ancestry]
+<Evidence kind="measured" /> **Ancestry versus released content.** The retained maintenance record reports negative commit-ancestry and tag-containment checks, followed by direct inspection of the release's file, which found the fix. The repository's squash-merge history explains the discrepancy. This measures presence in the tagged source, not presence in a deployed process, and supplies no outcome comparison.[^ancestry]
 
-**[Measured]** **A provenance writer on one path.** The September 16 audit traced automatic BOM emission through composite/bundle materialization and inspected the separate single-artifact deployment route. The latter emitted activity events without invoking the BOM generator. The finding is a path-coverage gap. It doesn't measure the proportion of all deployments missing records, and a working bundle path doesn't close that gap.[^bom-scope]
+<Evidence kind="measured" /> **A provenance writer on one path.** The September 16 audit traced automatic BOM emission through composite/bundle materialization and inspected the separate single-artifact deployment route. The latter emitted activity events without invoking the BOM generator. The finding is a path-coverage gap. It doesn't measure the proportion of all deployments missing records, and a working bundle path doesn't close that gap.[^bom-scope]
 
-**[Measured]** **Real records, unresolved caller.** The same audit inspected three real context-provenance rows with deployment findings and traced the CLI's call into the writer. It found no durable dispatch log in the inspected canonical checkout that identified which actor produced those rows. That leaves the actor unresolved. It doesn't make the rows fictitious, and it doesn't prove the automated pilot produced them.[^context-records]
+<Evidence kind="measured" /> **Real records, unresolved caller.** The same audit inspected three real context-provenance rows with deployment findings and traced the CLI's call into the writer. It found no durable dispatch log in the inspected canonical checkout that identified which actor produced those rows. That leaves the actor unresolved. It doesn't make the rows fictitious, and it doesn't prove the automated pilot produced them.[^context-records]
 
-**[Observed]** The compact chronology below comes from the first commits of the named local mechanisms. These are implementation-history markers, not public-priority claims or dates of complete fleet coverage.
+<Evidence kind="observed" /> The compact chronology below comes from the first commits of the named local mechanisms. These are implementation-history markers, not public-priority claims or dates of complete fleet coverage.
 
 | First committed | Local mechanism | What the record adds |
 | --- | --- | --- |
@@ -360,12 +371,14 @@ These are dated implementation records, summarized as methods. The August commit
 | August 2026 | Deployed-artifact drift check | Comparison at the deployment destination |
 | August 2026 | Direction-aware workflow synchronization | Protection against erasing local-ahead changes |
 
-**[Proposed synthesis]** Those repairs support the managed-variation architecture in this essay. They don't establish a complete identity-to-outcome chain. I still need evidence for when a local improvement should become shared policy, when an automated fast path should return to judgment, and how an independent acceptance decision changes results. The three-project comparison is illustrative. No promotion, demotion or acceptance-by-assertion incident is being claimed from these receipts.
+<Evidence kind="proposed" /> Those repairs support the managed-variation architecture in this essay. They don't establish a complete identity-to-outcome chain. I still need evidence for when a local improvement should become shared policy, when an automated fast path should return to judgment, and how an independent acceptance decision changes results. The three-project comparison is illustrative. No promotion, demotion or acceptance-by-assertion incident is being claimed from these receipts.
 
-**[Externally reported]** The four vendor descriptions and the related architecture research are outside sources. Their product boundaries and contribution claims remain distinct from my implementation records. In particular, no external benchmark result is reported here as a benefit measured in the lab.
+<Evidence kind="external" /> The four vendor descriptions and the related architecture research are outside sources. Their product boundaries and contribution claims remain distinct from my implementation records. In particular, no external benchmark result is reported here as a benefit measured in the lab.
 
 <Callout type="info" title="Evidence labels">
-**Observed** means bounded operating evidence. **Externally reported** identifies a claim from an outside source, not a lab result. **Proposed synthesis** marks my architecture interpretation or an unvalidated extension. **Measured** is reserved for a defined measurement with a stated method; this essay reports no measured outcome improvement.
+<EvidenceLegend />
+
+This essay reports no measured outcome improvement.
 </Callout>
 
 <Figure
