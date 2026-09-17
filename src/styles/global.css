@@ -780,8 +780,9 @@ pre code {
 .figure-plate__caption,
 .prose-custom .figure-plate__caption {
   display: flex;
-  align-items: baseline;
-  gap: 0.75rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
   margin-top: 0.875rem;
   padding: 0 0.125rem;
   font-size: 0.8125rem;
@@ -789,6 +790,12 @@ pre code {
   font-style: normal;
   text-align: left;
   color: #475569;
+}
+
+.figure-plate__caption-main {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
 }
 
 .figure-plate__label {
@@ -809,6 +816,22 @@ pre code {
   font-weight: 400;
 }
 
+.figure-plate__credit {
+  color: #64748b;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  line-height: 1.4;
+}
+
+.figure-plate__credit a {
+  color: inherit;
+  text-underline-offset: 0.18em;
+}
+
+.figure-plate__credit a:hover {
+  color: #334155;
+}
+
 @media (max-width: 640px) {
   .figure-plate {
     margin: 2rem 0;
@@ -819,6 +842,9 @@ pre code {
     padding: 1.125rem 1.125rem 1rem;
   }
   .figure-plate__caption {
+    gap: 0.3rem;
+  }
+  .figure-plate__caption-main {
     flex-direction: column;
     gap: 0.25rem;
   }

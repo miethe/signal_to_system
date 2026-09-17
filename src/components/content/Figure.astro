@@ -16,12 +16,14 @@ interface Props {
   alt: string;
   caption?: string;
   number?: string;
+  credit?: string;
+  creditHref?: string;
   variant?: 'default' | 'hero';
 }
 
-const { src, alt, caption, number, variant = 'default' } = Astro.props;
+const { src, alt, caption, number, credit, creditHref, variant = 'default' } = Astro.props;
 const isHero = variant === 'hero';
-const showCaption = !isHero && (number || caption);
+const showCaption = !isHero && (number || caption || credit);
 ---
 
 <figure class:list={['figure-plate', isHero && 'figure-plate--hero']}>
@@ -41,8 +43,17 @@ const showCaption = !isHero && (number || caption);
 
   {showCaption && (
     <figcaption class="figure-plate__caption">
-      {number && <span class="figure-plate__label">Fig · {number}</span>}
-      {caption && <span class="figure-plate__text">{caption}</span>}
+      {(number || caption) && (
+        <span class="figure-plate__caption-main">
+          {number && <span class="figure-plate__label">Fig · {number}</span>}
+          {caption && <span class="figure-plate__text">{caption}</span>}
+        </span>
+      )}
+      {credit && (
+        <span class="figure-plate__credit">
+          {creditHref ? <a href={creditHref}>{credit}</a> : credit}
+        </span>
+      )}
     </figcaption>
   )}
 </figure>
