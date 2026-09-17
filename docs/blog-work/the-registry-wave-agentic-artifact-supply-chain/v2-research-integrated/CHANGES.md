@@ -14,6 +14,18 @@ Pack pointers below are relative to `/Users/miethe/dev/homelab/development/agent
 | Restored `diagram-estate-before-after.svg` at its c9b03ad position (Figure 07, after the Evidence labels callout, before WhereThisSits) with a qualified caption | The diagram's own claims (hash verification, drift detection) match mechanisms this essay already documents as implemented; rewrote the caption to drop the "running in production today" claim and mark specific versions/hashes/counts as illustrative |
 | Kept `diagram-aos-estate-deep.svg` OUT of the manuscript; file untouched | Contains specific type/adoption/CBOM/measurement assertions this leg cannot verify against current audits from this worktree (no access to `agentic_meta_dev`); see "Figures held for Nick" below |
 
+## Editor pass (Leg Z, voice rules)
+
+Checked against `.claude/skills/voice-writer/SKILL.md` and `docs/blog-work/.../voice/nick-voice-rules.md`: zero em/en dashes (verified by script, not self-report), no preview filler, no coinage claims on any of the five/six defined terms, all `<Term id>` usages resolve in `src/data/glossary.ts`, the four external footnotes remain byte-identical to c9b03ad, the "Some copies must change. Some differences must survive." line is unchanged, and all bracket-style evidence tags (`**[Observed]**` etc.) stay confined to the Receipts section.
+
+| Line(s) | Change | Reason |
+| --- | --- | --- |
+| Control fabric section (was: `*Proposed synthesis: these surfaces form a control fabric...*`) | Rewrote to drop the leaked evidence-tag label from narrative prose, keeping the same claim | Evidence tags belong only in Receipts or a caption; this line used the tag vocabulary as a sentence opener in the body |
+| "A configured integration is not enforcement; an advisory registration is not a gate." | Contracted to "isn't...isn't" | Uncontracted formal phrasing in body prose is a machine-draft tell per voice rules; the parallel-clause rhythm holds with contractions |
+| Figure 03 ("use" beat) caption | Contracted "is not evidence" to "isn't evidence" | Same rule; brings this caption in line with the essay's other captions |
+
+No other sentence-level departures found: the six ThreadBeat beats read as one continuous incident, the Xia paragraph reads as an engineer citing overlapping architecture rather than a literature review, and no hedge-on-hedge or formal-definition-register construction was present.
+
 ### Figures held for Nick
 
 `diagram-aos-estate-deep.svg` (`public/assets/posts/the-registry-wave-agentic-artifact-supply-chain/diagram-aos-estate-deep.svg`) asserts these specific claims in its embedded SVG text; each would need independent confirmation against current AOS state before this figure could return to the manuscript:
