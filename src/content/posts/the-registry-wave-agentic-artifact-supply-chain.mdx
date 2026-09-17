@@ -83,6 +83,12 @@ The stale reviewer is the easy half. A separate incident handed me the hard half
 Some copies must change. Some differences must survive. Keeping track of which is which is the supply-chain problem this essay is about.
 
 ## The harder problem: not every difference should disappear.
+<Figure
+  src="/assets/posts/the-registry-wave-agentic-artifact-supply-chain/diagram-thread-01-incident.svg"
+  alt="Schematic diagram showing the reviewer skill's guard restored at the source and reflected in the registry, while deployed copies remain unchanged."
+  number="01"
+  caption="Schematic of the recorded incident: the fix lands at the source and reaches the registry immediately; the deployed copies haven't caught up yet."
+/>
 
 A stale copy is the easy failure. The harder case is a different copy that is different on purpose. A project can carry a useful local improvement, and blindly replacing it with the shared version is also wrong. The job is not to make every copy identical. It is to know which differences are stale, which are deliberate, and which might be worth sharing.
 
@@ -192,13 +198,24 @@ The remedy is a recorded, registry-driven deployment. No manual copy/paste, no s
 
 <ThreadScene slug="the-registry-wave-agentic-artifact-supply-chain" beatId="use" />
 
-I need three separate answers: what the project intended to use, what is present on disk, and what the runtime actually used. A deployment check can establish the second without establishing the third. If a session started before the update, inspecting the file afterward won't tell me what it loaded. The run needs its own observation; absent that, the loaded version stays unknown.
+<Figure
+  src="/assets/posts/the-registry-wave-agentic-artifact-supply-chain/diagram-thread-02-deployment.svg"
+  alt="Schematic diagram contrasting the registry's corrected reviewer skill against three deployed project copies still missing the guard, under the same skill name."
+  number="02"
+  caption="Illustrative project copies: the registry and the deployed copies now disagree about what the same skill name means."
+/>
 
 I need three separate answers: what the project intended to use, what is present on disk, and what the runtime actually used. A deployment check can establish the second without establishing the third. If a session started before the update, inspecting the file afterward won't tell me what it loaded. The run needs its own observation; absent that, the loaded version stays unknown.
 
 At **use**, the project loads the deployed copy in its own context. The supply-chain obligation is to check that binding: the approved artifact, the expected context, and the allowed tools. The guard's presence is a prerequisite for the intended review, not evidence that the guard was followed.
 
 <ThreadScene slug="the-registry-wave-agentic-artifact-supply-chain" beatId="drift" composition="pane" />
+<Figure
+  src="/assets/posts/the-registry-wave-agentic-artifact-supply-chain/diagram-thread-03-use.svg"
+  alt="Schematic diagram showing an agent session loading a deployed copy, with a broken link between the guard instruction being present in the file and the guard actually being followed."
+  number="03"
+  caption="Diagram: the guard's presence in a file is not evidence the guard was followed."
+/>
 
 At **drift**, declared and actual state separate. The fix stayed in the source repository while every project outside it kept loading the pre-fix reviewer. For five days, “fixed” described one location.
 
@@ -228,6 +245,25 @@ Two redacted entries show the distinction. The first is a tracked copy, diffed a
 
 At **detection**, a gate compares deployed state with its source. The August 6 drift check classifies deployed entries, distinguishing tracked copies, justified copies, and drift; it also identifies symlinks. Drift fails the check.[^drift] A justified copy needs an explicit reason to differ. Otherwise exceptions become another way to lose the deployment record.
 
+*One tracked copy, diffed against its upstream on every run, and one allowed copy, never diffed, because no upstream exists to diff against.*
+
+<Figure
+  src="/assets/posts/the-registry-wave-agentic-artifact-supply-chain/diagram-thread-04-drift.svg"
+  alt="Schematic diagram showing five days on a timeline where the registry stays correct and the deployed copies stay stale, simultaneously and without change."
+  number="04"
+  caption="Diagram: for five days, 'fixed' described one location; the registry and the deployment disagreed the whole time."
+/>
+
+<ThreadBeat slug="the-registry-wave-agentic-artifact-supply-chain" beat="detection" />
+
+At **detection**, a gate compares deployed state with its source. The August 6 drift check classifies deployed entries, distinguishing tracked copies, justified copies, and drift; it also identifies symlinks. Drift fails the check.[^drift] A justified copy needs an explicit reason to differ. Otherwise exceptions become another way to lose the deployment record.
+
+<Figure
+  src="/assets/posts/the-registry-wave-agentic-artifact-supply-chain/diagram-thread-05-detection.svg"
+  alt="Schematic diagram of an August 6 byte-comparison check between the registry and deployed copies, outputting a drift-detected alert."
+  number="05"
+  caption="Diagram: a byte comparison is what finally noticed the gap no one else was checking."
+/>
 
 A content hash answers whether bytes match a recorded revision. An ancestry record answers which base a local change came from. Neither tells me whether that change is useful, approved or compatible. I need the base to understand the patch, the current bytes to identify it, and review and tests to decide what should happen next.
 
@@ -314,6 +350,13 @@ Failure rate needs a denominator and a definition: failed reviews among comparab
 
 Drift can also happen against a frozen skill. Keep its bytes unchanged and change the runtime or context; the same instructions may produce different behavior. Compare those runs separately from an artifact-version change. Otherwise the registry gets blamed for degradation it didn't cause, or credit for an improvement it didn't produce.
 
+<Figure
+  src="/assets/posts/the-registry-wave-agentic-artifact-supply-chain/diagram-thread-06-outcome.svg"
+  alt="Schematic diagram of a run record table showing which reviewer version an agent session actually loaded, contrasted with earlier runs where that version was never captured."
+  number="06"
+  caption="Proposed run-evidence model, not captured runtime data: record the loaded reviewer version, and keep earlier unknown versions unknown."
+/>
+
 I want to measure accepted outcomes with evidence. For this reviewer, that means a review that meets the request, with evidence of the required guard and an authorized acceptance decision. A <Term id="feature-contract">**Feature Contract**</Term> makes those obligations explicit; [The Contract Is the Work](/essays/the-contract-is-the-work/) takes up that boundary.
 
 <BoundaryGrid
@@ -347,6 +390,14 @@ The related August 5 parity gate followed six weeks of stale doctrine reaching o
 These are detection mechanisms with different boundaries. Byte comparison catches the stale reviewer. Parity catches divergence between sibling instructions. The staleness check catches a particular outdated claim even when the files aren't supposed to be identical. But none proves that every remaining instruction is correct.
 
 The same substitution showed up in provenance. In the September audit, SkillBOM emission was wired into bundle assembly. Deploying a single artifact used a different path and didn't automatically emit a BOM. Both operations could reasonably be described as deploying capability, but only one reached that evidence writer.[^bom-scope] A feature list saying “provenance supported” concealed the question I needed answered: supported on the operation I just performed?
+
+Another context-provenance tool had produced three real records with deployed-artifact findings. The records existed; the CLI path that could write them existed too. What the durable record didn't establish was whether a human had run that command or an automated agent had invoked it. The audit could confirm production-shaped output without confirming the automated caller.[^context-records] I can't use those rows to claim autonomous reconciliation, much less that every session's loaded context is known.
+
+Even the comparison itself can ask the wrong question. A maintenance check rejected a report that a dependency's fix had shipped because the original commit wasn't an ancestor of the release. The repository squash-merges. Inspecting the tagged file showed the fix was present.[^ancestry] The ancestry result was correct; my conclusion about the release would have been wrong. A receipt needs a question as well as a timestamp.
+
+These failures changed what I ask a registry to show me. I want a deployment record with a destination, a comparison against that destination's intended state, and a separate account of use. When one is missing, the other two shouldn't quietly fill in for it. A green registration result can't answer a loading question, and an output file can't identify its producer unless that identity was retained.
+
+The retained September 15 run of the same gate exited nonzero, on a different and unrelated class of finding:
 
 Another context-provenance tool had produced three real records with deployed-artifact findings. The records existed; the CLI path that could write them existed too. What the durable record didn't establish was whether a human had run that command or an automated agent had invoked it.[^context-records] Production-shaped output, unresolved producer. I can't use those rows to claim autonomous reconciliation.
 
@@ -449,24 +500,9 @@ This essay reports no measured outcome improvement.
 
 </details>
 
-<Figure
-  src="/assets/posts/the-registry-wave-agentic-artifact-supply-chain/diagram-estate-before-after.svg"
-  alt="Side-by-side diptych: on the left, two actors, a human and an agent, reach into worktrees scattered across four projects; a single tracked skill exists as four incompatible copies with different versions and hashes, threaded in red through the tangle. On the right, the same four projects deploy from one SkillMeat registry, each copy verified against it by content hash."
-  number="08"
-  caption="Same estate, same projects, same agents. The only difference is whether one registry is the authority: four divergent copies of one skill versus one canonical version, traceable by hash, and that difference is running in production today, not a roadmap item."
-/>
-
-<Figure
-  src="/assets/posts/the-registry-wave-agentic-artifact-supply-chain/diagram-aos-estate-deep.svg"
-  alt="A denser diagram of the whole Agentic OS: agents in per-project worktrees resolve twenty-one governed artifact types from one SkillMeat registry, checked by content hash and drift detection; SkillBOM is wired to git commits, a session-scoped CBOM is marked as designed-only; Hermes runs five zero-model cron lanes live while three agent-mode loops sit disarmed, and autonomous merge stops at a development branch, never main."
-  number="09"
-  caption="What's actually running, not what's specced. Solid means built; dashed means built but gated or incomplete; dotted means designed only. The CBOM box and the merge-to-main boundary are both dotted on purpose."
-/>
-
 <WhereThisSits slug="the-registry-wave-agentic-artifact-supply-chain" />
 
 I place this work within the emerging discipline of <Term id="agentic-systems-engineering">**Agentic Systems Engineering**</Term>, already named in academic work by Sun and colleagues and in enterprise work by OutSystems.[^ase] This series examines my particular architecture through the systems I build and the failures they expose. Agentic SDLC is its application to software delivery. This reading path connects the questions; it isn't a one-to-one map of architecture layers.
-
 
 The reviewer didn't need a better name or another catalog. It needed the fix to reach the place that loaded it, a check that noticed when it hadn't, and evidence that the resulting review did what was asked. It also needed room for a project-specific improvement to survive the next shared correction. That's the bar I want the supply chain to meet when I'm no longer watching every project myself.
 
@@ -497,4 +533,3 @@ External claims below reflect researched, scoped status for this edition: each f
 [^bom-scope]: September 16, 2026 lab audit, source-path inspection: bundle materialization attempts automatic BOM emission; the separate plain single-artifact deployment path emits activity events without invoking that generator. This is the audit's scoped result, not a fresh runtime probe or a measured fleet-wide adoption rate. Internal identifiers withheld; method only.
 [^context-records]: September 16, 2026 lab audit: three context-provenance rows inspected in the canonical checkout, containing real deployed-artifact drift findings. The CLI-to-writer call chain was traced, but the inspected durable records did not identify the actor that produced those rows. File modification time is not used as a per-row execution timestamp. This context record is separate from the still-designed just-in-time provisioning record. Internal identifiers withheld; method only.
 [^ancestry]: Retained lab maintenance record: commit-ancestry and tag-containment checks returned negative for a fix in a squash-merging dependency repository; direct inspection of the tagged file found the fixed content. The comparison establishes release content only. Internal identifiers withheld; method only.
-

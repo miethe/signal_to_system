@@ -85,6 +85,8 @@ Integrated `feat/essay-evidence-components` (tip `60883f0`) into the manuscript:
 
 The SVG file itself was not edited. If Nick confirms these are still current, the fix is a caption addition in the manuscript (same pattern as Figure 07 above), not a rewrite of the asset.
 
+Pack pointers below are relative to `/Users/miethe/dev/homelab/development/agentic_meta_dev/docs/project_plans/reports/chat-2026-09-17-theses/pack/`. E numbers refer to the sibling `E-real-examples.md`.
+
 ## Substantive changes
 
 | Section | What changed | Why / source | Open item | Evidence class |
@@ -316,3 +318,6 @@ Body: **4,187 before; 4,423 after; +236 words**, measured with my own reimplemen
 - The built route contains the authored hero alt twice, for the inline hero and dialog image, and its Open Graph image points to `hero-governed-cube.png`.
 - `npm run check:prose` passed, `git diff --check` passed, and the added diff contains zero U+2013 and U+2014 characters.
 - Source review confirms native Escape behavior, backdrop close, focus return, body scroll restoration, and reduced-motion suppression for the lightbox animation. Browser execution was not attempted because this delegated sandbox does not support Chromium.
+```json
+{"assumptions": []}
+```
