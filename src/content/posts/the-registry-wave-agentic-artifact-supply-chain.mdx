@@ -401,6 +401,20 @@ This essay reports no measured outcome improvement.
 
 </details>
 
+<Figure
+  src="/assets/posts/the-registry-wave-agentic-artifact-supply-chain/diagram-estate-before-after.svg"
+  alt="Side-by-side diptych: on the left, two actors, a human and an agent, reach into worktrees scattered across four projects; a single tracked skill exists as four incompatible copies with different versions and hashes, threaded in red through the tangle. On the right, the same four projects deploy from one SkillMeat registry, each copy verified against it by content hash."
+  number="08"
+  caption="Same estate, same projects, same agents. The only difference is whether one registry is the authority: four divergent copies of one skill versus one canonical version, traceable by hash, and that difference is running in production today, not a roadmap item."
+/>
+
+<Figure
+  src="/assets/posts/the-registry-wave-agentic-artifact-supply-chain/diagram-aos-estate-deep.svg"
+  alt="A denser diagram of the whole Agentic OS: agents in per-project worktrees resolve twenty-one governed artifact types from one SkillMeat registry, checked by content hash and drift detection; SkillBOM is wired to git commits, a session-scoped CBOM is marked as designed-only; Hermes runs five zero-model cron lanes live while three agent-mode loops sit disarmed, and autonomous merge stops at a development branch, never main."
+  number="09"
+  caption="What's actually running, not what's specced. Solid means built; dashed means built but gated or incomplete; dotted means designed only. The CBOM box and the merge-to-main boundary are both dotted on purpose."
+/>
+
 <WhereThisSits slug="the-registry-wave-agentic-artifact-supply-chain" />
 
 I place this work within the emerging discipline of <Term id="agentic-systems-engineering">**Agentic Systems Engineering**</Term>, already named in academic work by Sun and colleagues and in enterprise work by OutSystems.[^ase] This series examines my particular architecture through the systems I build and the failures they expose. Agentic SDLC is its application to software delivery. This reading path connects the questions; it isn't a one-to-one map of architecture layers.
