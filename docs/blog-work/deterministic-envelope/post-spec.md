@@ -1,5 +1,23 @@
 # Post Spec
 
+## Revision 2026-09-17 (research pass)
+
+**Core question restated.** Not "can we make the model deterministic?" The working question is: under what conditions does judgment get promoted to a deterministic rule, and under what conditions does a rule get demoted back to judgment. The "make the model deterministic" framing below (One-Sentence Thesis, movement 1) is quote-and-replaced to match this; the rest of the spec is left as-is.
+
+**Attribution posture.** "Deterministic envelope" is existing terminology, not coined here (older control-systems usage, plus close 2025-2026 agent/governance work). This essay's emphasis: controls enforced outside model judgment, the evidence that they actually mediate execution, and the lifecycle for promoting or withdrawing reusable automation. State this once, early, per the spec's own "What This Essay Must NOT Claim" section.
+
+**Alternate display title (PROPOSED, not a rename).** "What Should Stop Requiring a Model?" (subtitle: "Deterministic envelopes, validated exceptions and the return to automation.") A proposed editorial title under consideration only; the working title and slug above are unchanged pending Nick's decision.
+
+**Related work this essay must acknowledge** (citation punch list, not yet source-verified; pin exact references before drafting):
+- **RAILS**: prior work separating deterministic and stochastic execution paths inside an agent; closest match to this essay's own determinism-gradient split.
+- **Parallax**: trace-driven precedent for extracting repeatable, rule-shaped behavior from agent execution history.
+- **TraceCompiler**: precedent for compiling execution traces into deterministic workflow/rule artifacts; bears directly on this essay's learning-loop movement (resolution to candidate to promotion).
+- **SkillDroid**: reports a large numerical improvement claim; acknowledge the work, hold the number. Do not repeat SkillDroid's figure in this essay.
+- **Trace2Policy**: adjacent trace-to-policy compilation precedent alongside TraceCompiler; both weaken any claim that trace-to-rule compilation itself is new here.
+- **Ripple Down Rules (RDR)**: established knowledge-engineering technique (incremental exception-rule maintenance) that predates agentic AI entirely; direct precedent for this essay's promotion/demotion lifecycle.
+
+**Sustained example (OPEN for Nick).** Undecided between: (a) an enterprise SAP/Oracle/Confluent-style data-contract-to-agent frame (externally legible, no internal receipts needed); (b) the lab leg-dispatch pipeline receipts already scoped below in "The Sustained End-to-End Example" (dated, re-derivable, lab-scale); (c) both, sequenced. Do not draft against a single choice until Nick decides.
+
 ## Working Title
 The Deterministic Envelope: Probabilistic Intelligence Inside a Deterministic Enterprise
 
@@ -25,10 +43,10 @@ Agentic SDLC
 Dual register, per `s2s-blog-dual-register`: technical enough that a staff engineer finds it honest, story-first enough that a technical executive with no agent background finishes it and can retell the argument. No raw identifiers (node IDs, internal repo paths, ULIDs) in body prose; every internal system gets a one-clause introduction or is genericized. Receipts live in a light footnote/rail layer, matching sibling essays.
 
 ## One-Sentence Thesis
-Do not try to make the model deterministic; build a deterministic envelope around it, so probabilistic cognition is spent only where ambiguity is real, and every resolution that repeats becomes infrastructure instead of another inference call.
+The question is not whether the model can be made deterministic; it is under what conditions judgment gets promoted to a deterministic rule, and under what conditions a rule gets demoted back to judgment, so probabilistic cognition is spent only where ambiguity is real, and every resolution that repeats becomes infrastructure instead of another inference call.
 
 ## The Argument Spine (7 movements)
-1. **The wrong goal.** "Make AI deterministic" is not achievable and not the right target; the achievable target is bounding *where* probabilism is allowed to operate.
+1. **The wrong question.** "Can we make the model deterministic?" is not achievable and not the right target; the achievable question is under what conditions judgment gets promoted to a deterministic rule, and under what conditions a rule gets demoted back to judgment.
 2. **The envelope, defined.** A deterministic envelope is the set of ordinary software controls, identity, permissions, budgets, schemas, validators, and policy gates, wrapped around a probabilistic core, so the model's freedom is scoped to the part of the decision that actually requires judgment.
 3. **The determinism gradient.** Four zones (hard deterministic, bounded probabilistic, governed judgment, novel exploration) replace a binary "autonomous vs. supervised" framing with a spectrum keyed to evidence, not to trust in the model.
 4. **Registered is not enforced.** The gap between a control that exists on paper and a control that actually fires, illustrated with two dated, receipted cases where a governance mechanism was configured but not yet load-bearing.

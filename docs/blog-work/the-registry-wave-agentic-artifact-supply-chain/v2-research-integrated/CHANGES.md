@@ -181,3 +181,10 @@ First local commit: `f0fdf814a86e779b6c3a052e67fafef9abf67e9b` (attribution, mar
 | drift section | "that gate" to "the drift gate" | the antecedent (the detection gate) is introduced two beats later; dangling reference present since the baseline |
 
 No other edits. The manuscript is the final draft for this edition; hero and estate figures remain Nick's call as recorded above.
+
+## Merge from main after arc re-label
+
+- `git merge origin/main` was refused before changing the worktree because the sandbox denied creation of the linked-worktree `ORIG_HEAD.lock`. Applied the equivalent three-way file merge: the two true conflicts were the Registry Wave MDX and `src/data/glossary.ts`.
+- Kept this branch's MDX wholesale. Main-only MDX additions were either already represented or contradicted by this ledger (including the held estate/deep figures and editorial framing); none were carried. Retained this branch's glossary entries and definitions, while taking main's neutral module-comment wording.
+- Main's clean arc artifacts were applied: the Deterministic Envelope spec, Registry Wave LinkedIn thread, arc delta record, productivity-post date, and glossary page.
+- Under Node 24.14.0, `npm run check` exited 1 with 2,635 errors, 0 warnings, and 218 hints; no diagnostic named `src/content/posts/` or `src/data/glossary.ts`. `npm run build` initially exposed an existing parser-invalid multiline union type in `Evidence.astro`; changed it to a string-keyed record and the rebuild exited 0. The essay route exists at `dist/essays/the-registry-wave-agentic-artifact-supply-chain/index.html` and contains “September 2026 edition.” `git diff --check` passes; all Term IDs resolve; the MDX has zero en/em dashes.
