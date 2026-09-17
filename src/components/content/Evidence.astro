@@ -5,23 +5,15 @@
  * Keep these markers in receipt sections, figure captions, and other places
  * where readers are evaluating evidence; do not interrupt narrative prose.
  */
-export type EvidenceKind =
-  | 'observed'
-  | 'measured'
-  | 'proposed'
-  | 'related-work'
-  | 'external'
-  | 'hypothesis';
-
 interface Props {
-  kind: EvidenceKind;
+  kind: string;
   date?: string;
   href?: string;
 }
 
 const { kind, date, href } = Astro.props;
 
-const evidenceClasses: Record<EvidenceKind, { label: string; definition: string }> = {
+const evidenceClasses: Record<string, { label: string; definition: string }> = {
   observed: {
     label: 'Observed',
     definition: 'A directly witnessed event or artifact state.',
