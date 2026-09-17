@@ -49,3 +49,38 @@ Voice moves preserved: owned failure; forensic five-day detail; short corrective
 Baseline tally: SATISFIED: 13, PARTIAL: 11, OUT OF SCOPE FOR THIS BRANCH: 6, NOT DONE: 3.
 
 No screenshot or runtime observation is inferred from a diagram, receipt summary, or build. All pack open items remain open.
+
+## Phase 2: follow-through
+
+Every baseline row above was re-read against the manuscript at `daeda64` before editing. **No row required correction.** Four rows carried site claims that I verified directly rather than accepting: `Figure.astro` renders a bare `<img>` with no `srcset`, `sizes`, intrinsic dimensions, or enlargement affordance (rows 25, 26); `PostLayout.astro:96` opens the `<header>` and renders `heroImage` afterwards at line 186, and `src/pages/essays/[...slug].astro:29` maps `heroImage` straight to `ogImage` with no separate social field (row 20); `PostLayout.astro:173` mounts exactly one `ThreadRail` and the layout has no autoplay (row 23).
+
+| # | Baseline status | Now | What closed it |
+| --- | --- | --- | --- |
+| 3 | PARTIAL | SATISFIED | Vendor survey moved out of the incident into `## What the market has joined so far`, after the worked example; both duplicate interactive representations removed |
+| 4 | PARTIAL | SATISFIED | Opening tightened; the managed-variation dilemma now arrives as a paragraph before Nick's "Some copies must change" line, which becomes its payoff rather than an unset-up assertion |
+| 5 | PARTIAL | SATISFIED | The workflow-copy incident and the A/B/C comparison are lifted out of the detection beat into their own section, `## Some differences must survive` |
+| 9 | PARTIAL | SATISFIED | Explicit **Source** / **Collection** / **Project** hops named in the new section, with intended binding, present bytes, and loaded version kept as three separate facts and the third left to a run record |
+| 18 | PARTIAL | SATISFIED | Workflow synchronization now labelled "local lab tooling rather than a registry feature" in prose; the three-project panel and the Source/Collection/Project path are both labelled illustrative |
+| 22 | PARTIAL | SATISFIED | One compact three-beat panel ("Three projects, three different repairs") with the technical detail in a closed native `<details>`. The chronology table stays inline: it already sits inside the evidence appendix, so a disclosure there buys a click and no reading-line improvement |
+| 24 | PARTIAL | SATISFIED | `ArtifactTaxonomy` and `ArtifactControlPlane` invocations, imports, and the `registry-wave.css` import removed. Static tables are the single representation; the essay drops from three competing part-models (four assurances / four responsibilities / six control-plane layers) to two |
+| 27 | PARTIAL | SATISFIED | With both islands gone, every comparative structure in the essay is a static table, a native `<details>`, or a `Callout`. Nothing in the body now shows only its first tab without JS |
+| 29 | PARTIAL | SATISFIED | Manuscript diff, this audit, and the appended `CHANGES.md` ledger. No new image prompts warranted; page implementation stays rows 20, 25, 26 |
+| 31 | PARTIAL | SATISFIED | Preservation and voice checks run and reported below; external citation verification still belongs to the separate verification leg |
+| 33 | PARTIAL | PARTIAL | `check:prose` and an MDX compile pass; `npm run check` / `npm run build` are **unrunnable in this sandbox**, recorded honestly rather than claimed. See "Validation" in `CHANGES.md` |
+| 16, 17, 30 | NOT DONE | NOT DONE | Unchanged: no capture exists; Nick's 09-15 decision keeps Figure 01 a diagram |
+| 12, 15, 20, 25, 26, 32 | OUT OF SCOPE | OUT OF SCOPE | Unchanged, reasons as recorded above |
+
+Closing tally: SATISFIED: 23, PARTIAL: 1 (row 33, sandbox-blocked gate), OUT OF SCOPE FOR THIS BRANCH: 6, NOT DONE: 3.
+
+### Site items, forwarded not built
+
+Each is a one-line spec for a separate site leg. None was implemented here, per the brief.
+
+| Item | Spec | Anchor |
+| --- | --- | --- |
+| Hero before the title | Move the `heroImage` render above `<header>`, or add a `variant="hero"` frontispiece slot the layout places first | `src/layouts/PostLayout.astro:96,186` |
+| Separate social asset | Add an optional `socialImage` to the posts schema and prefer it over `heroImage` for `ogImage`, so the frontispiece and the card can diverge | `src/content.config.ts:49`, `src/pages/essays/[...slug].astro:29` |
+| Accessible figure enlargement | Wrap `Figure`'s `<img>` in a keyboard-operable trigger opening a dialog, with focus return, Escape to close, and the raw image as the no-JS fallback href | `src/components/content/Figure.astro:36` |
+| Responsive images | Give `Figure` `width`/`height` and `srcset`/`sizes`, and verify existing SVG sizing on mobile in a browser-capable lane | `src/components/content/Figure.astro:36` |
+| Disclosure styling | `.prose-custom` styles no `details`/`summary`, so the new panel's disclosure renders with browser defaults. Four story MDX files already rely on the same bare element, so this is a site-wide gap, not one introduced here | `src/styles/global.css` |
+| Retire or reuse `registry-wave.css` | With both islands out of the manuscript, `src/styles/registry-wave.css` and both `src/components/interactive/Artifact*.tsx` have no consumer. Files left untouched; deletion is a separate call | `src/styles/registry-wave.css` |
