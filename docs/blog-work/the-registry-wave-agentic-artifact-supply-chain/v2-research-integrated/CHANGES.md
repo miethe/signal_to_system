@@ -172,3 +172,12 @@ First local commit: `f0fdf814a86e779b6c3a052e67fafef9abf67e9b` (attribution, mar
 ```json
 {"assumptions": [{"claim": "npm run check still reports ~2635 errors with 0 new diagnostics naming this post or glossary.ts after this leg's edits", "confidence": 0.55, "blast_radius": "low", "evidence_if_wrong": "re-running npm run check under Node >=22.12.0 (blocked in this session's sandbox) shows a diagnostic count change or a new error naming the-registry-wave-agentic-artifact-supply-chain.mdx or glossary.ts"}]}
 ```
+
+## Front read (2026-09-17, after Leg Z)
+
+| Line | Edit | Why |
+| --- | --- | --- |
+| frontmatter `readTime` | 14 min to 18 min | body prose grew from 2,773 to 4,305 words; the displayed estimate was stale |
+| drift section | "that gate" to "the drift gate" | the antecedent (the detection gate) is introduced two beats later; dangling reference present since the baseline |
+
+No other edits. The manuscript is the final draft for this edition; hero and estate figures remain Nick's call as recorded above.
