@@ -6,6 +6,28 @@ Date: 2026-09-17. Baseline: `c9b03ad`, Nick's hand-edit snapshot. Scope: manuscr
 
 Pack pointers below are relative to `/Users/miethe/dev/homelab/development/agentic_meta_dev/docs/project_plans/reports/chat-2026-09-17-theses/pack/`. E numbers refer to the sibling `E-real-examples.md`.
 
+## Editor pass (Leg Z, front corrections)
+
+| Change | Reason |
+| --- | --- |
+| Restored `heroImage` to `diagram-market-wave.svg` (c9b03ad value) | Hero/social card image is a site-wide author-taste decision, not a research-pass call; the writer's removal of the in-body market-wave Figure stands |
+| Restored `diagram-estate-before-after.svg` at its c9b03ad position (Figure 07, after the Evidence labels callout, before WhereThisSits) with a qualified caption | The diagram's own claims (hash verification, drift detection) match mechanisms this essay already documents as implemented; rewrote the caption to drop the "running in production today" claim and mark specific versions/hashes/counts as illustrative |
+| Kept `diagram-aos-estate-deep.svg` OUT of the manuscript; file untouched | Contains specific type/adoption/CBOM/measurement assertions this leg cannot verify against current audits from this worktree (no access to `agentic_meta_dev`); see "Figures held for Nick" below |
+
+### Figures held for Nick
+
+`diagram-aos-estate-deep.svg` (`public/assets/posts/the-registry-wave-agentic-artifact-supply-chain/diagram-aos-estate-deep.svg`) asserts these specific claims in its embedded SVG text; each would need independent confirmation against current AOS state before this figure could return to the manuscript:
+
+- "21 governed artifact types verified in code (13 more not shown for space)"
+- "caught 2 regressions, 8/23" (Content-hash verify box)
+- "SkillBOM ... adoption thin, 1 seen live"
+- "CBOM (session): designed only, no writer yet ... JIT-provisioning spec, gap N13"
+- "5 zero-model cron lanes: built, live" naming `seed-queue·seam-reconcile·hai-sweep·attest-suite·attest-deadman`
+- "3 agent-mode loops: partial, disarmed ... ~26M input tok/day measured; cost gate reports used=0"
+- "autonomous merge to main: never yet; R3 not entered on the autonomy ladder (R0.5 today)"
+
+The SVG file itself was not edited. If Nick confirms these are still current, the fix is a caption addition in the manuscript (same pattern as Figure 07 above), not a rewrite of the asset.
+
 ## Substantive changes
 
 | Section | What changed | Why / source | Open item | Evidence class |
