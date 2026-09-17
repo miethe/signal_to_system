@@ -250,10 +250,6 @@ First local commit: `f0fdf814a86e779b6c3a052e67fafef9abf67e9b` (attribution, mar
 - **Approximate, not measured: body word count.** Re-running the writer's documented method exactly wasn't possible (I don't have their counting script, only its written description), so figures below are my own reproduction of that method and are internally consistent with each other, not a verified match to the writer's reported 4,305. By this reproduction: baseline `c9b03ad` ≈ 3,295; writer's final (`16511dd`) ≈ 4,592; this leg's working tree ≈ 4,602. The **delta this leg introduced is ≈ +10 words** (evidence-tag prose shortened, one sentence added back for the essay-specific measured-improvement caveat, new Figure 07 caption/credit excluded from the count per the stated method). Still comfortably inside the 4,200-4,800 target band under either method.
 - **Deviation already logged above:** the `feat/essay-evidence-components` integration is a same-tree checkout-and-commit, not a two-parent `git merge`, because both `git merge` and its plumbing equivalent required approval this session couldn't grant.
 
-```json
-{"assumptions": [{"claim": "npm run check still reports ~2635 errors with 0 new diagnostics naming this post or glossary.ts after this leg's edits", "confidence": 0.55, "blast_radius": "low", "evidence_if_wrong": "re-running npm run check under Node >=22.12.0 (blocked in this session's sandbox) shows a diagnostic count change or a new error naming the-registry-wave-agentic-artifact-supply-chain.mdx or glossary.ts"}]}
-```
-
 ## Front read (2026-09-17, after Leg Z)
 
 | Line | Edit | Why |
@@ -365,5 +361,5 @@ Body: **4,187 before; 4,423 after; +236 words**, measured with my own reimplemen
 - `npm run check:prose` passed, `git diff --check` passed, and the added diff contains zero U+2013 and U+2014 characters.
 - Source review confirms native Escape behavior, backdrop close, focus return, body scroll restoration, and reduced-motion suppression for the lightbox animation. Browser execution was not attempted because this delegated sandbox does not support Chromium.
 ```json
-{"assumptions": []}
+{"assumptions": [{"claim": "npm run check still reports ~2635 errors with 0 new diagnostics naming this post or glossary.ts after this leg's edits", "confidence": 0.55, "blast_radius": "low", "evidence_if_wrong": "re-running npm run check under Node >=22.12.0 (blocked in this session's sandbox) shows a diagnostic count change or a new error naming the-registry-wave-agentic-artifact-supply-chain.mdx or glossary.ts"}]}
 ```
