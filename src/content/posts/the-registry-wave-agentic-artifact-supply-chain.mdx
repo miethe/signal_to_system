@@ -4,6 +4,7 @@ excerpt: "Registries can tell you which capability exists. They cannot tell you 
 date: 2026-07-01T12:00:00-04:00
 updatedDate: 2026-09-18T17:00:00-04:00
 readTime: "18 min"
+
 contentType: essay
 format: essay
 category: "AI Agents"
@@ -15,10 +16,12 @@ tags:
   - "delivery-systems"
 status: published
 heroImage: "/assets/posts/the-registry-wave-agentic-artifact-supply-chain/hero-governed-cube.png"
+interactiveElement: "registry-wave-control-plane"
 heroAlt: "A shared capability pattern connects several project workbenches, each retaining a distinct adaptation."
 heroPlacement: frontispiece
 whyItMatters: "Reusable agent behavior now moves between projects like software dependencies, except useful local variation is part of the problem. Enterprises need to know what changed, what should propagate, and what actually ran."
 leaderTakeaway: "Govern lineage, project binding, conditions of use, execution evidence, and acceptance as distinct but connected responsibilities. Do not equate a current registry record with a trustworthy run."
+
 relatedSlugs:
   - "agentic-operations-flow"
   - "the-contract-is-the-work"
@@ -52,6 +55,7 @@ import ReceiptDisclosure from '../../components/content/ReceiptDisclosure.astro'
   takeaway="Govern lineage, project binding, conditions of use, execution evidence, and acceptance as distinct but connected responsibilities. Do not equate a current registry record with a trustworthy run."
 />
 
+
 ## The fix existed. The projects were still wrong.
 
 The reviewer was supposed to check the work. First I had to check the reviewer.
@@ -59,6 +63,7 @@ The reviewer was supposed to check the work. First I had to check the reviewer.
 <ThreadScene slug="the-registry-wave-agentic-artifact-supply-chain" beatId="incident" composition="pane" />
 
 A reviewer skill used across my projects was missing a mandatory guard, so I fixed it at the source: the `/.claude/skills/` directory in my most active project. My personal registry showed the fixed version. Inside the source repository, the reviewer (obviously) had the new instruction, but every other project on the machine loaded a deployed file copy, and that copy sat five days without the fix.[^drift]
+
 
 Same skill name, but different instructions reaching the runtime.
 
@@ -69,6 +74,7 @@ What exactly did the approval attach to?
 <PullQuote variant="thesis-marker">Trusted artifact ≠ trusted use.</PullQuote>
 
 Approval attaches to an artifact; use happens in a context the approval never saw. Even after I correct the copy (`task-completion-validator`, the reviewer skill from the opening), I still need to know who may use it, with which tools and context, what actually ran, and whether the review met its purpose.
+
 
 The system lied in four increasingly important ways: “fixed” did not mean deployed; the same name did not mean the same artifact; present did not mean followed; traceable did not mean successful. The stale reviewer only proves the first lie. It gave me a clean place to see the others.
 
@@ -117,6 +123,21 @@ What it couldn't tell me was whether any of those answers still described the fi
 
 ### Four assurances, four places to lose the thread
 
+
+GitHub CLI's public-preview `gh skill` command supports discovering, installing, managing and publishing agent skills.[^github]
+{/* <!-- (to verify) GitHub skill discovery, installation, and publishing availability as of September 2026. --> */}
+JFrog documents immutable skill bundles, Xray scanning, optional signing and project-scoped controls; the documented local scan-gate enforcement requires Preview enablement.[^jfrog]
+{/* <!-- (to verify) JFrog skills versioning, scanning, signing, and access-control scope. --> */}
+In OpenShift AI 3.5, Red Hat's Developer Preview Agent Catalog supports starter-kit discovery, while its Developer Preview MCP Catalog connects server discovery to deployment through MCP components whose lifecycle and gateway operators remain Technology Preview.[^redhat]
+{/* <!-- (to verify) Red Hat catalog deployment/connectivity scope and preview status. --> */}
+The official MCP Registry, still in preview in the reviewed documentation, publishes metadata for discovering publicly accessible MCP servers rather than hosting their executable artifacts.[^mcp]
+{/* <!-- (to verify) Official MCP Registry metadata/discovery scope. --> */}
+
+I read these as validation of the package-management problem that sent me into this work. But convergence is uneven and component-specific. JFrog comes closest to joining the responsibilities in the reviewed scope; the MCP Registry deliberately remains a metadata service. The reviewed documentation doesn't establish a complete join from exact bytes through policy decisions and execution evidence to accepted outcomes for any of the four. That is a boundary of this comparison, not a claim about everything those companies can do. The useful question is which assurances survive each handoff.[^market-scope]
+
+## Four assurances, four places to lose the thread
+
+
 I use “Wave 1” and “Wave 2” here to distinguish responsibilities, not to rank vendors or predict a release sequence. A registry can participate in every row. It can't establish every answer from its own artifact record.
 
 | Assurance | Wave 1: registry record | Wave 2: supply-chain obligation |
@@ -153,6 +174,7 @@ Instruction, Tool, Context and Governance are the static side: the things an age
 
 I use <Term id="agentic-artifact-supply-chain">**agentic artifact supply chain**</Term> for the managed lifecycle of those reusable instructions, context, tools, policies and related assets. Existing work on agent supply chains and governed agent primitives already covers this ground; this is my organizing label for the lifecycle I'm building, not a new supply-chain analogy.[^primitives]
 
+
 Both executable code and non-executable context are versioned dependencies. Changing either can change runtime behavior. Freezing both makes the inputs inspectable; it doesn't freeze the model's reasoning.
 
 A skill is small enough to install and large enough to carry intent. It can tell an agent how to perform a task, when to use supporting scripts, which references matter, and which constraints should shape execution. We're talking about more than just a prompt; it's a capability bundle.
@@ -167,7 +189,10 @@ The lifecycle starts with **authoring**: the reviewer lives in one source reposi
 
 The remedy is a recorded, registry-driven deployment. No manual copy/paste, no symlink as a shortcut around the record. A symlink follows the source checkout as branches change, so it drifts with the branch instead of leaving stale bytes behind. Multiple git worktrees make this worse, as each checkout silently maintains its own artifact state. Either way, “it's the same skill” conceals the state that matters.
 
+
 <ThreadScene slug="the-registry-wave-agentic-artifact-supply-chain" beatId="use" />
+
+I need three separate answers: what the project intended to use, what is present on disk, and what the runtime actually used. A deployment check can establish the second without establishing the third. If a session started before the update, inspecting the file afterward won't tell me what it loaded. The run needs its own observation; absent that, the loaded version stays unknown.
 
 I need three separate answers: what the project intended to use, what is present on disk, and what the runtime actually used. A deployment check can establish the second without establishing the third. If a session started before the update, inspecting the file afterward won't tell me what it loaded. The run needs its own observation; absent that, the loaded version stays unknown.
 
@@ -202,6 +227,15 @@ Two redacted entries show the distinction. The first is a tracked copy, diffed a
 <ThreadScene slug="the-registry-wave-agentic-artifact-supply-chain" beatId="detection" />
 
 At **detection**, a gate compares deployed state with its source. The August 6 drift check classifies deployed entries, distinguishing tracked copies, justified copies, and drift; it also identifies symlinks. Drift fails the check.[^drift] A justified copy needs an explicit reason to differ. Otherwise exceptions become another way to lose the deployment record.
+
+
+A content hash answers whether bytes match a recorded revision. An ancestry record answers which base a local change came from. Neither tells me whether that change is useful, approved or compatible. I need the base to understand the patch, the current bytes to identify it, and review and tests to decide what should happen next.
+
+That distinction mattered in a separate workflow-copy incident. Some projects were behind upstream and missing review checks. Others had a stricter local check: they could refuse a conditional review verdict that upstream would accept. Copying upstream over every project would have repaired one group by deleting a protection from another. The sync tool therefore inspects the direction of change, preserves the per-project agent roster, and refuses to overwrite local-ahead copies. Mixed changes need inspection.[^workflow]
+
+Consider three projects using the reviewer. This is an illustrative comparison, not a production inventory. Project A declares the corrected revision but still has the old bytes: repair the deployment. Project B has a local patch for its review process: inspect the difference before replacing it. Project C deliberately pins an older revision for a bounded comparison: check that the pin is still allowed. All three have unknown runtime identity until a run record establishes what loaded.
+
+For Project B, preserving the patch keeps the evidence available. It doesn't approve the patch for everyone. The project owner still needs to explain what changed, which assumptions it relies on, and what tests support it. A useful local change can become a candidate for shared policy; it shouldn't become shared policy just because a sync command encountered it. Likewise, Project C's deliberate pin may become ineligible under a changed security or compatibility requirement. That is a policy question in this example, not a lab incident I have recorded.
 
 
 The next correction handles **missing dependencies**. An artifact absent locally is *unprovisioned, not non-existent*. The provisioning rule directs the agent back to the registry. Its failure hook suggests the deploy command; it doesn't write the artifact itself.[^provisioning] Hand-rolling a replacement would recreate the problem under a new name.
@@ -244,6 +278,7 @@ I read these as validation of the package-management problem that sent me into t
 
 ## The handoffs are the architecture.
 
+
 “Control plane” is the familiar shorthand. But an enterprise will run many governance systems, with different owners and enforcement mechanisms. <Term id="control-fabric">**Control fabric**</Term> is established terminology, including BCG's federated agent-control framing. Here it names independently operated systems that preserve compatible identity, authority, policy-decision and evidence records across handoffs.[^fabric] I use it to connect four responsibilities:
 
 | Responsibility | What it owes the reviewer workflow |
@@ -265,6 +300,9 @@ Xia and colleagues' *Harnessing Agent Skills* describes a closely related archit
 
 The lab receipts establish narrower facts: a stale reviewer copy, a drift detector, and related checks for instruction parity and stale operating guidance. They don't establish a complete artifact-version-to-outcome measurement system.
 
+These surfaces overlap. Context can be a governed dependency and an input to a runtime decision; an adapter can move an artifact and carry its evidence. Placing a policy in the Governance box doesn't establish that a runtime checks it. I still need to identify the mechanism in the execution path and what it actually blocks.
+
+
 <ThreadScene slug="the-registry-wave-agentic-artifact-supply-chain" beatId="outcome" composition="pane" />
 
 In the model I want to build, closing that loop requires a run record that identifies which reviewer version was loaded, alongside the model, context, tools, and policy state. Join that record to the review's findings, verification, and acceptance decision. Then ask which runs used the old copy and which outputs need re-review. Where the loaded identity wasn't captured, mark the run's version unknown. Don't reconstruct certainty from the current registry.
@@ -272,6 +310,7 @@ In the model I want to build, closing that loop requires a run record that ident
 <Term id="skillbom">**SkillBOM**</Term> already appears in research on skill identity, dependencies and run provenance.[^skillbom] Here it names this implementation's manifest for recording artifact composition and provenance. The useful question is which relationships it preserves. A manifest produced while assembling a bundle can identify the assembled artifacts without proving that a later session loaded them. A run record has to bind that use separately.
 
 Failure rate needs a denominator and a definition: failed reviews among comparable tasks, failure decided by an explicit acceptance criterion. A lower rate after deploying the guard would be useful evidence. It still wouldn't isolate the guard if the model or task mix changed too.
+
 
 Drift can also happen against a frozen skill. Keep its bytes unchanged and change the runtime or context; the same instructions may produce different behavior. Compare those runs separately from an artifact-version change. Otherwise the registry gets blamed for degradation it didn't cause, or credit for an improvement it didn't produce.
 
@@ -290,9 +329,18 @@ A known source can supply a harmful artifact. Permitted work can still be wrong.
 
 ### Where the system lied to us
 
+
 Keeping those assurances separate is easy on a page; I only learned they don't stay separate in practice because my own tooling kept reporting one of them and letting me read it as another.
 
 The drift-gate receipt records why the check was written at all: “the fix exists” had stood in for “the projects received the fix,” and my own artifact-management workflow let that substitution pass.[^drift]
+
+The next essay considers the <Term id="deterministic-envelope">deterministic envelope</Term>, an existing way of describing constraints around probabilistic systems. My emphasis will be on controls outside model judgment and evidence that they mediate execution, alongside related work such as RAILS.[^envelope] Repeated successful reasoning can suggest a candidate for automation. It doesn't establish authority to promote it, or tell me when to withdraw it. Those remain questions to test.
+</Callout>
+
+## Where the system lied to us
+
+The drift-gate receipt records why the check was written: the deployed reviewer had spent five days without a mandatory guard. “The fix exists” had stood in for “the projects received the fix.” My own artifact-management workflow let that substitution pass.[^drift]
+
 
 The related August 5 parity gate followed six weeks of stale doctrine reaching one class of agent harness. A harness is the software that loads instructions and runs the agent. Updating one harness-specific instruction file hadn't updated its sibling.[^parity] The staleness check, two days later, searches live documents for assertions naming a superseded model as the operating “spine,” while exempting dated historical records.[^staleness]
 
@@ -419,6 +467,7 @@ This essay reports no measured outcome improvement.
 
 I place this work within the emerging discipline of <Term id="agentic-systems-engineering">**Agentic Systems Engineering**</Term>, already named in academic work by Sun and colleagues and in enterprise work by OutSystems.[^ase] This series examines my particular architecture through the systems I build and the failures they expose. Agentic SDLC is its application to software delivery. This reading path connects the questions; it isn't a one-to-one map of architecture layers.
 
+
 The reviewer didn't need a better name or another catalog. It needed the fix to reach the place that loaded it, a check that noticed when it hadn't, and evidence that the resulting review did what was asked. It also needed room for a project-specific improvement to survive the next shared correction. That's the bar I want the supply chain to meet when I'm no longer watching every project myself.
 
 ## Sources
@@ -436,6 +485,7 @@ External claims below reflect researched, scoped status for this edition: each f
 [^coverage]: Registry implementation receipt, August 11, 2026: fleet-wide compliance scanning explicitly labelled target state. A local registration scan exists (August 24); that doesn't establish fleet-wide enforcement. Internal identifiers withheld; method only.
 
 [^market-scope]: September 17 research comparison of the four documented product surfaces, supplied for this edition. Registry features, runtime mediation and adjacent provenance products were treated separately. No complete bytes-to-policy-to-execution-to-outcome join was documented in the reviewed scope; this is not a company-wide incapability claim. Each product's scope and preview boundary is recorded above.
+
 [^primitives]: JFrog, [Managing AI Agent Primitives Like Real Software Packages with APM and JFrog](https://jfrog.com/blog/managing-ai-agent-primitives-with-apm-and-jfrog/), included in the supplied September 17 prior-art review. This supports the governed-dependency overlap, not a measured result for my systems.
 [^xia]: Xia et al., [Harnessing Agent Skills: Architectural Patterns and a Reference Architecture for Skill-Mediated LLM Agents](https://arxiv.org/html/2606.20631v1), version 1, reviewed in the supplied September 17 research pack. Direct architectural overlap includes artifact/use separation, mediation, run evidence and feedback.
 [^skillbom]: Alongside Xia et al., Liu, Wu and Li, [The Decomposition Is the Fingerprint: Per-Component Identity for Agent Skills](https://arxiv.org/abs/2606.31272), and Jia et al., [Skills Are Not Islands: Measuring Dependency and Risk in Agent Skill Supply Chains](https://arxiv.org/abs/2607.01136), use SkillBOM for related identity and dependency concerns. These are distinct schema meanings, not an established interoperability contract with this implementation.
@@ -447,3 +497,4 @@ External claims below reflect researched, scoped status for this edition: each f
 [^bom-scope]: September 16, 2026 lab audit, source-path inspection: bundle materialization attempts automatic BOM emission; the separate plain single-artifact deployment path emits activity events without invoking that generator. This is the audit's scoped result, not a fresh runtime probe or a measured fleet-wide adoption rate. Internal identifiers withheld; method only.
 [^context-records]: September 16, 2026 lab audit: three context-provenance rows inspected in the canonical checkout, containing real deployed-artifact drift findings. The CLI-to-writer call chain was traced, but the inspected durable records did not identify the actor that produced those rows. File modification time is not used as a per-row execution timestamp. This context record is separate from the still-designed just-in-time provisioning record. Internal identifiers withheld; method only.
 [^ancestry]: Retained lab maintenance record: commit-ancestry and tag-containment checks returned negative for a fix in a squash-merging dependency repository; direct inspection of the tagged file found the fixed content. The comparison establishes release content only. Internal identifiers withheld; method only.
+

@@ -3,6 +3,7 @@
 // ---------------------------------------------------------------------------
 //
 // Terms defined for Signal to System essays, with inline definitions
+
 // sourced from the post that first defines them. Rendered via the <Term />
 // component (src/components/content/Term.astro) as a hover/focus tooltip
 // rather than a navigating link.
