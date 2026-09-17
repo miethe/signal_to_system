@@ -44,10 +44,10 @@ The winning metric is accepted outcomes with evidence.
 
 Not tokens, sessions, or number of agents. A review that meets the request, executed with the approved guard, using authorized context and tools, with that acceptance decision on record.
 
-The agentic artifact supply chain exists to deliver that.
+What I call the agentic artifact supply chain exists to deliver that.
 
 ### Post 7
-I call the umbrella Agentic Systems Engineering. It's how I think enterprise agentic architecture is going: not one registry for everything, but a federated control fabric across skills, prompts, MCP servers, context, policies, evals, runtimes, and evidence.
+I use Agentic Systems Engineering, an emerging discipline others are naming too, as the umbrella. It's how I think enterprise agentic architecture is going: not one registry for everything, but a federated control fabric across skills, prompts, MCP servers, context, policies, evals, runtimes, and evidence.
 
 The registry wave is here. The supply chain comes next.
 
@@ -65,6 +65,6 @@ The enterprise question is bigger: who approved this, what context does it requi
 
 I built SkillMeat to solve this across the full lifecycle. Four surfaces need to talk: supply chain (artifact identity, recorded deployment, drift detection), runtime control (caller identity, authorization, permissions), orchestration (routing and handoffs), and evidence (what ran, what was verified, who accepted it).
 
-The winning metric is accepted outcomes with evidence: a review that meets the request, executed with the approved guard, using authorized context and tools, with that acceptance decision on record. I call the umbrella Agentic Systems Engineering. That is where I think enterprise agentic architecture is headed: not one registry, but a federated control fabric across skills, prompts, MCP servers, context, policies, evals, runtimes, and evidence.
+The winning metric is accepted outcomes with evidence: a review that meets the request, executed with the approved guard, using authorized context and tools, with that acceptance decision on record. I use Agentic Systems Engineering, an emerging discipline others are naming too, as the umbrella. That is where I think enterprise agentic architecture is headed: not one registry, but a federated control fabric across skills, prompts, MCP servers, context, policies, evals, runtimes, and evidence.
 
 The registry wave is here. The supply chain comes next.

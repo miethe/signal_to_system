@@ -17,6 +17,7 @@ const relatedItems = await getRelatedArticles(post);
 ---
 
 <PostLayout
+  slug={post.id}
   frontmatter={{
     title: post.data.title,
     excerpt: post.data.excerpt,

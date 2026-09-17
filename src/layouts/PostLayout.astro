@@ -3,12 +3,15 @@ import BaseLayout from './BaseLayout.astro';
 import Figure from '../components/content/Figure.astro';
 import RelatedContent from '../components/content/RelatedContent.astro';
 import AuthorProfile from '../components/content/AuthorProfile.astro';
+import ThreadRail from '../components/content/ThreadRail.astro';
 import { generateJsonLd, buildCanonicalUrl } from '../lib/seo';
 import { formatDate, formatDateISO } from '../lib/utils';
 import { site } from '../data/site';
+import { threads } from '../data/threads';
 import type { Article } from '../lib/content';
 
 interface Props {
+  slug?: string;
   frontmatter: {
     title: string;
     excerpt?: string;
@@ -36,7 +39,8 @@ interface Props {
   relatedItems?: Article[];
 }
 
-const { frontmatter, prevPost, nextPost, relatedItems = [] } = Astro.props;
+const { slug, frontmatter, prevPost, nextPost, relatedItems = [] } = Astro.props;
+const thread = slug ? threads[slug] : undefined;
 
 const {
   title,
@@ -165,7 +169,8 @@ const jsonLd = generateJsonLd('article', {
     </header>
 
     <!-- Desktop byline follows the header in source order and spans the article rail. -->
-    <div class="hidden xl:col-start-2 xl:row-span-2 xl:row-start-1 xl:block xl:self-start xl:sticky xl:top-24">
+    <div class="hidden xl:col-start-2 xl:row-span-2 xl:row-start-1 xl:block xl:self-start xl:sticky xl:top-24 xl:max-h-[calc(100vh-7rem)] xl:overflow-y-auto xl:pr-1">
+      {thread && <ThreadRail slug={thread.slug} />}
       <AuthorProfile variant="sidebar" headingLevel="h2" />
     </div>
 
