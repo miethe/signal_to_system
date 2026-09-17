@@ -1,0 +1,141 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="950" viewBox="0 0 1200 950" role="img" aria-labelledby="title desc">
+  <title id="title">Inside the Agentic OS, governed at scale</title>
+  <desc id="desc">A denser view of the whole system: agents in per-project worktrees resolve twenty-one governed artifact types from one SkillMeat registry, verified by content hash and checked for drift; SkillBOM is built and wired to git, a session-scoped CBOM is designed only; below, Hermes runs five zero-model cron lanes live while three agent-mode loops sit disarmed, and autonomous merge reaches development but never main.</desc>
+  <rect x="0" y="0" width="1200" height="950" fill="#f8fafc"/>
+  <g font-family="Inter, Arial, sans-serif">
+    <text x="60" y="70" font-size="34" font-weight="700" fill="#0f172a">Inside the Agentic OS, Governed at Scale</text>
+    <text x="60" y="106" font-size="18" fill="#475569">Every agent, every worktree, resolving one registry: marked by what's actually running.</text>
+
+    <!-- Region B: project worktrees -->
+    <text x="60" y="144" font-size="15" font-weight="700" fill="#334155">PROJECT WORKTREES</text>
+    <g>
+      <rect x="60" y="160" width="245" height="100" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+      <text x="182" y="182" font-size="13" font-weight="700" fill="#0f172a" text-anchor="middle">signal_to_system</text>
+      <text x="182" y="202" font-size="14" fill="#64748b" text-anchor="middle">agent · own worktree</text>
+      <text x="182" y="222" font-size="13" fill="#334155" text-anchor="middle">resolves: skill · rule</text>
+    </g>
+    <g>
+      <rect x="335" y="160" width="245" height="100" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+      <text x="457" y="182" font-size="13" font-weight="700" fill="#0f172a" text-anchor="middle">skillmeat</text>
+      <text x="457" y="202" font-size="14" fill="#64748b" text-anchor="middle">agent · own worktree</text>
+      <text x="457" y="222" font-size="13" fill="#334155" text-anchor="middle">resolves: skill · agent</text>
+    </g>
+    <g>
+      <rect x="610" y="160" width="245" height="100" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+      <text x="732" y="182" font-size="13" font-weight="700" fill="#0f172a" text-anchor="middle">agentic_meta_dev</text>
+      <text x="732" y="202" font-size="14" fill="#64748b" text-anchor="middle">agent · own worktree</text>
+      <text x="732" y="222" font-size="13" fill="#334155" text-anchor="middle">resolves: rule · soul</text>
+    </g>
+    <g>
+      <rect x="885" y="160" width="245" height="100" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+      <text x="1007" y="182" font-size="13" font-weight="700" fill="#0f172a" text-anchor="middle">spirits-cabinet</text>
+      <text x="1007" y="202" font-size="14" fill="#64748b" text-anchor="middle">agent · own worktree</text>
+      <text x="1007" y="222" font-size="13" fill="#334155" text-anchor="middle">resolves: skill · bundle</text>
+    </g>
+
+    <!-- connectors: worktrees to registry -->
+    <path d="M182 260 L480 316" stroke="#059669" stroke-width="3" fill="none"/>
+    <path d="M474 316 L486 316 L480 330 Z" fill="#059669"/>
+    <path d="M457 260 L560 316" stroke="#059669" stroke-width="3" fill="none"/>
+    <path d="M554 316 L566 316 L560 330 Z" fill="#059669"/>
+    <path d="M732 260 L640 316" stroke="#059669" stroke-width="3" fill="none"/>
+    <path d="M634 316 L646 316 L640 330 Z" fill="#059669"/>
+    <path d="M1007 260 L720 316" stroke="#059669" stroke-width="3" fill="none"/>
+    <path d="M714 316 L726 316 L720 330 Z" fill="#059669"/>
+    <text x="600" y="298" font-size="14" fill="#047857" text-anchor="middle">deploy · resolve</text>
+
+    <!-- Region C: registry + artifact types -->
+    <text x="60" y="320" font-size="15" font-weight="700" fill="#334155">REGISTRY &amp; ARTIFACT TYPES</text>
+    <rect x="460" y="330" width="280" height="70" rx="8" fill="#111827"/>
+    <text x="600" y="358" font-size="18" font-weight="700" fill="#ffffff" text-anchor="middle">SkillMeat Registry</text>
+    <text x="600" y="378" font-size="14" fill="#cbd5e1" text-anchor="middle">single authoritative catalog</text>
+
+    <path d="M600 400 L600 416" stroke="#2563eb" stroke-width="3" fill="none"/>
+    <path d="M594 416 L606 416 L600 430 Z" fill="#2563eb"/>
+    <text x="610" y="413" font-size="13" fill="#1d4ed8">governs</text>
+
+    <g font-size="14" font-weight="700" fill="#1d4ed8" text-anchor="middle">
+      <rect x="60" y="420" width="132" height="40" rx="6" fill="#ffffff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="126" y="444">Skill</text>
+      <rect x="202" y="420" width="132" height="40" rx="6" fill="#ffffff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="268" y="444">Command</text>
+      <rect x="344" y="420" width="132" height="40" rx="6" fill="#ffffff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="410" y="444">Agent</text>
+      <rect x="486" y="420" width="132" height="40" rx="6" fill="#ffffff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="552" y="444">Rule</text>
+      <rect x="628" y="420" width="132" height="40" rx="6" fill="#ffffff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="694" y="444">Context file</text>
+      <rect x="770" y="420" width="132" height="40" rx="6" fill="#ffffff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="836" y="444">Soul/persona</text>
+      <rect x="912" y="420" width="132" height="40" rx="6" fill="#ffffff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="978" y="444">Context pack</text>
+      <rect x="1054" y="420" width="132" height="40" rx="6" fill="#ffffff" stroke="#2563eb" stroke-width="1.5"/>
+      <text x="1120" y="444">Bundle</text>
+    </g>
+    <text x="600" y="478" font-size="14" font-style="italic" fill="#64748b" text-anchor="middle">21 governed artifact types verified in code (13 more not shown for space)</text>
+
+    <!-- Region D: governance mechanisms -->
+    <text x="60" y="506" font-size="15" font-weight="700" fill="#334155">GOVERNANCE MECHANISMS</text>
+    <g>
+      <rect x="60" y="520" width="245" height="110" rx="8" fill="#ffffff" stroke="#059669" stroke-width="2"/>
+      <text x="182" y="544" font-size="14" font-weight="700" fill="#047857" text-anchor="middle">Content-hash verify</text>
+      <text x="182" y="568" font-size="13" fill="#334155" text-anchor="middle">SHA-256 at deploy</text>
+      <text x="182" y="584" font-size="13" fill="#334155" text-anchor="middle">caught 2 regressions, 8/23</text>
+    </g>
+    <g>
+      <rect x="335" y="520" width="245" height="110" rx="8" fill="#ffffff" stroke="#0f766e" stroke-width="2"/>
+      <text x="457" y="544" font-size="14" font-weight="700" fill="#0f766e" text-anchor="middle">Drift detection</text>
+      <text x="457" y="568" font-size="13" fill="#334155" text-anchor="middle">sync-check + global scan</text>
+      <text x="457" y="584" font-size="13" fill="#334155" text-anchor="middle">coverage gaps documented</text>
+    </g>
+    <g>
+      <rect x="610" y="520" width="245" height="110" rx="8" fill="#ffffff" stroke="#2563eb" stroke-width="2"/>
+      <text x="732" y="544" font-size="14" font-weight="700" fill="#1d4ed8" text-anchor="middle">SkillBOM</text>
+      <text x="732" y="568" font-size="13" fill="#334155" text-anchor="middle">generator + CLI + git hooks</text>
+      <text x="732" y="584" font-size="13" fill="#334155" text-anchor="middle">adoption thin, 1 seen live</text>
+    </g>
+    <g>
+      <rect x="885" y="520" width="245" height="110" rx="8" fill="#f1f5f9" stroke="#64748b" stroke-width="2" stroke-dasharray="2 3"/>
+      <text x="1007" y="544" font-size="14" font-weight="700" fill="#475569" text-anchor="middle">CBOM (session)</text>
+      <text x="1007" y="568" font-size="13" fill="#64748b" text-anchor="middle">designed only, no writer yet</text>
+      <text x="1007" y="584" font-size="13" fill="#64748b" text-anchor="middle">JIT-provisioning spec, gap N13</text>
+    </g>
+
+    <!-- Region E: autonomy runtime -->
+    <text x="60" y="656" font-size="15" font-weight="700" fill="#334155">AUTONOMY RUNTIME · HERMES</text>
+    <g>
+      <rect x="60" y="670" width="510" height="80" rx="8" fill="#ffffff" stroke="#059669" stroke-width="2"/>
+      <text x="315" y="692" font-size="14" font-weight="700" fill="#047857" text-anchor="middle">5 zero-model cron lanes: built, live</text>
+      <text x="315" y="714" font-size="13" fill="#334155" text-anchor="middle">seed-queue·seam-reconcile·hai-sweep·attest-suite·attest-deadman</text>
+      <text x="315" y="732" font-size="13" font-style="italic" fill="#64748b" text-anchor="middle">script-only, 0 model calls per run</text>
+    </g>
+    <g>
+      <rect x="630" y="670" width="510" height="80" rx="8" fill="#fffbeb" stroke="#d97706" stroke-width="2" stroke-dasharray="6 4"/>
+      <text x="885" y="692" font-size="14" font-weight="700" fill="#b45309" text-anchor="middle">3 agent-mode loops: partial, disarmed</text>
+      <text x="885" y="714" font-size="14" fill="#334155" text-anchor="middle">story-loop · readynode-poll · self-directed</text>
+      <text x="885" y="732" font-size="13" font-style="italic" fill="#64748b" text-anchor="middle">~26M input tok/day measured; cost gate reports used=0</text>
+    </g>
+
+    <rect x="430" y="765" width="160" height="40" rx="6" fill="#ffffff" stroke="#059669" stroke-width="2"/>
+    <text x="510" y="790" font-size="13" font-weight="700" fill="#047857" text-anchor="middle">→ development</text>
+    <path d="M590 785 L600 785" stroke="#059669" stroke-width="2" fill="none"/>
+    <path d="M600 785 L610 785" stroke="#64748b" stroke-width="2" stroke-dasharray="2 3" fill="none"/>
+    <path d="M604 779 L604 791 L613 785 Z" fill="#64748b"/>
+    <rect x="610" y="765" width="160" height="40" rx="6" fill="#f1f5f9" stroke="#64748b" stroke-width="2" stroke-dasharray="2 3"/>
+    <text x="690" y="790" font-size="13" font-weight="700" fill="#475569" text-anchor="middle">→ main</text>
+    <text x="600" y="820" font-size="14" font-style="italic" fill="#64748b" text-anchor="middle">autonomous merge to main: never yet; R3 not entered on the autonomy ladder (R0.5 today)</text>
+
+    <!-- footer + legend -->
+    <text x="60" y="838" font-size="14" font-style="italic" fill="#64748b">Provenance chain (deployed file → SkillBOM → git commit) is built via opt-in hooks;</text>
+    <text x="60" y="858" font-size="14" font-style="italic" fill="#64748b">off by default until installed per project.</text>
+
+    <rect x="930" y="845" width="210" height="90" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+    <text x="945" y="865" font-size="14" font-weight="700" fill="#334155">KEY</text>
+    <path d="M945 883 L970 883" stroke="#334155" stroke-width="3" fill="none"/>
+    <text x="978" y="887" font-size="13" fill="#334155">BUILT: running today</text>
+    <path d="M945 901 L970 901" stroke="#b45309" stroke-width="2" stroke-dasharray="6 4" fill="none"/>
+    <text x="978" y="905" font-size="13" fill="#334155">PARTIAL: gated</text>
+    <path d="M945 919 L970 919" stroke="#64748b" stroke-width="2" stroke-dasharray="2 3" fill="none"/>
+    <text x="978" y="923" font-size="13" fill="#334155">DESIGNED: spec only</text>
+  </g>
+</svg>

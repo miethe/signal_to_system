@@ -33,34 +33,50 @@ import Term from '../../components/content/Term.astro';
 import ArtifactTaxonomy from '../../components/interactive/ArtifactTaxonomy';
 import ArtifactControlPlane from '../../components/interactive/ArtifactControlPlane';
 import WhereThisSits from '../../components/content/WhereThisSits.astro';
+import ThreadBeat from '../../components/content/ThreadBeat.astro';
 import '../../styles/registry-wave.css';
 
 <Callout type="info" title="September 2026 edition">
 First published July 2026; re-published September 15, 2026. This full September rewrite follows two external reviews and a failure in my own deployment process. The July argument centered on registries becoming supply chains. This edition sharpens the boundary: approving an artifact doesn't establish that a particular use is trustworthy. The distinction below is the September argument, not a claim about what the July essay already said.
 </Callout>
 
+To kick this off, let's look at an example of a given skill, which we'll track across the essay.
+
+<ThreadBeat slug="the-registry-wave-agentic-artifact-supply-chain" beat="incident" />
+
 **[Observed]** A reviewer skill used across my projects was missing a mandatory guard. I fixed the source. The personal registry showed the fixed version. Inside the source repository, the reviewer had the new instruction. Every other project on the machine loaded a deployed file copy, and that copy sat five days without the fix.[^drift]
 
-Same skill name. Different instructions reaching the runtime.
+Same skill name, but different instructions reaching the runtime.
 
-The registry was right. The use was wrong. Nothing said so, because nothing compared the deployed bytes to the registered ones.
+The registry was right. My usage was wrong. Nothing said so, because nothing compared the deployed bytes to the registered ones.
 
 What exactly did the approval attach to?
 
-**Trusted artifact ≠ trusted use.** Approval attaches to an artifact; use happens in a context the approval never saw. Even after I correct the copy, I still need to know who may use it, with which tools and context, what actually ran, and whether the review met its purpose. That distinction is loadbearing (an inside joke for the Claude 5 model-family users).
+**Trusted artifact ≠ trusted use.** Approval attaches to an artifact; use happens in a context the approval never saw. Even after I correct the copy (`task-completion-validator`, the reviewer skill from the opening), I still need to know who may use it, with which tools and context, what actually ran, and whether the review met its purpose. That distinction is loadbearing (an inside joke for the Claude 5 model-family users).
 
 That is the supply-chain problem this essay is about.
 
+<Figure
+  src="/assets/posts/the-registry-wave-agentic-artifact-supply-chain/diagram-thread-01-incident.svg"
+  alt="Schematic diagram showing the reviewer skill's guard restored at the source and reflected in the registry, while deployed copies remain unchanged."
+  number="01"
+  caption="Diagram: the fix lands at the source and reaches the registry immediately; the deployed copies haven't caught up yet."
+/>
+
 I didn't begin this journey by defining a new category. Like most good (engineering) stories, it started with an annoyance, and the desire to be lazy.
 
-It was mid-late 2025 when I started building SkillMeat, my registry and deployment tool for reusable agent capabilities. The hard part was not getting an agent to do something useful once. The hard part was making that behavior repeatable across projects, machines, teams, and runtimes. Good agent behavior was a bundle: instructions, context, assumptions, examples, tools, permissions, and review expectations. When that bundle lived in one chat transcript or one local folder, it was fragile. When another project needed it, the answer was usually copy and paste.
+It was mid-late 2025 when I started building <Term id="skillmeat">SkillMeat</Term>, my registry and deployment tool for reusable agent capabilities. Having an agent do something useful once was no longer a challenge. The hard part was making that behavior repeatable across projects, machines, teams, and runtimes. Good agent behavior was a bundle: instructions, context, assumptions, examples, tools, permissions, and review expectations. When that bundle lived in one chat transcript or one local folder, it was fragile, and when another project needed it, the answer was usually copy and paste.
 
 Copy and paste is fine for discovery, but it will never be a lifecycle.
 
 <Callout type="info" title="The question this essay carries">
-**Prior question:** How does work survive the session? **This thesis:** artifact approval and trusted use require different evidence. **Next question:** what preserves the authoritative meaning of the work?
+**Prior question:** How does work survive the session?
+**This thesis:** artifact approval and trusted use require different evidence.
+**Next question:** what preserves the authoritative meaning of the work?
 
-**Built and tested in:** my personal lab, using SkillMeat and local deployment checks. **Related external work:** the registry and catalog sources below. **Status:** observed drift and implemented local checks; the complete relationship from version to accepted outcome remains proposed synthesis.
+**Built and tested in:** my personal lab, using SkillMeat and local deployment checks.
+**Related external work:** the registry and catalog sources below.
+**Status:** observed drift and implemented local checks; the complete relationship from version to accepted outcome remains proposed synthesis.
 </Callout>
 
 ## What the registry wave solved
@@ -93,7 +109,7 @@ I read these as validation of the package-management problem that sent me into t
 | **Execution** | Records availability or deployment intent. Doesn't establish what actually ran. | Captures the loaded artifacts, runtime/model state, permitted actions, and observed tool activity within an execution envelope. |
 | **Outcome** | Preserves evaluations or prior acceptance. Doesn't establish that this run fulfilled this request. | Connects output to intent, verification evidence, and the authority accepting or rejecting the result. |
 
-The reviewer failed the first handoff: registered identity never reached the loaded copy. Fixing that closes one gap. But a correctly deployed reviewer could still receive stale project context, have inappropriate permissions, skip its guard, or approve the wrong thing.
+The reviewer failed the first handoff: registered identity never reached the loaded copy. Fixing that closes one gap, but a correctly deployed reviewer could still receive stale project context, have inappropriate permissions, skip its guard, or approve the wrong thing.
 
 Thus the enterprise question isn't "do we have a place to store these things?", as that's essentially a solved problem.
 
@@ -120,28 +136,50 @@ Both executable code and non-executable context are versioned dependencies. Chan
 
 <ArtifactTaxonomy client:visible />
 
-A skill is small enough to install and large enough to carry intent. It can tell an agent how to perform a task, when to use supporting scripts, which references matter, and which constraints should shape execution. We're talking about more than just a prompt; it is a capability bundle.
+A skill is small enough to install and large enough to carry intent. It can tell an agent how to perform a task, when to use supporting scripts, which references matter, and which constraints should shape execution. We're talking about more than just a prompt; it's a capability bundle.
 
 ## Follow the reviewer out of the registry
 
 The lifecycle starts with **authoring**: the reviewer lives in one source repository, and a fix adds the missing guard. **Registration** makes that revision discoverable. **Approval** needs to attach to an exact revision and state its permitted use. The incident doesn't give me evidence of a complete approval record; it gives me a corrected source and a registry entry that didn't match deployment.
+
+<ThreadBeat slug="the-registry-wave-agentic-artifact-supply-chain" beat="deployment" />
 
 **Deployment** is where I lost the thread. A file copy is a separate object. Updating its source doesn't update it, and a successful registration says nothing about the copy another project loads.
 
 <Figure
   src="/assets/posts/the-registry-wave-agentic-artifact-supply-chain/diagram-market-wave.svg"
   alt="Editorial diagram of SkillMeat separating a registered artifact version from its project deployment."
-  number="01"
+  number="02"
   caption="Diagram: the registered artifact version and its project deployment are separate objects in SkillMeat."
 />
 
-The remedy is a recorded, registry-driven deployment. No hand copy. No symlink as a shortcut around the record. A symlink would follow the source checkout as branches changed, creating an unrecorded deployment that drifts with the branch instead of leaving stale bytes behind. Either way, “it's the same skill” conceals the state that matters.
+The remedy is a recorded, registry-driven deployment. No manual copy/paste, no symlink as a shortcut around the record. A symlink would follow the source checkout as branches changed, creating an unrecorded deployment that drifts with the branch instead of leaving stale bytes behind. Not to even mention if we have multiple worktrees, each potentially with their own unique artifact versions. Either way, “it's the same skill” conceals the state that matters.
+
+<Figure
+  src="/assets/posts/the-registry-wave-agentic-artifact-supply-chain/diagram-thread-02-deployment.svg"
+  alt="Schematic diagram contrasting the registry's corrected reviewer skill against three deployed project copies still missing the guard, under the same skill name."
+  number="03"
+  caption="Diagram: the registry and the deployed copies now disagree about what the same skill name means."
+/>
+
+<ThreadBeat slug="the-registry-wave-agentic-artifact-supply-chain" beat="use" />
 
 At **use**, the project loads the deployed copy in its own context. The supply-chain obligation is to check that binding: the approved artifact, the expected context, and the allowed tools. The guard's presence is a prerequisite for the intended review, not evidence that the guard was followed.
 
+<Figure
+  src="/assets/posts/the-registry-wave-agentic-artifact-supply-chain/diagram-thread-03-use.svg"
+  alt="Schematic diagram showing an agent session loading a deployed copy, with a broken link between the guard instruction being present in the file and the guard actually being followed."
+  number="04"
+  caption="Diagram: the guard's presence in a file is not evidence the guard was followed."
+/>
+
+<ThreadBeat slug="the-registry-wave-agentic-artifact-supply-chain" beat="drift" />
+
 At **drift**, declared and actual state separate. The fix stayed in the source repository while every project outside it kept loading the pre-fix reviewer. For five days, “fixed” described one location.
 
-The manifest driving that gate classifies each deployed path into exactly one bucket: a diffed tracked copy, a never-diffed allowed copy, or an undeclared hard failure. Two real entries, redacted:
+The manifest driving that gate classifies each deployed path into exactly one bucket: a diffed tracked copy, a never-diffed allowed copy, or an undeclared hard failure.
+
+See below two real entries, redacted:
 
 ```yaml
 # scripts/global-artifact-manifest.yaml
@@ -156,9 +194,25 @@ The manifest driving that gate classifies each deployed path into exactly one bu
     reason: No repo upstream anywhere under development/. Global is the only instance.
 ```
 
-*From the drift gate's own manifest, redacted. One tracked copy, diffed against its upstream on every run. One allowed copy, never diffed, because no upstream exists to diff against.*
+* One tracked copy, diffed against its upstream on every run, and one allowed copy, never diffed, because no upstream exists to diff against.*
+
+<Figure
+  src="/assets/posts/the-registry-wave-agentic-artifact-supply-chain/diagram-thread-04-drift.svg"
+  alt="Schematic diagram showing five days on a timeline where the registry stays correct and the deployed copies stay stale, simultaneously and without change."
+  number="05"
+  caption="Diagram: for five days, 'fixed' described one location; the registry and the deployment disagreed the whole time."
+/>
+
+<ThreadBeat slug="the-registry-wave-agentic-artifact-supply-chain" beat="detection" />
 
 At **detection**, a gate compares deployed state with its source. The August 6 drift check classifies deployed entries, distinguishing tracked copies, justified copies, and drift; it also identifies symlinks. Drift fails the check.[^drift] A justified copy needs an explicit reason to differ. Otherwise exceptions become another way to lose the deployment record.
+
+<Figure
+  src="/assets/posts/the-registry-wave-agentic-artifact-supply-chain/diagram-thread-05-detection.svg"
+  alt="Schematic diagram of an August 6 byte-comparison check between the registry and deployed copies, outputting a drift-detected alert."
+  number="06"
+  caption="Diagram: a byte comparison is what finally noticed the gap no one else was checking."
+/>
 
 The next correction handles **missing dependencies**. An artifact absent locally is *unprovisioned, not non-existent*. The August 4 provisioning rule directs the agent back to the registry. Its failure hook suggests the deploy command; it doesn't write the artifact itself.[^provisioning] Hand-rolling a replacement would recreate the problem under a new name.
 
@@ -181,7 +235,7 @@ Shared identity means the deployment record and run record can refer to the same
 
 A configured integration is not enforcement; an advisory registration is not a gate.
 
-The interactive below retains the earlier control-plane vocabulary as a map of participating surfaces. It isn't a stack that one product must own. The Agentic OS (AOS) named in the map is my personal lab system.
+The interactive below retains the earlier control-plane vocabulary as a map of participating surfaces. It isn't a stack that one product must own. The <Term id="aos">Agentic OS (AOS)</Term> named in the map is my personal lab system.
 
 <ArtifactControlPlane client:visible />
 
@@ -193,11 +247,20 @@ Each of the six layers above serves exactly one of the four responsibilities: Re
 
 **[Observed]** The lab receipts establish narrower facts: a stale reviewer copy, a drift detector, and related checks for instruction parity and stale operating guidance. They don't establish a complete artifact-version-to-outcome measurement system.
 
+<ThreadBeat slug="the-registry-wave-agentic-artifact-supply-chain" beat="outcome" />
+
 **[Proposed synthesis]** Closing that loop requires a run record that identifies which reviewer version was loaded, alongside the model, context, tools, and policy state. Join that record to the review's findings, verification, and acceptance decision. Then ask which runs used the old copy and which outputs need re-review. Where the loaded identity wasn't captured, mark the run's version unknown. Don't reconstruct certainty from the current registry.
 
 Failure rate needs a denominator and a definition: failed reviews among comparable review tasks, with failure determined by an explicit acceptance criterion. A lower rate after deploying the guard would be useful evidence. It wouldn't isolate the guard's effect if the model or task mix changed too.
 
 Drift can also happen against a frozen skill. Keep its bytes unchanged and change the runtime or context; the same instructions may produce different behavior. Compare those runs separately from an artifact-version change. Otherwise the registry gets blamed for degradation it didn't cause, or credit for an improvement it didn't produce.
+
+<Figure
+  src="/assets/posts/the-registry-wave-agentic-artifact-supply-chain/diagram-thread-06-outcome.svg"
+  alt="Schematic diagram of a run record table showing which reviewer version an agent session actually loaded, contrasted with earlier runs where that version was never captured."
+  number="07"
+  caption="Diagram: the missing piece is a run record that names which reviewer version actually loaded."
+/>
 
 The winning metric will be accepted outcomes with evidence, not activity. For this reviewer, that means a review that meets the request, with evidence of the required guard and an authorized acceptance decision. A <Term id="feature-contract">**Feature Contract**</Term> makes those obligations explicit; [The Contract Is the Work](/essays/the-contract-is-the-work/) takes up that boundary.
 
@@ -241,12 +304,12 @@ Global artifact drift (deployed artifact vs repo upstream vs origin/main):
 exit 1
 ```
 
-*A live run, redacted, September 15, 2026. The task-completion-validator drift this section describes is recorded in the receipt below (August 6, 2026), not replayed here; today's nonzero exit is a different, unrelated undeclared-copy finding.*
+*A live run, redacted, September 15, 2026. The <Term id="task-completion-validator">task-completion-validator</Term> drift this section describes is recorded in the receipt below (August 6, 2026), not replayed here; today's nonzero exit is a different, unrelated undeclared-copy finding.*
 
 <Callout type="info" title="What this looks like in my lab">
-**Implemented:** SkillMeat manages artifact registration and deployment. The Operator, my work-routing surface, sits over the subsystems. That is one implementation of coordination, not a requirement that enterprises adopt one router.
+**Implemented:** SkillMeat manages artifact registration and deployment. The <Term id="operator">Operator</Term> sits over the subsystems. That is one implementation of coordination, not a requirement that enterprises adopt one router.
 
-**Implemented:** MeatyWiki, my durable knowledge store, and Research Foundry, my evidence-oriented research system, give context and evidence homes beyond the registry. MeatyPrompts, my earlier prompt-management experiment, was part of the path here.
+**Implemented:** <Term id="meatywiki">MeatyWiki</Term>, my durable knowledge store, and <Term id="research-foundry">Research Foundry</Term>, my evidence-oriented research system, give context and evidence homes beyond the registry. <Term id="meatyprompts">MeatyPrompts</Term>, my earlier prompt-management experiment, was part of the path here.
 
 **Proposed:** complete cross-system linkage from loaded artifact version to accepted outcome. Local checks are implemented; fleet-wide compliance remains a target state in the registry's own August 11 rules.[^coverage]
 
@@ -265,6 +328,20 @@ These are dated implementation records, summarized as methods. They establish th
 <Callout type="info" title="Evidence labels">
 **Observed** means bounded operating evidence. **Externally reported** identifies a claim from an outside source, not a lab result. **Proposed synthesis** marks my architecture interpretation or an unvalidated extension. **Measured** is reserved for a defined measurement with a stated method; this essay reports no measured outcome improvement.
 </Callout>
+
+<Figure
+  src="/assets/posts/the-registry-wave-agentic-artifact-supply-chain/diagram-estate-before-after.svg"
+  alt="Side-by-side diptych: on the left, two actors, a human and an agent, reach into worktrees scattered across four projects; a single tracked skill exists as four incompatible copies with different versions and hashes, threaded in red through the tangle. On the right, the same four projects deploy from one SkillMeat registry, each copy verified against it by content hash."
+  number="08"
+  caption="Same estate, same projects, same agents. The only difference is whether one registry is the authority: four divergent copies of one skill versus one canonical version, traceable by hash, and that difference is running in production today, not a roadmap item."
+/>
+
+<Figure
+  src="/assets/posts/the-registry-wave-agentic-artifact-supply-chain/diagram-aos-estate-deep.svg"
+  alt="A denser diagram of the whole Agentic OS: agents in per-project worktrees resolve twenty-one governed artifact types from one SkillMeat registry, checked by content hash and drift detection; SkillBOM is wired to git commits, a session-scoped CBOM is marked as designed-only; Hermes runs five zero-model cron lanes live while three agent-mode loops sit disarmed, and autonomous merge stops at a development branch, never main."
+  number="09"
+  caption="What's actually running, not what's specced. Solid means built; dashed means built but gated or incomplete; dotted means designed only. The CBOM box and the merge-to-main boundary are both dotted on purpose."
+/>
 
 <WhereThisSits slug="the-registry-wave-agentic-artifact-supply-chain" />
 

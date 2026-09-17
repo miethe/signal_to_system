@@ -102,6 +102,58 @@ export const GLOSSARY: Record<string, GlossaryEntry> = {
       "The shared identity, evidence, and explicit handoffs connecting the systems responsible for an agentic artifact's supply chain, runtime control, orchestration, and evidence.",
     definedIn: "the-registry-wave-agentic-artifact-supply-chain",
   },
+  "skillmeat": {
+    term: "SkillMeat",
+    definition:
+      "Nick Miethe's registry and deployment tool for reusable agent capabilities: skills, commands, agent definitions, and context packs. It separates a registered artifact's version from the deployed copy a project actually loads, which is the distinction this essay's incident turns on.",
+    definedIn: "the-registry-wave-agentic-artifact-supply-chain",
+  },
+  "aos": {
+    term: "Agentic OS (AOS)",
+    definition:
+      "Nick Miethe's personal lab system for agentic work: the registry, runtime control, orchestration, and evidence surfaces named across the control-fabric map. It's a personal system, not a product any enterprise is expected to adopt.",
+    definedIn: "the-registry-wave-agentic-artifact-supply-chain",
+  },
+  "task-completion-validator": {
+    term: "task-completion-validator",
+    definition:
+      "A reviewer that checks a claimed completion against what actually shipped, rather than trusting the report: it verifies the work is functional and meets its stated requirements before accepting it as done.",
+    definedIn: "the-registry-wave-agentic-artifact-supply-chain",
+  },
+  "operator": {
+    term: "The Operator",
+    definition:
+      "The work-routing surface that sits over the AOS subsystems: it takes an incoming idea or request, classifies it, and dispatches it to the right subsystem at the right effort level.",
+    definedIn: "the-registry-wave-agentic-artifact-supply-chain",
+  },
+  "meatywiki": {
+    term: "MeatyWiki",
+    definition:
+      "A durable knowledge store built on a file-first markdown vault: it compiles ingested material into structured, queryable knowledge that survives past any single session.",
+    definedIn: "the-registry-wave-agentic-artifact-supply-chain",
+  },
+  "research-foundry": {
+    term: "Research Foundry",
+    definition:
+      "An evidence-oriented research system: it runs research passes, extracts and verifies claims against sources, and produces evidence a reviewer can check instead of trusting recall.",
+    definedIn: "the-registry-wave-agentic-artifact-supply-chain",
+  },
+  "meatyprompts": {
+    term: "MeatyPrompts",
+    definition:
+      "An earlier prompt-management experiment that preceded SkillMeat: a first attempt at giving reusable prompts a durable home instead of leaving them in one-off chat transcripts.",
+    definedIn: "the-registry-wave-agentic-artifact-supply-chain",
+  },
+  "intenttree": {
+    term: "IntentTree",
+    definition:
+      "The task-graph system used across the Agentic OS: a tree of nodes representing intents and work items, connected by typed edges for dependencies, claims, evidence, and completion state.",
+  },
+  "aosbench": {
+    term: "AOSBench",
+    definition:
+      "The ablation and measurement instrument used to evaluate changes to the Agentic OS's own agents: a system-under-test harness for measuring the effect of an identity, prompt, or capability change rather than assuming it.",
+  },
 };
 
 export type GlossaryTermId = keyof typeof GLOSSARY;
