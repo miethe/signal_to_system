@@ -41,7 +41,7 @@ const displayTitle = title ?? LABEL[kind];
 
 <aside class:list={['callout-v2', `callout-v2--${kind}`, 'lift-hover']} role="note">
   <span class="callout-v2__icon" aria-hidden="true">
-    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       {kind === 'info' && (<><circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" /></>)}
       {kind === 'warning' && (<><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" /><path d="M12 9v4" /><path d="M12 17h.01" /></>)}
       {kind === 'leader-takeaway' && <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />}
@@ -61,17 +61,22 @@ const displayTitle = title ?? LABEL[kind];
     display: flex;
     gap: 12px;
     margin: 20px 0;
-    padding: 2px 4px 2px 14px;
-    border: 0;
-    border-left: 2px solid var(--s2s-rule);
-    border-radius: 0;
-    background: transparent;
+    padding: 1rem;
+    border: 1px solid var(--tone-border);
+    border-radius: 0.75rem;
+    background: var(--tone-bg);
     color: var(--s2s-ink-muted);
   }
-  .callout-v2--warning { --tone: var(--s2s-status-warn); }
-  .callout-v2--leader-takeaway { --tone: var(--s2s-accent); }
-  .callout-v2--why-it-matters { --tone: var(--s2s-status-ok); }
-  .callout-v2--story { --tone: var(--s2s-ink-subtle); }
+  .callout-v2--info { --tone-border: #bfdbfe; --tone-bg: #eff6ff; --tone: #2563eb; }
+  .callout-v2--warning { --tone-border: #fde68a; --tone-bg: #fffbeb; --tone: #d97706; }
+  .callout-v2--leader-takeaway { --tone-border: #ddd6fe; --tone-bg: #f5f3ff; --tone: #7c3aed; }
+  .callout-v2--why-it-matters { --tone-border: #a7f3d0; --tone-bg: #ecfdf5; --tone: #059669; }
+  .callout-v2--story { --tone-border: #cbd5e1; --tone-bg: #f8fafc; --tone: #64748b; }
+  .dark .callout-v2--info { --tone-border: #1e40af; --tone-bg: rgb(23 37 84 / 0.3); --tone: #60a5fa; }
+  .dark .callout-v2--warning { --tone-border: #92400e; --tone-bg: rgb(69 26 3 / 0.3); --tone: #fbbf24; }
+  .dark .callout-v2--leader-takeaway { --tone-border: #5b21b6; --tone-bg: rgb(46 16 101 / 0.3); --tone: #c4b5fd; }
+  .dark .callout-v2--why-it-matters { --tone-border: #065f46; --tone-bg: rgb(2 44 34 / 0.3); --tone: #6ee7b7; }
+  .dark .callout-v2--story { --tone-border: #334155; --tone-bg: rgb(15 23 42 / 0.3); --tone: #cbd5e1; }
 
   .callout-v2__icon { flex-shrink: 0; margin-top: 1px; color: var(--tone); }
   .callout-v2__body { min-width: 0; flex: 1; }

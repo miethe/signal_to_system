@@ -64,6 +64,10 @@ const pageDescription = description || excerpt || site.description;
 const canonicalUrl = buildCanonicalUrl(Astro.url.pathname);
 const publishedISO = formatDateISO(date);
 const updatedISO = updatedDate ? formatDateISO(updatedDate) : undefined;
+const resolvedHeroAlt = heroAlt
+  || (heroImage === '/assets/posts/the-registry-wave-agentic-artifact-supply-chain/hero-governed-cube.png'
+    ? 'A shared capability pattern connects several project workbenches, each retaining a distinct adaptation.'
+    : `Hero illustration for ${title}`);
 
 const jsonLd = generateJsonLd('article', {
   title,
@@ -186,7 +190,7 @@ const jsonLd = generateJsonLd('article', {
       heroImage && (
         <Figure
           src={heroImage}
-          alt={heroAlt || `Hero illustration for ${title}`}
+          alt={resolvedHeroAlt}
           variant="hero"
         />
       )
