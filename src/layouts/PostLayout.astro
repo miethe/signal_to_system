@@ -3,15 +3,22 @@ import BaseLayout from './BaseLayout.astro';
 import Figure from '../components/content/Figure.astro';
 import RelatedContent from '../components/content/RelatedContent.astro';
 import AuthorProfile from '../components/content/AuthorProfile.astro';
-import ThreadRail from '../components/content/ThreadRail.astro';
+import PostSidebar from '../components/content/PostSidebar.astro';
 import { generateJsonLd, buildCanonicalUrl } from '../lib/seo';
 import { formatDate, formatDateISO } from '../lib/utils';
 import { site } from '../data/site';
 import { threads } from '../data/threads';
 import type { Article } from '../lib/content';
 
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
 interface Props {
   slug?: string;
+  headings?: Heading[];
   frontmatter: {
     title: string;
     excerpt?: string;
@@ -39,7 +46,7 @@ interface Props {
   relatedItems?: Article[];
 }
 
-const { slug, frontmatter, prevPost, nextPost, relatedItems = [] } = Astro.props;
+const { slug, headings = [], frontmatter, prevPost, nextPost, relatedItems = [] } = Astro.props;
 const thread = slug ? threads[slug] : undefined;
 
 const {
@@ -97,7 +104,7 @@ const jsonLd = generateJsonLd('article', {
 
   <article class="post-layout mx-auto grid w-full max-w-[var(--measure)] items-start px-4 py-12 sm:px-6 lg:px-8 xl:max-w-7xl xl:grid-cols-[minmax(0,var(--measure))_minmax(14rem,18rem)] xl:justify-center xl:gap-x-12">
     <!-- Article header -->
-    <header class="mb-16 min-w-0 space-y-6 pb-4 xl:col-start-1 xl:row-start-1">
+    <header id="post-header" class="mb-16 min-w-0 space-y-6 pb-4 xl:col-start-1 xl:row-start-1">
       {
         series && (
           <div class="flex items-center gap-2 text-xs font-mono font-medium text-[var(--accent)]">
@@ -172,10 +179,9 @@ const jsonLd = generateJsonLd('article', {
       }
     </header>
 
-    <!-- Desktop byline follows the header in source order and spans the article rail. -->
+    <!-- Desktop rail follows the header in source order and spans the article column: author card (collapsing to a badge on scroll), a live TOC in the space it frees, then the running-example thread. -->
     <div class="hidden xl:col-start-2 xl:row-span-2 xl:row-start-1 xl:block xl:self-start xl:sticky xl:top-24 xl:max-h-[calc(100vh-7rem)] xl:overflow-y-auto xl:pr-1">
-      {thread && <ThreadRail slug={thread.slug} />}
-      <AuthorProfile variant="sidebar" headingLevel="h2" />
+      <PostSidebar slug={thread?.slug} headings={headings} />
     </div>
 
     <div class="min-w-0 xl:col-start-1 xl:row-start-2">
