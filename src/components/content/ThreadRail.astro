@@ -236,22 +236,69 @@ const thread = threads[slug];
 
       if (targets.length === 0) return;
 
+      // Open/close visibility: a beat counts as "on screen" as soon as a
+      // meaningful slice of it is in the viewport — a beat centered on
+      // screen (or one only partly into the bottom 10%) must open the
+      // card. Kept deliberately looser than the step-highlight band below,
+      // which decides *which* step is current, not whether to open at all.
+      let closeTimer: ReturnType<typeof setTimeout> | null = null;
+      const cancelClose = () => {
+        if (closeTimer !== null) {
+          clearTimeout(closeTimer);
+          closeTimer = null;
+        }
+      };
+      const scheduleClose = () => {
+        if (closeTimer !== null) return;
+        closeTimer = setTimeout(() => {
+          closeTimer = null;
+          autoExpanded = false;
+          if (manualOverride === null) applyState(false);
+        }, 250);
+      };
+
       const visibleTargets = new Set<HTMLElement>();
-      const observer = new IntersectionObserver(
+      const visibilityObserver = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
             const target = entry.target as HTMLElement;
-            if (entry.isIntersecting) {
+            const isVisible = entry.isIntersecting && entry.intersectionRatio >= 0.15;
+            if (isVisible) {
               visibleTargets.add(target);
             } else {
               visibleTargets.delete(target);
             }
           });
 
-          const visible = Array.from(visibleTargets);
-          autoExpanded = visible.length > 0;
-          if (manualOverride === null) applyState(autoExpanded);
+          if (visibleTargets.size > 0) {
+            cancelClose();
+            autoExpanded = true;
+            if (manualOverride === null) applyState(true);
+          } else {
+            scheduleClose();
+          }
+        },
+        { rootMargin: '0px 0px -10% 0px', threshold: [0, 0.15] },
+      );
 
+      targets.forEach((target) => visibilityObserver.observe(target));
+
+      // Step highlight: which rail link is "current" — a narrower band so
+      // the highlighted step doesn't jump the moment a beat's edge clips
+      // into view, independent of the open/close decision above.
+      const stepVisibleTargets = new Set<HTMLElement>();
+      const stepObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            const target = entry.target as HTMLElement;
+            if (entry.isIntersecting) {
+              stepVisibleTargets.add(target);
+            } else {
+              stepVisibleTargets.delete(target);
+            }
+          });
+
+          const visible = Array.from(stepVisibleTargets);
           if (visible.length === 0) return;
 
           const closest = visible.reduce((current, candidate) =>
@@ -264,11 +311,13 @@ const thread = threads[slug];
         { rootMargin: '-20% 0px -65% 0px', threshold: 0 },
       );
 
-      targets.forEach((target) => observer.observe(target));
+      targets.forEach((target) => stepObserver.observe(target));
 
       const performanceObserver = new MutationObserver(() => {
         if (document.documentElement.classList.contains('perf-lite')) {
-          observer.disconnect();
+          cancelClose();
+          visibilityObserver.disconnect();
+          stepObserver.disconnect();
           performanceObserver.disconnect();
           applyState(true);
         }
