@@ -15,45 +15,81 @@ const thread = threads[slug];
 
 {
   thread && (
-    <aside class="thread-rail mb-6 border border-[var(--border-subtle)] bg-[var(--bg-subtle)] p-4" data-thread-rail>
-      <span class="thread-rail__corner thread-rail__corner--tl" aria-hidden="true"></span>
-      <span class="thread-rail__corner thread-rail__corner--tr" aria-hidden="true"></span>
-      <span class="thread-rail__corner thread-rail__corner--bl" aria-hidden="true"></span>
-      <span class="thread-rail__corner thread-rail__corner--br" aria-hidden="true"></span>
+    <div class="thread-rail-wrap" data-thread-rail-wrap>
+      <button
+        type="button"
+        class="thread-rail-badge font-mono flex w-full items-center gap-2 border border-[var(--border-subtle)] bg-[var(--bg-subtle)] px-3 py-2 text-left text-xs text-[var(--text-secondary)] transition-colors hover:border-[var(--accent)]/50 hover:bg-[var(--accent-subtle)] focus-ring"
+        data-thread-rail-badge
+        aria-expanded="false"
+        aria-controls={`thread-rail-panel-${thread.slug}`}
+        hidden
+      >
+        <span aria-hidden="true" class="thread-rail-badge__icon flex h-5 w-5 shrink-0 items-center justify-center border border-[var(--border-strong)] text-[0.625rem]">&rarr;</span>
+        <span class="min-w-0 truncate">
+          <span class="font-semibold uppercase tracking-[0.1em] text-[var(--accent-text)]">Running example</span>
+          <span class="ml-1.5 text-[var(--text-tertiary)]">{thread.title}</span>
+        </span>
+      </button>
 
-      <div class="border-l-2 border-[var(--accent)] pl-3">
-        <p class="font-mono text-[0.625rem] font-semibold uppercase tracking-[0.16em] text-[var(--accent-text)]">
-          Running example
-        </p>
-        <h2 class="mt-1 font-serif text-lg font-semibold leading-tight text-[var(--text-primary)]">
-          {thread.title}
-        </h2>
-        <p class="mt-1 font-mono text-[0.6875rem] text-[var(--text-tertiary)]">{thread.subject}</p>
-      </div>
+      <aside
+        id={`thread-rail-panel-${thread.slug}`}
+        class="thread-rail relative mb-6 border border-[var(--border-subtle)] bg-[var(--bg-subtle)] p-4"
+        data-thread-rail
+      >
+        <span class="thread-rail__corner thread-rail__corner--tl" aria-hidden="true"></span>
+        <span class="thread-rail__corner thread-rail__corner--tr" aria-hidden="true"></span>
+        <span class="thread-rail__corner thread-rail__corner--bl" aria-hidden="true"></span>
+        <span class="thread-rail__corner thread-rail__corner--br" aria-hidden="true"></span>
 
-      <nav class="mt-4 max-h-[calc(100vh-25rem)] overflow-y-auto pr-1" aria-label={`Thread progress: ${thread.title}`}>
-        <ol class="space-y-1 border-l border-[var(--border)] pl-0">
-          {
-            thread.beats.map((beat, index) => (
-              <li>
-                <a
-                  href={`#thread-${beat.id}`}
-                  class="thread-rail__link group flex items-start gap-3 px-3 py-2 no-underline"
-                  data-thread-rail-link
-                  data-thread-target={`thread-${beat.id}`}
-                  aria-current={index === 0 ? 'step' : undefined}
-                >
-                  <span class="thread-rail__number font-mono mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center border border-[var(--border-strong)] text-[0.625rem] font-semibold text-[var(--text-tertiary)]">
-                    {beat.n}
-                  </span>
-                  <span class="min-w-0 text-xs leading-5 text-[var(--text-secondary)]">{beat.label}</span>
-                </a>
-              </li>
-            ))
-          }
-        </ol>
-      </nav>
-    </aside>
+        <div class="flex items-start justify-between gap-2 border-l-2 border-[var(--accent)] pl-3">
+          <div class="min-w-0">
+            <p class="font-mono text-[0.625rem] font-semibold uppercase tracking-[0.16em] text-[var(--accent-text)]">
+              Running example
+            </p>
+            <h2 class="mt-1 font-serif text-lg font-semibold leading-tight text-[var(--text-primary)]">
+              {thread.title}
+            </h2>
+            <p class="mt-1 font-mono text-[0.6875rem] text-[var(--text-tertiary)]">{thread.subject}</p>
+          </div>
+          <button
+            type="button"
+            class="thread-rail__collapse focus-ring shrink-0 border border-[var(--border-strong)] p-1 text-[var(--text-tertiary)] hover:border-[var(--accent)] hover:text-[var(--accent)]"
+            data-thread-rail-collapse
+            aria-expanded="true"
+            aria-controls={`thread-rail-panel-${thread.slug}`}
+            aria-label="Collapse running example"
+            hidden
+          >
+            <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <nav class="mt-4 max-h-[calc(100vh-25rem)] overflow-y-auto pr-1" aria-label={`Thread progress: ${thread.title}`}>
+          <ol class="space-y-1 border-l border-[var(--border)] pl-0">
+            {
+              thread.beats.map((beat, index) => (
+                <li>
+                  <a
+                    href={`#thread-${beat.id}`}
+                    class="thread-rail__link group flex items-start gap-3 px-3 py-2 no-underline"
+                    data-thread-rail-link
+                    data-thread-target={`thread-${beat.id}`}
+                    aria-current={index === 0 ? 'step' : undefined}
+                  >
+                    <span class="thread-rail__number font-mono mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center border border-[var(--border-strong)] text-[0.625rem] font-semibold text-[var(--text-tertiary)]">
+                      {beat.n}
+                    </span>
+                    <span class="min-w-0 text-xs leading-5 text-[var(--text-secondary)]">{beat.label}</span>
+                  </a>
+                </li>
+              ))
+            }
+          </ol>
+        </nav>
+      </aside>
+    </div>
   )
 }
 
@@ -115,36 +151,90 @@ const thread = threads[slug];
       transition: none;
     }
   }
+
+  .thread-rail-badge:hover .thread-rail-badge__icon {
+    transform: translateX(2px);
+  }
+
+  .thread-rail-badge__icon {
+    transition: transform 0.2s ease;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .thread-rail-badge__icon {
+      transition: none;
+    }
+  }
 </style>
 
 <script>
   const initializeThreadRails = () => {
-    if (document.documentElement.classList.contains('perf-lite')) return;
-    if (!('IntersectionObserver' in window)) return;
+    document.querySelectorAll<HTMLElement>('[data-thread-rail-wrap]').forEach((wrap) => {
+      if (wrap.dataset.threadRailReady === 'true') return;
+      wrap.dataset.threadRailReady = 'true';
 
-    document.querySelectorAll<HTMLElement>('[data-thread-rail]').forEach((rail) => {
-      if (rail.dataset.threadRailReady === 'true') return;
-      rail.dataset.threadRailReady = 'true';
+      const panel = wrap.querySelector<HTMLElement>('[data-thread-rail]');
+      const badge = wrap.querySelector<HTMLButtonElement>('[data-thread-rail-badge]');
+      const collapseButton = wrap.querySelector<HTMLButtonElement>('[data-thread-rail-collapse]');
+
+      if (!panel || !badge) return;
+
+      // Skip the collapse/auto-expand enhancement entirely in lite mode or
+      // without IntersectionObserver — the panel stays in its default
+      // (always-expanded, no badge) markup, matching pre-JS behavior.
+      const canEnhance =
+        !document.documentElement.classList.contains('perf-lite') && 'IntersectionObserver' in window;
+      if (!canEnhance) return;
 
       const links = Array.from(
-        rail.querySelectorAll<HTMLAnchorElement>('[data-thread-rail-link]'),
+        panel.querySelectorAll<HTMLAnchorElement>('[data-thread-rail-link]'),
       );
       const targets = links
         .map((link) => document.getElementById(link.dataset.threadTarget ?? ''))
         .filter((target): target is HTMLElement => target !== null);
 
-      if (targets.length === 0) return;
+      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
       const setActive = (id: string) => {
         links.forEach((link) => {
           const isCurrent = link.dataset.threadTarget === id;
           if (isCurrent) {
             link.setAttribute('aria-current', 'step');
+            link.scrollIntoView({ block: 'nearest', behavior: prefersReducedMotion ? 'auto' : 'smooth' });
           } else {
             link.removeAttribute('aria-current');
           }
         });
       };
+
+      // Manual clicks win over the auto beat-visibility signal until the
+      // reader clicks again — 'open' | 'closed' | null (no override yet).
+      let manualOverride: 'open' | 'closed' | null = null;
+      let autoExpanded = false;
+      const isExpanded = () => (manualOverride !== null ? manualOverride === 'open' : autoExpanded);
+
+      const applyState = (expanded: boolean) => {
+        panel.toggleAttribute('hidden', !expanded);
+        badge.toggleAttribute('hidden', expanded);
+        collapseButton?.toggleAttribute('hidden', !expanded);
+        badge.setAttribute('aria-expanded', String(expanded));
+        collapseButton?.setAttribute('aria-expanded', String(expanded));
+      };
+
+      // Progressive enhancement: markup ships expanded (panel visible, badge
+      // hidden) so a no-JS reader sees today's full card. Collapse to the
+      // badge only once this script has actually run.
+      applyState(false);
+
+      const toggle = () => {
+        const next = !isExpanded();
+        manualOverride = next ? 'open' : 'closed';
+        applyState(next);
+      };
+      badge.addEventListener('click', toggle);
+      collapseButton?.addEventListener('click', toggle);
+
+      if (targets.length === 0) return;
 
       const visibleTargets = new Set<HTMLElement>();
       const observer = new IntersectionObserver(
@@ -159,6 +249,8 @@ const thread = threads[slug];
           });
 
           const visible = Array.from(visibleTargets);
+          autoExpanded = visible.length > 0;
+          if (manualOverride === null) applyState(autoExpanded);
 
           if (visible.length === 0) return;
 
@@ -178,6 +270,7 @@ const thread = threads[slug];
         if (document.documentElement.classList.contains('perf-lite')) {
           observer.disconnect();
           performanceObserver.disconnect();
+          applyState(true);
         }
       });
       performanceObserver.observe(document.documentElement, {

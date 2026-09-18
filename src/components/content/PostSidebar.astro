@@ -1,0 +1,182 @@
+---
+/**
+ * PostSidebar — the sticky desktop rail beside a post: a collapsible author
+ * card, a scroll-spy table of contents that appears in the space the author
+ * card frees up, and (when the post has one) the running-example thread.
+ *
+ * The author card and TOC are two faces of the same IntersectionObserver on
+ * the article header — collapsing the card is what frees the room the TOC
+ * renders into, so one script owns both rather than splitting the signal.
+ */
+import AuthorProfile from './AuthorProfile.astro';
+import ThreadRail from './ThreadRail.astro';
+
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  slug?: string;
+  headings?: Heading[];
+}
+
+const { slug, headings = [] } = Astro.props;
+const toc = headings.filter((heading) => heading.depth === 2 || heading.depth === 3);
+const showToc = toc.length >= 2;
+---
+
+<div class="post-sidebar" data-post-sidebar>
+  <div data-author-slot>
+    <AuthorProfile variant="sidebar" headingLevel="h2" />
+  </div>
+
+  {
+    showToc && (
+      <nav class="post-sidebar__toc mb-6" aria-label="Table of contents" data-post-toc hidden>
+        <ol class="space-y-0.5 border-l border-[var(--border)] pl-0">
+          {toc.map((heading) => (
+            <li>
+              <a
+                href={`#${heading.slug}`}
+                class:list={[
+                  'post-sidebar__toc-link block truncate border-l-2 border-transparent py-1.5 pl-3 text-xs leading-5 text-[var(--text-secondary)] no-underline',
+                  heading.depth === 3 && 'pl-6 text-[0.6875rem] text-[var(--text-tertiary)]',
+                ]}
+                data-toc-link
+                data-toc-target={heading.slug}
+              >
+                {heading.text}
+              </a>
+            </li>
+          ))}
+        </ol>
+      </nav>
+    )
+  }
+
+  {slug && <ThreadRail slug={slug} />}
+</div>
+
+<style>
+  /* Collapse styling lives on AuthorProfile itself (see its own <style>) —
+     this component only decides *when* to toggle `.is-collapsed`, via the
+     script below. */
+
+  .post-sidebar__toc-link {
+    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  }
+
+  .post-sidebar__toc-link:hover,
+  .post-sidebar__toc-link:focus-visible {
+    background-color: var(--accent-subtle);
+    color: var(--text-primary);
+    outline: none;
+  }
+
+  .post-sidebar__toc-link:focus-visible {
+    box-shadow: 0 0 0 2px var(--accent);
+  }
+
+  .post-sidebar__toc-link[aria-current='location'] {
+    border-color: var(--accent);
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .post-sidebar__toc-link {
+      transition: none;
+    }
+  }
+</style>
+
+<script>
+  const initializePostSidebars = () => {
+    document.querySelectorAll<HTMLElement>('[data-post-sidebar]').forEach((root) => {
+      if (root.dataset.postSidebarReady === 'true') return;
+      root.dataset.postSidebarReady = 'true';
+
+      const authorEl = root.querySelector<HTMLElement>('[data-author-slot] .author-profile');
+      const toc = root.querySelector<HTMLElement>('[data-post-toc]');
+      const header = document.getElementById('post-header');
+
+      const setCollapsed = (collapsed: boolean) => {
+        authorEl?.classList.toggle('is-collapsed', collapsed);
+        toc?.toggleAttribute('hidden', !collapsed);
+      };
+
+      if (header && authorEl && 'IntersectionObserver' in window) {
+        const headerObserver = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => setCollapsed(!entry.isIntersecting));
+          },
+          { threshold: 0 },
+        );
+        headerObserver.observe(header);
+
+        const performanceObserver = new MutationObserver(() => {
+          if (document.documentElement.classList.contains('perf-lite')) {
+            headerObserver.disconnect();
+            performanceObserver.disconnect();
+            setCollapsed(false);
+          }
+        });
+        performanceObserver.observe(document.documentElement, {
+          attributes: true,
+          attributeFilter: ['class'],
+        });
+      }
+
+      if (!toc) return;
+
+      const links = Array.from(toc.querySelectorAll<HTMLAnchorElement>('[data-toc-link]'));
+      const targets = links
+        .map((link) => document.getElementById(link.dataset.tocTarget ?? ''))
+        .filter((target): target is HTMLElement => target !== null);
+
+      if (targets.length === 0 || !('IntersectionObserver' in window)) return;
+
+      const setActive = (id: string) => {
+        links.forEach((link) => {
+          if (link.dataset.tocTarget === id) {
+            link.setAttribute('aria-current', 'location');
+          } else {
+            link.removeAttribute('aria-current');
+          }
+        });
+      };
+
+      const visibleTargets = new Set<HTMLElement>();
+      const tocObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            const target = entry.target as HTMLElement;
+            if (entry.isIntersecting) {
+              visibleTargets.add(target);
+            } else {
+              visibleTargets.delete(target);
+            }
+          });
+
+          const visible = Array.from(visibleTargets);
+          if (visible.length === 0) return;
+
+          const closest = visible.reduce((current, candidate) =>
+            Math.abs(candidate.getBoundingClientRect().top) < Math.abs(current.getBoundingClientRect().top)
+              ? candidate
+              : current,
+          );
+          setActive(closest.id);
+        },
+        { rootMargin: '-10% 0px -80% 0px', threshold: 0 },
+      );
+
+      targets.forEach((target) => tocObserver.observe(target));
+    });
+  };
+
+  initializePostSidebars();
+  document.addEventListener('astro:page-load', initializePostSidebars);
+</script>
