@@ -1,25 +1,28 @@
 ---
 import BaseLayout from './BaseLayout.astro';
 import Figure from '../components/content/Figure.astro';
-import RelatedContent from '../components/content/RelatedContent.astro';
-import AuthorProfile from '../components/content/AuthorProfile.astro';
+import AutomatedDisclaimer from '../components/content/AutomatedDisclaimer.astro';
 import LeaderTakeaway from '../components/content/LeaderTakeaway.astro';
-import PostSidebar from '../components/content/PostSidebar.astro';
+import StoryMetaHeader from '../components/content/StoryMetaHeader.astro';
+import RelatedContent from '../components/content/RelatedContent.astro';
 import { generateJsonLd, buildCanonicalUrl } from '../lib/seo';
 import { formatDate, formatDateISO } from '../lib/utils';
 import { site } from '../data/site';
-import { threads } from '../data/threads';
 import type { Article } from '../lib/content';
 
-interface Heading {
-  depth: number;
-  slug: string;
-  text: string;
+interface Workflow {
+  version?: string;
+  orchestrator?: string;
+  model?: string;
+  tokens?: number;
+  tier?: number;
+  points?: number;
+  commits?: number;
+  runId?: string;
+  intentId?: string;
 }
 
 interface Props {
-  slug?: string;
-  headings?: Heading[];
   frontmatter: {
     title: string;
     excerpt?: string;
@@ -27,7 +30,6 @@ interface Props {
     date: Date | string;
     updatedDate?: Date | string;
     readTime?: number;
-    category?: string;
     tags?: string[];
     ogImage?: string;
     heroImage?: string;
@@ -36,19 +38,23 @@ interface Props {
     leaderTakeaway?: string;
     series?: string;
     seriesPart?: number;
-    draft?: boolean;
+    // Dev-story specifics
+    storyType: 'after-action' | 'feature-story' | 'build-note';
+    automated?: boolean;
+    sourceAar?: string;
+    projects?: string[];
+    aos?: boolean;
+    aosAreas?: string[];
+    workflow?: Workflow;
   };
-  // Optional: inject prev/next series posts from the page. `href` is
-  // collection-aware (e.g. via hrefFor()) and falls back to /essays/<slug>/.
-  prevPost?: { title: string; slug: string; href?: string };
-  nextPost?: { title: string; slug: string; href?: string };
+  prevPost?: { title: string; slug: string };
+  nextPost?: { title: string; slug: string };
   // Optional: related posts/stories from getRelatedArticles(), resolved on
   // the page (where the content collection entry is in scope).
   relatedItems?: Article[];
 }
 
-const { slug, headings = [], frontmatter, prevPost, nextPost, relatedItems = [] } = Astro.props;
-const thread = slug ? threads[slug] : undefined;
+const { frontmatter, prevPost, nextPost, relatedItems = [] } = Astro.props;
 
 const {
   title,
@@ -57,7 +63,6 @@ const {
   date,
   updatedDate,
   readTime,
-  category,
   tags = [],
   ogImage,
   heroImage,
@@ -66,16 +71,19 @@ const {
   leaderTakeaway,
   series,
   seriesPart,
+  storyType,
+  automated = true,
+  sourceAar,
+  projects = [],
+  aos = false,
+  aosAreas = [],
+  workflow,
 } = frontmatter;
 
 const pageDescription = description || excerpt || site.description;
 const canonicalUrl = buildCanonicalUrl(Astro.url.pathname);
 const publishedISO = formatDateISO(date);
 const updatedISO = updatedDate ? formatDateISO(updatedDate) : undefined;
-const resolvedHeroAlt = heroAlt
-  || (heroImage === '/assets/posts/the-registry-wave-agentic-artifact-supply-chain/hero-governed-cube.png'
-    ? 'A shared capability pattern connects several project workbenches, each retaining a distinct adaptation.'
-    : `Hero illustration for ${title}`);
 
 const jsonLd = generateJsonLd('article', {
   title,
@@ -103,31 +111,23 @@ const jsonLd = generateJsonLd('article', {
     aria-hidden="true"
   ></div>
 
-  <article class="post-layout mx-auto grid w-full max-w-[var(--measure)] items-start px-4 py-12 sm:px-6 lg:px-8 xl:max-w-7xl xl:grid-cols-[minmax(0,var(--measure))_minmax(14rem,18rem)] xl:justify-center xl:gap-x-12">
+  <article class="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
     <!-- Article header -->
-    <header id="post-header" class="mb-16 min-w-0 space-y-6 pb-4 xl:col-start-1 xl:row-start-1">
-      {
-        series && (
-          <div class="flex items-center gap-2 text-xs font-mono font-medium text-[var(--accent)]">
-            <span class="uppercase tracking-widest">Series</span>
-            <span class="text-[var(--text-disabled)]">/</span>
-            <span>{series}</span>
-            {seriesPart && <span class="text-[var(--text-disabled)]">Part {seriesPart}</span>}
-          </div>
-        )
-      }
+    <header class="mb-8 space-y-6 pb-2">
+      <div class="flex flex-wrap items-center gap-2 text-xs font-mono font-medium text-[var(--accent)]">
+        <a href="/dev-stories/" class="uppercase tracking-widest hover:text-[var(--text-primary)] transition-colors">Dev Stories</a>
+        {
+          series && (
+            <>
+              <span class="text-[var(--text-disabled)]">/</span>
+              <span class="text-[var(--text-tertiary)]">{series}</span>
+              {seriesPart && <span class="text-[var(--text-disabled)]">Part {seriesPart}</span>}
+            </>
+          )
+        }
+      </div>
 
-      {
-        category && (
-          <div>
-            <span class="font-mono inline-block rounded-full bg-[var(--accent-subtle)] px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[var(--accent-text)] ring-1 ring-inset ring-[var(--border-subtle)]">
-              {category}
-            </span>
-          </div>
-        )
-      }
-
-      <h1 class="font-serif text-4xl font-bold leading-[1.1] tracking-tight text-[var(--text-primary)] sm:text-5xl lg:text-7xl">
+      <h1 class="font-serif text-4xl font-bold leading-[1.1] tracking-tight text-[var(--text-primary)] sm:text-5xl lg:text-6xl">
         {title}
       </h1>
 
@@ -146,10 +146,7 @@ const jsonLd = generateJsonLd('article', {
           updatedDate && (
             <>
               <span aria-hidden="true">&middot;</span>
-              <span>
-                Updated{' '}
-                <time datetime={updatedISO}>{formatDate(updatedDate)}</time>
-              </span>
+              <span>Updated <time datetime={updatedISO}>{formatDate(updatedDate)}</time></span>
             </>
           )
         }
@@ -180,34 +177,30 @@ const jsonLd = generateJsonLd('article', {
       }
     </header>
 
-    <!-- Desktop rail follows the header in source order and spans the article column: author card (collapsing to a badge on scroll), a live TOC in the space it frees, then the running-example thread. -->
-    <div class="no-scrollbar hidden xl:col-start-2 xl:row-span-2 xl:row-start-1 xl:block xl:self-start xl:sticky xl:top-24 xl:max-h-[calc(100vh-7rem)] xl:overflow-y-auto xl:pr-1">
-      <PostSidebar slug={thread?.slug} headings={headings} />
-    </div>
+    <!-- Automated provenance banner -->
+    {automated && <AutomatedDisclaimer variant="banner" sourceAar={sourceAar} class="mb-8" />}
 
-    <div class="min-w-0 xl:col-start-1 xl:row-start-2">
+    <!-- Story context: workflow metadata + project/AOS badges -->
+    <StoryMetaHeader
+      storyType={storyType}
+      projects={projects}
+      aos={aos}
+      aosAreas={aosAreas}
+      workflow={workflow}
+    />
 
-    <!-- Compact author context remains in the reading flow below desktop. -->
-    <div class="mb-10 xl:hidden">
-      <AuthorProfile variant="compact" headingLevel="h2" />
-    </div>
-
-    <!-- Hero illustration (engineering plate) -->
+    <!-- Hero illustration -->
     {
       heroImage && (
-        <Figure
-          src={heroImage}
-          alt={resolvedHeroAlt}
-          variant="hero"
-        />
+        <Figure src={heroImage} alt={heroAlt || `Hero illustration for ${title}`} variant="hero" />
       )
     }
 
-    <!-- Callout: Why It Matters (executive signal) -->
+    <!-- Callout: Why It Matters -->
     {
       whyItMatters && (
-        <aside class="mb-7 border-l-2 border-[var(--accent-muted)] py-1 pl-4">
-          <p class="font-mono mb-1 text-[0.6875rem] font-bold uppercase tracking-widest text-[var(--accent-text)]">
+        <aside class="mb-8 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-subtle)] p-6 shadow-sm">
+          <p class="font-mono mb-2 text-xs font-bold uppercase tracking-widest text-[var(--accent)]">
             Why It Matters
           </p>
           <p class="text-sm leading-relaxed text-[var(--text-secondary)]">{whyItMatters}</p>
@@ -219,19 +212,18 @@ const jsonLd = generateJsonLd('article', {
     {leaderTakeaway && <LeaderTakeaway text={leaderTakeaway} />}
 
     <!-- Article body -->
-    <div class="prose-custom">
+    <div class="prose-custom max-w-none">
       <slot />
     </div>
 
-    <!-- Article footer: series nav + tags recap -->
+    <!-- Article footer: series nav + back links -->
     <footer class="mt-12 space-y-8 border-t border-[var(--border-subtle)] pt-8">
-      <!-- Series navigation -->
       {
         (prevPost || nextPost) && (
           <nav aria-label="Series navigation" class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {prevPost ? (
               <a
-                href={prevPost.href ?? `/essays/${prevPost.slug}/`}
+                href={`/dev-stories/${prevPost.slug}/`}
                 class="group flex flex-col gap-1 rounded-lg border border-[var(--border-subtle)] p-4 transition-colors hover:border-indigo-500/50 hover:bg-[var(--bg-subtle)]"
               >
                 <span class="text-xs font-medium uppercase tracking-widest text-[var(--text-disabled)] transition-colors group-hover:text-[var(--accent)]">
@@ -246,7 +238,7 @@ const jsonLd = generateJsonLd('article', {
             )}
             {nextPost && (
               <a
-                href={nextPost.href ?? `/essays/${nextPost.slug}/`}
+                href={`/dev-stories/${nextPost.slug}/`}
                 class="group flex flex-col items-end gap-1 rounded-lg border border-[var(--border-subtle)] p-4 transition-colors hover:border-indigo-500/50 hover:bg-[var(--bg-subtle)]"
               >
                 <span class="text-xs font-medium uppercase tracking-widest text-[var(--text-disabled)] transition-colors group-hover:text-[var(--accent)]">
@@ -264,27 +256,25 @@ const jsonLd = generateJsonLd('article', {
       <!-- Related reading -->
       <RelatedContent items={relatedItems} />
 
-      <!-- Back links -->
       <div class="flex flex-wrap items-center gap-4 text-sm">
         <a
-          href="/essays"
+          href="/dev-stories"
           class="text-[var(--accent)] transition-colors hover:text-[var(--accent-hover)]"
         >
-          &larr; All Essays
+          &larr; All Dev Stories
         </a>
         {
-          category && (
+          projects[0] && (
             <a
-              href={`/categories/${category.toLowerCase()}`}
+              href={`/systems/${projects[0]}/`}
               class="text-[var(--text-disabled)] transition-colors hover:text-[var(--text-secondary)]"
             >
-              More in {category}
+              More on this system
             </a>
           )
         }
       </div>
     </footer>
-  </div>
   </article>
 
   <!-- Scroll to top button -->
@@ -300,7 +290,6 @@ const jsonLd = generateJsonLd('article', {
   </button>
 
   <script>
-    // Reading progress bar
     const progressBar = document.getElementById('reading-progress');
     const articleEl = document.querySelector('article');
     const scrollToTopBtn = document.getElementById('scroll-to-top');
@@ -315,14 +304,12 @@ const jsonLd = generateJsonLd('article', {
         const progress = Math.min(Math.max(scrolled / (articleHeight - window.innerHeight), 0), 1);
         progressBar.style.width = `${progress * 100}%`;
       };
-
       window.addEventListener('scroll', updateProgress, { passive: true });
       updateProgress();
     } else if (progressBar && isLite) {
       progressBar.style.display = 'none';
     }
 
-    // Scroll to top button
     if (scrollToTopBtn) {
       const toggleButton = () => {
         const show = window.scrollY > window.innerHeight * 0.5;
@@ -333,10 +320,8 @@ const jsonLd = generateJsonLd('article', {
         scrollToTopBtn.classList.toggle('translate-y-0', show);
         scrollToTopBtn.classList.toggle('pointer-events-auto', show);
       };
-
       window.addEventListener('scroll', toggleButton, { passive: true });
       toggleButton();
-
       scrollToTopBtn.addEventListener('click', () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       });
