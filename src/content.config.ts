@@ -33,6 +33,10 @@ const posts = defineCollection({
     featured: z.boolean().optional(),
     heroImage: z.string().optional(),
     heroAlt: z.string().optional(),
+    // Layout options (PostLayout). Both default to today's behavior when
+    // omitted — additive, not a breaking change to any existing post.
+    takeawayPlacement: z.enum(["body", "rail"]).optional(),
+    heroPlacement: z.enum(["default", "frontispiece"]).optional(),
 
     // Cross-collection discovery (shared vocab with the `stories` collection).
     // Optional on posts so essays can also relate to projects/AOS and appear on
@@ -45,6 +49,10 @@ const posts = defineCollection({
     seoTitle: z.string().optional(),
     seoDescription: z.string().optional(),
     canonicalUrl: z.string().url().optional(),
+    // Distinct from heroImage — [...slug].astro falls back to heroImage
+    // when this is absent, so every existing post keeps its current
+    // og:image without needing this field set.
+    ogImage: z.string().optional(),
 
     // Interactive / rich content
     interactiveElement: z.string().optional(),

@@ -2,19 +2,32 @@
 /**
  * ThreadBeat — a repeatable worked-example marker for long-form MDX.
  *
+ * Two variants:
+ *   - `card` (default): today's full recap card. Unchanged — other posts
+ *     still use this for their own running threads.
+ *   - `marker`: a light inline mention (`"{n}/{total} · {label}"`) linking
+ *     to the beat's panel in `ThreadStoryboard`. No recap, no figure, no
+ *     card chrome. This is the shape the Registry Wave essay uses, since
+ *     `ThreadStoryboard` is now the only place a beat's recap/figure render
+ *     (see COMPONENT-API.md §2-3 in
+ *     docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/v2-research-integrated/).
+ *
  * Usage in MDX:
  *   <ThreadBeat slug="post-slug" beat="incident">
  *     Optional detail that advances the running example.
  *   </ThreadBeat>
+ *
+ *   <ThreadBeat slug="post-slug" beat="incident" variant="marker" />
  */
 import { threads } from '../../data/threads';
 
 interface Props {
   slug: string;
   beat: string;
+  variant?: 'card' | 'marker';
 }
 
-const { slug, beat } = Astro.props;
+const { slug, beat, variant = 'card' } = Astro.props;
 const thread = threads[slug];
 const threadBeat = thread?.beats.find((candidate) => candidate.id === beat);
 
@@ -26,7 +39,24 @@ if (!thread || !threadBeat) {
 ---
 
 {
-  thread && threadBeat && (
+  thread && threadBeat && variant === 'marker' && (
+    // A real heading element (D10) — replaces the old `<p>` + `aria-labelledby`
+    // pattern the card variant still uses. The whole beat mention is the
+    // heading; there's no separate label paragraph to attach it to.
+    <h4 class="thread-beat-marker my-6 font-serif text-sm font-semibold text-[var(--text-primary)]">
+      <a href={`#thread-${threadBeat.id}`} class="thread-beat-marker__link inline-flex items-baseline gap-2 no-underline">
+        <span class="thread-beat-marker__count font-mono text-[0.6875rem] font-semibold uppercase tracking-[0.14em] text-[var(--accent-text)]">
+          {threadBeat.n}/{thread.beats.length}
+        </span>
+        <span aria-hidden="true" class="text-[var(--text-tertiary)]">·</span>
+        <span class="thread-beat-marker__label">{threadBeat.label}</span>
+      </a>
+    </h4>
+  )
+}
+
+{
+  thread && threadBeat && variant === 'card' && (
     <section
       id={`thread-${threadBeat.id}`}
       class="thread-beat lift-hover my-8 border border-[var(--border-strong)] bg-[var(--bg-surface)] p-4 sm:p-5"
@@ -95,5 +125,33 @@ if (!thread || !threadBeat) {
 
   .thread-beat__detail :global(> :last-child) {
     margin-bottom: 0;
+  }
+
+  .thread-beat-marker {
+    margin: 0;
+  }
+
+  .thread-beat-marker__link {
+    border-bottom: 1px solid var(--border-strong);
+    padding-bottom: 1px;
+    color: inherit;
+    transition: border-color 0.15s ease, color 0.15s ease;
+  }
+
+  .thread-beat-marker__link:hover,
+  .thread-beat-marker__link:focus-visible {
+    border-color: var(--accent);
+    color: var(--accent-text);
+    outline: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .thread-beat-marker__link {
+      transition: none;
+    }
+  }
+
+  :global(html.perf-lite) .thread-beat-marker__link {
+    transition: none;
   }
 </style>

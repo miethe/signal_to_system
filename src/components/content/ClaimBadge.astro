@@ -1,0 +1,32 @@
+---
+/**
+ * ClaimBadge — a small inline badge for replacing literal `[Observed]`-
+ * style bracket labels in running prose. Wraps `Evidence.astro` rather
+ * than duplicating its kind-to-label/definition map; the only addition
+ * here is tighter inline sizing, since Evidence's own sizing targets
+ * captions and receipt sections, not mid-sentence use.
+ */
+import Evidence from './Evidence.astro';
+
+interface Props {
+  kind: 'observed' | 'measured' | 'proposed' | 'related-work' | 'external' | 'hypothesis';
+}
+
+const { kind } = Astro.props;
+---
+
+<span class="claim-badge">
+  <Evidence kind={kind} />
+</span>
+
+<style>
+  .claim-badge {
+    display: inline;
+  }
+
+  .claim-badge :global(.evidence) {
+    margin: 0 0.14em;
+    font-size: 0.62em;
+    vertical-align: 0.08em;
+  }
+</style>

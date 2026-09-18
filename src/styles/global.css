@@ -828,6 +828,46 @@ pre code {
   padding: 1.5rem 1.5rem 1.25rem;
 }
 
+/* Inline variant — stays within the prose measure, cancelling the grid
+   breakout the default plate gets at lg (see the `.prose-custom >
+   .figure-plate` rule below). For small supporting figures. */
+@media (min-width: 1024px) {
+  .prose-custom > .figure-plate.figure-plate--inline {
+    width: 100%;
+    max-width: 100%;
+    margin-right: 0;
+    margin-left: 0;
+  }
+}
+
+/* Wide / technical variants — break out further than the default plate for
+   diagrams that need more than the 72ch reading measure. */
+@media (min-width: 1024px) {
+  .prose-custom > .figure-plate.figure-plate--wide,
+  .prose-custom > .figure-plate.figure-plate--technical {
+    width: min(calc(100% + 6rem), calc(100vw - 2rem));
+    max-width: none;
+    margin-right: -3rem;
+    margin-left: -3rem;
+  }
+}
+
+/* Technical variant — a thinner, dashed "schematic" plate treatment,
+   distinct from the warm editorial plate used for photos/illustrations. */
+.figure-plate--technical {
+  border-width: 1px;
+  border-style: dashed;
+  border-color: #94a3b8;
+}
+
+.dark .figure-plate--technical {
+  border-color: rgba(45, 212, 191, 0.35);
+}
+
+.figure-plate--technical .figure-plate__label {
+  color: #0f766e;
+}
+
 /* Corner tick marks — four 10px L-brackets echoing drafting sheets */
 .figure-plate__corner {
   position: absolute;

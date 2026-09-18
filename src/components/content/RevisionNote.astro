@@ -1,0 +1,101 @@
+---
+/**
+ * RevisionNote — a thin, one-line revision marker (date plus a
+ * `<details>` disclosure), for posts that want a quieter signal than a
+ * full callout box. Replaces `EditionBanner` for this post only;
+ * `EditionBanner.astro` itself is untouched and stays available where the
+ * boxed treatment is still wanted.
+ *
+ * The line stays one line by keeping the summary text collapsed by
+ * default — only "Revised {date}" and the disclosure trigger are visible
+ * at rest; expanding reveals the revision note and, if given, the
+ * changelog link.
+ */
+interface Props {
+  note: string;
+  revisedDate: string;
+  changelogHref?: string;
+}
+
+const { note, revisedDate, changelogHref } = Astro.props;
+---
+
+<p class="revision-note">
+  <span class="revision-note__date">Revised {revisedDate}</span>
+  <details class="revision-note__details">
+    <summary>What&rsquo;s changed?</summary>
+    <span class="revision-note__note">
+      {note}
+      {
+        changelogHref && (
+          <>
+            {' '}
+            <a href={changelogHref}>View full changelog</a>
+          </>
+        )
+      }
+    </span>
+  </details>
+</p>
+
+<style>
+  .revision-note {
+    margin: 0 0 1.5rem;
+    color: var(--text-tertiary);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.02em;
+    line-height: 1.5;
+  }
+
+  .revision-note__date {
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+
+  .revision-note__details {
+    display: inline;
+    margin-left: 0.5rem;
+  }
+
+  .revision-note__details summary {
+    display: inline;
+    list-style: none;
+    cursor: pointer;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .revision-note__details summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .revision-note__details summary::before {
+    content: '· ';
+    color: var(--text-tertiary);
+  }
+
+  .revision-note__details summary:hover {
+    color: var(--accent-hover);
+    text-decoration: underline;
+  }
+
+  .revision-note__note {
+    display: block;
+    margin-top: 0.4rem;
+    color: var(--text-secondary);
+    font-family: var(--font-sans);
+    font-size: 0.8125rem;
+    letter-spacing: normal;
+    line-height: 1.6;
+  }
+
+  .revision-note__note a {
+    color: var(--accent);
+    text-underline-offset: 0.18em;
+  }
+
+  .revision-note__note a:hover {
+    color: var(--accent-hover);
+  }
+</style>

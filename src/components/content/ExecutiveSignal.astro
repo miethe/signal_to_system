@@ -1,0 +1,101 @@
+---
+/**
+ * ExecutiveSignal — the post-level executive read: "why this matters" and,
+ * when the post wants it, "what to carry forward". Replaces the ad-hoc
+ * `whyItMatters` aside plus the in-body `LeaderTakeaway` render that used to
+ * sit at the top of the body.
+ *
+ * Two columns at `sm:` and up when a takeaway is shown; stacks otherwise.
+ * The takeaway half mirrors PostLayout's mobile-author-card pattern
+ * (`xl:hidden`): below `xl` this is the only place the takeaway renders; at
+ * `xl+`, PostSidebar's rail card takes over, so this half hides there
+ * rather than showing the same text twice. `showTakeaway` only gates
+ * whether the essay wants a takeaway at all (from `takeawayPlacement`) —
+ * the viewport split is handled by CSS, not by this prop.
+ */
+interface Props {
+  whyItMatters: string;
+  takeaway?: string;
+  showTakeaway?: boolean;
+}
+
+const { whyItMatters, takeaway, showTakeaway = false } = Astro.props;
+const hasTakeaway = Boolean(showTakeaway && takeaway);
+---
+
+<aside
+  class:list={['executive-signal', 'lift-hover', { 'executive-signal--split': hasTakeaway }]}
+  role="note"
+  aria-label="Executive signal"
+>
+  <div class="executive-signal__col">
+    <p class="executive-signal__eyebrow">Why this matters</p>
+    <p class="executive-signal__body">{whyItMatters}</p>
+  </div>
+  {
+    hasTakeaway && (
+      <div class="executive-signal__col executive-signal__col--takeaway xl:hidden">
+        <p class="executive-signal__eyebrow">Carry this forward</p>
+        <p class="executive-signal__body">{takeaway}</p>
+      </div>
+    )
+  }
+</aside>
+
+<style>
+  .executive-signal {
+    position: relative;
+    margin: 0 0 1.75rem;
+    padding: 1.125rem 1.25rem 1.1875rem 1.5rem;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-xl);
+    background: var(--bg-surface);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .executive-signal::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 3px;
+    border-radius: var(--radius-xl) 0 0 var(--radius-xl);
+    background: var(--accent);
+  }
+
+  .executive-signal--split {
+    display: grid;
+    gap: 1.1rem;
+  }
+
+  @media (min-width: 640px) {
+    .executive-signal--split {
+      grid-template-columns: 1fr 1fr;
+      gap: 1.1rem 1.75rem;
+    }
+
+    .executive-signal__col--takeaway {
+      padding-left: 1.5rem;
+      border-left: 1px solid var(--border-subtle);
+    }
+  }
+
+  .executive-signal__eyebrow {
+    margin: 0 0 0.4rem;
+    color: var(--accent-text);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  .executive-signal__body {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+  }
+</style>

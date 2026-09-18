@@ -14,9 +14,9 @@ export default function ArtifactTaxonomy() {
   const item = artifacts[active];
   return <section className="rw-interactive" aria-labelledby="artifact-taxonomy-title">
     <p className="rw-kicker">Interactive taxonomy</p><h2 id="artifact-taxonomy-title">Every artifact changes the review question</h2>
-    <div className="rw-tabs" role="tablist" aria-label="Agentic artifact categories">
-      {artifacts.map(([name], index) => <button key={name} role="tab" aria-selected={active === index} className={active === index ? "is-active" : ""} onClick={() => setActive(index)}>{name}</button>)}
+    <div className="rw-tabs" aria-label="Agentic artifact categories">
+      {artifacts.map(([name], index) => <button key={name} type="button" aria-pressed={active === index} className={active === index ? "is-active" : ""} onClick={() => setActive(index)}>{name}</button>)}
     </div>
-    <div className="rw-panel" role="tabpanel" aria-live="polite"><h3>{item[0]} artifacts</h3><p><strong>Examples:</strong> {item[1]}</p><p><strong>Governance question:</strong> {item[2]}</p></div>
+    <div className="rw-panel" aria-live="polite"><h3>{item[0]} artifacts</h3><p><strong>Examples:</strong> {item[1]}</p><p><strong>Governance question:</strong> {item[2]}</p></div>
   </section>;
 }

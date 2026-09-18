@@ -1,12 +1,15 @@
 ---
 /**
- * PostSidebar — the sticky desktop rail beside a post: a collapsible author
- * card, a scroll-spy table of contents that appears in the space the author
- * card frees up, and (when the post has one) the running-example thread.
+ * PostSidebar — the sticky desktop rail beside a post: an optional takeaway
+ * card, a collapsible author card, a scroll-spy table of contents that
+ * appears in the space the author card frees up, and (when the post has
+ * one) the running-example thread.
  *
- * The author card and TOC are two faces of the same IntersectionObserver on
- * the article header — collapsing the card is what frees the room the TOC
- * renders into, so one script owns both rather than splitting the signal.
+ * The takeaway card, the author card, and the TOC are all faces of the same
+ * IntersectionObserver on the article header — collapsing the card is what
+ * frees the room the TOC renders into, and the same signal collapses the
+ * takeaway card to a one-line pill, so one script owns all three rather
+ * than splitting the signal.
  *
  * When a thread exists, the TOC and ThreadRail become a two-item accordion
  * (only one expanded at a time) so the column never needs to scroll — this
@@ -26,9 +29,11 @@ interface Heading {
 interface Props {
   slug?: string;
   headings?: Heading[];
+  takeaway?: string;
+  showTakeaway?: boolean;
 }
 
-const { slug, headings = [] } = Astro.props;
+const { slug, headings = [], takeaway, showTakeaway = false } = Astro.props;
 const thread = slug ? threads[slug] : undefined;
 
 // The footnotes section starts at the "Footnotes" heading (id
@@ -55,6 +60,34 @@ const toc = rawToc.map((heading) => {
 ---
 
 <div class="post-sidebar flex flex-col gap-3" data-post-sidebar>
+  {
+    showTakeaway && takeaway && (
+      <div
+        class="post-sidebar__block post-sidebar__takeaway rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-subtle)] px-4 py-3"
+        data-takeaway-slot
+      >
+        <div data-takeaway-full>
+          <p class="post-sidebar__takeaway-label font-mono mb-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--accent)]">
+            Carry this forward
+          </p>
+          <p class="post-sidebar__takeaway-text text-sm leading-relaxed text-[var(--text-secondary)]">
+            {takeaway}
+          </p>
+        </div>
+        <p
+          class="post-sidebar__takeaway-pill font-mono truncate text-[11px] text-[var(--text-tertiary)]"
+          data-takeaway-pill
+          hidden
+        >
+          <span class="post-sidebar__takeaway-pill-label mr-2 font-bold uppercase tracking-[0.14em] text-[var(--accent)]">
+            Takeaway
+          </span>
+          {takeaway}
+        </p>
+      </div>
+    )
+  }
+
   <div data-author-slot>
     <AuthorProfile variant="sidebar" headingLevel="h2" />
   </div>
@@ -304,10 +337,17 @@ const toc = rawToc.map((heading) => {
       const tocBlock = root.querySelector<HTMLElement>('[data-post-toc-block]');
       const toc = root.querySelector<HTMLElement>('[data-toc-panel]');
       const header = document.getElementById('post-header');
+      const takeawaySlot = root.querySelector<HTMLElement>('[data-takeaway-slot]');
+      const takeawayFull = root.querySelector<HTMLElement>('[data-takeaway-full]');
+      const takeawayPill = root.querySelector<HTMLElement>('[data-takeaway-pill]');
 
       const setCollapsed = (collapsed: boolean) => {
         authorEl?.classList.toggle('is-collapsed', collapsed);
         tocBlock?.toggleAttribute('hidden', !collapsed);
+        // Same signal collapses the takeaway card to its one-line pill —
+        // no second observer (see this file's header comment).
+        takeawayFull?.toggleAttribute('hidden', collapsed);
+        takeawayPill?.toggleAttribute('hidden', !collapsed);
       };
 
       // Collapsing is cheap and must keep working in every performance mode
@@ -636,11 +676,16 @@ const toc = rawToc.map((heading) => {
         };
 
         // Fully-expanded (unwindowed) height of the TOC block plus the
-        // rail panel, plus the collapsed author badge and the two gap-3
-        // gaps between the three stacked blocks — compared against the
-        // room actually left in the sticky column. Measured off-screen on
-        // clones (see measureExpandedHeight) so nothing visibly flickers
-        // open just to be measured.
+        // rail panel, plus the collapsed author badge, the takeaway card
+        // (whatever it currently renders as — full card or one-line pill,
+        // read live rather than re-derived, since which one is showing is
+        // itself driven by this same collapse signal), and the gap-3 gaps
+        // between the stacked blocks — compared against the room actually
+        // left in the sticky column. Measured off-screen on clones (see
+        // measureExpandedHeight) so nothing visibly flickers open just to
+        // be measured; the takeaway card is read in place since both of its
+        // states are cheap, on-screen block reads, not a collapse toggle
+        // that would need cloning.
         const evaluateFits = (): boolean => {
           if (!railPanel) return false;
           const columnWidth = root.getBoundingClientRect().width;
@@ -648,8 +693,11 @@ const toc = rawToc.map((heading) => {
           const authorHeight = measureCollapsedAuthorHeight();
           const tocHeight = measureExpandedHeight(tocBlock, columnWidth, '[data-toc-more]');
           const railHeight = measureExpandedHeight(railPanel, columnWidth, '[data-thread-more]');
+          const takeawayHeight = takeawaySlot
+            ? takeawaySlot.getBoundingClientRect().height + SIDEBAR_GAP_PX
+            : 0;
           const available = window.innerHeight - root.getBoundingClientRect().top - 24; // 24px bottom breathing room
-          const total = authorHeight + SIDEBAR_GAP_PX + tocHeight + SIDEBAR_GAP_PX + railHeight;
+          const total = takeawayHeight + authorHeight + SIDEBAR_GAP_PX + tocHeight + SIDEBAR_GAP_PX + railHeight;
           return total <= available;
         };
 

@@ -6,6 +6,7 @@ import AuthorProfile from '../components/content/AuthorProfile.astro';
 import LeaderTakeaway from '../components/content/LeaderTakeaway.astro';
 import PostSidebar from '../components/content/PostSidebar.astro';
 import SeriesWayfinding from '../components/content/SeriesWayfinding.astro';
+import ExecutiveSignal from '../components/content/ExecutiveSignal.astro';
 import { generateJsonLd, buildCanonicalUrl } from '../lib/seo';
 import { formatDate, formatDateISO } from '../lib/utils';
 import { site } from '../data/site';
@@ -38,6 +39,8 @@ interface Props {
     series?: string;
     seriesPart?: number;
     draft?: boolean;
+    takeawayPlacement?: 'body' | 'rail';
+    heroPlacement?: 'default' | 'frontispiece';
   };
   // Optional: inject prev/next series posts from the page. `href` is
   // collection-aware (e.g. via hrefFor()) and falls back to /essays/<slug>/.
@@ -67,7 +70,12 @@ const {
   leaderTakeaway,
   series,
   seriesPart,
+  takeawayPlacement = 'body',
+  heroPlacement = 'default',
 } = frontmatter;
+
+const isFrontispiece = heroPlacement === 'frontispiece';
+const showRailTakeaway = takeawayPlacement === 'rail';
 
 const pageDescription = description || excerpt || site.description;
 const canonicalUrl = buildCanonicalUrl(Astro.url.pathname);
@@ -103,6 +111,20 @@ const jsonLd = generateJsonLd('article', {
     style="width: 0%;"
     aria-hidden="true"
   ></div>
+
+  <!-- Frontispiece hero: rendered before the header entirely (title/dek/
+       meta) when heroPlacement === 'frontispiece'. Sits outside the
+       article's two-column grid — full-measure at every breakpoint,
+       matching the article's own container widths — rather than as a grid
+       item, so it doesn't disturb the header/sidebar/body row placement
+       tuned for the default position below. -->
+  {
+    isFrontispiece && heroImage && (
+      <div class="mx-auto w-full max-w-[var(--measure)] px-4 pt-12 sm:px-6 lg:px-8 xl:max-w-7xl">
+        <Figure src={heroImage} alt={resolvedHeroAlt} variant="hero" />
+      </div>
+    )
+  }
 
   <article class="post-layout mx-auto grid w-full max-w-[var(--measure)] items-start px-4 py-12 sm:px-6 lg:px-8 xl:max-w-7xl xl:grid-cols-[minmax(0,var(--measure))_minmax(14rem,18rem)] xl:justify-center xl:gap-x-12">
     <!-- Article header -->
@@ -187,7 +209,12 @@ const jsonLd = generateJsonLd('article', {
 
     <!-- Desktop rail follows the header in source order and spans the article column: author card (collapsing to a badge on scroll), a live TOC in the space it frees, then the running-example thread. -->
     <div class="no-scrollbar hidden xl:col-start-2 xl:row-span-2 xl:row-start-1 xl:block xl:self-start xl:sticky xl:top-24 xl:max-h-[calc(100vh-7rem)] xl:overflow-y-auto xl:pr-1">
-      <PostSidebar slug={thread?.slug} headings={headings} />
+      <PostSidebar
+        slug={thread?.slug}
+        headings={headings}
+        takeaway={leaderTakeaway}
+        showTakeaway={showRailTakeaway}
+      />
     </div>
 
     <div class="min-w-0 xl:col-start-1 xl:row-start-2">
@@ -197,9 +224,10 @@ const jsonLd = generateJsonLd('article', {
       <AuthorProfile variant="compact" headingLevel="h2" />
     </div>
 
-    <!-- Hero illustration (engineering plate) -->
+    <!-- Hero illustration (engineering plate) — the frontispiece position
+         (above the header) is rendered earlier and skips this slot. -->
     {
-      heroImage && (
+      !isFrontispiece && heroImage && (
         <Figure
           src={heroImage}
           alt={resolvedHeroAlt}
@@ -208,20 +236,23 @@ const jsonLd = generateJsonLd('article', {
       )
     }
 
-    <!-- Callout: Why It Matters (executive signal) -->
+    <!-- Executive signal: "why this matters" plus, when the essay places
+         its takeaway in the rail, the mobile-only "carry this forward"
+         half (PostSidebar's rail card is the xl+ home for that text). -->
     {
       whyItMatters && (
-        <aside class="mb-7 border-l-2 border-[var(--accent-muted)] py-1 pl-4">
-          <p class="font-mono mb-1 text-[0.6875rem] font-bold uppercase tracking-widest text-[var(--accent-text)]">
-            Why It Matters
-          </p>
-          <p class="text-sm leading-relaxed text-[var(--text-secondary)]">{whyItMatters}</p>
-        </aside>
+        <ExecutiveSignal
+          whyItMatters={whyItMatters}
+          takeaway={leaderTakeaway}
+          showTakeaway={showRailTakeaway}
+        />
       )
     }
 
-    <!-- Leader Takeaway (executive summary card) -->
-    {leaderTakeaway && <LeaderTakeaway text={leaderTakeaway} />}
+    <!-- Leader Takeaway (executive summary card) — skipped when the essay
+         places its takeaway in the rail instead (ExecutiveSignal above
+         already carries it for mobile in that case). -->
+    {!showRailTakeaway && leaderTakeaway && <LeaderTakeaway text={leaderTakeaway} />}
 
     <!-- Article body -->
     <div class="prose-custom">

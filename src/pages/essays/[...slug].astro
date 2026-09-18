@@ -27,13 +27,16 @@ const relatedItems = await getRelatedArticles(post);
     readTime: post.data.readTime ? parseInt(post.data.readTime) : undefined,
     category: post.data.category,
     tags: post.data.tags,
-    ogImage: post.data.heroImage,
+    ogImage: post.data.ogImage ?? post.data.heroImage,
     heroImage: post.data.heroImage,
+    heroAlt: post.data.heroAlt,
     whyItMatters: post.data.whyItMatters,
     leaderTakeaway: post.data.leaderTakeaway,
     series: post.data.series,
     seriesPart: post.data.seriesOrder,
     draft: post.data.status === 'draft',
+    takeawayPlacement: post.data.takeawayPlacement,
+    heroPlacement: post.data.heroPlacement,
   }}
   relatedItems={relatedItems}
 >

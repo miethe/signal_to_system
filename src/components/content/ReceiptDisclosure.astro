@@ -1,0 +1,102 @@
+---
+/**
+ * ReceiptDisclosure — a raw evidence receipt (YAML, shell output) tucked
+ * behind a native `<details>` so the page stays readable. The label and
+ * the finding stay visible without expanding — this is never the only
+ * place the finding appears; the prose carries it too.
+ */
+interface Props {
+  label: string;
+  summary: string;
+}
+
+const { label, summary } = Astro.props;
+---
+
+<figure class="receipt-disclosure lift-hover">
+  <figcaption class="receipt-disclosure__head">
+    <span class="receipt-disclosure__label">{label}</span>
+    <p class="receipt-disclosure__summary">{summary}</p>
+  </figcaption>
+  <details class="receipt-disclosure__details">
+    <summary>Show receipt</summary>
+    <div class="receipt-disclosure__body">
+      <slot />
+    </div>
+  </details>
+</figure>
+
+<style>
+  .receipt-disclosure {
+    margin: 1.75rem 0;
+    padding: 1rem 1.125rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--bg-muted);
+  }
+
+  .receipt-disclosure__head {
+    margin: 0 0 0.75rem;
+  }
+
+  .receipt-disclosure__label {
+    display: inline-block;
+    margin-bottom: 0.35rem;
+    color: var(--text-tertiary);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .receipt-disclosure__summary {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 0.9375rem;
+    line-height: 1.55;
+  }
+
+  .receipt-disclosure__details {
+    margin: 0;
+  }
+
+  .receipt-disclosure__details summary {
+    cursor: pointer;
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    list-style: none;
+  }
+
+  .receipt-disclosure__details summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .receipt-disclosure__details summary::before {
+    content: '▸ ';
+  }
+
+  .receipt-disclosure__details[open] summary::before {
+    content: '▾ ';
+  }
+
+  .receipt-disclosure__details[open] summary {
+    margin-bottom: 0.6rem;
+  }
+
+  .receipt-disclosure__details summary:hover {
+    color: var(--accent-hover);
+  }
+
+  .receipt-disclosure__body {
+    margin-top: 0.25rem;
+  }
+
+  .receipt-disclosure__body :global(pre) {
+    margin: 0.5rem 0 0;
+  }
+</style>
