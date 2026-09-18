@@ -260,7 +260,8 @@ pre code {
 }
 
 /* Reader prose, figure plates, glossary and editorial furniture:
-   ./reader/prose.css (imported above). */
+   ./reader/prose.css (imported above). The reading-layout refinements
+   are maintained in that extracted stylesheet. */
 
 /* ============================================================
    UTILITY CLASSES

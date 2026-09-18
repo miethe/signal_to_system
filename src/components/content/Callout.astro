@@ -59,13 +59,13 @@ const displayTitle = title ?? LABEL[kind];
   .callout-v2 {
     --tone: var(--s2s-status-info);
     display: flex;
-    gap: 14px;
-    margin: 28px 0;
-    padding: 16px 18px 16px 16px;
-    border: 1px solid color-mix(in srgb, var(--tone) 28%, var(--s2s-rule));
-    border-left: 3px solid var(--tone);
-    border-radius: var(--s2s-radius-card);
-    background: color-mix(in srgb, var(--tone) 7%, var(--s2s-surface));
+    gap: 12px;
+    margin: 20px 0;
+    padding: 2px 4px 2px 14px;
+    border: 0;
+    border-left: 2px solid var(--s2s-rule);
+    border-radius: 0;
+    background: transparent;
     color: var(--s2s-ink-muted);
   }
   .callout-v2--warning { --tone: var(--s2s-status-warn); }
@@ -76,13 +76,13 @@ const displayTitle = title ?? LABEL[kind];
   .callout-v2__icon { flex-shrink: 0; margin-top: 1px; color: var(--tone); }
   .callout-v2__body { min-width: 0; flex: 1; }
   .callout-v2__title {
-    margin: 0 0 6px;
+    margin: 0 0 2px;
     font: 600 var(--type-ui) / 1.4 var(--font-sans);
     letter-spacing: 0.02em;
     color: var(--tone);
   }
   .callout-v2__content {
-    font: 400 0.9688rem / 1.62 var(--font-sans);
+    font: 400 0.9375rem / 1.62 var(--font-sans);
     color: var(--s2s-ink-muted);
   }
   .callout-v2__content :global(p) { margin: 0 0 10px; color: inherit; font: inherit; }
