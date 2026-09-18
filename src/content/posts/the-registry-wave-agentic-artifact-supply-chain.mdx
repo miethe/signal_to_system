@@ -50,7 +50,7 @@ A reviewer skill used across my projects was missing a mandatory guard, so I fix
 
 Same skill name, but different instructions reaching the runtime.
 
-The registry was right. It was my usage that was wrong. Nothing said so, because nothing compared the deployed bytes to the registered ones.
+The registry was right. The copy the runtime loaded was wrong. Nothing said so, because nothing compared the deployed bytes to the registered ones.
 
 What exactly did the approval attach to?
 
@@ -90,7 +90,7 @@ A registry solves important problems.
 
 Where do I find this skill? How do I install it? What version am I using? Where did it come from? Can I update it? Can I publish it?
 
-Those are real questions which demand good answers. For my reviewer, the registry preserved the corrected artifact while the deployed copy fell behind. Having a source of truth made the discrepancy diagnosable.
+Those questions matter. They are not the whole lifecycle. For my reviewer, the registry preserved the corrected artifact while the deployed copy fell behind. Having a source of truth made the discrepancy diagnosable.
 
 What it couldn't tell me was whether any of those answers still described the file an agent actually loaded. The useful question is which assurances survive each handoff.
 
@@ -174,7 +174,7 @@ At **drift**, declared and actual state separate. The fix stayed in the source r
 
 The manifest driving the drift gate classifies each deployed path into exactly one bucket: a diffed tracked copy, a never-diffed allowed copy, or an undeclared hard failure.
 
-See below two real entries, redacted:
+Two redacted entries show the distinction:
 
 ```yaml
 # scripts/global-artifact-manifest.yaml
@@ -418,25 +418,25 @@ This essay reports no measured outcome improvement.
 
 <WhereThisSits slug="the-registry-wave-agentic-artifact-supply-chain" />
 
-I use <Term id="agentic-systems-engineering">**Agentic Systems Engineering**</Term> as an emerging discipline, already named in academic work by Sun and colleagues and in enterprise work by OutSystems.[^ase] This series examines my particular architecture through the systems I build and the failures they expose. Agentic SDLC is its application to software delivery. This reading path connects the questions; it isn't a one-to-one map of architecture layers.
+I place this work within the emerging discipline of <Term id="agentic-systems-engineering">**Agentic Systems Engineering**</Term>, already named in academic work by Sun and colleagues and in enterprise work by OutSystems.[^ase] This series examines my particular architecture through the systems I build and the failures they expose. Agentic SDLC is its application to software delivery. This reading path connects the questions; it isn't a one-to-one map of architecture layers.
 
 The reviewer didn't need a better name or another catalog. It needed the fix to reach the place that loaded it, a check that noticed when it hadn't, and evidence that the resulting review did what was asked. It also needed room for a project-specific improvement to survive the next shared correction. That's the bar I want the supply chain to meet when I'm no longer watching every project myself.
 
 ## Sources
 
-External claims below are carried forward for the September verification pass. Their scope and availability still need confirmation before this edition is published. Lab references identify supplied implementation receipts.
+External claims below reflect researched, scoped status for this edition: each footnote states its own preview, GA, or tier boundary rather than treating verification as pending. Lab references identify supplied implementation receipts.
 
-[^github]: GitHub Changelog, [Manage agent skills with GitHub CLI](https://github.blog/changelog/2026-04-16-manage-agent-skills-with-github-cli/). Verification pending for this edition.
-[^jfrog]: JFrog, [Agent Skills Registry](https://jfrog.com/ai-catalog/skills-registry/) and [Skills Repositories](https://docs.jfrog.com/artifactory/docs/skills-repositories). Verification pending for this edition.
-[^redhat]: Red Hat, [agentic catalog](https://catalog.redhat.com/en/ai) and [MCP catalog: discover, deploy, and connect](https://www.redhat.com/en/blog/mcp-catalog-here-discover-deploy-and-connect-red-hat-openshift-ai). Verification pending, including preview boundaries.
-[^mcp]: Model Context Protocol, [The MCP Registry](https://modelcontextprotocol.io/registry/about). Verification pending for this edition.
+[^github]: GitHub Changelog, [Manage agent skills with GitHub CLI](https://github.blog/changelog/2026-04-16-manage-agent-skills-with-github-cli/). `gh skill` remains a public preview feature as of this edition.
+[^jfrog]: JFrog, [Agent Skills Registry](https://jfrog.com/ai-catalog/skills-registry/) and [Skills Repositories](https://docs.jfrog.com/artifactory/docs/skills-repositories). The registry itself is generally available; artifact signing is optional and tier-dependent, and the locally enforced boundary described here remains a preview capability.
+[^redhat]: Red Hat, [agentic catalog](https://catalog.redhat.com/en/ai) and [MCP catalog: discover, deploy, and connect](https://www.redhat.com/en/blog/mcp-catalog-here-discover-deploy-and-connect-red-hat-openshift-ai). Red Hat maintains the Agent Catalog and the MCP Catalog as separate roles, and both carry pre-GA boundaries as of this edition.
+[^mcp]: Model Context Protocol, [The MCP Registry](https://modelcontextprotocol.io/registry/about). The registry is a preview metadata and discovery service, not an enforcement point.
 [^drift]: Lab implementation receipt, August 6, 2026: global artifact-drift check, following a reviewer deployed five days behind its source. Method summarized from the supplied receipt; no claim of a measured reduction in review failures. Internal identifiers withheld; method only.
 [^parity]: Lab implementation receipt, August 5, 2026: sibling instruction parity gate, following six weeks of stale instructions reaching one harness class. Internal identifiers withheld; method only.
 [^staleness]: Lab implementation receipt, August 7, 2026: live-document scan for superseded operating-model assertions, with dated historical records exempted. Internal identifiers withheld; method only.
 [^provisioning]: Supplied lab provisioning receipt (origin date unresolved): missing local artifacts are treated as unprovisioned; a tool-failure hook probes the registry and supplies a deployment command without writing the artifact itself. Internal identifiers withheld; method only.
 [^coverage]: Registry implementation receipt, August 11, 2026: fleet-wide compliance scanning explicitly labelled target state. A local registration scan exists (August 24); that doesn't establish fleet-wide enforcement. Internal identifiers withheld; method only.
 
-[^market-scope]: September 17 research comparison of the four documented product surfaces, supplied for this edition. Registry features, runtime mediation and adjacent provenance products were treated separately. No complete bytes-to-policy-to-execution-to-outcome join was documented in the reviewed scope; this is not a company-wide incapability claim. External verification remains pending as recorded above.
+[^market-scope]: September 17 research comparison of the four documented product surfaces, supplied for this edition. Registry features, runtime mediation and adjacent provenance products were treated separately. No complete bytes-to-policy-to-execution-to-outcome join was documented in the reviewed scope; this is not a company-wide incapability claim. Each product's scope and preview boundary is recorded above.
 [^primitives]: JFrog, [Managing AI Agent Primitives Like Real Software Packages with APM and JFrog](https://jfrog.com/blog/managing-ai-agent-primitives-with-apm-and-jfrog/), included in the supplied September 17 prior-art review. This supports the governed-dependency overlap, not a measured result for my systems.
 [^xia]: Xia et al., [Harnessing Agent Skills: Architectural Patterns and a Reference Architecture for Skill-Mediated LLM Agents](https://arxiv.org/html/2606.20631v1), version 1, reviewed in the supplied September 17 research pack. Direct architectural overlap includes artifact/use separation, mediation, run evidence and feedback.
 [^skillbom]: Alongside Xia et al., Liu, Wu and Li, [The Decomposition Is the Fingerprint: Per-Component Identity for Agent Skills](https://arxiv.org/abs/2606.31272), and Jia et al., [Skills Are Not Islands: Measuring Dependency and Risk in Agent Skill Supply Chains](https://arxiv.org/abs/2607.01136), use SkillBOM for related identity and dependency concerns. These are distinct schema meanings, not an established interoperability contract with this implementation.
