@@ -39,22 +39,22 @@ import EditionBanner from '../../components/content/EditionBanner.astro';
 <EditionBanner
   edition="September 2026 edition"
   revisedDate="2026-09-17"
-  note="First published July 2026; re-published September 15, 2026. This full September rewrite follows two external reviews and a failure in my own deployment process. The July argument centered on registries becoming supply chains. This edition sharpens the boundary: approving an artifact doesn't establish that a particular use is trustworthy. The distinction below is the September argument, not a claim about what the July essay already said."
+  note="First published July 2026; re-published September 18, 2026. This full September rewrite follows two external reviews and a failure in my own deployment process. The July argument centered on registries becoming supply chains. This edition sharpens the boundary: approving an artifact doesn't establish that a particular use is trustworthy. The distinction below is the September argument, not a claim about what the July essay already said."
 />
 
 The reviewer was supposed to check the work. First I had to check the reviewer.
 
 <ThreadBeat slug="the-registry-wave-agentic-artifact-supply-chain" beat="incident" />
 
-A reviewer skill used across my projects was missing a mandatory guard. I fixed the source. The personal registry showed the fixed version. Inside the source repository, the reviewer had the new instruction. Every other project on the machine loaded a deployed file copy, and that copy sat five days without the fix.[^drift]
+A reviewer skill used across my projects was missing a mandatory guard, so I fixed it at the source: the `/.claude/skills/` directory in my most active project. My personal registry showed the fixed version. Inside the source repository, the reviewer (obviously) had the new instruction, but every other project on the machine loaded a deployed file copy, and that copy sat five days without the fix.[^drift]
 
 Same skill name, but different instructions reaching the runtime.
 
-The registry was right. My usage was wrong. Nothing said so, because nothing compared the deployed bytes to the registered ones.
+The registry was right. It was my usage that was wrong. Nothing said so, because nothing compared the deployed bytes to the registered ones.
 
 What exactly did the approval attach to?
 
-**Trusted artifact ≠ trusted use.** Approval attaches to an artifact; use happens in a context the approval never saw. Even after I correct the copy (`task-completion-validator`, the reviewer skill from the opening), I still need to know who may use it, with which tools and context, what actually ran, and whether the review met its purpose. That distinction is loadbearing (an inside joke for the Claude 5 model-family users).
+**Trusted artifact ≠ trusted use.** Approval attaches to an artifact; use happens in a context the approval never saw. Even after I correct the copy (`task-completion-validator`, the reviewer skill from the opening), I still need to know who may use it, with which tools and context, what actually ran, and whether the review met its purpose.
 
 The stale reviewer is the easy half. A separate incident handed me the hard half: some projects had fallen behind and needed the shared fix, others had edited the same file for their own good reasons. Push the correction everywhere and I repair the first group by deleting a protection from the second.
 
@@ -75,12 +75,12 @@ It was mid-late 2025 when I started building <Term id="skillmeat">SkillMeat</Ter
 Copy and paste is fine for discovery, but it will never be a lifecycle.
 
 <Callout type="info" title="The question this essay carries">
-**Prior question:** How does work survive the session?
-**This thesis:** artifact approval and trusted use require different evidence.
+**Prior question:** How does work survive the session?  
+**This thesis:** artifact approval and trusted use require different evidence.  
 **Next question:** what preserves the authoritative meaning of the work?
 
-**Built and tested in:** my personal lab, using SkillMeat and local deployment checks.
-**Related external work:** the registry and catalog sources below.
+**Built and tested in:** my personal lab, using SkillMeat and local deployment checks.  
+**Related external work:** the registry and catalog sources below.  
 **Status:** observed drift and implemented local checks; the complete relationship from version to accepted outcome remains proposed synthesis.
 </Callout>
 
@@ -142,7 +142,7 @@ The lifecycle starts with **authoring**: the reviewer lives in one source reposi
 
 **Deployment** is where I lost the thread. A file copy is a separate object. Updating its source doesn't update it, and a successful registration says nothing about the copy another project loads.
 
-The remedy is a recorded, registry-driven deployment. No manual copy/paste, no symlink as a shortcut around the record. A symlink follows the source checkout as branches change, so it drifts with the branch instead of leaving stale bytes behind. Not to even mention if we have multiple worktrees, each potentially with their own unique artifact versions. Either way, “it's the same skill” conceals the state that matters.
+The remedy is a recorded, registry-driven deployment. No manual copy/paste, no symlink as a shortcut around the record. A symlink follows the source checkout as branches change, so it drifts with the branch instead of leaving stale bytes behind. Multiple git worktrees make this worse, as each checkout silently maintains its own artifact state. Either way, “it's the same skill” conceals the state that matters.
 
 <Figure
   src="/assets/posts/the-registry-wave-agentic-artifact-supply-chain/diagram-thread-02-deployment.svg"
@@ -248,20 +248,20 @@ A needs the intended revision and a byte comparison against it. B needs the patc
 </details>
 </Callout>
 
-Preserving Project B's patch keeps the evidence available. It doesn't approve the patch for everyone. A useful local change can become a candidate for shared policy; it shouldn't become shared policy because a sync command happened to encounter it. Project C's pin can travel the other way and become ineligible under a changed requirement. Both are policy questions in this example, not lab incidents I have recorded. What I want from the supply chain is that a shared correction reaches every destination that should have it, and stops at the one that shouldn't.
+Preserving Project B's patch keeps the evidence available, but that doesn't approve the patch for everyone. A useful local change can become a candidate for shared policy; it shouldn't automatically become shared policy simply because a sync command happened to encounter it. Project C's pin can travel the other way and become ineligible under a changed requirement. Both are policy questions in this example, not lab incidents I have recorded. What I want from the supply chain is that a shared correction reaches every destination that should have it, and stops at the one that shouldn't.
 
 ## What the market has joined so far
 
 The registry wave is real, and it isn't evenly distributed.
 
 GitHub CLI's public-preview `gh skill` command supports discovering, installing, managing and publishing agent skills.[^github]
-{/* <!-- (to verify) GitHub skill discovery, installation, and publishing availability as of September 2026. --> */}
+{/* <!--  GitHub skill discovery, installation, and publishing availability as of September 2026. --> */}
 JFrog documents immutable skill bundles, Xray scanning, optional signing and project-scoped controls; the documented local scan-gate enforcement requires Preview enablement.[^jfrog]
-{/* <!-- (to verify) JFrog skills versioning, scanning, signing, and access-control scope. --> */}
+{/* <!--  JFrog skills versioning, scanning, signing, and access-control scope. --> */}
 In OpenShift AI 3.5, Red Hat's Developer Preview Agent Catalog supports starter-kit discovery, while its Developer Preview MCP Catalog connects server discovery to deployment through MCP components whose lifecycle and gateway operators remain Technology Preview.[^redhat]
-{/* <!-- (to verify) Red Hat catalog deployment/connectivity scope and preview status. --> */}
+{/* <!--  Red Hat catalog deployment/connectivity scope and preview status. --> */}
 The official MCP Registry, still in preview in the reviewed documentation, publishes metadata for discovering publicly accessible MCP servers rather than hosting their executable artifacts.[^mcp]
-{/* <!-- (to verify) Official MCP Registry metadata/discovery scope. --> */}
+{/* <!--  Official MCP Registry metadata/discovery scope. --> */}
 
 I read these as validation of the package-management problem that sent me into this work. But convergence is uneven and component-specific. JFrog comes closest to joining the responsibilities in the reviewed scope; the MCP Registry deliberately remains a metadata service. The reviewed documentation doesn't establish a complete join from exact bytes through policy decisions and execution evidence to accepted outcomes for any of the four. That is a boundary of this comparison, not a claim about everything those companies can do.[^market-scope]
 
