@@ -75,9 +75,9 @@ const toc = rawToc.map((heading) => {
               aria-expanded="true"
               aria-controls="post-sidebar-toc-panel"
             >
-              <span>On this page</span>
+              <span class="shrink-0 whitespace-nowrap">On this page</span>
               <span
-                class="post-sidebar__toc-header-current min-w-0 truncate text-[var(--text-tertiary)]"
+                class="post-sidebar__toc-header-current min-w-0 flex-1 truncate text-[var(--text-tertiary)]"
                 data-toc-header-current
                 hidden
               />
@@ -290,7 +290,10 @@ const toc = rawToc.map((heading) => {
 </style>
 
 <script>
-  import { computeListWindow } from '../../lib/sidebar-window';
+  import { computeListWindow, measureExpandedHeight } from '../../lib/sidebar-window';
+
+  /** gap-3 on `.post-sidebar` — the vertical space between each stacked block. */
+  const SIDEBAR_GAP_PX = 12;
 
   const initializePostSidebars = () => {
     document.querySelectorAll<HTMLElement>('[data-post-sidebar]').forEach((root) => {
@@ -376,6 +379,11 @@ const toc = rawToc.map((heading) => {
 
       let activeIndex = 0;
 
+      // Set once the accordion coordinator (below) exists, so setActive can
+      // ask it to re-check whether the TOC and rail both fit whenever the
+      // active branch's h3 set changes the TOC's own height.
+      let refreshAccordionFit: (() => void) | null = null;
+
       // Fit the list to whatever room the panel actually has — measured,
       // not guessed, so it's correct at any viewport height. `maxVisible`
       // is a row COUNT: available px for the list, divided by one row's
@@ -458,6 +466,10 @@ const toc = rawToc.map((heading) => {
           activeLink?.scrollIntoView({ block: 'nearest', behavior: reduceMotion() ? 'auto' : 'smooth' });
         }
         queueFit();
+        // The active branch's h3 set (toggled by setActiveBranch above) can
+        // change the TOC's natural height — re-check whether both blocks
+        // still fit now that it might have.
+        refreshAccordionFit?.();
       };
 
       const visibleTargets = new Set<HTMLElement>();
@@ -527,16 +539,40 @@ const toc = rawToc.map((heading) => {
       recomputeActive();
       window.addEventListener('scroll', queueRecompute, { passive: true });
       window.addEventListener('resize', queueRecompute, { passive: true });
+
+      let windowResizeFitQueued = false;
+      window.addEventListener(
+        'resize',
+        () => {
+          if (windowResizeFitQueued) return;
+          windowResizeFitQueued = true;
+          requestAnimationFrame(() => {
+            windowResizeFitQueued = false;
+            queueFit();
+            refreshAccordionFit?.();
+          });
+        },
+        { passive: true },
+      );
+
       if ('ResizeObserver' in window) {
-        new ResizeObserver(queueFit).observe(tocBlock);
+        new ResizeObserver(() => {
+          queueFit();
+          refreshAccordionFit?.();
+        }).observe(tocBlock);
       }
 
       // ---------------------------------------------------------------
-      // Accordion: when a thread rail exists, exactly one of the TOC and
-      // the rail is expanded at a time. The rail keeps owning its own beat
-      // IntersectionObservers (it knows its own beat targets); it reports
-      // open/close intent here via events on the wrap element, and this
-      // coordinator tells it (and the TOC) what to actually show.
+      // Accordion: when a thread rail exists, the TOC and rail SHARE a
+      // sticky column with finite height. If both fully expanded (every
+      // row, no windowing) fit in the room left after the collapsed author
+      // badge, they stay expanded independently — each header only ever
+      // toggles its own block. If they don't fit, fall back to a strict
+      // one-open accordion where the rail wins while a beat is in view. The
+      // rail keeps owning its own beat IntersectionObservers (it knows its
+      // own beat targets); it reports open/close intent here via events on
+      // the wrap element, and this coordinator tells it (and the TOC) what
+      // to actually show.
       // ---------------------------------------------------------------
       const railWrap = root.querySelector<HTMLElement>('[data-thread-rail-wrap]');
 
@@ -546,46 +582,127 @@ const toc = rawToc.map((heading) => {
       }
 
       if (railWrap) {
+        const railPanel = railWrap.querySelector<HTMLElement>('[data-thread-rail]');
+
+        // Exclusive-accordion state (used when the two blocks don't fit).
         let manualPanel: 'toc' | 'rail' | null = null;
+        // Independent-toggle state (used when they do fit).
+        let tocManualClosed = false;
+        let railManualOverride: boolean | null = null;
         let railAutoOpen = false;
+        let bothFit = false;
+
+        // The collapsed-badge height, measured on a clone with
+        // `.is-collapsed` forced on *before* it's inserted — so it reads
+        // the final target height instantly, never a mid-transition value
+        // (the class-added-then-transitioned case only applies to an
+        // element already on-screen; a freshly inserted clone renders at
+        // its end state immediately).
+        const measureCollapsedAuthorHeight = (): number => {
+          if (!authorEl) return 0;
+          const clone = authorEl.cloneNode(true) as HTMLElement;
+          clone.classList.add('is-collapsed');
+          clone.style.position = 'fixed';
+          clone.style.top = '-9999px';
+          clone.style.left = '-9999px';
+          clone.style.margin = '0';
+          clone.style.visibility = 'hidden';
+          clone.style.pointerEvents = 'none';
+          clone.style.width = `${root.getBoundingClientRect().width}px`;
+          document.body.appendChild(clone);
+          const height = clone.getBoundingClientRect().height;
+          clone.remove();
+          return height;
+        };
+
+        // Fully-expanded (unwindowed) height of the TOC block plus the
+        // rail panel, plus the collapsed author badge and the two gap-3
+        // gaps between the three stacked blocks — compared against the
+        // room actually left in the sticky column. Measured off-screen on
+        // clones (see measureExpandedHeight) so nothing visibly flickers
+        // open just to be measured.
+        const evaluateFits = (): boolean => {
+          if (!railPanel) return false;
+          const columnWidth = root.getBoundingClientRect().width;
+          if (columnWidth === 0) return false;
+          const authorHeight = measureCollapsedAuthorHeight();
+          const tocHeight = measureExpandedHeight(tocBlock, columnWidth, '[data-toc-more]');
+          const railHeight = measureExpandedHeight(railPanel, columnWidth, '[data-thread-more]');
+          const available = window.innerHeight - root.getBoundingClientRect().top - 24; // 24px bottom breathing room
+          const total = authorHeight + SIDEBAR_GAP_PX + tocHeight + SIDEBAR_GAP_PX + railHeight;
+          return total <= available;
+        };
 
         const applyAccordion = () => {
-          const active = manualPanel ?? (railAutoOpen ? 'rail' : 'toc');
-          const tocExpanded = active === 'toc';
+          let tocExpanded: boolean;
+          let railExpanded: boolean;
+
+          if (bothFit) {
+            tocExpanded = !tocManualClosed;
+            railExpanded = railManualOverride ?? railAutoOpen;
+          } else {
+            const active = manualPanel ?? (railAutoOpen ? 'rail' : 'toc');
+            tocExpanded = active === 'toc';
+            railExpanded = active === 'rail';
+          }
+
           tocPanelExpandedState.value = tocExpanded;
           tocHeader?.setAttribute('aria-expanded', String(tocExpanded));
           toc.toggleAttribute('hidden', !tocExpanded);
           tocBlock.classList.toggle('is-expanded', tocExpanded);
           if (tocHeaderCurrent) tocHeaderCurrent.toggleAttribute('hidden', tocExpanded || !tocHeaderCurrent.textContent);
-          railWrap.dispatchEvent(new CustomEvent('threadrail:setexpanded', { detail: { expanded: !tocExpanded } }));
+          railWrap.dispatchEvent(new CustomEvent('threadrail:setexpanded', { detail: { expanded: railExpanded } }));
           if (tocExpanded) queueFit();
         };
 
+        refreshAccordionFit = () => {
+          bothFit = evaluateFits();
+          applyAccordion();
+        };
+
         tocHeader?.addEventListener('click', () => {
-          manualPanel = tocPanelExpanded() ? 'rail' : 'toc';
+          if (bothFit) {
+            tocManualClosed = !tocManualClosed;
+          } else {
+            manualPanel = tocPanelExpanded() ? 'rail' : 'toc';
+          }
           applyAccordion();
         });
 
         railWrap.addEventListener('threadrail:request-open', () => {
-          manualPanel = 'rail';
+          if (bothFit) {
+            railManualOverride = true;
+          } else {
+            manualPanel = 'rail';
+          }
           applyAccordion();
         });
         railWrap.addEventListener('threadrail:request-close', () => {
-          manualPanel = 'toc';
+          if (bothFit) {
+            railManualOverride = false;
+          } else {
+            manualPanel = 'toc';
+          }
           applyAccordion();
         });
         railWrap.addEventListener('threadrail:auto', (event) => {
           const detail = (event as CustomEvent<{ open: boolean }>).detail;
           railAutoOpen = detail.open;
           // "Manual overrides auto until the current beat leaves view" — the
-          // override is cleared on the close-side transition only, so it
-          // never fights an in-progress manual choice while a beat is still
-          // visible, but auto resumes cleanly once nothing is.
-          if (!detail.open) manualPanel = null;
+          // override is cleared on the close-side transition only (in both
+          // modes), so it never fights an in-progress manual choice while a
+          // beat is still visible, but auto resumes cleanly once nothing is.
+          if (!detail.open) {
+            manualPanel = null;
+            railManualOverride = null;
+          }
+          // Re-check the fit right as the rail wants to expand (or stop
+          // wanting to) — the trigger named in the brief for this check.
+          bothFit = evaluateFits();
           applyAccordion();
         });
 
-        applyAccordion();
+        refreshAccordionFit();
       } else {
         // No thread on this post: the TOC is the only block, always open,
         // no accordion header/click affordance needed.
