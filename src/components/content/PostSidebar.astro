@@ -112,7 +112,9 @@ const toc = rawToc.map((heading) => {
     left: 0;
     width: 2px;
     border-radius: 1px;
-    background-color: var(--border-subtle);
+    /* border-subtle was too faint to read as a track in either theme;
+       border-strong stays understated but is actually visible. */
+    background-color: var(--border-strong);
   }
 
   .post-sidebar__toc-rail-fill {
@@ -164,7 +166,10 @@ const toc = rawToc.map((heading) => {
     font-size: 0.625rem;
     font-weight: 600;
     letter-spacing: 0.02em;
-    color: var(--text-disabled);
+    font-variant-numeric: tabular-nums;
+    /* text-disabled reads as invisible in dark mode; text-tertiary is the
+       muted floor that's still legible. */
+    color: var(--text-tertiary);
   }
 
   .post-sidebar__toc-label {
@@ -337,6 +342,47 @@ const toc = rawToc.map((heading) => {
       );
 
       pairs.forEach(({ target }) => tocObserver.observe(target));
+
+      // Belt-and-suspenders: IntersectionObserver is the primary signal
+      // above, but its first callback is async and can, on some
+      // browser/scroll-timing combinations, be missed for a page that
+      // loads (or jumps) already scrolled deep into the article — which
+      // would otherwise leave every link with no `aria-current` until the
+      // next observed crossing. This recomputes the same "closest heading
+      // at or above the activation line" answer synchronously from layout,
+      // so the active section is always correct on init and on scroll
+      // regardless of whether the observer has fired yet. Cheap (a handful
+      // of getBoundingClientRect calls) and only writes when the answer
+      // actually changed, so it never fights the observer for scrollIntoView.
+      const currentActiveTarget = () =>
+        toc.querySelector<HTMLAnchorElement>('[data-toc-link][aria-current="location"]')?.dataset.tocTarget ?? null;
+
+      const recomputeActive = () => {
+        const activationLine = window.innerHeight * 0.1;
+        let activeId: string | null = null;
+        for (const { target } of pairs) {
+          if (target.getBoundingClientRect().top <= activationLine) {
+            activeId = target.id;
+          } else {
+            break;
+          }
+        }
+        if (activeId && activeId !== currentActiveTarget()) setActive(activeId);
+      };
+
+      let recomputeQueued = false;
+      const queueRecompute = () => {
+        if (recomputeQueued) return;
+        recomputeQueued = true;
+        requestAnimationFrame(() => {
+          recomputeQueued = false;
+          recomputeActive();
+        });
+      };
+
+      recomputeActive();
+      window.addEventListener('scroll', queueRecompute, { passive: true });
+      window.addEventListener('resize', queueRecompute, { passive: true });
     });
   };
 
