@@ -16,6 +16,36 @@ export interface ListWindow {
   below: number;
 }
 
+/**
+ * Fully-expanded, unwindowed height of `source` — measured off-screen on a
+ * clone so the real element never flickers open to be measured. Elements
+ * matching `keepHiddenSelector` (e.g. the "+N more" indicators, which are
+ * meaningless once nothing is windowed) stay hidden on the clone; every
+ * other `hidden` attribute and `.is-window-hidden` class is stripped so the
+ * clone renders as if every row were showing. `width` should come from a
+ * currently-visible ancestor (the source itself may be `display:none`).
+ */
+export function measureExpandedHeight(source: HTMLElement, width: number, keepHiddenSelector?: string): number {
+  const clone = source.cloneNode(true) as HTMLElement;
+  clone.removeAttribute('hidden');
+  clone.querySelectorAll('[hidden]').forEach((el) => {
+    if (keepHiddenSelector && el.matches(keepHiddenSelector)) return;
+    el.removeAttribute('hidden');
+  });
+  clone.querySelectorAll('.is-window-hidden').forEach((el) => el.classList.remove('is-window-hidden'));
+  clone.style.position = 'fixed';
+  clone.style.top = '-9999px';
+  clone.style.left = '-9999px';
+  clone.style.margin = '0';
+  clone.style.visibility = 'hidden';
+  clone.style.pointerEvents = 'none';
+  clone.style.width = `${width}px`;
+  document.body.appendChild(clone);
+  const height = clone.getBoundingClientRect().height;
+  clone.remove();
+  return height;
+}
+
 export function computeListWindow(total: number, active: number, maxVisible: number): ListWindow {
   if (total <= 0) return { start: 0, end: -1, above: 0, below: 0 };
   if (maxVisible >= total || maxVisible <= 0) {

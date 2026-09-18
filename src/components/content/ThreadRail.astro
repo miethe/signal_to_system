@@ -384,9 +384,15 @@ const thread = threads[slug];
 
       targets.forEach((target) => visibilityObserver.observe(target));
 
-      // Step highlight: which rail link is "current" — a narrower band so
-      // the highlighted step doesn't jump the moment a beat's edge clips
-      // into view, independent of the open/close decision above.
+      // Step highlight: which rail link is "current" — among every beat
+      // actually on screen right now (no narrow top-biased band; a beat
+      // fully visible mid-screen must count), pick whichever one is
+      // closest to the viewport's vertical center. That's a better proxy
+      // for "which beat is the reader looking at" than "closest to the top
+      // edge", which lagged behind (a beat leaving the top band never got
+      // picked back up as current even while it filled the middle of the
+      // screen). Independent of the open/close decision above, which keeps
+      // its own band and delay.
       const stepVisibleTargets = new Set<HTMLElement>();
       const stepObserver = new IntersectionObserver(
         (entries) => {
@@ -402,14 +408,17 @@ const thread = threads[slug];
           const visible = Array.from(stepVisibleTargets);
           if (visible.length === 0) return;
 
+          const viewportCenter = window.innerHeight / 2;
+          const distanceFromCenter = (el: HTMLElement) => {
+            const rect = el.getBoundingClientRect();
+            return Math.abs(rect.top + rect.height / 2 - viewportCenter);
+          };
           const closest = visible.reduce((current, candidate) =>
-            Math.abs(candidate.getBoundingClientRect().top) < Math.abs(current.getBoundingClientRect().top)
-              ? candidate
-              : current,
+            distanceFromCenter(candidate) < distanceFromCenter(current) ? candidate : current,
           );
           setActive(closest.id);
         },
-        { rootMargin: '-20% 0px -65% 0px', threshold: 0 },
+        { rootMargin: '0px', threshold: 0 },
       );
 
       targets.forEach((target) => stepObserver.observe(target));
