@@ -251,14 +251,37 @@ const thread = threads[slug];
       // Fit the step list to the room the panel actually has — measured,
       // not guessed. `overflow-y:auto` (scrollbar hidden) on the nav stays
       // as a fallback only; the current step is always kept in the window.
+      //
+      // `panel.getBoundingClientRect().top` moves whenever a SIBLING block
+      // (the author card collapsing, the TOC expanding) resizes the shared
+      // sticky column — this list's own box rarely changes size on its own,
+      // so a ResizeObserver on just `panel` misses that. See the
+      // ResizeObserver/transitionend wiring below, which re-runs this on
+      // any sibling resize and once more when a transition settles, so the
+      // window is always computed against the FINAL layout, not a
+      // transient mid-transition one.
+      let lastFitSignature = '';
       const fitList = () => {
         if (!scrollBody || pairs.length === 0) return;
+
+        // Cheap guard, checked before touching the DOM: `top` isn't
+        // affected by this list's own visible-row count (only by what's
+        // above it), so if it — and the active step — haven't moved since
+        // the last fit, recomputing would only reproduce the same window.
+        // Skipping avoids the unhide/measure/rehide cycle below from
+        // resizing this block and retriggering the ResizeObserver on its
+        // own account.
+        const panelTop = panel.getBoundingClientRect().top;
+        const available = window.innerHeight - panelTop - 24; // 24px bottom breathing room
+        const signature = `${available.toFixed(1)}:${pairs.length}:${activeIndex}`;
+        if (signature === lastFitSignature) return;
+        lastFitSignature = signature;
+
         pairs.forEach(({ item }) => item.classList.remove('is-window-hidden'));
         moreAbove?.setAttribute('hidden', '');
         moreBelow?.setAttribute('hidden', '');
 
         const panelRect = panel.getBoundingClientRect();
-        const available = window.innerHeight - panelRect.top - 24; // 24px bottom breathing room
         const rowHeight = pairs[0].link.getBoundingClientRect().height || 36;
         const totalRowsHeight = pairs.reduce((sum, { link }) => sum + link.getBoundingClientRect().height, 0);
         // Everything in the panel that isn't the scrollable row list itself
@@ -330,10 +353,29 @@ const thread = threads[slug];
         const detail = (event as CustomEvent<{ expanded: boolean }>).detail;
         applyState(detail.expanded);
       });
+      // PostSidebar pings this whenever the shared column's layout could
+      // have moved (a sibling resized, a transition on it just ended) —
+      // see the matching dispatch in its own script.
+      wrap.addEventListener('threadrail:refit', () => queueFit());
 
+      // The column (`.post-sidebar`, this wrap's direct parent) is the
+      // shared ancestor whose own box height is the sum of every sibling
+      // block's height. Watching IT, not just this panel, catches the
+      // author card collapsing and the TOC expanding/collapsing — sibling
+      // resizes that move this panel's `top` without changing its own
+      // size, which a ResizeObserver scoped to `panel` alone would miss.
+      const sidebarRoot = wrap.parentElement;
       if ('ResizeObserver' in window) {
-        new ResizeObserver(queueFit).observe(panel);
+        const columnResizeObserver = new ResizeObserver(queueFit);
+        columnResizeObserver.observe(panel);
+        if (sidebarRoot) columnResizeObserver.observe(sidebarRoot);
       }
+      // A CSS transition (the author card's collapse) can still be
+      // mid-flight when a resize notification lands — that notification
+      // reports the box size at that instant, not the transition's
+      // eventual end. One more fit once it finishes guarantees the last
+      // word is the settled layout.
+      sidebarRoot?.addEventListener('transitionend', queueFit);
 
       if (pairs.length === 0) return;
 
