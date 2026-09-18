@@ -5,6 +5,7 @@ import RelatedContent from '../components/content/RelatedContent.astro';
 import AuthorProfile from '../components/content/AuthorProfile.astro';
 import LeaderTakeaway from '../components/content/LeaderTakeaway.astro';
 import PostSidebar from '../components/content/PostSidebar.astro';
+import SeriesWayfinding from '../components/content/SeriesWayfinding.astro';
 import { generateJsonLd, buildCanonicalUrl } from '../lib/seo';
 import { formatDate, formatDateISO } from '../lib/utils';
 import { site } from '../data/site';
@@ -107,17 +108,6 @@ const jsonLd = generateJsonLd('article', {
     <!-- Article header -->
     <header id="post-header" class="mb-16 min-w-0 space-y-6 pb-4 xl:col-start-1 xl:row-start-1">
       {
-        series && (
-          <div class="flex items-center gap-2 text-xs font-mono font-medium text-[var(--accent)]">
-            <span class="uppercase tracking-widest">Series</span>
-            <span class="text-[var(--text-disabled)]">/</span>
-            <span>{series}</span>
-            {seriesPart && <span class="text-[var(--text-disabled)]">Part {seriesPart}</span>}
-          </div>
-        )
-      }
-
-      {
         category && (
           <div>
             <span class="font-mono inline-block rounded-full bg-[var(--accent-subtle)] px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[var(--accent-text)] ring-1 ring-inset ring-[var(--border-subtle)]">
@@ -134,6 +124,21 @@ const jsonLd = generateJsonLd('article', {
       {
         excerpt && (
           <p class="text-lg leading-relaxed text-[var(--text-tertiary)]">{excerpt}</p>
+        )
+      }
+
+      <!-- Series wayfinding: arc position and/or mini-series part. Grouped
+           with the dek (it answers "where does this sit?", which is editorial
+           context) and kept away from the grey tag chips below, so the two
+           chip rows never read as one muddled row. -->
+      {
+        slug && (
+          <SeriesWayfinding
+            slug={slug}
+            collection="posts"
+            series={series}
+            seriesPart={seriesPart}
+          />
         )
       }
 
