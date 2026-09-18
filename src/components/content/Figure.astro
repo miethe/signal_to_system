@@ -26,7 +26,7 @@ const isHero = variant === 'hero';
 const showCaption = !isHero && (number || caption || credit);
 ---
 
-<figure class:list={['figure-plate', isHero && 'figure-plate--hero']} data-enlargeable-figure>
+<figure class:list={['figure-plate', 'lift-hover', isHero && 'figure-plate--hero']} data-enlargeable-figure>
   <span class="figure-plate__corner figure-plate__corner--tl" aria-hidden="true"></span>
   <span class="figure-plate__corner figure-plate__corner--tr" aria-hidden="true"></span>
   <span class="figure-plate__corner figure-plate__corner--bl" aria-hidden="true"></span>
