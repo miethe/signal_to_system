@@ -1,0 +1,66 @@
+---
+import Evidence from './Evidence.astro';
+
+const entries = [
+  ['observed', 'A directly witnessed event or artifact state.'],
+  ['measured', 'A result with a stated method, unit, or denominator.'],
+  ['proposed', 'An interpretation or design proposal assembled from the available evidence.'],
+  ['related-work', 'A relevant method, idea, or result from adjacent work.'],
+  ['external', 'A claim reported by an external source and attributed to it.'],
+  ['hypothesis', 'A testable explanation that has not yet been established.'],
+] as const;
+---
+
+<section class="evidence-legend" aria-label="How to read the receipts">
+  <p class="evidence-legend__title">How to read the receipts</p>
+  <ul>
+    {
+      entries.map(([kind, definition]) => (
+        <li>
+          <Evidence kind={kind} />
+          <span>{definition}</span>
+        </li>
+      ))
+    }
+  </ul>
+</section>
+
+<style>
+  .evidence-legend {
+    margin: 0;
+  }
+
+  .evidence-legend__title {
+    margin: 0 0 0.55rem;
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .evidence-legend ul {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    gap: 0.55rem 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .evidence-legend li {
+    display: flex;
+    align-items: baseline;
+    gap: 0.3rem;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    line-height: 1.4;
+  }
+
+  .evidence-legend :global(.evidence) {
+    flex: none;
+    margin: 0;
+    font-size: 0.61rem;
+  }
+</style>

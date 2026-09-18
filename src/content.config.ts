@@ -32,6 +32,7 @@ const posts = defineCollection({
     seriesOrder: z.number().optional(),
     featured: z.boolean().optional(),
     heroImage: z.string().optional(),
+    heroAlt: z.string().optional(),
 
     // Cross-collection discovery (shared vocab with the `stories` collection).
     // Optional on posts so essays can also relate to projects/AOS and appear on

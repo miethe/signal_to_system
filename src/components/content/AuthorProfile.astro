@@ -58,11 +58,12 @@ const socialLinks = [
         <Heading class:list={['font-serif font-bold text-[var(--text-primary)]', isFeatured ? 'text-2xl' : 'text-lg']}>
           {site.author.name}
         </Heading>
-        <p class="mt-1 text-xs leading-relaxed text-[var(--text-tertiary)]">{site.author.role}</p>
+        <p class="author-profile__role mt-1 text-xs leading-relaxed text-[var(--text-tertiary)]">{site.author.role}</p>
       </div>
     </div>
 
-    <div class:list={['border-[var(--border-subtle)]', variant === 'compact' ? 'mt-5 border-t pt-5 sm:mt-0 sm:border-l sm:border-t-0 sm:pl-5 sm:pt-0' : 'mt-5 border-t pt-5']}>
+    <div class:list={['author-profile__extra border-[var(--border-subtle)]', variant === 'compact' ? 'mt-5 border-t pt-5 sm:mt-0 sm:border-l sm:border-t-0 sm:pl-5 sm:pt-0' : 'mt-5 border-t pt-5']}>
+      <div class="author-profile__extra-inner">
       <p class:list={['leading-relaxed text-[var(--text-secondary)]', isSidebar ? 'text-sm' : 'text-sm sm:text-[15px]']}>
         {isFeatured ? site.author.bioLong : site.author.bioShort}
       </p>
@@ -103,6 +104,7 @@ const socialLinks = [
           ))}
         </nav>
       )}
+      </div>
     </div>
   </div>
 </aside>
@@ -122,5 +124,80 @@ const socialLinks = [
   .author-profile :global(p) {
     margin: 0;
     border: 0;
+  }
+
+  /*
+   * Collapse hooks: the `.is-collapsed` class is toggled externally (by
+   * PostSidebar, only on the "sidebar" variant instance used in the post
+   * rail) via an IntersectionObserver on the article header — never set by
+   * this component itself, so `featured`/`compact` usages are unaffected.
+   */
+  .author-profile__role {
+    max-height: 1.5rem;
+    overflow: hidden;
+    opacity: 1;
+    transition: max-height 0.25s ease, opacity 0.2s ease, margin-top 0.25s ease;
+  }
+
+  .author-profile__extra {
+    display: grid;
+    grid-template-rows: 1fr;
+    opacity: 1;
+    transition:
+      grid-template-rows 0.25s ease,
+      opacity 0.2s ease,
+      margin-top 0.25s ease,
+      padding-top 0.25s ease,
+      border-top-width 0.25s ease;
+  }
+
+  .author-profile__extra-inner {
+    overflow: hidden;
+    min-height: 0;
+  }
+
+  .author-profile.is-collapsed {
+    padding: 0.625rem 0.875rem;
+    transition: padding 0.25s ease;
+  }
+
+  .author-profile.is-collapsed .author-profile__role {
+    max-height: 0;
+    opacity: 0;
+    margin-top: 0;
+  }
+
+  /*
+   * The grid-rows trick above only collapses the CONTENT height to 0 — the
+   * block's own margin-top/border-top/padding-top (mt-5 border-t pt-5 from
+   * the markup) are box properties of this element itself, not its grid
+   * track, so they keep reserving space even at grid-template-rows: 0fr.
+   * Zero them explicitly so no dead space survives the collapse. `!important`
+   * is safe here: `.is-collapsed` never applies to the featured/compact
+   * variants that rely on the un-collapsed mt-5/border-t/pt-5 (or compact's
+   * sm:border-l) utility values.
+   */
+  .author-profile.is-collapsed .author-profile__extra {
+    grid-template-rows: 0fr;
+    opacity: 0;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    border-top-width: 0 !important;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .author-profile,
+    .author-profile__role,
+    .author-profile__extra {
+      transition: none;
+    }
+  }
+
+  /* perf-lite drops the animation, never the collapse itself — the class
+     toggle in PostSidebar's script always runs regardless of this mode. */
+  :global(html.perf-lite) .author-profile,
+  :global(html.perf-lite) .author-profile__role,
+  :global(html.perf-lite) .author-profile__extra {
+    transition: none;
   }
 </style>

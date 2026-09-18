@@ -1,0 +1,126 @@
+---
+/**
+ * Evidence — an inline marker for the confidence class of an adjacent claim.
+ *
+ * Keep these markers in receipt sections, figure captions, and other places
+ * where readers are evaluating evidence; do not interrupt narrative prose.
+ */
+interface Props {
+  kind: string;
+  date?: string;
+  href?: string;
+}
+
+const { kind, date, href } = Astro.props;
+
+const evidenceClasses: Record<string, { label: string; definition: string }> = {
+  observed: {
+    label: 'Observed',
+    definition: 'A directly witnessed event or artifact state.',
+  },
+  measured: {
+    label: 'Measured',
+    definition: 'A result with a stated method, unit, or denominator.',
+  },
+  proposed: {
+    label: 'Proposed synthesis',
+    definition: 'An interpretation or design proposal assembled from the available evidence.',
+  },
+  'related-work': {
+    label: 'Related work',
+    definition: 'A relevant method, idea, or result from adjacent work.',
+  },
+  external: {
+    label: 'Externally reported',
+    definition: 'A claim reported by an external source and attributed to it.',
+  },
+  hypothesis: {
+    label: 'Hypothesis',
+    definition: 'A testable explanation that has not yet been established.',
+  },
+};
+
+const evidence = evidenceClasses[kind];
+---
+
+{
+  href ? (
+    <a
+      href={href}
+      class:list={['evidence', `evidence--${kind}`]}
+      aria-label={`Evidence class: ${kind}`}
+      title={evidence.definition}
+    >
+      <span class="evidence__label">{evidence.label}</span>
+      {date && <span class="evidence__date">· {date}</span>}
+    </a>
+  ) : (
+    <span
+      class:list={['evidence', `evidence--${kind}`]}
+      aria-label={`Evidence class: ${kind}`}
+      title={evidence.definition}
+    >
+      <span class="evidence__label">{evidence.label}</span>
+      {date && <span class="evidence__date">· {date}</span>}
+    </span>
+  )
+}
+
+<style>
+  .evidence {
+    display: inline-flex;
+    align-items: baseline;
+    width: fit-content;
+    box-sizing: border-box;
+    margin: 0 0.16em;
+    padding: 0.06em 0.44em 0.1em;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: var(--bg-muted);
+    color: var(--text-secondary);
+    font-family: var(--font-mono);
+    font-size: 0.68em;
+    font-weight: 650;
+    letter-spacing: 0.04em;
+    line-height: 1.25;
+    text-decoration: none;
+    text-transform: uppercase;
+    vertical-align: baseline;
+    white-space: nowrap;
+  }
+
+  a.evidence:hover {
+    border-color: var(--accent);
+    color: var(--accent-text);
+    text-decoration: none;
+  }
+
+  a.evidence:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .evidence__date {
+    color: var(--text-tertiary);
+    font-size: 0.9em;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+
+  .evidence--observed,
+  .evidence--measured {
+    border-color: var(--accent-muted);
+    background: var(--accent-subtle);
+    color: var(--accent-text);
+  }
+
+  .evidence--proposed,
+  .evidence--hypothesis {
+    border-style: dashed;
+  }
+
+  .evidence--external,
+  .evidence--related-work {
+    background: var(--bg-subtle);
+  }
+</style>

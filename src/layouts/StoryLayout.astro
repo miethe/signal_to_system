@@ -2,8 +2,10 @@
 import BaseLayout from './BaseLayout.astro';
 import Figure from '../components/content/Figure.astro';
 import AutomatedDisclaimer from '../components/content/AutomatedDisclaimer.astro';
+import LeaderTakeaway from '../components/content/LeaderTakeaway.astro';
 import StoryMetaHeader from '../components/content/StoryMetaHeader.astro';
 import RelatedContent from '../components/content/RelatedContent.astro';
+import SeriesWayfinding from '../components/content/SeriesWayfinding.astro';
 import { generateJsonLd, buildCanonicalUrl } from '../lib/seo';
 import { formatDate, formatDateISO } from '../lib/utils';
 import { site } from '../data/site';
@@ -22,6 +24,8 @@ interface Workflow {
 }
 
 interface Props {
+  /** Collection entry id — needed to resolve series/arc membership. */
+  slug?: string;
   frontmatter: {
     title: string;
     excerpt?: string;
@@ -53,7 +57,7 @@ interface Props {
   relatedItems?: Article[];
 }
 
-const { frontmatter, prevPost, nextPost, relatedItems = [] } = Astro.props;
+const { slug, frontmatter, prevPost, nextPost, relatedItems = [] } = Astro.props;
 
 const {
   title,
@@ -113,17 +117,10 @@ const jsonLd = generateJsonLd('article', {
   <article class="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
     <!-- Article header -->
     <header class="mb-8 space-y-6 pb-2">
+      <!-- Collection eyebrow only. Series position moved below the dek, into
+           the shared SeriesWayfinding element, where it is clickable. -->
       <div class="flex flex-wrap items-center gap-2 text-xs font-mono font-medium text-[var(--accent)]">
         <a href="/dev-stories/" class="uppercase tracking-widest hover:text-[var(--text-primary)] transition-colors">Dev Stories</a>
-        {
-          series && (
-            <>
-              <span class="text-[var(--text-disabled)]">/</span>
-              <span class="text-[var(--text-tertiary)]">{series}</span>
-              {seriesPart && <span class="text-[var(--text-disabled)]">Part {seriesPart}</span>}
-            </>
-          )
-        }
       </div>
 
       <h1 class="font-serif text-4xl font-bold leading-[1.1] tracking-tight text-[var(--text-primary)] sm:text-5xl lg:text-6xl">
@@ -133,6 +130,18 @@ const jsonLd = generateJsonLd('article', {
       {
         excerpt && (
           <p class="text-lg leading-relaxed text-[var(--text-tertiary)]">{excerpt}</p>
+        )
+      }
+
+      <!-- Series wayfinding (see PostLayout for the placement rationale). -->
+      {
+        slug && (
+          <SeriesWayfinding
+            slug={slug}
+            collection="stories"
+            series={series}
+            seriesPart={seriesPart}
+          />
         )
       }
 
@@ -207,17 +216,8 @@ const jsonLd = generateJsonLd('article', {
       )
     }
 
-    <!-- Callout: Leader Takeaway -->
-    {
-      leaderTakeaway && (
-        <aside class="mb-8 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-subtle)] p-6 shadow-sm">
-          <p class="font-mono mb-2 text-xs font-bold uppercase tracking-widest text-[var(--text-primary)]">
-            Leader Takeaway
-          </p>
-          <p class="text-sm leading-relaxed text-[var(--text-secondary)]">{leaderTakeaway}</p>
-        </aside>
-      )
-    }
+    <!-- Leader Takeaway (executive summary card) -->
+    {leaderTakeaway && <LeaderTakeaway text={leaderTakeaway} />}
 
     <!-- Article body -->
     <div class="prose-custom max-w-none">

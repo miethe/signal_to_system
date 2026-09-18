@@ -1,0 +1,54 @@
+---
+/**
+ * LeaderTakeaway — the post-level executive summary, as a distinctive card.
+ *
+ * Rendered from the `leaderTakeaway` frontmatter field by PostLayout and
+ * StoryLayout (NOT from MDX). The in-body `<Callout type="leader-takeaway">`
+ * is a different thing: a pull-aside inside the argument. This is the card a
+ * leader reads instead of the essay, so it gets its own treatment:
+ *
+ *   - an inset accent edge (the site's drafting-rule vocabulary, rounded),
+ *   - a mono eyebrow with a small crosshair mark ("the point"),
+ *   - serif body copy at reading size, and slight elevation.
+ *
+ * Deliberately quieter than the h1: serif at ~17px, normal weight, secondary
+ * text colour. It reads as the summary of the title, never a second title.
+ *
+ * Styles live in styles/global.css (`.leader-takeaway`) rather than a scoped
+ * block, following the `.figure-plate` precedent: the card needs `.dark`
+ * descendant rules, which Astro's style scoping does not express cleanly.
+ *
+ * NOTE: the card owns its own bottom margin. `class` is for non-spacing
+ * extras — an unlayered `.leader-takeaway { margin }` in global.css outranks
+ * Tailwind's layered `mb-*` utilities, so a margin class here is a no-op.
+ */
+interface Props {
+  text: string;
+  label?: string;
+  class?: string;
+}
+
+const { text, label = 'Leader Takeaway', class: className = '' } = Astro.props;
+---
+
+<aside class:list={['leader-takeaway', 'lift-hover', className]} role="note" aria-label={label}>
+  <p class="leader-takeaway__eyebrow">
+    <svg
+      class="leader-takeaway__mark"
+      viewBox="0 0 24 24"
+      width="13"
+      height="13"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2.25"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="9" />
+      <circle cx="12" cy="12" r="3.25" />
+    </svg>
+    <span>{label}</span>
+  </p>
+  <p class="leader-takeaway__body">{text}</p>
+</aside>

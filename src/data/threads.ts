@@ -36,7 +36,7 @@ export const threads: Record<string, Thread> = {
         id: "deployment",
         n: 2,
         label: "Deployment",
-        recap: "Every other project keeps loading an old deployed copy — same name, different instructions.",
+        recap: "Every other project keeps loading an old deployed copy: same name, different instructions.",
       },
       {
         id: "use",

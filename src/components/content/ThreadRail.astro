@@ -2,6 +2,12 @@
 /**
  * ThreadRail — desktop navigation for a post's running worked example.
  * The anchor list remains fully usable without JavaScript.
+ *
+ * Expand/collapse is decided by PostSidebar (the TOC and this rail share one
+ * accordion slot — see its script). This component only reports its own
+ * beat-visibility signal (`threadrail:auto`) and manual clicks
+ * (`threadrail:request-open`/`-close`) as events on the wrap element, and
+ * applies whatever PostSidebar tells it via `threadrail:setexpanded`.
  */
 import { threads } from '../../data/threads';
 
@@ -15,45 +21,83 @@ const thread = threads[slug];
 
 {
   thread && (
-    <aside class="thread-rail mb-6 border border-[var(--border-subtle)] bg-[var(--bg-subtle)] p-4" data-thread-rail>
-      <span class="thread-rail__corner thread-rail__corner--tl" aria-hidden="true"></span>
-      <span class="thread-rail__corner thread-rail__corner--tr" aria-hidden="true"></span>
-      <span class="thread-rail__corner thread-rail__corner--bl" aria-hidden="true"></span>
-      <span class="thread-rail__corner thread-rail__corner--br" aria-hidden="true"></span>
+    <div class="thread-rail-wrap" data-thread-rail-wrap>
+      <button
+        type="button"
+        class="thread-rail-badge font-mono flex w-full items-center gap-2 border border-[var(--border-subtle)] bg-[var(--bg-subtle)] px-3 py-2 text-left text-xs text-[var(--text-secondary)] transition-colors hover:border-[var(--accent)]/50 hover:bg-[var(--accent-subtle)] focus-ring"
+        data-thread-rail-badge
+        aria-expanded="false"
+        aria-controls={`thread-rail-panel-${thread.slug}`}
+        hidden
+      >
+        <span aria-hidden="true" class="thread-rail-badge__icon flex h-5 w-5 shrink-0 items-center justify-center border border-[var(--border-strong)] text-[0.625rem]">&rarr;</span>
+        <span class="min-w-0 truncate">
+          <span class="font-semibold uppercase tracking-[0.1em] text-[var(--accent-text)]">Running example</span>
+          <span class="ml-1.5 text-[var(--text-tertiary)]">{thread.title}</span>
+        </span>
+      </button>
 
-      <div class="border-l-2 border-[var(--accent)] pl-3">
-        <p class="font-mono text-[0.625rem] font-semibold uppercase tracking-[0.16em] text-[var(--accent-text)]">
-          Running example
-        </p>
-        <h2 class="mt-1 font-serif text-lg font-semibold leading-tight text-[var(--text-primary)]">
-          {thread.title}
-        </h2>
-        <p class="mt-1 font-mono text-[0.6875rem] text-[var(--text-tertiary)]">{thread.subject}</p>
-      </div>
+      <aside
+        id={`thread-rail-panel-${thread.slug}`}
+        class="thread-rail relative border border-[var(--border-subtle)] bg-[var(--bg-subtle)] p-4"
+        data-thread-rail
+      >
+        <span class="thread-rail__corner thread-rail__corner--tl" aria-hidden="true"></span>
+        <span class="thread-rail__corner thread-rail__corner--tr" aria-hidden="true"></span>
+        <span class="thread-rail__corner thread-rail__corner--bl" aria-hidden="true"></span>
+        <span class="thread-rail__corner thread-rail__corner--br" aria-hidden="true"></span>
 
-      <nav class="mt-4 max-h-[calc(100vh-25rem)] overflow-y-auto pr-1" aria-label={`Thread progress: ${thread.title}`}>
-        <ol class="space-y-1 border-l border-[var(--border)] pl-0">
-          {
-            thread.beats.map((beat, index) => (
-              <li>
-                <a
-                  href={`#thread-${beat.id}`}
-                  class="thread-rail__link group flex items-start gap-3 px-3 py-2 no-underline"
-                  data-thread-rail-link
-                  data-thread-target={`thread-${beat.id}`}
-                  aria-current={index === 0 ? 'step' : undefined}
-                >
-                  <span class="thread-rail__number font-mono mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center border border-[var(--border-strong)] text-[0.625rem] font-semibold text-[var(--text-tertiary)]">
-                    {beat.n}
-                  </span>
-                  <span class="min-w-0 text-xs leading-5 text-[var(--text-secondary)]">{beat.label}</span>
-                </a>
-              </li>
-            ))
-          }
-        </ol>
-      </nav>
-    </aside>
+        <div class="flex items-start justify-between gap-2 border-l-2 border-[var(--accent)] pl-3">
+          <div class="min-w-0">
+            <p class="font-mono text-[0.625rem] font-semibold uppercase tracking-[0.16em] text-[var(--accent-text)]">
+              Running example
+            </p>
+            <h2 class="mt-1 font-serif text-lg font-semibold leading-tight text-[var(--text-primary)]">
+              {thread.title}
+            </h2>
+            <p class="mt-1 font-mono text-[0.6875rem] text-[var(--text-tertiary)]">{thread.subject}</p>
+          </div>
+          <button
+            type="button"
+            class="thread-rail__collapse focus-ring shrink-0 border border-[var(--border-strong)] p-1 text-[var(--text-tertiary)] hover:border-[var(--accent)] hover:text-[var(--accent)]"
+            data-thread-rail-collapse
+            aria-expanded="true"
+            aria-controls={`thread-rail-panel-${thread.slug}`}
+            aria-label="Collapse running example"
+            hidden
+          >
+            <svg aria-hidden="true" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M18 6 6 18M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <nav class="thread-rail__nav mt-4 pr-1" aria-label={`Thread progress: ${thread.title}`} data-thread-rail-scroll>
+          <p class="thread-rail__more" data-thread-more="above" hidden />
+          <ol class="space-y-1 border-l border-[var(--border)] pl-0">
+            {
+              thread.beats.map((beat, index) => (
+                <li data-thread-rail-item>
+                  <a
+                    href={`#thread-${beat.id}`}
+                    class="thread-rail__link group flex items-start gap-3 px-3 py-2 no-underline"
+                    data-thread-rail-link
+                    data-thread-target={`thread-${beat.id}`}
+                    aria-current={index === 0 ? 'step' : undefined}
+                  >
+                    <span class="thread-rail__number font-mono mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center border border-[var(--border-strong)] text-[0.625rem] font-semibold text-[var(--text-tertiary)]">
+                      {beat.n}
+                    </span>
+                    <span class="min-w-0 text-xs leading-5 text-[var(--text-secondary)]">{beat.label}</span>
+                  </a>
+                </li>
+              ))
+            }
+          </ol>
+          <p class="thread-rail__more" data-thread-more="below" hidden />
+        </nav>
+      </aside>
+    </div>
   )
 }
 
@@ -75,6 +119,29 @@ const thread = threads[slug];
   .thread-rail__corner--tr { top: 5px; right: 5px; border-left: 0; border-bottom: 0; }
   .thread-rail__corner--bl { bottom: 5px; left: 5px; border-right: 0; border-top: 0; }
   .thread-rail__corner--br { right: 5px; bottom: 5px; border-left: 0; border-top: 0; }
+
+  .thread-rail__nav {
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+
+  .thread-rail__nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .thread-rail__more {
+    margin: 0 0 0.25rem 0;
+    padding-left: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-disabled);
+  }
+
+  [data-thread-rail-item].is-window-hidden {
+    display: none;
+  }
 
   .thread-rail__link:hover,
   .thread-rail__link:focus-visible {
@@ -115,75 +182,288 @@ const thread = threads[slug];
       transition: none;
     }
   }
+
+  :global(html.perf-lite) .thread-rail__link {
+    transition: none;
+  }
+
+  .thread-rail-badge:hover .thread-rail-badge__icon {
+    transform: translateX(2px);
+  }
+
+  .thread-rail-badge__icon {
+    transition: transform 0.2s ease;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .thread-rail-badge__icon {
+      transition: none;
+    }
+  }
+
+  :global(html.perf-lite) .thread-rail-badge__icon {
+    transition: none;
+  }
 </style>
 
 <script>
+  import { computeListWindow } from '../../lib/sidebar-window';
+
   const initializeThreadRails = () => {
-    if (document.documentElement.classList.contains('perf-lite')) return;
-    if (!('IntersectionObserver' in window)) return;
+    document.querySelectorAll<HTMLElement>('[data-thread-rail-wrap]').forEach((wrap) => {
+      if (wrap.dataset.threadRailReady === 'true') return;
+      wrap.dataset.threadRailReady = 'true';
 
-    document.querySelectorAll<HTMLElement>('[data-thread-rail]').forEach((rail) => {
-      if (rail.dataset.threadRailReady === 'true') return;
-      rail.dataset.threadRailReady = 'true';
+      const panel = wrap.querySelector<HTMLElement>('[data-thread-rail]');
+      const badge = wrap.querySelector<HTMLButtonElement>('[data-thread-rail-badge]');
+      const collapseButton = wrap.querySelector<HTMLButtonElement>('[data-thread-rail-collapse]');
+      const scrollBody = wrap.querySelector<HTMLElement>('[data-thread-rail-scroll]');
+      const moreAbove = wrap.querySelector<HTMLElement>('[data-thread-more="above"]');
+      const moreBelow = wrap.querySelector<HTMLElement>('[data-thread-more="below"]');
 
+      if (!panel || !badge) return;
+
+      // Collapsing is cheap and must work in every performance mode — only
+      // the animation is dropped under perf-lite (see `reduceMotion` below
+      // and the matching CSS in this component's <style>). Skip the whole
+      // enhancement only when the browser can't support it at all.
+      const canEnhance = 'IntersectionObserver' in window;
+      if (!canEnhance) return;
+
+      const items = Array.from(wrap.querySelectorAll<HTMLLIElement>('[data-thread-rail-item]'));
       const links = Array.from(
-        rail.querySelectorAll<HTMLAnchorElement>('[data-thread-rail-link]'),
+        panel.querySelectorAll<HTMLAnchorElement>('[data-thread-rail-link]'),
       );
-      const targets = links
-        .map((link) => document.getElementById(link.dataset.threadTarget ?? ''))
-        .filter((target): target is HTMLElement => target !== null);
+      const pairs = links
+        .map((link, index) => {
+          const target = document.getElementById(link.dataset.threadTarget ?? '');
+          const item = items[index];
+          return target && item ? { link, target, item } : null;
+        })
+        .filter((pair): pair is { link: HTMLAnchorElement; target: HTMLElement; item: HTMLLIElement } => pair !== null);
 
-      if (targets.length === 0) return;
+      const reduceMotion = () =>
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+        document.documentElement.classList.contains('perf-lite');
+
+      let activeIndex = 0;
+
+      // Fit the step list to the room the panel actually has — measured,
+      // not guessed. `overflow-y:auto` (scrollbar hidden) on the nav stays
+      // as a fallback only; the current step is always kept in the window.
+      //
+      // `panel.getBoundingClientRect().top` moves whenever a SIBLING block
+      // (the author card collapsing, the TOC expanding) resizes the shared
+      // sticky column — this list's own box rarely changes size on its own,
+      // so a ResizeObserver on just `panel` misses that. See the
+      // ResizeObserver/transitionend wiring below, which re-runs this on
+      // any sibling resize and once more when a transition settles, so the
+      // window is always computed against the FINAL layout, not a
+      // transient mid-transition one.
+      let lastFitSignature = '';
+      const fitList = () => {
+        if (!scrollBody || pairs.length === 0) return;
+
+        // Cheap guard, checked before touching the DOM: `top` isn't
+        // affected by this list's own visible-row count (only by what's
+        // above it), so if it — and the active step — haven't moved since
+        // the last fit, recomputing would only reproduce the same window.
+        // Skipping avoids the unhide/measure/rehide cycle below from
+        // resizing this block and retriggering the ResizeObserver on its
+        // own account.
+        const panelTop = panel.getBoundingClientRect().top;
+        const available = window.innerHeight - panelTop - 24; // 24px bottom breathing room
+        const signature = `${available.toFixed(1)}:${pairs.length}:${activeIndex}`;
+        if (signature === lastFitSignature) return;
+        lastFitSignature = signature;
+
+        pairs.forEach(({ item }) => item.classList.remove('is-window-hidden'));
+        moreAbove?.setAttribute('hidden', '');
+        moreBelow?.setAttribute('hidden', '');
+
+        const panelRect = panel.getBoundingClientRect();
+        const rowHeight = pairs[0].link.getBoundingClientRect().height || 36;
+        const totalRowsHeight = pairs.reduce((sum, { link }) => sum + link.getBoundingClientRect().height, 0);
+        // Everything in the panel that isn't the scrollable row list itself
+        // (title block, corners, nav's own top margin, panel padding) —
+        // measured once as "panel height minus scrollBody's own height",
+        // rather than re-deriving each piece's box model by hand.
+        const headerFootprint = panelRect.height - scrollBody.getBoundingClientRect().height;
+        const internalGap = Math.max(0, scrollBody.clientHeight - totalRowsHeight);
+        const budgetForRows = available - headerFootprint - internalGap;
+        const maxVisible = Math.max(1, Math.floor(budgetForRows / rowHeight));
+
+        const win = computeListWindow(pairs.length, activeIndex, maxVisible);
+        pairs.forEach(({ item }, i) => {
+          item.classList.toggle('is-window-hidden', i < win.start || i > win.end);
+        });
+        moreAbove?.toggleAttribute('hidden', win.above === 0);
+        if (moreAbove) moreAbove.textContent = `+${win.above} more above`;
+        moreBelow?.toggleAttribute('hidden', win.below === 0);
+        if (moreBelow) moreBelow.textContent = `+${win.below} more below`;
+      };
+
+      let fitQueued = false;
+      const queueFit = () => {
+        if (fitQueued) return;
+        fitQueued = true;
+        requestAnimationFrame(() => {
+          fitQueued = false;
+          fitList();
+        });
+      };
 
       const setActive = (id: string) => {
+        activeIndex = Math.max(0, pairs.findIndex((pair) => pair.target.id === id));
         links.forEach((link) => {
           const isCurrent = link.dataset.threadTarget === id;
           if (isCurrent) {
             link.setAttribute('aria-current', 'step');
+            if (!panel.hasAttribute('hidden')) {
+              link.scrollIntoView({ block: 'nearest', behavior: reduceMotion() ? 'auto' : 'smooth' });
+            }
           } else {
             link.removeAttribute('aria-current');
           }
         });
+        queueFit();
+      };
+
+      // Applying expand/collapse is owned here (this component knows its
+      // own markup); *deciding* when to expand is owned by PostSidebar's
+      // accordion coordinator, which calls this via an event so both the
+      // rail and the TOC agree on which one is open.
+      const applyState = (expanded: boolean) => {
+        panel.toggleAttribute('hidden', !expanded);
+        badge.toggleAttribute('hidden', expanded);
+        collapseButton?.toggleAttribute('hidden', !expanded);
+        badge.setAttribute('aria-expanded', String(expanded));
+        collapseButton?.setAttribute('aria-expanded', String(expanded));
+        if (expanded) queueFit();
+      };
+
+      // Progressive enhancement: markup ships expanded (panel visible, badge
+      // hidden) so a no-JS reader sees today's full card. Collapse to the
+      // badge only once this script has actually run.
+      applyState(false);
+
+      badge.addEventListener('click', () => wrap.dispatchEvent(new CustomEvent('threadrail:request-open')));
+      collapseButton?.addEventListener('click', () => wrap.dispatchEvent(new CustomEvent('threadrail:request-close')));
+      wrap.addEventListener('threadrail:setexpanded', (event) => {
+        const detail = (event as CustomEvent<{ expanded: boolean }>).detail;
+        applyState(detail.expanded);
+      });
+      // PostSidebar pings this whenever the shared column's layout could
+      // have moved (a sibling resized, a transition on it just ended) —
+      // see the matching dispatch in its own script.
+      wrap.addEventListener('threadrail:refit', () => queueFit());
+
+      // The column (`.post-sidebar`, this wrap's direct parent) is the
+      // shared ancestor whose own box height is the sum of every sibling
+      // block's height. Watching IT, not just this panel, catches the
+      // author card collapsing and the TOC expanding/collapsing — sibling
+      // resizes that move this panel's `top` without changing its own
+      // size, which a ResizeObserver scoped to `panel` alone would miss.
+      const sidebarRoot = wrap.parentElement;
+      if ('ResizeObserver' in window) {
+        const columnResizeObserver = new ResizeObserver(queueFit);
+        columnResizeObserver.observe(panel);
+        if (sidebarRoot) columnResizeObserver.observe(sidebarRoot);
+      }
+      // A CSS transition (the author card's collapse) can still be
+      // mid-flight when a resize notification lands — that notification
+      // reports the box size at that instant, not the transition's
+      // eventual end. One more fit once it finishes guarantees the last
+      // word is the settled layout.
+      sidebarRoot?.addEventListener('transitionend', queueFit);
+
+      if (pairs.length === 0) return;
+
+      const targets = pairs.map((pair) => pair.target);
+
+      // Open/close visibility: a beat counts as "on screen" as soon as a
+      // meaningful slice of it is in the viewport — a beat centered on
+      // screen (or one only partly into the bottom 10%) must open the
+      // card. Kept deliberately looser than the step-highlight band below,
+      // which decides *which* step is current, not whether to open at all.
+      let closeTimer: ReturnType<typeof setTimeout> | null = null;
+      const cancelClose = () => {
+        if (closeTimer !== null) {
+          clearTimeout(closeTimer);
+          closeTimer = null;
+        }
+      };
+      const scheduleClose = () => {
+        if (closeTimer !== null) return;
+        closeTimer = setTimeout(() => {
+          closeTimer = null;
+          wrap.dispatchEvent(new CustomEvent('threadrail:auto', { detail: { open: false } }));
+        }, 250);
       };
 
       const visibleTargets = new Set<HTMLElement>();
-      const observer = new IntersectionObserver(
+      const visibilityObserver = new IntersectionObserver(
         (entries) => {
           entries.forEach((entry) => {
             const target = entry.target as HTMLElement;
-            if (entry.isIntersecting) {
+            const isVisible = entry.isIntersecting && entry.intersectionRatio >= 0.15;
+            if (isVisible) {
               visibleTargets.add(target);
             } else {
               visibleTargets.delete(target);
             }
           });
 
-          const visible = Array.from(visibleTargets);
+          if (visibleTargets.size > 0) {
+            cancelClose();
+            wrap.dispatchEvent(new CustomEvent('threadrail:auto', { detail: { open: true } }));
+          } else {
+            scheduleClose();
+          }
+        },
+        { rootMargin: '0px 0px -10% 0px', threshold: [0, 0.15] },
+      );
 
+      targets.forEach((target) => visibilityObserver.observe(target));
+
+      // Step highlight: which rail link is "current" — among every beat
+      // actually on screen right now (no narrow top-biased band; a beat
+      // fully visible mid-screen must count), pick whichever one is
+      // closest to the viewport's vertical center. That's a better proxy
+      // for "which beat is the reader looking at" than "closest to the top
+      // edge", which lagged behind (a beat leaving the top band never got
+      // picked back up as current even while it filled the middle of the
+      // screen). Independent of the open/close decision above, which keeps
+      // its own band and delay.
+      const stepVisibleTargets = new Set<HTMLElement>();
+      const stepObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            const target = entry.target as HTMLElement;
+            if (entry.isIntersecting) {
+              stepVisibleTargets.add(target);
+            } else {
+              stepVisibleTargets.delete(target);
+            }
+          });
+
+          const visible = Array.from(stepVisibleTargets);
           if (visible.length === 0) return;
 
+          const viewportCenter = window.innerHeight / 2;
+          const distanceFromCenter = (el: HTMLElement) => {
+            const rect = el.getBoundingClientRect();
+            return Math.abs(rect.top + rect.height / 2 - viewportCenter);
+          };
           const closest = visible.reduce((current, candidate) =>
-            Math.abs(candidate.getBoundingClientRect().top) < Math.abs(current.getBoundingClientRect().top)
-              ? candidate
-              : current,
+            distanceFromCenter(candidate) < distanceFromCenter(current) ? candidate : current,
           );
           setActive(closest.id);
         },
-        { rootMargin: '-20% 0px -65% 0px', threshold: 0 },
+        { rootMargin: '0px', threshold: 0 },
       );
 
-      targets.forEach((target) => observer.observe(target));
-
-      const performanceObserver = new MutationObserver(() => {
-        if (document.documentElement.classList.contains('perf-lite')) {
-          observer.disconnect();
-          performanceObserver.disconnect();
-        }
-      });
-      performanceObserver.observe(document.documentElement, {
-        attributes: true,
-        attributeFilter: ['class'],
-      });
+      targets.forEach((target) => stepObserver.observe(target));
     });
   };
 
