@@ -1366,6 +1366,128 @@ pre code {
 }
 
 /* ============================================================
+   SERIES WAYFINDING
+   The one-line "where does this sit?" element between a post's
+   dek and its tag row (components/content/SeriesWayfinding.astro).
+   Two chip kinds, deliberately different in weight: an Arc is a
+   narrative throughline across series (accent-forward), a Series
+   is a mini-series (quiet outline).
+   ============================================================ */
+
+.series-wayfinding {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.wayfind {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.34rem;
+  padding: 0.3rem 0.6875rem 0.32rem 0.5625rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 9999px;
+  background: var(--bg-subtle);
+  color: var(--text-tertiary);
+  font-size: 0.8125rem;
+  line-height: 1.3;
+  text-decoration: none;
+  transition:
+    border-color 150ms ease,
+    background-color 150ms ease,
+    color 150ms ease;
+}
+
+.wayfind__icon {
+  flex: none;
+  color: var(--text-disabled);
+  transition: color 150ms ease;
+}
+
+.wayfind__kicker {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.wayfind__sep {
+  color: var(--text-disabled);
+}
+
+.wayfind__name {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.wayfind__position {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The Arc — the throughline. Reads as the primary of the two. */
+.wayfind--arc {
+  border-color: var(--accent-muted);
+  background: var(--accent-subtle);
+  color: var(--accent-text);
+}
+
+.wayfind--arc .wayfind__icon,
+.wayfind--arc .wayfind__sep {
+  color: var(--accent);
+}
+
+.wayfind--arc .wayfind__kicker,
+.wayfind--arc .wayfind__name {
+  color: var(--accent-text);
+}
+
+.dark .wayfind--arc {
+  border-color: rgba(192, 193, 255, 0.28);
+  background: rgba(192, 193, 255, 0.09);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  a.wayfind:hover {
+    border-color: var(--accent);
+    color: var(--accent-text);
+  }
+
+  a.wayfind:hover .wayfind__name,
+  a.wayfind:hover .wayfind__icon {
+    color: var(--accent-text);
+  }
+
+  a.wayfind--arc:hover {
+    background: var(--accent-muted);
+  }
+
+  .dark a.wayfind--arc:hover {
+    background: rgba(192, 193, 255, 0.16);
+  }
+}
+
+a.wayfind:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* No series page to link to — same chip, no affordance. */
+.wayfind--static {
+  cursor: default;
+}
+
+@media (max-width: 640px) {
+  .wayfind {
+    font-size: 0.78125rem;
+  }
+}
+
+/* ============================================================
    LEADER TAKEAWAY CARD
    The post-level executive summary (frontmatter `leaderTakeaway`),
    rendered by components/content/LeaderTakeaway.astro. Lives here
