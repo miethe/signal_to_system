@@ -2,6 +2,7 @@
 import BaseLayout from './BaseLayout.astro';
 import Figure from '../components/content/Figure.astro';
 import AutomatedDisclaimer from '../components/content/AutomatedDisclaimer.astro';
+import LeaderTakeaway from '../components/content/LeaderTakeaway.astro';
 import StoryMetaHeader from '../components/content/StoryMetaHeader.astro';
 import RelatedContent from '../components/content/RelatedContent.astro';
 import { generateJsonLd, buildCanonicalUrl } from '../lib/seo';
@@ -207,17 +208,8 @@ const jsonLd = generateJsonLd('article', {
       )
     }
 
-    <!-- Callout: Leader Takeaway -->
-    {
-      leaderTakeaway && (
-        <aside class="mb-8 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-subtle)] p-6 shadow-sm">
-          <p class="font-mono mb-2 text-xs font-bold uppercase tracking-widest text-[var(--text-primary)]">
-            Leader Takeaway
-          </p>
-          <p class="text-sm leading-relaxed text-[var(--text-secondary)]">{leaderTakeaway}</p>
-        </aside>
-      )
-    }
+    <!-- Leader Takeaway (executive summary card) -->
+    {leaderTakeaway && <LeaderTakeaway text={leaderTakeaway} />}
 
     <!-- Article body -->
     <div class="prose-custom max-w-none">
