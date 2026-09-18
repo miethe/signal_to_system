@@ -1273,6 +1273,102 @@ pre code {
 }
 
 /* ============================================================
+   LEADER TAKEAWAY CARD
+   The post-level executive summary (frontmatter `leaderTakeaway`),
+   rendered by components/content/LeaderTakeaway.astro. Lives here
+   rather than in a scoped block because it needs `.dark` rules.
+   ============================================================ */
+
+.leader-takeaway {
+  position: relative;
+  overflow: hidden;
+  margin: 0 0 1.75rem;
+  padding: 1.125rem 1.25rem 1.1875rem 1.5rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.75rem;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(99, 102, 241, 0.07) 0%,
+      rgba(99, 102, 241, 0) 58%
+    ),
+    var(--bg-surface);
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 10px 24px -14px rgba(15, 23, 42, 0.16);
+}
+
+/* Inset accent edge. Clipped by the card's own overflow so it follows the
+   rounded corners instead of mitring against the 1px border. */
+.leader-takeaway::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 3px;
+  background: linear-gradient(
+    to bottom,
+    var(--accent) 0%,
+    var(--accent) 62%,
+    var(--accent-muted) 100%
+  );
+}
+
+.dark .leader-takeaway {
+  border-color: rgba(192, 193, 255, 0.14);
+  background:
+    linear-gradient(
+      135deg,
+      rgba(192, 193, 255, 0.09) 0%,
+      rgba(192, 193, 255, 0) 58%
+    ),
+    var(--bg-surface);
+  box-shadow:
+    0 0 0 1px rgba(192, 193, 255, 0.05),
+    0 14px 30px -18px rgba(0, 0, 0, 0.66);
+}
+
+.leader-takeaway__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0 0 0.5rem;
+  color: var(--accent-text);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.leader-takeaway__mark {
+  flex: none;
+  color: var(--accent);
+}
+
+.leader-takeaway__body {
+  margin: 0;
+  color: var(--text-secondary);
+  font-family: var(--font-serif);
+  font-size: 1.0625rem;
+  line-height: 1.62;
+}
+
+@media (max-width: 640px) {
+  .leader-takeaway {
+    padding: 1rem 1rem 1.0625rem 1.25rem;
+    border-radius: 0.625rem;
+  }
+
+  .leader-takeaway__body {
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+}
+
+/* ============================================================
    ANIMATED UNDERLINE (nav links)
    ============================================================ */
 
