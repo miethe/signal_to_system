@@ -1,0 +1,198 @@
+---
+/**
+ * SeriesWayfinding — "where does this piece sit?", as one compact line.
+ *
+ * A post can belong to two groupings at once, and they mean different things:
+ *
+ *   Arc     the 5-part cross-series reading path (src/data/reading-paths.json).
+ *           A narrative throughline that deliberately spans several series.
+ *           Rendered accent-forward, with position in the arc.
+ *   Series  a mini-series (`series` + `seriesOrder` frontmatter, with a page
+ *           in the `series` collection). Rendered quieter, as "Part N of M".
+ *
+ * Both are derived — the arc from the reading-path data, the mini-series from
+ * the posts + stories collections — so nothing here hardcodes a slug.
+ *
+ * Renders nothing when the entry belongs to neither.
+ *
+ * A label only becomes a link when the destination route actually exists:
+ * arcs always have a page (/series/<pageSlug>/), but a mini-series named in
+ * frontmatter may have no entry in the `series` collection, and linking to a
+ * 404 is worse than plain text.
+ */
+import { getCollection } from 'astro:content';
+import pathsData from '../../data/reading-paths.json';
+
+interface Props {
+  /** Content-collection entry id (the slug), e.g. "the-registry-wave-...". */
+  slug: string;
+  /** Which collection the entry came from — mini-series can span both. */
+  collection?: 'posts' | 'stories';
+  /** Raw `series` frontmatter value: an id ("ai-workflows") or a title. */
+  series?: string;
+  /** Raw `seriesOrder` frontmatter value. */
+  seriesPart?: number;
+  class?: string;
+}
+
+const { slug, collection = 'posts', series, seriesPart, class: className = '' } = Astro.props;
+
+// --- Arc (cross-series reading path) ---------------------------------------
+
+interface PathStep {
+  slug: string | null;
+  title: string;
+}
+
+interface ReadingPath {
+  pageSlug: string;
+  umbrellaTerm: string;
+  steps: PathStep[];
+}
+
+const paths = (pathsData as { paths: ReadingPath[] }).paths;
+const arcPath = collection === 'posts'
+  ? paths.find((p) => p.steps.some((s) => s.slug === slug))
+  : undefined;
+
+const arc = arcPath
+  ? {
+      name: arcPath.umbrellaTerm,
+      href: `/series/${arcPath.pageSlug}/`,
+      position: arcPath.steps.findIndex((s) => s.slug === slug) + 1,
+      total: arcPath.steps.length,
+    }
+  : null;
+
+// --- Mini-series ------------------------------------------------------------
+
+/**
+ * `series` frontmatter is authored inconsistently — some entries use the
+ * series-collection id ("governed-agentic-sdlc"), some the display title
+ * ("AI Workflows"). Compare on a normalised slug so both group correctly.
+ */
+const normalize = (value: string) =>
+  value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+
+let miniSeries: {
+  name: string;
+  href?: string;
+  part?: number;
+  total: number;
+} | null = null;
+
+if (series) {
+  const key = normalize(series);
+
+  const [allSeries, allPosts, allStories] = await Promise.all([
+    getCollection('series'),
+    getCollection('posts'),
+    getCollection('stories'),
+  ]);
+
+  // The series page, if one exists. Match on id first (how /series/[...slug]
+  // builds its routes), then on the display title.
+  const seriesEntry =
+    allSeries.find((entry) => normalize(entry.id) === key) ??
+    allSeries.find((entry) => normalize(entry.data.title) === key);
+
+  // Siblings: every published post/story in the same series, in reading order.
+  // The entry being rendered always counts itself, even when it is a draft —
+  // otherwise a draft preview claims "Part 5 of 5" while sitting outside the 5.
+  const siblings = [...allPosts, ...allStories]
+    .filter((entry) => entry.data.series && normalize(entry.data.series) === key)
+    .filter(
+      (entry) =>
+        entry.data.status !== 'draft' ||
+        (entry.collection === collection && entry.id === slug),
+    )
+    .sort((a, b) => (a.data.seriesOrder ?? Infinity) - (b.data.seriesOrder ?? Infinity));
+
+  const index = siblings.findIndex(
+    (entry) => entry.collection === collection && entry.id === slug,
+  );
+
+  miniSeries = {
+    name: seriesEntry?.data.title ?? series,
+    href: seriesEntry ? `/series/${seriesEntry.id}/` : undefined,
+    part: seriesPart ?? (index >= 0 ? index + 1 : undefined),
+    total: siblings.length,
+  };
+}
+
+const hasWayfinding = Boolean(arc || miniSeries);
+
+// A mini-series with no page in the `series` collection renders as text, not
+// a dead link. Astro resolves a capitalised string variable as the tag name.
+const SeriesTag = miniSeries?.href ? 'a' : 'span';
+---
+
+{
+  hasWayfinding && (
+    <nav class:list={['series-wayfinding', className]} aria-label="Series and reading path">
+      {arc && (
+        <a class="wayfind wayfind--arc" href={arc.href}>
+          <svg
+            class="wayfind__icon"
+            viewBox="0 0 24 24"
+            width="13"
+            height="13"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M4 18c0-6 5-3 8-7s-1-7 4-7" />
+            <circle cx="4" cy="18" r="2" />
+            <circle cx="19" cy="6" r="2" />
+          </svg>
+          <span class="wayfind__kicker">Arc</span>
+          <span class="wayfind__sep" aria-hidden="true">·</span>
+          <span class="wayfind__name">{arc.name}</span>
+          <span class="wayfind__sep" aria-hidden="true">·</span>
+          <span class="wayfind__position">{arc.position} of {arc.total}</span>
+        </a>
+      )}
+
+      {miniSeries && (
+        <SeriesTag
+          class:list={['wayfind', 'wayfind--series', !miniSeries.href && 'wayfind--static']}
+          href={miniSeries.href}
+        >
+          <svg
+            class="wayfind__icon"
+            viewBox="0 0 24 24"
+            width="13"
+            height="13"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M4 7h16M4 12h16M4 17h10" />
+          </svg>
+          <span class="wayfind__kicker">Series</span>
+          <span class="wayfind__sep" aria-hidden="true">·</span>
+          <span class="wayfind__name">{miniSeries.name}</span>
+          {miniSeries.part && (
+            <>
+              <span class="wayfind__sep" aria-hidden="true">·</span>
+              <span class="wayfind__position">
+                Part {miniSeries.part}
+                {miniSeries.total > 1 && ` of ${miniSeries.total}`}
+              </span>
+            </>
+          )}
+        </SeriesTag>
+      )}
+    </nav>
+  )
+}
