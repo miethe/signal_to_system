@@ -23,7 +23,12 @@ interface Props {
 }
 
 const { slug, headings = [] } = Astro.props;
-const toc = headings.filter((heading) => heading.depth === 2 || heading.depth === 3);
+// The footnotes section starts at the "Footnotes" heading (id
+// `footnote-label`, injected by the remark footnotes plugin) — exclude it
+// and everything after it so the TOC never lists footnote content.
+const footnoteIndex = headings.findIndex((heading) => heading.slug === 'footnote-label');
+const contentHeadings = footnoteIndex === -1 ? headings : headings.slice(0, footnoteIndex);
+const toc = contentHeadings.filter((heading) => heading.depth === 2 || heading.depth === 3);
 const showToc = toc.length >= 2;
 ---
 
