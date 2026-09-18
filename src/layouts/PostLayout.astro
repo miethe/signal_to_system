@@ -91,7 +91,7 @@ const jsonLd = generateJsonLd('article', {
     aria-hidden="true"
   ></div>
 
-  <article class="mx-auto grid w-full max-w-[72ch] items-start px-4 py-12 sm:px-6 lg:px-8 xl:max-w-7xl xl:grid-cols-[minmax(0,72ch)_18rem] xl:justify-center xl:gap-x-12">
+  <article class="post-layout mx-auto grid w-full max-w-[var(--measure)] items-start px-4 py-12 sm:px-6 lg:px-8 xl:max-w-7xl xl:grid-cols-[minmax(0,var(--measure))_minmax(14rem,18rem)] xl:justify-center xl:gap-x-12">
     <!-- Article header -->
     <header class="mb-16 min-w-0 space-y-6 pb-4 xl:col-start-1 xl:row-start-1">
       {
@@ -195,8 +195,8 @@ const jsonLd = generateJsonLd('article', {
     <!-- Callout: Why It Matters (executive signal) -->
     {
       whyItMatters && (
-        <aside class="mb-8 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-subtle)] p-6 shadow-sm">
-          <p class="font-mono mb-2 text-xs font-bold uppercase tracking-widest text-[var(--accent)]">
+        <aside class="mb-7 border-l-2 border-[var(--accent-muted)] py-1 pl-4">
+          <p class="font-mono mb-1 text-[0.6875rem] font-bold uppercase tracking-widest text-[var(--accent-text)]">
             Why It Matters
           </p>
           <p class="text-sm leading-relaxed text-[var(--text-secondary)]">{whyItMatters}</p>
@@ -207,8 +207,8 @@ const jsonLd = generateJsonLd('article', {
     <!-- Callout: Leader Takeaway -->
     {
       leaderTakeaway && (
-        <aside class="mb-8 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-subtle)] p-6 shadow-sm">
-          <p class="font-mono mb-2 text-xs font-bold uppercase tracking-widest text-[var(--text-primary)]">
+        <aside class="mb-7 border-l-2 border-[var(--accent-muted)] py-1 pl-4">
+          <p class="font-mono mb-1 text-[0.6875rem] font-bold uppercase tracking-widest text-[var(--accent-text)]">
             Leader Takeaway
           </p>
           <p class="text-sm leading-relaxed text-[var(--text-secondary)]">{leaderTakeaway}</p>
@@ -217,7 +217,7 @@ const jsonLd = generateJsonLd('article', {
     }
 
     <!-- Article body -->
-    <div class="prose-custom max-w-none">
+    <div class="prose-custom">
       <slot />
     </div>
 

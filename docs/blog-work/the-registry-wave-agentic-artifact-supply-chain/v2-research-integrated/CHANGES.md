@@ -4,6 +4,39 @@ Target-Node: node_01M2RD7QANCCJAY2VB881PSZRX
 
 Date: 2026-09-17. Baseline: `c9b03ad`, Nick's hand-edit snapshot. Scope: manuscript, named glossary definitions, this ledger. `threads.ts` unchanged. No remote publication. No agents dispatched.
 
+## Reading layout (Leg V)
+
+The layout direction is restrained editorial density: prose gets a materially wider measure and the supporting apparatus uses rules, type, and spacing rather than repeated cards. Manuscript text is unchanged.
+
+### Measure and rail decision
+
+`PostLayout` now owns `--measure`: 72ch below `lg`, 84ch at `lg` and above. With the 17px body type and the site's approximately 0.53em serif `ch`, the nominal text widths are about 648px before and 756px after at desktop. The old `xl` grid was 648px text plus 288px rail plus 48px gap. The new grid is 756px text plus a rail that can use 224px to 288px plus the same 48px gap. Empty horizontal margin for the occupied grid is therefore approximately:
+
+| Viewport | Before text / empty share | After text / empty share |
+| --- | --- | --- |
+| 1280px | 648px / 23.1% | 756px / 14.7% |
+| 1440px | 648px / 31.7% | 756px / 24.2% |
+| 1728px | 648px / 43.1% | 756px / 36.8% |
+| 1920px | 648px / 48.8% | 756px / 43.1% |
+
+The empty-share calculation uses the complete text, 18rem rail, and 3rem inter-column gap; at constrained `xl` widths the new rail may shrink to 14rem, leaving the text measure intact. This is ThreadRail option A: keep the sticky desktop aside because it supports the six-beat worked example, but reserve a 14rem floor and let the reading column widen first. Below `xl`, the existing in-flow compact author context and 16px mobile gutter behavior remain unchanged.
+
+### Interruption inventory and footprint
+
+The Registry Wave body has 5 Callouts, 7 Figures, 9 inline Evidence markers in Receipts, 6 ThreadBeats, 4 tables, 1 closed `<details>`, 1 EditionBanner, 1 WhereThisSits panel, and no rendered ReadingPathNav (the post has no series navigation). Figures, tables, panels, and beats occupy the text column; Evidence sits inline. Approximate fixed vertical chrome before changes: Callout 48px margins plus 40px padding; Figure 88px margins plus 44px plate padding and caption; ThreadBeat 80px margins plus 40px to 48px padding and 32px divider spacing; table 56px margins; WhereThisSits 80px margins plus 40px padding; EditionBanner inherits Callout; native details had browser-default disclosure chrome only. Content and image height are necessarily variable.
+
+After changes, Callout and EditionBanner use 40px margins, a 2px left rule, and 2px vertical padding; ThreadBeat uses 56px margins, a left rule, 8px vertical padding, and no divider; Figure caption is 12px with a 10px top gap; tables and figures may borrow 24px on either side at `lg`; details receives a 20px vertical margin, 2px left rule, link-coloured summary, and reduced-motion-safe transition. These changes keep every interruption but lower its repeated card treatment.
+
+| File | Change and reason |
+| --- | --- |
+| `src/layouts/PostLayout.astro` | Added the shared measure to the layout, widened desktop grid text, permitted a 14rem to 18rem sticky rail, and quieted frontmatter callouts. |
+| `src/styles/global.css` | Defined responsive measure, disclosure treatment, quieter prose asides, wider visual/table bleed, tighter captions, and kept the container on the shared variable. |
+| `src/components/content/Callout.astro` | Replaced coloured box treatment with token-based rule, smaller icon, title, spacing. |
+| `src/components/content/Callout.tsx` | Matched the Astro callout implementation so either renderer remains consistent. |
+| `src/components/content/ThreadBeat.astro` | Removed card frame, corners, and divider to keep beats in the narrative flow. |
+| `src/components/content/ThreadRail.astro` | Receded the sticky rail from a boxed card to a compact ruled aside. |
+| this ledger | Recorded measurements, inventory, decision, and changed files. |
+
 Pack pointers below are relative to `/Users/miethe/dev/homelab/development/agentic_meta_dev/docs/project_plans/reports/chat-2026-09-17-theses/pack/`. E numbers refer to the sibling `E-real-examples.md`.
 
 ## Editor pass (Leg Z, front corrections)

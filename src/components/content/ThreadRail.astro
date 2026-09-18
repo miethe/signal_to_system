@@ -15,13 +15,8 @@ const thread = threads[slug];
 
 {
   thread && (
-    <aside class="thread-rail mb-6 border border-[var(--border-subtle)] bg-[var(--bg-subtle)] p-4" data-thread-rail>
-      <span class="thread-rail__corner thread-rail__corner--tl" aria-hidden="true"></span>
-      <span class="thread-rail__corner thread-rail__corner--tr" aria-hidden="true"></span>
-      <span class="thread-rail__corner thread-rail__corner--bl" aria-hidden="true"></span>
-      <span class="thread-rail__corner thread-rail__corner--br" aria-hidden="true"></span>
-
-      <div class="border-l-2 border-[var(--accent)] pl-3">
+    <aside class="thread-rail mb-6 border-l-2 border-[var(--accent-muted)] py-1 pl-3" data-thread-rail>
+      <div>
         <p class="font-mono text-[0.625rem] font-semibold uppercase tracking-[0.16em] text-[var(--accent-text)]">
           Running example
         </p>
@@ -61,20 +56,6 @@ const thread = threads[slug];
   .thread-rail {
     position: relative;
   }
-
-  .thread-rail__corner {
-    position: absolute;
-    width: 7px;
-    height: 7px;
-    border: 1px solid var(--border-strong);
-    opacity: 0.58;
-    pointer-events: none;
-  }
-
-  .thread-rail__corner--tl { top: 5px; left: 5px; border-right: 0; border-bottom: 0; }
-  .thread-rail__corner--tr { top: 5px; right: 5px; border-left: 0; border-bottom: 0; }
-  .thread-rail__corner--bl { bottom: 5px; left: 5px; border-right: 0; border-top: 0; }
-  .thread-rail__corner--br { right: 5px; bottom: 5px; border-left: 0; border-top: 0; }
 
   .thread-rail__link:hover,
   .thread-rail__link:focus-visible {
