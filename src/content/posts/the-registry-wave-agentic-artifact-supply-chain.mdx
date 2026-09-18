@@ -119,6 +119,8 @@ Call that the <Term id="agentic-artifact">**agentic artifact**</Term>: whatever 
 
 The runtime executes. A skill shapes its behavior. Markdown instructions don't reason on their own, and a signed context pack doesn't enforce the permissions it describes.
 
+Instruction, Tool, Context and Governance are the static side: the things an agent draws on. Execution is the runtime topology that selects which of them a session actually loads, and Evidence is what that session leaves behind.
+
 | Artifact family | Examples | What needs versioning and review |
 | --- | --- | --- |
 | Instruction | Prompts, skills, commands, rules | Non-executable instructions and any bundled executable dependencies |
@@ -323,6 +325,8 @@ The next essay considers the <Term id="deterministic-envelope">deterministic env
 </Callout>
 
 ## Where the system lied to us
+
+Keeping those assurances separate is easy on a page; I only learned they don't stay separate in practice because my own tooling kept reporting one of them and letting me read it as another.
 
 The drift-gate receipt records why the check was written at all: “the fix exists” had stood in for “the projects received the fix,” and my own artifact-management workflow let that substitution pass.[^drift]
 
