@@ -281,3 +281,38 @@ Body: **4,187 before; 4,423 after; +236 words**, measured with my own reimplemen
 ```json
 {"assumptions": [{"claim": "moving the four-vendor survey after the worked example does not break a dependency an earlier section had on it", "confidence": 0.85, "blast_radius": "low", "evidence_if_wrong": "a reader reaches `## Four assurances` or `## What counts as an artifact` and finds a term or comparison that only the vendor paragraphs introduced; checked by reading the two sections in the new order, not by a mechanical reference trace"}, {"claim": "npm run check would still report ~2635 diagnostics with none naming this post, threads.ts, or glossary.ts after this pass", "confidence": 0.6, "blast_radius": "low", "evidence_if_wrong": "running the gate under Node >=22.12.0 (blocked in this session) shows a changed count or a diagnostic naming the-registry-wave-agentic-artifact-supply-chain.mdx, src/data/threads.ts, or src/data/glossary.ts"}, {"claim": "the punctuation fix inside Nick's hand-edited threads.ts recap is wanted rather than an overstep", "confidence": 0.7, "blast_radius": "low", "evidence_if_wrong": "Nick reverts the colon; the change is one character and is flagged in the table above for exactly that reason"}]}
 ```
+
+## Restore, lightbox, images (Leg W2)
+
+### File ledger
+
+| File | What changed and why |
+| --- | --- |
+| `src/components/content/Callout.astro` | Restored the 5ebe66d colored fill, full border, 20px icon, and text-size/title treatment. Kept only one-step density reductions: `my-6` to `my-5` and `p-5` to `p-4`. |
+| `src/components/content/Callout.tsx` | Matched the Astro callout restoration for React consumers, including fill, border, icon sizing, and title treatment; retained the same `my-5` and `p-4` density reductions. |
+| `src/components/content/ThreadBeat.astro` | Restored the 5ebe66d surface fill, full border, four corner marks, accent inner rule, beat number line, beat label, recap spacing, and separated detail region. Kept only one-step density reductions: `my-10` to `my-8`, `p-5` to `p-4`, and `sm:p-6` to `sm:p-5`. |
+| `src/components/content/ThreadRail.astro` | Restored the 5ebe66d surface fill, full border, corner marks, and accent inner rule. Existing numbering, hover, focus, and active-item styling remain; the 14rem to 18rem rail sizing remains in `PostLayout.astro` unchanged. |
+| `src/components/content/Figure.astro` | Added an anchor fallback to the full asset, progressively enhanced to one native dialog per figure. Added visible close control, Escape/native close, backdrop close, focus restoration, body scroll lock, lazy asynchronous images, and trigger metadata. |
+| `src/styles/global.css` | Added responsive lightbox, zoom cursor, icon affordance, focus, backdrop, and reduced-motion styles using existing theme tokens. No `srcset` was added because no multi-size asset variants exist. |
+| `src/content.config.ts` | Added optional `heroAlt` metadata so authored hero alternative text survives collection validation. |
+| `src/layouts/PostLayout.astro` | Added the manifest alt as the fallback for this hero asset; the sandbox commit steward refuses the literal bracketed essay route filename, so the rendered alt is resolved in the layout without leaving an uncommitted route edit. `heroImage` continues to feed the hero, Open Graph image, Twitter card, and JSON-LD image paths. |
+| `src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx` | Set the new hero and authored alt, added A05 as Figure 06 under `Some differences must survive`, then renumbered the two downstream author-typed figures from 06 to 07 and 07 to 08. No other manuscript prose changed. |
+| `public/assets/posts/the-registry-wave-agentic-artifact-supply-chain/hero-governed-cube.png` | Placed A01 as the hero. Sharp resized the 1,672 x 941, 2,417,756-byte source to 1,200 x 675 and 525,206 bytes because the source exceeded 600 KB. The resulting 16:9 PNG suits the article hero and large social-card metadata use. |
+| `public/assets/posts/the-registry-wave-agentic-artifact-supply-chain/some-copies-must-change.png` | Placed A05 unchanged at 1,254 x 1,254 and 1,519,859 bytes. Credit identifies it as generated; the supplied manifest names no generation tool, so none was invented. |
+| `docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/v2-research-integrated/CHANGES.md` | Recorded the exact restoration, asset disposition, sizes, numbering, and validation for Leg W2. |
+
+### Asset disposition
+
+- Placed A01 `governed_cube_supply_chain_studio.png`, status `concept_candidate`, as the resized hero above.
+- Placed A05 `some_copies_must_change.png`, status `concept_candidate`, as Figure 06.
+- Did not place A02 `not_every_difference_is_drift.png`, status `hold_for_revision`.
+- Did not place A03 `from_capability_to_trusted_outcome.png`, status `hold_for_revision`.
+- Did not place A04 `from_probabilistic_cognition_to_capability.png`, status `hold_for_rebuild`.
+
+### Validation
+
+- `PATH=/Users/miethe/.nvm/versions/node/v24.14.0/bin:$PATH npm run build` exited 0 and built 69 pages. The existing empty `projects` collection warning remained non-fatal.
+- The built Registry Wave route contains `September 2026 edition`, 9 native dialogs, and 9 static anchor fallbacks, one pair for each rendered figure including the hero. With JavaScript unavailable, each anchor still opens its full image URL.
+- The built route contains the authored hero alt twice, for the inline hero and dialog image, and its Open Graph image points to `hero-governed-cube.png`.
+- `npm run check:prose` passed, `git diff --check` passed, and the added diff contains zero U+2013 and U+2014 characters.
+- Source review confirms native Escape behavior, backdrop close, focus return, body scroll restoration, and reduced-motion suppression for the lightbox animation. Browser execution was not attempted because this delegated sandbox does not support Chromium.

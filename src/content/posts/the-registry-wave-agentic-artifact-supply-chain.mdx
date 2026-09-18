@@ -13,7 +13,8 @@ tags:
   - "platform-strategy"
   - "delivery-systems"
 status: published
-heroImage: "/assets/posts/the-registry-wave-agentic-artifact-supply-chain/diagram-market-wave.svg"
+heroImage: "/assets/posts/the-registry-wave-agentic-artifact-supply-chain/hero-governed-cube.png"
+heroAlt: "A shared capability pattern connects several project workbenches, each retaining a distinct adaptation."
 whyItMatters: "Approval attaches to an artifact. Its use happens in a context that approval never saw. A current registry can coexist with stale deployed instructions and unacceptable outcomes."
 leaderTakeaway: "Require four separate assurances: pinned artifact identity, authorized conditions of use, evidence of actual execution, and an accepted outcome. Connect the systems responsible for each."
 relatedSlugs:
@@ -216,6 +217,14 @@ Replacement and revocation also need a destination list. If I retire the reviewe
 
 ## Some differences must survive
 
+<Figure
+  src="/assets/posts/the-registry-wave-agentic-artifact-supply-chain/some-copies-must-change.png"
+  alt="Editorial card reading 'Some copies must change. Some differences must survive.' above lines branching from many small squares into several distinct endpoints."
+  number="06"
+  caption="I use this branching pattern to show one shared source narrowing into copies that do not all need the same outcome."
+  credit="Generated image; tool not named in the asset manifest."
+/>
+
 A content hash answers whether bytes match a recorded revision. An ancestry record answers which base a local change came from. Neither tells me whether that change is useful, approved or compatible. I need the base to understand the patch, the current bytes to identify it, and review and tests to decide what should happen next.
 
 That distinction is what the second incident turned on, the workflow copies rather than the reviewer. Some projects were behind upstream and missing review checks. Others had a stricter local check: they could refuse a conditional review verdict that upstream would accept. Copying upstream over every project would have repaired one group by deleting a protection from another. The synchronization tool is local lab tooling rather than a registry feature, and it inspects the direction of change, preserves the per-project agent roster, and refuses to overwrite local-ahead copies. Mixed changes need inspection.[^workflow]
@@ -292,7 +301,7 @@ Drift can also happen against a frozen skill. Keep its bytes unchanged and chang
 <Figure
   src="/assets/posts/the-registry-wave-agentic-artifact-supply-chain/diagram-thread-06-outcome.svg"
   alt="Schematic diagram of a run record table showing which reviewer version an agent session actually loaded, contrasted with earlier runs where that version was never captured."
-  number="06"
+  number="07"
   caption="Proposed run-evidence model, not captured runtime data: record the loaded reviewer version, and keep earlier unknown versions unknown."
   credit="Diagram: Nick Miethe, 2026-09"
 />
@@ -399,7 +408,7 @@ This essay reports no measured outcome improvement.
 <Figure
   src="/assets/posts/the-registry-wave-agentic-artifact-supply-chain/diagram-estate-before-after.svg"
   alt="Side-by-side diptych: on the left, two actors, a human and an agent, reach into worktrees scattered across four projects; a single tracked skill exists as four incompatible copies with different versions and hashes, threaded in red through the tangle. On the right, the same four projects deploy from one SkillMeat registry, each copy verified against it by content hash."
-  number="07"
+  number="08"
   caption="Schematic of the estate as designed, September 2026: the ungoverned-versus-governed contrast this essay's incident illustrates. Project names are real; the specific skill versions, hashes, and worktree counts shown are illustrative, not a captured snapshot."
 />
 

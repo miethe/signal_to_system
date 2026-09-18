@@ -11,30 +11,30 @@ interface CalloutProps {
 const configs: Record<CalloutType, { label: string; containerCls: string; iconCls: string; titleCls: string; icon: string }> = {
   info: {
     label: "Note",
-    containerCls: "border-l-2 border-[var(--accent-muted)] bg-transparent",
-    iconCls: "text-[var(--accent-text)]",
-    titleCls: "text-[var(--text-primary)]",
+    containerCls: "border-blue-200 bg-blue-50 dark:border-blue-800 dark:bg-blue-950/30",
+    iconCls: "text-blue-500 dark:text-blue-400",
+    titleCls: "text-blue-800 dark:text-blue-300",
     icon: "info",
   },
   warning: {
     label: "Warning",
-    containerCls: "border-l-2 border-[var(--accent-muted)] bg-transparent",
-    iconCls: "text-[var(--accent-text)]",
-    titleCls: "text-[var(--text-primary)]",
+    containerCls: "border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950/30",
+    iconCls: "text-amber-500 dark:text-amber-400",
+    titleCls: "text-amber-800 dark:text-amber-300",
     icon: "warning",
   },
   "leader-takeaway": {
     label: "Leader Takeaway",
-    containerCls: "border-l-2 border-[var(--accent-muted)] bg-transparent",
-    iconCls: "text-[var(--accent-text)]",
-    titleCls: "text-[var(--text-primary)]",
+    containerCls: "border-violet-200 bg-violet-50 dark:border-violet-800 dark:bg-violet-950/30",
+    iconCls: "text-violet-500 dark:text-violet-400",
+    titleCls: "text-violet-800 dark:text-violet-300",
     icon: "star",
   },
   "why-it-matters": {
     label: "Why It Matters",
-    containerCls: "border-l-2 border-[var(--accent-muted)] bg-transparent",
-    iconCls: "text-[var(--accent-text)]",
-    titleCls: "text-[var(--text-primary)]",
+    containerCls: "border-emerald-200 bg-emerald-50 dark:border-emerald-800 dark:bg-emerald-950/30",
+    iconCls: "text-emerald-500 dark:text-emerald-400",
+    titleCls: "text-emerald-800 dark:text-emerald-300",
     icon: "zap",
   },
   story: {
@@ -83,12 +83,12 @@ export default function Callout({ type = "info", title, children }: CalloutProps
   const displayTitle = title ?? cfg.label;
 
   return (
-  <aside className={`my-5 flex gap-3 py-1 pl-4 pr-1 ${cfg.containerCls}`} role="note">
-      <div className={`mt-0.5 shrink-0 [&_svg]:h-4 [&_svg]:w-4 ${cfg.iconCls}`} aria-hidden="true">
+    <aside className={`my-5 flex gap-4 rounded-xl border p-4 ${cfg.containerCls}`} role="note">
+      <div className={`mt-0.5 shrink-0 ${cfg.iconCls}`} aria-hidden="true">
         {icons[cfg.icon]}
       </div>
       <div className="min-w-0 flex-1">
-        <p className={`mb-0.5 text-xs font-semibold ${cfg.titleCls}`}>{displayTitle}</p>
+        <p className={`mb-1 text-sm font-semibold ${cfg.titleCls}`}>{displayTitle}</p>
         <div className="prose prose-sm dark:prose-invert max-w-none text-inherit [&>*:last-child]:mb-0">
           {children}
         </div>

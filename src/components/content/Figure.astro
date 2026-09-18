@@ -26,19 +26,30 @@ const isHero = variant === 'hero';
 const showCaption = !isHero && (number || caption || credit);
 ---
 
-<figure class:list={['figure-plate', isHero && 'figure-plate--hero']}>
+<figure class:list={['figure-plate', isHero && 'figure-plate--hero']} data-enlargeable-figure>
   <span class="figure-plate__corner figure-plate__corner--tl" aria-hidden="true"></span>
   <span class="figure-plate__corner figure-plate__corner--tr" aria-hidden="true"></span>
   <span class="figure-plate__corner figure-plate__corner--bl" aria-hidden="true"></span>
   <span class="figure-plate__corner figure-plate__corner--br" aria-hidden="true"></span>
 
   <div class="figure-plate__frame">
-    <img
-      src={src}
-      alt={alt}
-      loading={isHero ? 'eager' : 'lazy'}
-      decoding="async"
-    />
+    <a
+      class="figure-plate__enlarge"
+      href={src}
+      aria-label={`Enlarge: ${alt}`}
+      aria-haspopup="dialog"
+      data-figure-trigger
+    >
+      <img src={src} alt={alt} loading="lazy" decoding="async" />
+      <span class="figure-plate__enlarge-affordance" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M15 3h6v6" />
+          <path d="m21 3-7 7" />
+          <path d="M9 21H3v-6" />
+          <path d="m3 21 7-7" />
+        </svg>
+      </span>
+    </a>
   </div>
 
   {showCaption && (
@@ -56,4 +67,58 @@ const showCaption = !isHero && (number || caption || credit);
       )}
     </figcaption>
   )}
+
+  <dialog
+    class="figure-lightbox"
+    aria-label={`Enlarged figure: ${alt}`}
+    data-figure-dialog
+  >
+    <div class="figure-lightbox__panel">
+      <button class="figure-lightbox__close" type="button" aria-label="Close enlarged figure" data-figure-close>
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+          <path d="M6 6l12 12M18 6 6 18" />
+        </svg>
+      </button>
+      <img src={src} alt={alt} loading="lazy" decoding="async" />
+      <p class="figure-lightbox__caption">
+        {caption ?? alt}
+      </p>
+    </div>
+  </dialog>
 </figure>
+
+<script>
+  const initializeFigureLightboxes = () => {
+    document.querySelectorAll<HTMLElement>('[data-enlargeable-figure]').forEach((figure) => {
+      if (figure.dataset.figureLightboxReady === 'true') return;
+
+      const trigger = figure.querySelector<HTMLAnchorElement>('[data-figure-trigger]');
+      const dialog = figure.querySelector<HTMLDialogElement>('[data-figure-dialog]');
+      const closeButton = figure.querySelector<HTMLButtonElement>('[data-figure-close]');
+      if (!trigger || !dialog || !closeButton || typeof dialog.showModal !== 'function') return;
+
+      figure.dataset.figureLightboxReady = 'true';
+      let previousBodyOverflow = '';
+
+      trigger.addEventListener('click', (event) => {
+        event.preventDefault();
+        previousBodyOverflow = document.body.style.overflow;
+        document.body.style.overflow = 'hidden';
+        dialog.showModal();
+        closeButton.focus();
+      });
+
+      closeButton.addEventListener('click', () => dialog.close());
+      dialog.addEventListener('click', (event) => {
+        if (event.target === dialog) dialog.close();
+      });
+      dialog.addEventListener('close', () => {
+        document.body.style.overflow = previousBodyOverflow;
+        trigger.focus();
+      });
+    });
+  };
+
+  initializeFigureLightboxes();
+  document.addEventListener('astro:page-load', initializeFigureLightboxes);
+</script>
