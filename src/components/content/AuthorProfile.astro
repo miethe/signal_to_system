@@ -174,4 +174,12 @@ const socialLinks = [
       transition: none;
     }
   }
+
+  /* perf-lite drops the animation, never the collapse itself — the class
+     toggle in PostSidebar's script always runs regardless of this mode. */
+  :global(html.perf-lite) .author-profile,
+  :global(html.perf-lite) .author-profile__role,
+  :global(html.perf-lite) .author-profile__extra {
+    transition: none;
+  }
 </style>

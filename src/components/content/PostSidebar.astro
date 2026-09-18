@@ -28,8 +28,22 @@ const { slug, headings = [] } = Astro.props;
 // and everything after it so the TOC never lists footnote content.
 const footnoteIndex = headings.findIndex((heading) => heading.slug === 'footnote-label');
 const contentHeadings = footnoteIndex === -1 ? headings : headings.slice(0, footnoteIndex);
-const toc = contentHeadings.filter((heading) => heading.depth === 2 || heading.depth === 3);
-const showToc = toc.length >= 2;
+const rawToc = contentHeadings.filter((heading) => heading.depth === 2 || heading.depth === 3);
+const showToc = rawToc.length >= 2;
+
+// Number each h2 section (01, 02…) and record which h2 slug each h3 falls
+// under, so the client script can show only the active section's
+// sub-headings instead of the full flat list.
+let h2Count = 0;
+let currentH2Slug: string | null = null;
+const toc = rawToc.map((heading) => {
+  if (heading.depth === 2) {
+    h2Count += 1;
+    currentH2Slug = heading.slug;
+    return { ...heading, sectionNumber: h2Count, parentSlug: null as string | null };
+  }
+  return { ...heading, sectionNumber: null as number | null, parentSlug: currentH2Slug };
+});
 ---
 
 <div class="post-sidebar" data-post-sidebar>
@@ -40,23 +54,38 @@ const showToc = toc.length >= 2;
   {
     showToc && (
       <nav class="post-sidebar__toc mb-6" aria-label="Table of contents" data-post-toc hidden>
-        <ol class="space-y-0.5 border-l border-[var(--border)] pl-0">
-          {toc.map((heading) => (
-            <li>
-              <a
-                href={`#${heading.slug}`}
-                class:list={[
-                  'post-sidebar__toc-link block truncate border-l-2 border-transparent py-1.5 pl-3 text-xs leading-5 text-[var(--text-secondary)] no-underline',
-                  heading.depth === 3 && 'pl-6 text-[0.6875rem] text-[var(--text-tertiary)]',
-                ]}
-                data-toc-link
-                data-toc-target={heading.slug}
+        <p class="post-sidebar__toc-eyebrow font-mono mb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--accent)]">
+          On this page
+        </p>
+        <div class="post-sidebar__toc-body" data-toc-scroll>
+          <div class="post-sidebar__toc-rail" aria-hidden="true">
+            <div class="post-sidebar__toc-rail-fill" data-toc-fill></div>
+          </div>
+          <ol class="post-sidebar__toc-list">
+            {toc.map((heading) => (
+              <li
+                class:list={['post-sidebar__toc-item', heading.depth === 3 && 'post-sidebar__toc-item--sub']}
+                data-toc-item
+                data-toc-depth={heading.depth}
+                data-toc-parent={heading.parentSlug ?? ''}
               >
-                {heading.text}
-              </a>
-            </li>
-          ))}
-        </ol>
+                <a
+                  href={`#${heading.slug}`}
+                  class="post-sidebar__toc-link"
+                  data-toc-link
+                  data-toc-target={heading.slug}
+                >
+                  {heading.depth === 2 && (
+                    <span class="post-sidebar__toc-index font-mono" aria-hidden="true">
+                      {String(heading.sectionNumber).padStart(2, '0')}
+                    </span>
+                  )}
+                  <span class="post-sidebar__toc-label line-clamp-2">{heading.text}</span>
+                </a>
+              </li>
+            ))}
+          </ol>
+        </div>
       </nav>
     )
   }
@@ -69,8 +98,77 @@ const showToc = toc.length >= 2;
      this component only decides *when* to toggle `.is-collapsed`, via the
      script below. */
 
+  .post-sidebar__toc-body {
+    position: relative;
+    max-height: 22rem;
+    overflow-y: auto;
+    padding-left: 0.75rem;
+  }
+
+  .post-sidebar__toc-rail {
+    position: absolute;
+    top: 0.35rem;
+    bottom: 0.35rem;
+    left: 0;
+    width: 2px;
+    border-radius: 1px;
+    background-color: var(--border-subtle);
+  }
+
+  .post-sidebar__toc-rail-fill {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 0%;
+    border-radius: 1px;
+    background-color: var(--accent);
+    transition: height 0.2s ease;
+  }
+
+  .post-sidebar__toc-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+  }
+
+  .post-sidebar__toc-item--sub {
+    display: none;
+  }
+
+  .post-sidebar__toc-item--sub.is-active-branch {
+    display: block;
+  }
+
   .post-sidebar__toc-link {
-    transition: background-color 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    border-radius: 0.25rem;
+    padding: 0.375rem 0.5rem;
+    font-size: 0.75rem;
+    line-height: 1.35;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: background-color 0.15s ease, color 0.15s ease;
+  }
+
+  .post-sidebar__toc-item--sub .post-sidebar__toc-link {
+    margin-left: 1rem;
+    font-size: 0.6875rem;
+    color: var(--text-tertiary);
+  }
+
+  .post-sidebar__toc-index {
+    flex-shrink: 0;
+    font-size: 0.625rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    color: var(--text-disabled);
+  }
+
+  .post-sidebar__toc-label {
+    min-width: 0;
   }
 
   .post-sidebar__toc-link:hover,
@@ -84,16 +182,33 @@ const showToc = toc.length >= 2;
     box-shadow: 0 0 0 2px var(--accent);
   }
 
+  /* Sections already scrolled past read as slightly more muted than the
+     upcoming (neutral) default above; the active section is set apart by
+     accent color, weight, and a subtle fill. */
+  .post-sidebar__toc-item.is-visited .post-sidebar__toc-link {
+    color: var(--text-tertiary);
+  }
+
   .post-sidebar__toc-link[aria-current='location'] {
-    border-color: var(--accent);
+    background-color: var(--accent-subtle);
     color: var(--text-primary);
     font-weight: 600;
   }
 
+  .post-sidebar__toc-link[aria-current='location'] .post-sidebar__toc-index {
+    color: var(--accent-text);
+  }
+
   @media (prefers-reduced-motion: reduce) {
-    .post-sidebar__toc-link {
+    .post-sidebar__toc-link,
+    .post-sidebar__toc-rail-fill {
       transition: none;
     }
+  }
+
+  :global(html.perf-lite) .post-sidebar__toc-link,
+  :global(html.perf-lite) .post-sidebar__toc-rail-fill {
+    transition: none;
   }
 </style>
 
@@ -112,6 +227,17 @@ const showToc = toc.length >= 2;
         toc?.toggleAttribute('hidden', !collapsed);
       };
 
+      // Collapsing is cheap and must keep working in every performance mode
+      // — perf-lite only drops the CSS transition (see AuthorProfile's and
+      // this file's <style>). There is deliberately no perf-lite branch
+      // here: an earlier version disconnected this observer the moment a
+      // `class` mutation on <html> left `perf-lite` present, but
+      // `applyPerfClass()` in themeStore re-toggles that class (to the same
+      // value) on every client-side import of the store — which any
+      // ModeToggle/ThemeToggle island triggers on every page load — so the
+      // observer was disconnecting itself almost immediately whenever a
+      // reader had lite mode set from an earlier visit, regardless of
+      // scroll position. Don't reintroduce that watcher.
       if (header && authorEl && 'IntersectionObserver' in window) {
         const headerObserver = new IntersectionObserver(
           (entries) => {
@@ -120,37 +246,69 @@ const showToc = toc.length >= 2;
           { threshold: 0 },
         );
         headerObserver.observe(header);
-
-        const performanceObserver = new MutationObserver(() => {
-          if (document.documentElement.classList.contains('perf-lite')) {
-            headerObserver.disconnect();
-            performanceObserver.disconnect();
-            setCollapsed(false);
-          }
-        });
-        performanceObserver.observe(document.documentElement, {
-          attributes: true,
-          attributeFilter: ['class'],
-        });
       }
 
       if (!toc) return;
 
-      const links = Array.from(toc.querySelectorAll<HTMLAnchorElement>('[data-toc-link]'));
-      const targets = links
-        .map((link) => document.getElementById(link.dataset.tocTarget ?? ''))
-        .filter((target): target is HTMLElement => target !== null);
+      const rail = toc.querySelector<HTMLElement>('[data-toc-fill]');
+      const items = Array.from(toc.querySelectorAll<HTMLLIElement>('[data-toc-item]'));
+      // Pair each link with its target element and owning <li> up front —
+      // one array, built once, so every lookup below is a plain index/get
+      // instead of a re-query.
+      const pairs = items
+        .map((item) => {
+          const link = item.querySelector<HTMLAnchorElement>('[data-toc-link]');
+          const target = link ? document.getElementById(link.dataset.tocTarget ?? '') : null;
+          return link && target ? { item, link, target } : null;
+        })
+        .filter((pair): pair is { item: HTMLLIElement; link: HTMLAnchorElement; target: HTMLElement } => pair !== null);
 
-      if (targets.length === 0 || !('IntersectionObserver' in window)) return;
+      if (pairs.length === 0 || !('IntersectionObserver' in window)) return;
+
+      const reduceMotion = () =>
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+        document.documentElement.classList.contains('perf-lite');
+
+      // Each h3's own section is its recorded parent slug; an h2's own
+      // section is itself. Used to show only the active section's h3s.
+      const resolveSection = (targetId: string): string | null => {
+        const pair = pairs.find((candidate) => candidate.target.id === targetId);
+        if (!pair) return null;
+        return pair.item.dataset.tocDepth === '2' ? targetId : pair.item.dataset.tocParent || null;
+      };
+
+      const setActiveBranch = (sectionSlug: string | null) => {
+        items.forEach((item) => {
+          if (item.dataset.tocDepth !== '3') return;
+          item.classList.toggle('is-active-branch', item.dataset.tocParent === sectionSlug);
+        });
+      };
+
+      // Default to the first section's sub-headings before any scroll-spy
+      // event has fired, so the list isn't empty-looking pre-scroll.
+      const firstH2 = pairs.find((pair) => pair.item.dataset.tocDepth === '2');
+      setActiveBranch(firstH2?.target.id ?? null);
 
       const setActive = (id: string) => {
-        links.forEach((link) => {
-          if (link.dataset.tocTarget === id) {
+        const activeIndex = pairs.findIndex((pair) => pair.target.id === id);
+        pairs.forEach(({ item, link }, index) => {
+          if (index === activeIndex) {
             link.setAttribute('aria-current', 'location');
           } else {
             link.removeAttribute('aria-current');
           }
+          item.classList.toggle('is-visited', activeIndex > -1 && index < activeIndex);
         });
+
+        setActiveBranch(resolveSection(id));
+
+        if (rail && pairs.length > 1) {
+          const pct = activeIndex > -1 ? (activeIndex / (pairs.length - 1)) * 100 : 0;
+          rail.style.height = `${Math.max(0, pct)}%`;
+        }
+
+        const activeLink = activeIndex > -1 ? pairs[activeIndex]?.link : null;
+        activeLink?.scrollIntoView({ block: 'nearest', behavior: reduceMotion() ? 'auto' : 'smooth' });
       };
 
       const visibleTargets = new Set<HTMLElement>();
@@ -178,7 +336,7 @@ const showToc = toc.length >= 2;
         { rootMargin: '-10% 0px -80% 0px', threshold: 0 },
       );
 
-      targets.forEach((target) => tocObserver.observe(target));
+      pairs.forEach(({ target }) => tocObserver.observe(target));
     });
   };
 
