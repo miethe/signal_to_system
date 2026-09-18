@@ -392,6 +392,15 @@ const toc = rawToc.map((heading) => {
       // shown when the full list wouldn't fit; `overflow-y:auto` (scrollbar
       // hidden) on the body is kept as a fallback only — this is meant to
       // never be needed in practice.
+      //
+      // `toc.getBoundingClientRect().top` moves whenever the author card
+      // above it collapses/expands — measuring at the wrong instant (mid
+      // collapse-transition) windows against a transient, too-small
+      // "available" and hides rows that would actually fit once the
+      // column settles. See the ResizeObserver/transitionend wiring below
+      // (on the whole `.post-sidebar` column, not just this block), which
+      // re-runs this whenever that could have happened.
+      let lastFitSignature = '';
       const fitList = () => {
         if (!tocBody) return;
         // The set actually laid out right now: every h2, plus h3s of the
@@ -399,23 +408,34 @@ const toc = rawToc.map((heading) => {
         const laidOut = pairs.filter(({ item }) => item.dataset.tocDepth === '2' || item.classList.contains('is-active-branch'));
         if (laidOut.length === 0) return;
 
+        // Measure from the PANEL's own top (below the header row), not the
+        // block's — the header's height isn't part of the list's budget.
+        // Checked before touching the DOM: `top` isn't affected by this
+        // list's own visible-row count, so if it — and what's laid out —
+        // haven't moved since the last fit, recomputing would only
+        // reproduce the same window. Skipping avoids the unhide/measure/
+        // rehide cycle below resizing this block and retriggering the
+        // ResizeObserver on its own account.
+        const panelTop = toc.getBoundingClientRect().top;
+        const available = window.innerHeight - panelTop - 24; // 24px bottom breathing room
+        const laidOutActiveIndex = Math.max(0, laidOut.findIndex(({ target }) => pairs[activeIndex]?.target === target));
+        const signature = `${available.toFixed(1)}:${laidOut.length}:${laidOutActiveIndex}`;
+        if (signature === lastFitSignature) return;
+        lastFitSignature = signature;
+
         // Measure with nothing window-hidden — a hidden (display:none) row
         // reads back a zero-height rect, which would corrupt the estimate.
         laidOut.forEach(({ item }) => item.classList.remove('is-window-hidden'));
         moreAbove?.setAttribute('hidden', '');
         moreBelow?.setAttribute('hidden', '');
 
-        // Measure from the PANEL's own top (below the header row), not the
-        // block's — the header's height isn't part of the list's budget.
         const panelRect = toc.getBoundingClientRect();
-        const available = window.innerHeight - panelRect.top - 24; // 24px bottom breathing room
         const rowHeight = laidOut[0].link.getBoundingClientRect().height || 32;
         const totalRowsHeight = laidOut.reduce((sum, { link }) => sum + link.getBoundingClientRect().height, 0);
         const chromeHeight = Math.max(0, tocBody.clientHeight - totalRowsHeight);
         const budgetForRows = available - chromeHeight;
         const maxVisible = Math.max(1, Math.floor(budgetForRows / rowHeight));
 
-        const laidOutActiveIndex = Math.max(0, laidOut.findIndex(({ target }) => pairs[activeIndex]?.target === target));
         const win = computeListWindow(laidOut.length, laidOutActiveIndex, maxVisible);
 
         laidOut.forEach(({ item }, i) => {
@@ -710,6 +730,43 @@ const toc = rawToc.map((heading) => {
         tocBlock.classList.add('is-expanded');
         queueFit();
       }
+
+      // ---------------------------------------------------------------
+      // Sibling-driven refit: the rail's step list and this TOC's own row
+      // list are each windowed against a `getBoundingClientRect()` read
+      // that assumes the column's layout is settled. But the author card
+      // collapsing, the TOC expanding, a `bothFit` flip, or the rail's own
+      // expand can all still be mid-transition when that read happens —
+      // the panel/rail's `top` shifts as the block above it changes
+      // height, and a fit computed against that transient position
+      // windows too aggressively (fewer rows than actually fit). `root`
+      // (`.post-sidebar`) is a flex column, so its own box height is the
+      // sum of every sibling's height — watching just it, rather than one
+      // observer per block, catches all of the above in one place.
+      // ---------------------------------------------------------------
+      let globalRefitQueued = false;
+      const scheduleGlobalRefit = () => {
+        if (globalRefitQueued) return;
+        globalRefitQueued = true;
+        requestAnimationFrame(() => {
+          globalRefitQueued = false;
+          queueFit();
+          refreshAccordionFit?.();
+          railWrap?.dispatchEvent(new CustomEvent('threadrail:refit'));
+        });
+      };
+
+      if ('ResizeObserver' in window) {
+        // Fires only on an actual size delta, so this can't spin on its
+        // own: a fit call that changes nothing (see the signature guards
+        // in both this file's and ThreadRail's `fitList`) never touches
+        // the DOM, so it can't retrigger this observer.
+        new ResizeObserver(scheduleGlobalRefit).observe(root);
+      }
+      // One more fit once any transition inside the column (chiefly the
+      // author card's collapse) finishes, so the very last measurement
+      // always uses the settled layout rather than a mid-transition one.
+      root.addEventListener('transitionend', scheduleGlobalRefit);
     });
   };
 
