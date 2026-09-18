@@ -152,6 +152,10 @@ const thread = threads[slug];
     }
   }
 
+  :global(html.perf-lite) .thread-rail__link {
+    transition: none;
+  }
+
   .thread-rail-badge:hover .thread-rail-badge__icon {
     transform: translateX(2px);
   }
@@ -164,6 +168,10 @@ const thread = threads[slug];
     .thread-rail-badge__icon {
       transition: none;
     }
+  }
+
+  :global(html.perf-lite) .thread-rail-badge__icon {
+    transition: none;
   }
 </style>
 
@@ -179,11 +187,11 @@ const thread = threads[slug];
 
       if (!panel || !badge) return;
 
-      // Skip the collapse/auto-expand enhancement entirely in lite mode or
-      // without IntersectionObserver — the panel stays in its default
-      // (always-expanded, no badge) markup, matching pre-JS behavior.
-      const canEnhance =
-        !document.documentElement.classList.contains('perf-lite') && 'IntersectionObserver' in window;
+      // Collapsing is cheap and must work in every performance mode — only
+      // the animation is dropped under perf-lite (see `reduceMotion` below
+      // and the matching CSS in this component's <style>). Skip the whole
+      // enhancement only when the browser can't support it at all.
+      const canEnhance = 'IntersectionObserver' in window;
       if (!canEnhance) return;
 
       const links = Array.from(
@@ -193,14 +201,16 @@ const thread = threads[slug];
         .map((link) => document.getElementById(link.dataset.threadTarget ?? ''))
         .filter((target): target is HTMLElement => target !== null);
 
-      const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      const reduceMotion = () =>
+        window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
+        document.documentElement.classList.contains('perf-lite');
 
       const setActive = (id: string) => {
         links.forEach((link) => {
           const isCurrent = link.dataset.threadTarget === id;
           if (isCurrent) {
             link.setAttribute('aria-current', 'step');
-            link.scrollIntoView({ block: 'nearest', behavior: prefersReducedMotion ? 'auto' : 'smooth' });
+            link.scrollIntoView({ block: 'nearest', behavior: reduceMotion() ? 'auto' : 'smooth' });
           } else {
             link.removeAttribute('aria-current');
           }
@@ -312,20 +322,6 @@ const thread = threads[slug];
       );
 
       targets.forEach((target) => stepObserver.observe(target));
-
-      const performanceObserver = new MutationObserver(() => {
-        if (document.documentElement.classList.contains('perf-lite')) {
-          cancelClose();
-          visibilityObserver.disconnect();
-          stepObserver.disconnect();
-          performanceObserver.disconnect();
-          applyState(true);
-        }
-      });
-      performanceObserver.observe(document.documentElement, {
-        attributes: true,
-        attributeFilter: ['class'],
-      });
     });
   };
 
