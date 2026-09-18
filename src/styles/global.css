@@ -130,6 +130,15 @@
   --shadow-md:  0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --shadow-lg:  0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   --shadow-ambient: 0px 32px 64px -12px rgba(11, 19, 38, 0.06);
+
+  /* Hover lift (see the HOVER LIFT section). Back-out curve overshoots
+     slightly then settles — the "bounce". */
+  --lift-y: -2px;
+  --lift-duration: 200ms;
+  --lift-ease: cubic-bezier(0.34, 1.4, 0.64, 1);
+  --lift-shadow:
+    0 2px 4px rgba(15, 23, 42, 0.05),
+    0 14px 30px -12px rgba(15, 23, 42, 0.22);
 }
 
 .dark {
@@ -167,6 +176,12 @@
   --shadow-md:  0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
   --shadow-lg:  0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.4);
   --shadow-ambient: 0px 32px 64px -12px rgba(11, 19, 38, 0.4);
+
+  /* A black drop shadow reads as dirt on a navy page, so the dark-mode lift
+     is a faint accent ring plus a coloured glow instead. */
+  --lift-shadow:
+    0 0 0 1px rgba(192, 193, 255, 0.16),
+    0 16px 34px -14px rgba(111, 0, 190, 0.5);
 }
 
 /* ============================================================
@@ -1270,6 +1285,84 @@ pre code {
   background-color: rgb(239 68 68 / 0.05);
   border-color: rgb(239 68 68 / 0.3);
   color: #fca5a5;
+}
+
+/* ============================================================
+   HOVER LIFT — shared treatment for boxed in-body content
+   Add `lift-hover` to the ROOT element of a boxed MDX/body
+   component (callouts, figures, thread beats, the leader-takeaway
+   card). Never on sidebar cards, and never on inline markers
+   (Evidence, Term) — a baseline-aligned pill must not move.
+
+   The lift is a transform, so it never reflows its neighbours.
+   Surfaces that already carry a resting shadow re-declare
+   --lift-shadow so the hover state is a superset of it rather
+   than a replacement (see .figure-plate below).
+   ============================================================ */
+
+.lift-hover {
+  transition:
+    transform var(--lift-duration) var(--lift-ease),
+    box-shadow var(--lift-duration) ease-out;
+}
+
+/* Pointer devices only: a `:hover` that sticks after a tap is worse than no
+   hover at all. */
+@media (hover: hover) and (pointer: fine) {
+  .lift-hover:hover {
+    transform: translateY(var(--lift-y));
+    box-shadow: var(--lift-shadow);
+  }
+
+  /* A transformed ancestor can become the containing block for fixed
+     descendants; don't lift a figure whose lightbox is open. */
+  .lift-hover:hover:has(dialog[open]) {
+    transform: none;
+  }
+}
+
+/* Reduced motion / lite mode: keep the shadow (it isn't motion), drop the
+   lift and the transition. The global rules below only clamp transition
+   DURATION, so the transform itself has to be cancelled explicitly. */
+@media (prefers-reduced-motion: reduce) {
+  .lift-hover,
+  .lift-hover:hover {
+    transform: none;
+    transition: box-shadow var(--lift-duration) ease-out;
+  }
+}
+
+.perf-lite .lift-hover,
+.perf-lite .lift-hover:hover {
+  transform: none;
+  transition: none;
+}
+
+/* Figure plates keep their engineering-plate resting shadow underneath. */
+.figure-plate.lift-hover {
+  --lift-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 16px 38px -12px rgba(15, 23, 42, 0.22);
+}
+
+.dark .figure-plate.lift-hover {
+  --lift-shadow:
+    0 0 0 1px rgba(99, 102, 241, 0.22),
+    0 2px 6px rgba(0, 0, 0, 0.35),
+    0 28px 64px -14px rgba(79, 70, 229, 0.52);
+}
+
+/* Same reasoning for the leader-takeaway card's resting elevation. */
+.leader-takeaway.lift-hover {
+  --lift-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 16px 34px -14px rgba(15, 23, 42, 0.24);
+}
+
+.dark .leader-takeaway.lift-hover {
+  --lift-shadow:
+    0 0 0 1px rgba(192, 193, 255, 0.16),
+    0 18px 38px -16px rgba(111, 0, 190, 0.55);
 }
 
 /* ============================================================

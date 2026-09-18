@@ -31,7 +31,7 @@ interface Props {
 const { text, label = 'Leader Takeaway', class: className = '' } = Astro.props;
 ---
 
-<aside class:list={['leader-takeaway', className]} role="note" aria-label={label}>
+<aside class:list={['leader-takeaway', 'lift-hover', className]} role="note" aria-label={label}>
   <p class="leader-takeaway__eyebrow">
     <svg
       class="leader-takeaway__mark"

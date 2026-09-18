@@ -52,7 +52,7 @@ const next = index < path.steps.length - 1 ? path.steps[index + 1] : null;
 const hrefFor = (step: Step) => (step.slug ? `/essays/${step.slug}/` : undefined);
 ---
 
-<aside class="where-this-sits my-10 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-5">
+<aside class="where-this-sits lift-hover my-10 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-5">
   <p class="mb-3 text-xs font-medium uppercase tracking-wider text-[var(--text-tertiary)]">
     Part of the <span class="text-[var(--text-primary)]">{path.umbrellaTerm}</span> reading path
     (<a href={`/series/${path.pageSlug}/`} class="text-violet-600 hover:underline dark:text-violet-400">see the full path</a>)
