@@ -2,6 +2,12 @@
 /**
  * ThreadRail — desktop navigation for a post's running worked example.
  * The anchor list remains fully usable without JavaScript.
+ *
+ * Expand/collapse is decided by PostSidebar (the TOC and this rail share one
+ * accordion slot — see its script). This component only reports its own
+ * beat-visibility signal (`threadrail:auto`) and manual clicks
+ * (`threadrail:request-open`/`-close`) as events on the wrap element, and
+ * applies whatever PostSidebar tells it via `threadrail:setexpanded`.
  */
 import { threads } from '../../data/threads';
 
@@ -33,7 +39,7 @@ const thread = threads[slug];
 
       <aside
         id={`thread-rail-panel-${thread.slug}`}
-        class="thread-rail relative mb-6 border border-[var(--border-subtle)] bg-[var(--bg-subtle)] p-4"
+        class="thread-rail relative border border-[var(--border-subtle)] bg-[var(--bg-subtle)] p-4"
         data-thread-rail
       >
         <span class="thread-rail__corner thread-rail__corner--tl" aria-hidden="true"></span>
@@ -66,11 +72,12 @@ const thread = threads[slug];
           </button>
         </div>
 
-        <nav class="mt-4 max-h-[calc(100vh-25rem)] overflow-y-auto pr-1" aria-label={`Thread progress: ${thread.title}`}>
+        <nav class="thread-rail__nav mt-4 pr-1" aria-label={`Thread progress: ${thread.title}`} data-thread-rail-scroll>
+          <p class="thread-rail__more" data-thread-more="above" hidden />
           <ol class="space-y-1 border-l border-[var(--border)] pl-0">
             {
               thread.beats.map((beat, index) => (
-                <li>
+                <li data-thread-rail-item>
                   <a
                     href={`#thread-${beat.id}`}
                     class="thread-rail__link group flex items-start gap-3 px-3 py-2 no-underline"
@@ -87,6 +94,7 @@ const thread = threads[slug];
               ))
             }
           </ol>
+          <p class="thread-rail__more" data-thread-more="below" hidden />
         </nav>
       </aside>
     </div>
@@ -111,6 +119,29 @@ const thread = threads[slug];
   .thread-rail__corner--tr { top: 5px; right: 5px; border-left: 0; border-bottom: 0; }
   .thread-rail__corner--bl { bottom: 5px; left: 5px; border-right: 0; border-top: 0; }
   .thread-rail__corner--br { right: 5px; bottom: 5px; border-left: 0; border-top: 0; }
+
+  .thread-rail__nav {
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+
+  .thread-rail__nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .thread-rail__more {
+    margin: 0 0 0.25rem 0;
+    padding-left: 0.75rem;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-disabled);
+  }
+
+  [data-thread-rail-item].is-window-hidden {
+    display: none;
+  }
 
   .thread-rail__link:hover,
   .thread-rail__link:focus-visible {
@@ -176,6 +207,8 @@ const thread = threads[slug];
 </style>
 
 <script>
+  import { computeListWindow } from '../../lib/sidebar-window';
+
   const initializeThreadRails = () => {
     document.querySelectorAll<HTMLElement>('[data-thread-rail-wrap]').forEach((wrap) => {
       if (wrap.dataset.threadRailReady === 'true') return;
@@ -184,6 +217,9 @@ const thread = threads[slug];
       const panel = wrap.querySelector<HTMLElement>('[data-thread-rail]');
       const badge = wrap.querySelector<HTMLButtonElement>('[data-thread-rail-badge]');
       const collapseButton = wrap.querySelector<HTMLButtonElement>('[data-thread-rail-collapse]');
+      const scrollBody = wrap.querySelector<HTMLElement>('[data-thread-rail-scroll]');
+      const moreAbove = wrap.querySelector<HTMLElement>('[data-thread-more="above"]');
+      const moreBelow = wrap.querySelector<HTMLElement>('[data-thread-more="below"]');
 
       if (!panel || !badge) return;
 
@@ -194,41 +230,93 @@ const thread = threads[slug];
       const canEnhance = 'IntersectionObserver' in window;
       if (!canEnhance) return;
 
+      const items = Array.from(wrap.querySelectorAll<HTMLLIElement>('[data-thread-rail-item]'));
       const links = Array.from(
         panel.querySelectorAll<HTMLAnchorElement>('[data-thread-rail-link]'),
       );
-      const targets = links
-        .map((link) => document.getElementById(link.dataset.threadTarget ?? ''))
-        .filter((target): target is HTMLElement => target !== null);
+      const pairs = links
+        .map((link, index) => {
+          const target = document.getElementById(link.dataset.threadTarget ?? '');
+          const item = items[index];
+          return target && item ? { link, target, item } : null;
+        })
+        .filter((pair): pair is { link: HTMLAnchorElement; target: HTMLElement; item: HTMLLIElement } => pair !== null);
 
       const reduceMotion = () =>
         window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
         document.documentElement.classList.contains('perf-lite');
 
+      let activeIndex = 0;
+
+      // Fit the step list to the room the panel actually has — measured,
+      // not guessed. `overflow-y:auto` (scrollbar hidden) on the nav stays
+      // as a fallback only; the current step is always kept in the window.
+      const fitList = () => {
+        if (!scrollBody || pairs.length === 0) return;
+        pairs.forEach(({ item }) => item.classList.remove('is-window-hidden'));
+        moreAbove?.setAttribute('hidden', '');
+        moreBelow?.setAttribute('hidden', '');
+
+        const panelRect = panel.getBoundingClientRect();
+        const available = window.innerHeight - panelRect.top - 24; // 24px bottom breathing room
+        const rowHeight = pairs[0].link.getBoundingClientRect().height || 36;
+        const totalRowsHeight = pairs.reduce((sum, { link }) => sum + link.getBoundingClientRect().height, 0);
+        // Everything in the panel that isn't the scrollable row list itself
+        // (title block, corners, nav's own top margin, panel padding) —
+        // measured once as "panel height minus scrollBody's own height",
+        // rather than re-deriving each piece's box model by hand.
+        const headerFootprint = panelRect.height - scrollBody.getBoundingClientRect().height;
+        const internalGap = Math.max(0, scrollBody.clientHeight - totalRowsHeight);
+        const budgetForRows = available - headerFootprint - internalGap;
+        const maxVisible = Math.max(1, Math.floor(budgetForRows / rowHeight));
+
+        const win = computeListWindow(pairs.length, activeIndex, maxVisible);
+        pairs.forEach(({ item }, i) => {
+          item.classList.toggle('is-window-hidden', i < win.start || i > win.end);
+        });
+        moreAbove?.toggleAttribute('hidden', win.above === 0);
+        if (moreAbove) moreAbove.textContent = `+${win.above} more above`;
+        moreBelow?.toggleAttribute('hidden', win.below === 0);
+        if (moreBelow) moreBelow.textContent = `+${win.below} more below`;
+      };
+
+      let fitQueued = false;
+      const queueFit = () => {
+        if (fitQueued) return;
+        fitQueued = true;
+        requestAnimationFrame(() => {
+          fitQueued = false;
+          fitList();
+        });
+      };
+
       const setActive = (id: string) => {
+        activeIndex = Math.max(0, pairs.findIndex((pair) => pair.target.id === id));
         links.forEach((link) => {
           const isCurrent = link.dataset.threadTarget === id;
           if (isCurrent) {
             link.setAttribute('aria-current', 'step');
-            link.scrollIntoView({ block: 'nearest', behavior: reduceMotion() ? 'auto' : 'smooth' });
+            if (!panel.hasAttribute('hidden')) {
+              link.scrollIntoView({ block: 'nearest', behavior: reduceMotion() ? 'auto' : 'smooth' });
+            }
           } else {
             link.removeAttribute('aria-current');
           }
         });
+        queueFit();
       };
 
-      // Manual clicks win over the auto beat-visibility signal until the
-      // reader clicks again — 'open' | 'closed' | null (no override yet).
-      let manualOverride: 'open' | 'closed' | null = null;
-      let autoExpanded = false;
-      const isExpanded = () => (manualOverride !== null ? manualOverride === 'open' : autoExpanded);
-
+      // Applying expand/collapse is owned here (this component knows its
+      // own markup); *deciding* when to expand is owned by PostSidebar's
+      // accordion coordinator, which calls this via an event so both the
+      // rail and the TOC agree on which one is open.
       const applyState = (expanded: boolean) => {
         panel.toggleAttribute('hidden', !expanded);
         badge.toggleAttribute('hidden', expanded);
         collapseButton?.toggleAttribute('hidden', !expanded);
         badge.setAttribute('aria-expanded', String(expanded));
         collapseButton?.setAttribute('aria-expanded', String(expanded));
+        if (expanded) queueFit();
       };
 
       // Progressive enhancement: markup ships expanded (panel visible, badge
@@ -236,15 +324,20 @@ const thread = threads[slug];
       // badge only once this script has actually run.
       applyState(false);
 
-      const toggle = () => {
-        const next = !isExpanded();
-        manualOverride = next ? 'open' : 'closed';
-        applyState(next);
-      };
-      badge.addEventListener('click', toggle);
-      collapseButton?.addEventListener('click', toggle);
+      badge.addEventListener('click', () => wrap.dispatchEvent(new CustomEvent('threadrail:request-open')));
+      collapseButton?.addEventListener('click', () => wrap.dispatchEvent(new CustomEvent('threadrail:request-close')));
+      wrap.addEventListener('threadrail:setexpanded', (event) => {
+        const detail = (event as CustomEvent<{ expanded: boolean }>).detail;
+        applyState(detail.expanded);
+      });
 
-      if (targets.length === 0) return;
+      if ('ResizeObserver' in window) {
+        new ResizeObserver(queueFit).observe(panel);
+      }
+
+      if (pairs.length === 0) return;
+
+      const targets = pairs.map((pair) => pair.target);
 
       // Open/close visibility: a beat counts as "on screen" as soon as a
       // meaningful slice of it is in the viewport — a beat centered on
@@ -262,8 +355,7 @@ const thread = threads[slug];
         if (closeTimer !== null) return;
         closeTimer = setTimeout(() => {
           closeTimer = null;
-          autoExpanded = false;
-          if (manualOverride === null) applyState(false);
+          wrap.dispatchEvent(new CustomEvent('threadrail:auto', { detail: { open: false } }));
         }, 250);
       };
 
@@ -282,8 +374,7 @@ const thread = threads[slug];
 
           if (visibleTargets.size > 0) {
             cancelClose();
-            autoExpanded = true;
-            if (manualOverride === null) applyState(true);
+            wrap.dispatchEvent(new CustomEvent('threadrail:auto', { detail: { open: true } }));
           } else {
             scheduleClose();
           }

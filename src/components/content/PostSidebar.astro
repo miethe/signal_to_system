@@ -7,9 +7,15 @@
  * The author card and TOC are two faces of the same IntersectionObserver on
  * the article header — collapsing the card is what frees the room the TOC
  * renders into, so one script owns both rather than splitting the signal.
+ *
+ * When a thread exists, the TOC and ThreadRail become a two-item accordion
+ * (only one expanded at a time) so the column never needs to scroll — this
+ * component owns that coordination; ThreadRail keeps owning its own beat
+ * IntersectionObservers and reports auto-open/close via events.
  */
 import AuthorProfile from './AuthorProfile.astro';
 import ThreadRail from './ThreadRail.astro';
+import { threads } from '../../data/threads';
 
 interface Heading {
   depth: number;
@@ -23,6 +29,8 @@ interface Props {
 }
 
 const { slug, headings = [] } = Astro.props;
+const thread = slug ? threads[slug] : undefined;
+
 // The footnotes section starts at the "Footnotes" heading (id
 // `footnote-label`, injected by the remark footnotes plugin) — exclude it
 // and everything after it so the TOC never lists footnote content.
@@ -46,47 +54,77 @@ const toc = rawToc.map((heading) => {
 });
 ---
 
-<div class="post-sidebar" data-post-sidebar>
+<div class="post-sidebar flex flex-col gap-3" data-post-sidebar>
   <div data-author-slot>
     <AuthorProfile variant="sidebar" headingLevel="h2" />
   </div>
 
   {
     showToc && (
-      <nav class="post-sidebar__toc mb-6" aria-label="Table of contents" data-post-toc hidden>
-        <p class="post-sidebar__toc-eyebrow font-mono mb-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--accent)]">
-          On this page
-        </p>
-        <div class="post-sidebar__toc-body" data-toc-scroll>
-          <div class="post-sidebar__toc-rail" aria-hidden="true">
-            <div class="post-sidebar__toc-rail-fill" data-toc-fill></div>
+      <div
+        class="post-sidebar__block post-sidebar__toc rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-subtle)]"
+        data-post-toc-block
+        hidden
+      >
+        {
+          thread ? (
+            <button
+              type="button"
+              class="post-sidebar__toc-header font-mono flex w-full items-center gap-2 px-4 py-2.5 text-left text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--accent)] focus-ring"
+              data-toc-header
+              aria-expanded="true"
+              aria-controls="post-sidebar-toc-panel"
+            >
+              <span>On this page</span>
+              <span
+                class="post-sidebar__toc-header-current min-w-0 truncate text-[var(--text-tertiary)]"
+                data-toc-header-current
+                hidden
+              />
+            </button>
+          ) : (
+            <p class="post-sidebar__toc-header font-mono px-4 py-2.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--accent)]">
+              On this page
+            </p>
+          )
+        }
+
+        <div id="post-sidebar-toc-panel" class="post-sidebar__toc-panel" data-toc-panel>
+          <div class="post-sidebar__toc-body" data-toc-scroll>
+            <div class="post-sidebar__toc-rail" aria-hidden="true">
+              <div class="post-sidebar__toc-rail-fill" data-toc-fill />
+            </div>
+            <nav aria-label="Table of contents">
+              <p class="post-sidebar__toc-more" data-toc-more="above" hidden />
+              <ol class="post-sidebar__toc-list">
+                {toc.map((heading) => (
+                  <li
+                    class:list={['post-sidebar__toc-item', heading.depth === 3 && 'post-sidebar__toc-item--sub']}
+                    data-toc-item
+                    data-toc-depth={heading.depth}
+                    data-toc-parent={heading.parentSlug ?? ''}
+                  >
+                    <a
+                      href={`#${heading.slug}`}
+                      class="post-sidebar__toc-link"
+                      data-toc-link
+                      data-toc-target={heading.slug}
+                    >
+                      {heading.depth === 2 && (
+                        <span class="post-sidebar__toc-index font-mono" aria-hidden="true">
+                          {String(heading.sectionNumber).padStart(2, '0')}
+                        </span>
+                      )}
+                      <span class="post-sidebar__toc-label line-clamp-2">{heading.text}</span>
+                    </a>
+                  </li>
+                ))}
+              </ol>
+              <p class="post-sidebar__toc-more" data-toc-more="below" hidden />
+            </nav>
           </div>
-          <ol class="post-sidebar__toc-list">
-            {toc.map((heading) => (
-              <li
-                class:list={['post-sidebar__toc-item', heading.depth === 3 && 'post-sidebar__toc-item--sub']}
-                data-toc-item
-                data-toc-depth={heading.depth}
-                data-toc-parent={heading.parentSlug ?? ''}
-              >
-                <a
-                  href={`#${heading.slug}`}
-                  class="post-sidebar__toc-link"
-                  data-toc-link
-                  data-toc-target={heading.slug}
-                >
-                  {heading.depth === 2 && (
-                    <span class="post-sidebar__toc-index font-mono" aria-hidden="true">
-                      {String(heading.sectionNumber).padStart(2, '0')}
-                    </span>
-                  )}
-                  <span class="post-sidebar__toc-label line-clamp-2">{heading.text}</span>
-                </a>
-              </li>
-            ))}
-          </ol>
         </div>
-      </nav>
+      </div>
     )
   }
 
@@ -98,11 +136,41 @@ const toc = rawToc.map((heading) => {
      this component only decides *when* to toggle `.is-collapsed`, via the
      script below. */
 
+  .post-sidebar__toc.is-expanded > .post-sidebar__toc-header {
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .post-sidebar__toc-header-current::before {
+    content: '\00b7';
+    margin-right: 0.375rem;
+  }
+
+  .post-sidebar__toc-panel[hidden] {
+    display: none;
+  }
+
   .post-sidebar__toc-body {
     position: relative;
-    max-height: 22rem;
     overflow-y: auto;
-    padding-left: 0.75rem;
+    padding: 0.75rem 0.5rem 0.75rem 0.75rem;
+    scrollbar-width: none;
+  }
+
+  .post-sidebar__toc-body::-webkit-scrollbar {
+    display: none;
+  }
+
+  .post-sidebar__toc-more {
+    margin: 0 0 0.25rem 0;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-disabled);
+  }
+
+  .post-sidebar__toc-list + .post-sidebar__toc-more {
+    margin: 0.25rem 0 0;
   }
 
   .post-sidebar__toc-rail {
@@ -194,6 +262,10 @@ const toc = rawToc.map((heading) => {
     color: var(--text-tertiary);
   }
 
+  .post-sidebar__toc-item.is-window-hidden {
+    display: none;
+  }
+
   .post-sidebar__toc-link[aria-current='location'] {
     background-color: var(--accent-subtle);
     color: var(--text-primary);
@@ -218,18 +290,21 @@ const toc = rawToc.map((heading) => {
 </style>
 
 <script>
+  import { computeListWindow } from '../../lib/sidebar-window';
+
   const initializePostSidebars = () => {
     document.querySelectorAll<HTMLElement>('[data-post-sidebar]').forEach((root) => {
       if (root.dataset.postSidebarReady === 'true') return;
       root.dataset.postSidebarReady = 'true';
 
       const authorEl = root.querySelector<HTMLElement>('[data-author-slot] .author-profile');
-      const toc = root.querySelector<HTMLElement>('[data-post-toc]');
+      const tocBlock = root.querySelector<HTMLElement>('[data-post-toc-block]');
+      const toc = root.querySelector<HTMLElement>('[data-toc-panel]');
       const header = document.getElementById('post-header');
 
       const setCollapsed = (collapsed: boolean) => {
         authorEl?.classList.toggle('is-collapsed', collapsed);
-        toc?.toggleAttribute('hidden', !collapsed);
+        tocBlock?.toggleAttribute('hidden', !collapsed);
       };
 
       // Collapsing is cheap and must keep working in every performance mode
@@ -253,9 +328,14 @@ const toc = rawToc.map((heading) => {
         headerObserver.observe(header);
       }
 
-      if (!toc) return;
+      if (!toc || !tocBlock) return;
 
+      const tocHeader = tocBlock.querySelector<HTMLButtonElement>('[data-toc-header]');
+      const tocHeaderCurrent = tocBlock.querySelector<HTMLElement>('[data-toc-header-current]');
+      const tocBody = toc.querySelector<HTMLElement>('[data-toc-scroll]');
       const rail = toc.querySelector<HTMLElement>('[data-toc-fill]');
+      const moreAbove = toc.querySelector<HTMLElement>('[data-toc-more="above"]');
+      const moreBelow = toc.querySelector<HTMLElement>('[data-toc-more="below"]');
       const items = Array.from(toc.querySelectorAll<HTMLLIElement>('[data-toc-item]'));
       // Pair each link with its target element and owning <li> up front —
       // one array, built once, so every lookup below is a plain index/get
@@ -294,8 +374,63 @@ const toc = rawToc.map((heading) => {
       const firstH2 = pairs.find((pair) => pair.item.dataset.tocDepth === '2');
       setActiveBranch(firstH2?.target.id ?? null);
 
+      let activeIndex = 0;
+
+      // Fit the list to whatever room the panel actually has — measured,
+      // not guessed, so it's correct at any viewport height. `maxVisible`
+      // is a row COUNT: available px for the list, divided by one row's
+      // real rendered height (h2 and h3 rows differ, so measure whichever
+      // kind is first visible). A window of items around the active one is
+      // shown when the full list wouldn't fit; `overflow-y:auto` (scrollbar
+      // hidden) on the body is kept as a fallback only — this is meant to
+      // never be needed in practice.
+      const fitList = () => {
+        if (!tocBody) return;
+        // The set actually laid out right now: every h2, plus h3s of the
+        // active branch only (others are display:none via CSS already).
+        const laidOut = pairs.filter(({ item }) => item.dataset.tocDepth === '2' || item.classList.contains('is-active-branch'));
+        if (laidOut.length === 0) return;
+
+        // Measure with nothing window-hidden — a hidden (display:none) row
+        // reads back a zero-height rect, which would corrupt the estimate.
+        laidOut.forEach(({ item }) => item.classList.remove('is-window-hidden'));
+        moreAbove?.setAttribute('hidden', '');
+        moreBelow?.setAttribute('hidden', '');
+
+        // Measure from the PANEL's own top (below the header row), not the
+        // block's — the header's height isn't part of the list's budget.
+        const panelRect = toc.getBoundingClientRect();
+        const available = window.innerHeight - panelRect.top - 24; // 24px bottom breathing room
+        const rowHeight = laidOut[0].link.getBoundingClientRect().height || 32;
+        const totalRowsHeight = laidOut.reduce((sum, { link }) => sum + link.getBoundingClientRect().height, 0);
+        const chromeHeight = Math.max(0, tocBody.clientHeight - totalRowsHeight);
+        const budgetForRows = available - chromeHeight;
+        const maxVisible = Math.max(1, Math.floor(budgetForRows / rowHeight));
+
+        const laidOutActiveIndex = Math.max(0, laidOut.findIndex(({ target }) => pairs[activeIndex]?.target === target));
+        const win = computeListWindow(laidOut.length, laidOutActiveIndex, maxVisible);
+
+        laidOut.forEach(({ item }, i) => {
+          item.classList.toggle('is-window-hidden', i < win.start || i > win.end);
+        });
+        moreAbove?.toggleAttribute('hidden', win.above === 0);
+        if (moreAbove) moreAbove.textContent = `+${win.above} more above`;
+        moreBelow?.toggleAttribute('hidden', win.below === 0);
+        if (moreBelow) moreBelow.textContent = `+${win.below} more below`;
+      };
+
+      let fitQueued = false;
+      const queueFit = () => {
+        if (fitQueued) return;
+        fitQueued = true;
+        requestAnimationFrame(() => {
+          fitQueued = false;
+          fitList();
+        });
+      };
+
       const setActive = (id: string) => {
-        const activeIndex = pairs.findIndex((pair) => pair.target.id === id);
+        activeIndex = pairs.findIndex((pair) => pair.target.id === id);
         pairs.forEach(({ item, link }, index) => {
           if (index === activeIndex) {
             link.setAttribute('aria-current', 'location');
@@ -312,8 +447,17 @@ const toc = rawToc.map((heading) => {
           rail.style.height = `${Math.max(0, pct)}%`;
         }
 
+        if (tocHeaderCurrent) {
+          const label = activeIndex > -1 ? pairs[activeIndex]?.link.textContent?.trim() : '';
+          tocHeaderCurrent.textContent = label ?? '';
+          tocHeaderCurrent.toggleAttribute('hidden', !label);
+        }
+
         const activeLink = activeIndex > -1 ? pairs[activeIndex]?.link : null;
-        activeLink?.scrollIntoView({ block: 'nearest', behavior: reduceMotion() ? 'auto' : 'smooth' });
+        if (!tocBlock.hasAttribute('hidden') && tocPanelExpanded()) {
+          activeLink?.scrollIntoView({ block: 'nearest', behavior: reduceMotion() ? 'auto' : 'smooth' });
+        }
+        queueFit();
       };
 
       const visibleTargets = new Set<HTMLElement>();
@@ -383,6 +527,72 @@ const toc = rawToc.map((heading) => {
       recomputeActive();
       window.addEventListener('scroll', queueRecompute, { passive: true });
       window.addEventListener('resize', queueRecompute, { passive: true });
+      if ('ResizeObserver' in window) {
+        new ResizeObserver(queueFit).observe(tocBlock);
+      }
+
+      // ---------------------------------------------------------------
+      // Accordion: when a thread rail exists, exactly one of the TOC and
+      // the rail is expanded at a time. The rail keeps owning its own beat
+      // IntersectionObservers (it knows its own beat targets); it reports
+      // open/close intent here via events on the wrap element, and this
+      // coordinator tells it (and the TOC) what to actually show.
+      // ---------------------------------------------------------------
+      const railWrap = root.querySelector<HTMLElement>('[data-thread-rail-wrap]');
+
+      const tocPanelExpandedState = { value: true };
+      function tocPanelExpanded() {
+        return tocPanelExpandedState.value;
+      }
+
+      if (railWrap) {
+        let manualPanel: 'toc' | 'rail' | null = null;
+        let railAutoOpen = false;
+
+        const applyAccordion = () => {
+          const active = manualPanel ?? (railAutoOpen ? 'rail' : 'toc');
+          const tocExpanded = active === 'toc';
+          tocPanelExpandedState.value = tocExpanded;
+          tocHeader?.setAttribute('aria-expanded', String(tocExpanded));
+          toc.toggleAttribute('hidden', !tocExpanded);
+          tocBlock.classList.toggle('is-expanded', tocExpanded);
+          if (tocHeaderCurrent) tocHeaderCurrent.toggleAttribute('hidden', tocExpanded || !tocHeaderCurrent.textContent);
+          railWrap.dispatchEvent(new CustomEvent('threadrail:setexpanded', { detail: { expanded: !tocExpanded } }));
+          if (tocExpanded) queueFit();
+        };
+
+        tocHeader?.addEventListener('click', () => {
+          manualPanel = tocPanelExpanded() ? 'rail' : 'toc';
+          applyAccordion();
+        });
+
+        railWrap.addEventListener('threadrail:request-open', () => {
+          manualPanel = 'rail';
+          applyAccordion();
+        });
+        railWrap.addEventListener('threadrail:request-close', () => {
+          manualPanel = 'toc';
+          applyAccordion();
+        });
+        railWrap.addEventListener('threadrail:auto', (event) => {
+          const detail = (event as CustomEvent<{ open: boolean }>).detail;
+          railAutoOpen = detail.open;
+          // "Manual overrides auto until the current beat leaves view" — the
+          // override is cleared on the close-side transition only, so it
+          // never fights an in-progress manual choice while a beat is still
+          // visible, but auto resumes cleanly once nothing is.
+          if (!detail.open) manualPanel = null;
+          applyAccordion();
+        });
+
+        applyAccordion();
+      } else {
+        // No thread on this post: the TOC is the only block, always open,
+        // no accordion header/click affordance needed.
+        toc.removeAttribute('hidden');
+        tocBlock.classList.add('is-expanded');
+        queueFit();
+      }
     });
   };
 

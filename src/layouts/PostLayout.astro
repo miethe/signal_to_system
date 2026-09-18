@@ -180,7 +180,7 @@ const jsonLd = generateJsonLd('article', {
     </header>
 
     <!-- Desktop rail follows the header in source order and spans the article column: author card (collapsing to a badge on scroll), a live TOC in the space it frees, then the running-example thread. -->
-    <div class="hidden xl:col-start-2 xl:row-span-2 xl:row-start-1 xl:block xl:self-start xl:sticky xl:top-24 xl:max-h-[calc(100vh-7rem)] xl:overflow-y-auto xl:pr-1">
+    <div class="no-scrollbar hidden xl:col-start-2 xl:row-span-2 xl:row-start-1 xl:block xl:self-start xl:sticky xl:top-24 xl:max-h-[calc(100vh-7rem)] xl:overflow-y-auto xl:pr-1">
       <PostSidebar slug={thread?.slug} headings={headings} />
     </div>
 
