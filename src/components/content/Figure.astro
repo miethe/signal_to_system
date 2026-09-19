@@ -110,6 +110,7 @@ const descId = longDescription
   <span class="figure-plate__corner figure-plate__corner--br" aria-hidden="true"></span>
 
   <div class="figure-plate__frame">
+    {canExpand && <span class="figure-plate__header" aria-hidden="true"><span>{number ? `Figure ${number}` : 'Figure'}</span><span>Enlarge figure ↗</span></span>}
     {
       canExpand ? (
         <a

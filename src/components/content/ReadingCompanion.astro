@@ -7,9 +7,8 @@
  *
  *   1. Compact nearby-chapter outline + an "All sections" action.
  *   2. `ThreadDock`, when the post has a thread.
- *   3. At most one authored `ContextualNote` — skipped for now: no
- *      authored-note data source exists yet, so this slot stays empty
- *      rather than fabricating content (per this leg's build brief).
+ *   3. At most one authored `ContextualNote`, selected from the post's
+ *      bounded note registry as the active section changes.
  *
  * `AuthorProfile` and `ExecutiveSignal` are no longer inside this sticky
  * column at all (V5: they sit in flow at the top of the rail and scroll
@@ -26,7 +25,9 @@
  * fallback `PostSidebar` provided) — `slug`/`thread` are both optional.
  */
 import ThreadDock from './ThreadDock.astro';
+import ContextualNote from './ContextualNote.astro';
 import { threads } from '../../data/threads';
+import { contextualNotes } from '../../data/contextual-notes';
 
 interface Heading {
   depth: number;
@@ -41,6 +42,7 @@ interface Props {
 
 const { slug, headings = [] } = Astro.props;
 const thread = slug ? threads[slug] : undefined;
+const notes = slug ? contextualNotes[slug] ?? [] : [];
 
 // The footnotes section starts at the "Footnotes" heading (id
 // `footnote-label`, injected by the remark footnotes plugin) — exclude it
@@ -122,8 +124,7 @@ const toc = rawToc.map((heading) => {
   }
 
   {thread && slug && <ThreadDock slug={slug} />}
-
-  {/* ContextualNote slot: intentionally empty (see header comment). */}
+  <ContextualNote notes={notes} />
 </div>
 
 <style>
@@ -148,7 +149,7 @@ const toc = rawToc.map((heading) => {
 
   .reading-companion__body {
     position: relative;
-    overflow-y: auto;
+    overflow: visible;
     padding: 0.75rem 0.5rem 0.75rem 0.75rem;
     scrollbar-width: none;
   }
@@ -312,6 +313,8 @@ const toc = rawToc.map((heading) => {
         .filter((pair): pair is { item: HTMLLIElement; link: HTMLAnchorElement; target: HTMLElement } => pair !== null);
 
       if (pairs.length === 0) return;
+      const noteRoot = root.querySelector<HTMLElement>('[data-contextual-note]');
+      const dismissedNotes = new Set<string>();
 
       const reduceMotion = () =>
         window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
@@ -399,6 +402,7 @@ const toc = rawToc.map((heading) => {
         });
 
         setActiveBranch(resolveSection(id));
+        document.dispatchEvent(new CustomEvent('reading-section-change', { detail: { sectionId: resolveSection(id), activeId: id } }));
 
         if (rail && pairs.length > 1) {
           const pct = activeIndex > -1 ? (activeIndex / (pairs.length - 1)) * 100 : 0;
@@ -410,6 +414,25 @@ const toc = rawToc.map((heading) => {
         lastFitSignature = ''; // active index changed — force a re-evaluation
         queueFit();
       };
+
+      const showContextualNote = (sectionId: string | null) => {
+        if (!noteRoot || noteRoot.contains(document.activeElement) || document.querySelector('[data-focus-dialog][open]')) return;
+        const candidates = Array.from(noteRoot.querySelectorAll<HTMLElement>('[data-contextual-note-item]'));
+        const visible = candidates.find((item) => item.dataset.sectionId === sectionId && !dismissedNotes.has(item.dataset.noteId ?? ''));
+        noteRoot.hidden = !visible;
+        candidates.forEach((item) => { item.hidden = item !== visible; });
+      };
+
+      document.addEventListener('reading-section-change', ((event: CustomEvent<{ sectionId: string | null }>) => {
+        showContextualNote(event.detail.sectionId);
+      }) as EventListener);
+      noteRoot?.querySelectorAll<HTMLButtonElement>('[data-contextual-note-dismiss]').forEach((button) => {
+        button.addEventListener('click', () => {
+          const note = button.closest<HTMLElement>('[data-contextual-note-item]');
+          if (note?.dataset.noteId) dismissedNotes.add(note.dataset.noteId);
+          showContextualNote(note?.dataset.sectionId ?? null);
+        });
+      });
 
       const visibleTargets = new Set<HTMLElement>();
       const observer = new IntersectionObserver(

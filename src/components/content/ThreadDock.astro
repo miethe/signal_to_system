@@ -28,9 +28,13 @@ const thread = threads[slug];
 {
   thread && (
     <nav class="thread-dock" aria-label={`Running example: ${thread.title}`} data-thread-dock>
-      <p class="thread-dock__eyebrow font-mono">Running example</p>
-      <p class="thread-dock__title font-serif">{thread.title}</p>
+      <div class="thread-dock__header">
+        <div><p class="thread-dock__eyebrow font-mono">Running example</p><p class="thread-dock__title font-serif">{thread.title}</p></div>
+        <button type="button" class="thread-dock__toggle focus-ring" data-thread-dock-toggle aria-expanded="true">Collapse</button>
+      </div>
 
+      <div data-thread-dock-content>
+      <p class="thread-dock__state" data-thread-dock-state>Following reading</p>
       <ol class="thread-dock__list">
         {
           thread.beats.map((beat) => (
@@ -47,6 +51,7 @@ const thread = threads[slug];
                 </span>
                 <span class="thread-dock__label">{beat.label}</span>
               </a>
+              <button type="button" class="thread-dock__hold focus-ring" data-thread-dock-hold data-beat-id={beat.id}>Hold</button>
               <a class="thread-dock__explore" href={`/essays/${slug}/thread/${beat.id}/`}>
                 Explore
               </a>
@@ -54,6 +59,7 @@ const thread = threads[slug];
           ))
         }
       </ol>
+      </div>
     </nav>
   )
 }
@@ -65,6 +71,9 @@ const thread = threads[slug];
     background: var(--bg-subtle);
     padding: 0.875rem 0.875rem 0.75rem;
   }
+  .thread-dock__header { display: flex; align-items: start; justify-content: space-between; gap: .5rem; }
+  .thread-dock__toggle, .thread-dock__hold { border: 0; background: transparent; color: var(--text-tertiary); cursor: pointer; font: 600 .625rem var(--font-mono); letter-spacing: .04em; text-transform: uppercase; }
+  .thread-dock__state { margin: 0 0 .35rem; color: var(--text-tertiary); font: 600 .625rem/1.4 var(--font-mono); letter-spacing: .04em; }
 
   .thread-dock__eyebrow {
     margin: 0;
@@ -154,6 +163,8 @@ const thread = threads[slug];
     text-decoration: none;
     padding: 0.2rem 0.35rem;
   }
+  .thread-dock__hold { flex-shrink: 0; padding: .2rem; }
+  .thread-dock__hold[aria-pressed='true'] { color: var(--accent-text); }
 
   .thread-dock__explore:hover,
   .thread-dock__explore:focus-visible {
@@ -161,3 +172,45 @@ const thread = threads[slug];
     text-decoration: underline;
   }
 </style>
+
+<script>
+  const initThreadDocks = () => {
+    document.querySelectorAll<HTMLElement>('[data-thread-dock]').forEach((dock) => {
+      if (dock.dataset.threadDockReady === 'true') return;
+      dock.dataset.threadDockReady = 'true';
+      const content = dock.querySelector<HTMLElement>('[data-thread-dock-content]');
+      const toggle = dock.querySelector<HTMLButtonElement>('[data-thread-dock-toggle]');
+      const state = dock.querySelector<HTMLElement>('[data-thread-dock-state]');
+      let heldId: string | null = null;
+      let readingId: string | null = null;
+      toggle?.addEventListener('click', () => {
+        const collapsed = !content?.hidden;
+        if (content) content.hidden = collapsed;
+        toggle.setAttribute('aria-expanded', String(!collapsed));
+        toggle.textContent = collapsed ? 'Expand' : 'Collapse';
+      });
+      dock.querySelectorAll<HTMLButtonElement>('[data-thread-dock-hold]').forEach((button) => {
+        button.addEventListener('click', () => {
+          const id = button.dataset.beatId ?? null;
+          heldId = heldId === id ? null : id;
+          dock.querySelectorAll<HTMLButtonElement>('[data-thread-dock-hold]').forEach((candidate) => candidate.setAttribute('aria-pressed', String(candidate.dataset.beatId === heldId)));
+          update();
+        });
+      });
+      const update = () => {
+        const label = (id: string | null) => dock.querySelector<HTMLElement>(`[data-beat-id="${id}"] .thread-dock__label`)?.textContent ?? 'Last thread scene';
+        if (state) state.textContent = heldId && readingId && heldId !== readingId ? `Held preview: ${label(heldId)} · Reading: ${label(readingId)}` : heldId ? `Held preview: ${label(heldId)}` : readingId ? `Reading: ${label(readingId)}` : 'Following reading';
+        dock.querySelectorAll<HTMLAnchorElement>('[data-thread-dock-link]').forEach((link) => {
+          if (!heldId && link.dataset.beatId === readingId) link.setAttribute('aria-current', 'step');
+          else link.removeAttribute('aria-current');
+        });
+      };
+      document.addEventListener('reading-section-change', ((event: CustomEvent<{ activeId: string }>) => {
+        const id = event.detail.activeId.replace(/^thread-/, '');
+        if (dock.querySelector(`[data-beat-id="${id}"]`)) { readingId = id; update(); }
+      }) as EventListener);
+    });
+  };
+  initThreadDocks();
+  document.addEventListener('astro:page-load', initThreadDocks);
+</script>

@@ -42,6 +42,8 @@ interface RootSnapshot {
   trigger: HTMLElement | null;
   /** A stable fallback focus target near `trigger`, in case it's gone by the time we restore. */
   headingId: string | null;
+  anchorId: string | null;
+  offsetWithinAnchor: number;
 }
 
 type FocusAction =
@@ -183,12 +185,11 @@ export function initFocusHost(): void {
     previousBodyStyle = null;
   };
 
-  const captureOrigin = (trigger: HTMLElement | null): RootSnapshot => ({
-    x: window.scrollX,
-    y: window.scrollY,
-    trigger,
-    headingId: trigger?.closest('section')?.querySelector('h2, h3')?.id ?? null,
-  });
+  const captureOrigin = (trigger: HTMLElement | null): RootSnapshot => {
+    const anchors = Array.from(document.querySelectorAll<HTMLElement>('.section-marker > h2, .thread-scene'));
+    const anchor = anchors.filter((candidate) => candidate.getBoundingClientRect().top <= 96).at(-1) ?? anchors[0] ?? null;
+    return { x: window.scrollX, y: window.scrollY, trigger, headingId: trigger?.closest('section')?.querySelector('h2, h3')?.id ?? null, anchorId: anchor?.id ?? null, offsetWithinAnchor: anchor ? window.scrollY - (anchor.getBoundingClientRect().top + window.scrollY) : 0 };
+  };
 
   const saveCurrentEntryState = () => {
     if (!currentKey) return;
@@ -260,7 +261,11 @@ export function initFocusHost(): void {
     if (dialogEl.open) dialogEl.close();
     unlockScroll();
     const snapshot = origin;
-    if (snapshot) window.scrollTo(snapshot.x, snapshot.y);
+    if (snapshot) {
+      const anchor = snapshot.anchorId ? document.getElementById(snapshot.anchorId) : null;
+      const y = anchor ? anchor.getBoundingClientRect().top + window.scrollY + snapshot.offsetWithinAnchor : snapshot.y;
+      window.scrollTo(snapshot.x, Math.max(0, Math.min(y, document.documentElement.scrollHeight - window.innerHeight)));
+    }
     entries.clear();
     currentKey = null;
     rootKey = null;

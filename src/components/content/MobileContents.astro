@@ -1,0 +1,78 @@
+---
+import { threads } from '../../data/threads';
+
+interface Heading { depth: number; slug: string; text: string; }
+interface Props { slug?: string; headings?: Heading[]; }
+const { slug, headings = [] } = Astro.props;
+const thread = slug ? threads[slug] : undefined;
+const outline = headings.filter((heading) => heading.depth === 2 && heading.slug !== 'footnote-label');
+---
+
+{outline.length > 0 && (
+  <>
+    <a class="mobile-contents__fallback" href="#post-contents">Contents</a>
+    <button type="button" class="mobile-contents__trigger focus-ring" data-mobile-contents-trigger aria-haspopup="dialog">Contents</button>
+    <dialog class="mobile-contents" data-mobile-contents aria-labelledby="mobile-contents-title">
+      <div class="mobile-contents__sheet">
+        <div class="mobile-contents__header">
+          <h2 id="mobile-contents-title" class="font-serif">Contents</h2>
+          <button type="button" class="mobile-contents__close focus-ring" data-mobile-contents-close>Close</button>
+        </div>
+        <nav aria-label="Article sections"><ol>{outline.map((heading, index) => <li><a href={`#${heading.slug}`} data-mobile-contents-link><span>{String(index + 1).padStart(2, '0')}</span>{heading.text}</a></li>)}</ol></nav>
+        {thread && <nav class="mobile-contents__thread" aria-label={`Running example: ${thread.title}`}><p class="font-mono">Running example</p><ol>{thread.beats.map((beat) => <li><a href={`#thread-${beat.id}`} data-mobile-contents-link><span>{String(beat.n).padStart(2, '0')}</span>{beat.label}</a><a class="mobile-contents__inspect" href={`/essays/${slug}/thread/${beat.id}/`}>Inspect</a></li>)}</ol></nav>}
+        {thread && <a class="mobile-contents__evidence" href={`/essays/${slug}/evidence/`}>Receipts behind the argument</a>}
+      </div>
+    </dialog>
+    <section id="post-contents" class="mobile-contents__section" aria-labelledby="post-contents-title">
+      <h2 id="post-contents-title">Contents</h2>
+      <ol>{outline.map((heading) => <li><a href={`#${heading.slug}`}>{heading.text}</a></li>)}</ol>
+    </section>
+  </>
+)}
+
+<style>
+  .mobile-contents__trigger { display: none; }
+  .mobile-contents__fallback { display: none; }
+  .mobile-contents__section { display: none; }
+  @media (max-width: 1279px) {
+    .mobile-contents__trigger { position: fixed; right: 1rem; bottom: calc(1rem + env(safe-area-inset-bottom)); z-index: 55; border: 1px solid var(--border-strong); border-radius: 999px; background: var(--bg-surface); box-shadow: var(--shadow-md); color: var(--accent-text); cursor: pointer; font: 700 .6875rem var(--font-mono); letter-spacing: .08em; padding: .65rem .9rem; text-transform: uppercase; }
+    .mobile-contents__fallback { display: inline-flex; position: fixed; right: 1rem; bottom: calc(1rem + env(safe-area-inset-bottom)); z-index: 54; border-radius: 999px; background: var(--bg-surface); color: var(--accent-text); font: 700 .6875rem var(--font-mono); padding: .65rem .9rem; text-decoration: none; }
+    :global(html.mobile-contents-ready) .mobile-contents__trigger { display: inline-flex; z-index: 56; }
+    :global(html.mobile-contents-ready) .mobile-contents__fallback { display: none; }
+    .mobile-contents__section { display: block; margin: 3rem 0; padding: 1.25rem; border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); background: var(--bg-subtle); }
+    .mobile-contents__section h2 { margin-top: 0; }
+  }
+  .mobile-contents { width: min(100%, 42rem); max-width: 100%; max-height: min(75dvh, 42rem); margin: auto 0 0; padding: 0; color: var(--text-primary); background: var(--bg-surface); border: 1px solid var(--border-strong); border-radius: 1rem 1rem 0 0; }
+  .mobile-contents::backdrop { background: var(--color-bg-overlay); }
+  .mobile-contents__sheet { max-height: min(75dvh, 42rem); overflow-y: auto; padding: 1.25rem 1.25rem calc(1.25rem + env(safe-area-inset-bottom)); }
+  .mobile-contents__header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: .75rem; }
+  .mobile-contents__header h2 { margin: 0; font-size: 1.5rem; }
+  .mobile-contents__close { border: 0; background: transparent; color: var(--accent-text); cursor: pointer; font: 700 .6875rem var(--font-mono); text-transform: uppercase; }
+  .mobile-contents ol { margin: .75rem 0 0; padding: 0; list-style: none; }
+  .mobile-contents li { display: flex; align-items: baseline; justify-content: space-between; gap: .75rem; border-bottom: 1px solid var(--border-subtle); }
+  .mobile-contents li > a:first-child { flex: 1; }
+  .mobile-contents a { display: flex; gap: .75rem; padding: .7rem 0; color: var(--text-secondary); text-decoration: none; }
+  .mobile-contents a:hover, .mobile-contents a:focus-visible { color: var(--accent-text); text-decoration: underline; }
+  .mobile-contents a span { color: var(--accent-text); font: 700 .6875rem var(--font-mono); }
+  .mobile-contents__thread { margin-top: 1.25rem; } .mobile-contents__thread > p { color: var(--accent-text); font-size: .6875rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+  .mobile-contents__inspect { color: var(--accent-text) !important; font: 700 .625rem var(--font-mono); text-transform: uppercase; }
+  .mobile-contents__evidence { margin-top: 1rem; color: var(--accent-text); font-weight: 600; }
+</style>
+
+<script>
+  const initMobileContents = () => {
+    document.querySelectorAll<HTMLDialogElement>('[data-mobile-contents]').forEach((dialog) => {
+      if (dialog.dataset.mobileContentsReady === 'true') return;
+      dialog.dataset.mobileContentsReady = 'true';
+      document.documentElement.classList.add('mobile-contents-ready');
+      const trigger = document.querySelector<HTMLButtonElement>('[data-mobile-contents-trigger]');
+      const close = dialog.querySelector<HTMLButtonElement>('[data-mobile-contents-close]');
+      trigger?.addEventListener('click', () => dialog.showModal());
+      close?.addEventListener('click', () => dialog.close());
+      dialog.addEventListener('click', (event) => { if (event.target === dialog) dialog.close(); });
+      dialog.addEventListener('close', () => trigger?.focus({ preventScroll: true }));
+      dialog.querySelectorAll<HTMLAnchorElement>('[data-mobile-contents-link]').forEach((link) => link.addEventListener('click', () => dialog.close()));
+    });
+  };
+  initMobileContents(); document.addEventListener('astro:page-load', initMobileContents);
+</script>

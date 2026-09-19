@@ -37,8 +37,18 @@
     });
   };
 
+  const setActiveSectionMarker = (sectionId: string | null) => {
+    document.querySelectorAll<HTMLElement>('[data-section-marker]').forEach((marker) => {
+      const heading = marker.querySelector<HTMLHeadingElement>('h2');
+      marker.classList.toggle('is-active', Boolean(sectionId) && heading?.id === sectionId);
+    });
+  };
+
   addSectionMarkers();
   document.addEventListener('astro:page-load', addSectionMarkers);
+  document.addEventListener('reading-section-change', ((event: CustomEvent<{ sectionId: string | null }>) => {
+    setActiveSectionMarker(event.detail.sectionId);
+  }) as EventListener);
 </script>
 
 <style>
@@ -79,10 +89,18 @@
     width: 1px;
     min-height: 2.2rem;
     background: var(--border-strong);
+    transition: background-color 0.15s ease;
   }
 
   :global(.section-marker > h2) {
     margin-top: 0;
+  }
+
+  :global(.section-marker.is-active .section-marker__rule) { background: var(--accent); }
+  :global(.section-marker.is-active .section-marker__ordinal) { border-color: var(--accent); color: var(--accent-text); }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(.section-marker__rule) { transition: none; }
   }
 
   @media (min-width: 768px) {

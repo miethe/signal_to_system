@@ -77,6 +77,9 @@ const filename = beat?.image.src.split('/').pop() ?? '';
         )}
       </div>
 
+      <p class="figure-viewer__eyebrow font-mono">Figure {String(beat.n).padStart(2, '0')} · {beat.label}</p>
+      <h2 class="figure-viewer__title font-serif">{beat.image.caption}</h2>
+
       <figure class="figure-viewer__figure">
         <img src={beat.image.src} alt={beat.image.alt} loading="lazy" decoding="async" />
         <figcaption>
@@ -156,6 +159,8 @@ const filename = beat?.image.src.split('/').pop() ?? '';
     width: 100%;
     height: auto;
     margin: 0 0 0.875rem;
+    max-height: 52vh;
+    object-fit: contain;
     border-radius: var(--radius-md);
   }
 
@@ -165,6 +170,8 @@ const filename = beat?.image.src.split('/').pop() ?? '';
     line-height: 1.5;
     color: #334155;
   }
+  .figure-viewer__eyebrow { margin: 0 0 .35rem; color: var(--cyan-text); font-size: .6875rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+  .figure-viewer__title { margin: 0 0 1.25rem; color: var(--text-primary); font-size: clamp(1.25rem, 2.5vw, 2rem); line-height: 1.25; }
 
   .figure-viewer__long-description {
     margin: 0;

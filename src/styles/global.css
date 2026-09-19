@@ -911,6 +911,25 @@ pre code {
   background: #ffffff;
 }
 
+.figure-plate__header {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .45rem .65rem;
+  color: #334155;
+  background: rgb(246 248 251 / .92);
+  border-bottom: 1px solid #cbd5e1;
+  font: 700 .625rem var(--font-mono);
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
 .figure-plate__enlarge {
   position: relative;
   display: block;
