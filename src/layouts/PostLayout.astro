@@ -4,6 +4,7 @@ import Figure from '../components/content/Figure.astro';
 import RelatedContent from '../components/content/RelatedContent.astro';
 import AuthorProfile from '../components/content/AuthorProfile.astro';
 import ReadingCompanion from '../components/content/ReadingCompanion.astro';
+import SectionMarker from '../components/content/SectionMarker.astro';
 import FocusTemplates from '../components/content/FocusTemplates.astro';
 import FocusHost from '../components/content/FocusHost.astro';
 import SeriesWayfinding from '../components/content/SeriesWayfinding.astro';
@@ -108,23 +109,25 @@ const jsonLd = generateJsonLd('article', {
     aria-hidden="true"
   ></div>
 
-  <!-- Frontispiece hero: rendered before the header entirely (title/dek/
-       meta) when heroPlacement === 'frontispiece'. Sits outside the
-       article's two-column grid — full-measure at every breakpoint,
-       matching the article's own container widths — rather than as a grid
-       item, so it doesn't disturb the header/sidebar/body row placement
-       tuned for the default position below. -->
-  {
-    isFrontispiece && heroImage && (
-      <div class="mx-auto w-full max-w-[var(--measure)] px-4 pt-12 sm:px-6 lg:px-8 xl:max-w-7xl">
-        <Figure src={heroImage} alt={resolvedHeroAlt} variant="hero" />
-      </div>
-    )
-  }
-
   <article class="post-layout mx-auto grid w-full max-w-[var(--measure)] items-start px-4 py-12 sm:px-6 lg:px-8 xl:max-w-7xl xl:grid-cols-[minmax(0,var(--measure))_minmax(14rem,18rem)] xl:justify-center xl:gap-x-12">
+    <!-- This lives inside .post-layout so the shared --measure token is
+         resolvable. It remains ahead of the title/dek/meta at every size. -->
+    {
+      isFrontispiece && heroImage && (
+        <div class="w-full pt-0 xl:col-span-2 xl:row-start-1">
+          <Figure src={heroImage} alt={resolvedHeroAlt} variant="hero" />
+        </div>
+      )
+    }
+
     <!-- Article header -->
-    <header id="post-header" class="mb-16 min-w-0 space-y-6 pb-4 xl:col-start-1 xl:row-start-1">
+    <header
+      id="post-header"
+      class:list={[
+        'mb-16 min-w-0 space-y-6 pb-4 xl:col-start-1',
+        isFrontispiece ? 'xl:row-start-2' : 'xl:row-start-1',
+      ]}
+    >
       {
         category && (
           <div>
@@ -208,16 +211,33 @@ const jsonLd = generateJsonLd('article', {
          card sits in flow here and scrolls away with the page; only
          ReadingCompanion (outline + ThreadDock + optional ContextualNote)
          is the sticky surface at depth. -->
-    <div class="hidden xl:col-start-2 xl:row-span-2 xl:row-start-1 xl:block xl:self-start">
+    <div
+      class:list={[
+        'hidden xl:col-start-2 xl:row-span-2 xl:block xl:self-stretch',
+        isFrontispiece ? 'xl:row-start-2' : 'xl:row-start-1',
+      ]}
+    >
       <div class="mb-4">
         <AuthorProfile variant="sidebar" headingLevel="h2" />
       </div>
+      {
+        whyItMatters && (
+          <div class="mb-4">
+            <ExecutiveSignal whyItMatters={whyItMatters} takeaway={leaderTakeaway} />
+          </div>
+        )
+      }
       <div class="no-scrollbar xl:sticky xl:top-24 xl:max-h-[calc(100vh-7rem)] xl:overflow-y-auto xl:pr-1">
         <ReadingCompanion slug={slug} headings={headings} />
       </div>
     </div>
 
-    <div class="min-w-0 xl:col-start-1 xl:row-start-2">
+    <div
+      class:list={[
+        'min-w-0 xl:col-start-1',
+        isFrontispiece ? 'xl:row-start-3' : 'xl:row-start-2',
+      ]}
+    >
 
     <!-- Compact author context remains in the reading flow below desktop. -->
     <div class="mb-10 xl:hidden">
@@ -236,18 +256,20 @@ const jsonLd = generateJsonLd('article', {
       )
     }
 
-    <!-- Executive signal: "why this matters" plus "carry this forward",
-         always in flow at every breakpoint (DIRECTION.md V5) — there is
-         no more rail-only takeaway card to avoid duplicating. -->
+    <!-- The narrow layout has no rail, so it keeps the signal in flow here.
+         Desktop places the same single signal under the author card above. -->
     {
       whyItMatters && (
-        <ExecutiveSignal whyItMatters={whyItMatters} takeaway={leaderTakeaway} />
+        <div class="xl:hidden">
+          <ExecutiveSignal whyItMatters={whyItMatters} takeaway={leaderTakeaway} />
+        </div>
       )
     }
 
     <!-- Article body -->
     <div class="prose-custom">
       <slot />
+      <SectionMarker />
     </div>
 
     <!-- Article footer: series nav + tags recap -->

@@ -1,0 +1,94 @@
+---
+/**
+ * SectionMarker — static editorial furniture for article-level headings.
+ *
+ * MDX supplies its headings through PostLayout's slot, so this component
+ * enhances those rendered h2 elements once without attaching a scroll
+ * observer. P1 owns the active-section state; this shell deliberately only
+ * establishes the stable ordinal and reserved gutter.
+ */
+---
+
+<script>
+  const addSectionMarkers = () => {
+    const headings = document.querySelectorAll<HTMLHeadingElement>(
+      '.prose-custom > h2:not([data-section-marker-heading])',
+    );
+
+    headings.forEach((heading, index) => {
+      const section = document.createElement('section');
+      const gutter = document.createElement('div');
+      const ordinal = document.createElement('span');
+      const rule = document.createElement('span');
+
+      section.className = 'section-marker';
+      section.dataset.sectionMarker = '';
+      section.dataset.sectionOrdinal = String(index + 1);
+      gutter.className = 'section-marker__gutter';
+      gutter.setAttribute('aria-hidden', 'true');
+      ordinal.className = 'section-marker__ordinal';
+      ordinal.textContent = String(index + 1).padStart(2, '0');
+      rule.className = 'section-marker__rule';
+
+      gutter.append(ordinal, rule);
+      heading.dataset.sectionMarkerHeading = '';
+      heading.parentNode?.insertBefore(section, heading);
+      section.append(gutter, heading);
+    });
+  };
+
+  addSectionMarkers();
+  document.addEventListener('astro:page-load', addSectionMarkers);
+</script>
+
+<style>
+  :global(.section-marker) {
+    display: grid;
+    grid-template-columns: 3rem minmax(0, 1fr);
+    column-gap: 0.875rem;
+    align-items: start;
+    margin-top: 2.5rem;
+  }
+
+  :global(.section-marker__gutter) {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+    padding-top: 0.15rem;
+  }
+
+  :global(.section-marker__ordinal) {
+    display: grid;
+    width: 2.2rem;
+    height: 1.75rem;
+    place-items: center;
+    border: 1px solid var(--border-strong);
+    border-radius: 0.2rem;
+    color: var(--text-tertiary);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    line-height: 1;
+  }
+
+  :global(.section-marker__rule) {
+    display: block;
+    width: 1px;
+    min-height: 2.2rem;
+    background: var(--border-strong);
+  }
+
+  :global(.section-marker > h2) {
+    margin-top: 0;
+  }
+
+  @media (min-width: 768px) {
+    :global(.section-marker) {
+      width: calc(100% + 3.875rem);
+      margin-left: -3.875rem;
+    }
+  }
+</style>

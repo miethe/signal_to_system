@@ -818,8 +818,8 @@ pre code {
 /* ============================================================
    FIGURE PLATE
    Editorial "engineering plate" treatment for schematic figures.
-   Paper background stays light in both themes by design — in dark
-   mode the plate reads as a luminous drawing card on the navy page.
+   Artwork stays light in its own frame; in dark mode the surrounding plate
+   becomes a restrained navy panel so it belongs to the page.
    Used via <Figure /> component, and by PostLayout for heroImage.
    ============================================================ */
 .figure-plate {
@@ -835,7 +835,7 @@ pre code {
 }
 
 .dark .figure-plate {
-  background: #f3f5fa;
+  background: #111a2c;
   border-color: rgba(99, 102, 241, 0.22);
   box-shadow:
     0 0 0 1px rgba(99, 102, 241, 0.12),

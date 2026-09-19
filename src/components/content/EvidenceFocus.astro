@@ -13,6 +13,7 @@
  */
 import EvidenceGuide from './EvidenceGuide.astro';
 import ReceiptIndex from './ReceiptIndex.astro';
+import ClaimBadge from './ClaimBadge.astro';
 import type { EvidenceRecord } from '../../data/evidence';
 
 interface Props {
@@ -24,7 +25,21 @@ interface Props {
 }
 
 const { records, selectedId, essaySlug, standalone = true } = Astro.props;
-const selected = selectedId ? records.find((record) => record.id === selectedId) : undefined;
+// The essay index is a receipt surface, not a bare directory. When no record
+// is named in the route, introduce the first related receipt in full and let
+// the rail provide the rest of the index.
+const selected = selectedId ? records.find((record) => record.id === selectedId) : records[0];
+const selectedRecordId = selected?.id;
+const receiptDate = selected?.recordedDate ?? selected?.eventDate ?? selected?.verifiedAt ?? null;
+const claimBadgeKind = selected
+  ? ({
+      observed: 'observed',
+      measured: 'measured',
+      proposed: 'proposed',
+      'externally-reported': 'external',
+      illustrative: 'hypothesis',
+    }[selected.evidenceClass] as 'observed' | 'measured' | 'proposed' | 'external' | 'hypothesis')
+  : undefined;
 
 const formatDate = (value: string | null) => value ?? 'Not stated';
 ---
@@ -56,10 +71,21 @@ const formatDate = (value: string | null) => value ?? 'Not stated';
         )}
       </div>
 
+      <h1 class="evidence-focus__page-title font-serif">
+        {selectedId && selected ? selected.title : 'Receipts behind the argument'}
+      </h1>
+
       {selected ? (
         <article class="evidence-focus__record">
-          <p class="evidence-focus__eyebrow font-mono">{selected.evidenceClass}</p>
-          <h2 class="evidence-focus__title font-serif">{selected.title}</h2>
+          <p class="evidence-focus__eyebrow font-mono">
+            {claimBadgeKind && <ClaimBadge kind={claimBadgeKind} />}
+            <span>{selected.evidenceClass}</span>
+          </p>
+          {!selectedId && <h2 class="evidence-focus__title font-serif">{selected.title}</h2>}
+
+          <p class="evidence-focus__receipt-date font-mono">
+            Receipt date: {formatDate(receiptDate)}
+          </p>
 
           <dl class="evidence-focus__facts">
             <div>
@@ -92,18 +118,20 @@ const formatDate = (value: string | null) => value ?? 'Not stated';
             </div>
           </dl>
 
-          <div class="evidence-focus__section">
-            <p class="evidence-focus__section-label font-mono">What this supports</p>
-            <ul>
-              {selected.supports.map((line) => <li>{line}</li>)}
-            </ul>
-          </div>
+          <div class="evidence-focus__claim-split">
+            <div class="evidence-focus__section">
+              <p class="evidence-focus__section-label font-mono">What this supports</p>
+              <ul>
+                {selected.supports.map((line) => <li>{line}</li>)}
+              </ul>
+            </div>
 
-          <div class="evidence-focus__section">
-            <p class="evidence-focus__section-label font-mono">Limits</p>
-            <ul>
-              {selected.limitations.map((line) => <li>{line}</li>)}
-            </ul>
+            <div class="evidence-focus__section">
+              <p class="evidence-focus__section-label font-mono">Limits</p>
+              <ul>
+                {selected.limitations.map((line) => <li>{line}</li>)}
+              </ul>
+            </div>
           </div>
 
           {selected.publicCapturePath ? (
@@ -113,33 +141,17 @@ const formatDate = (value: string | null) => value ?? 'Not stated';
             </div>
           ) : (
             <p class="evidence-focus__no-capture">
-              No standalone capture asset is published for this record — its capture type is{' '}
+              No standalone capture asset is published for this record; its capture type is{' '}
               <strong>{selected.captureType}</strong>.
             </p>
           )}
         </article>
-      ) : (
-        <div class="evidence-focus__list">
-          <p class="evidence-focus__intro">The full receipt set behind this essay's argument.</p>
-          <ol>
-            {records.map((record) => (
-              <li class="evidence-focus__list-item">
-                <a href={`/evidence/${record.id}/`}>
-                  <span class="evidence-focus__list-title">{record.title}</span>
-                  <span class="evidence-focus__list-meta font-mono">
-                    {record.evidenceClass} &middot; {record.captureType}
-                  </span>
-                </a>
-              </li>
-            ))}
-          </ol>
-        </div>
-      )}
+      ) : <p class="evidence-focus__intro">No public receipts are available for this essay.</p>}
     </div>
 
     <aside class="evidence-focus__rail">
       <EvidenceGuide />
-      <ReceiptIndex records={records} currentId={selectedId} />
+      <ReceiptIndex records={records} currentId={selectedRecordId} />
     </aside>
   </div>
 </div>
@@ -211,6 +223,34 @@ const formatDate = (value: string | null) => value ?? 'Not stated';
     font-weight: 700;
     line-height: 1.2;
     color: var(--text-primary);
+  }
+
+  .evidence-focus__page-title {
+    margin: 0 0 0.35rem;
+    color: var(--text-primary);
+    font-size: clamp(2rem, 4vw, 3.25rem);
+    line-height: 1.1;
+  }
+
+  .evidence-focus__receipt-date {
+    margin: -0.35rem 0 1.25rem;
+    color: var(--text-tertiary);
+    font-size: 0.6875rem;
+    font-weight: 650;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .evidence-focus__claim-split {
+    display: grid;
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  @media (min-width: 700px) {
+    .evidence-focus__claim-split {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
   }
 
   .evidence-focus__facts {
