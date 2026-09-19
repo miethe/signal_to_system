@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
+/* Bind Tailwind's `dark:` variant to the site's own `.dark` class instead of
+   the OS `prefers-color-scheme` media query (reading-experience-v2 FIX-LIST
+   A1). Without this, every `dark:` utility in the project (370+) is inert
+   whenever the reader's OS theme disagrees with the theme they picked on the
+   site. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* Include @miethe/ui compiled classes in Tailwind's content scan.
    Without this, showcase demos render unstyled (Tailwind v4 JIT prunes them). */
 @source "../../node_modules/@miethe/ui/dist/**/*.js";
@@ -1744,8 +1751,8 @@ a.wayfind:focus-visible {
   --color-secondary-foreground: hsl(var(--secondary-foreground));
   --color-muted: hsl(var(--muted));
   --color-muted-foreground: hsl(var(--muted-foreground));
-  --color-accent: hsl(var(--accent));
-  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-accent: hsl(var(--shadcn-accent));
+  --color-accent-foreground: hsl(var(--shadcn-accent-foreground));
   --color-destructive: hsl(var(--destructive));
   --color-destructive-foreground: hsl(var(--destructive-foreground));
   --color-border: hsl(var(--border-hsl));
@@ -1754,7 +1761,12 @@ a.wayfind:focus-visible {
 }
 
 :root {
-  /* shadcn defaults, light */
+  /* shadcn defaults, light. `--accent`/`--accent-foreground` are namespaced
+     to `--shadcn-*` (FIX-LIST A2) — the bare names collided at equal
+     specificity with the real editorial `--accent` set above (:116), and as
+     an invalid HSL-triple color they clobbered it silently instead of
+     erroring. @miethe/ui components still resolve the same values through
+     the `@theme inline` mapping above; only the shared variable name moved. */
   --background: 0 0% 100%;
   --foreground: 222.2 47.4% 11.2%;
   --card: 0 0% 100%;
@@ -1767,8 +1779,8 @@ a.wayfind:focus-visible {
   --secondary-foreground: 222.2 47.4% 11.2%;
   --muted: 210 40% 96.1%;
   --muted-foreground: 215.4 16.3% 46.9%;
-  --accent: 210 40% 96.1%;
-  --accent-foreground: 222.2 47.4% 11.2%;
+  --shadcn-accent: 210 40% 96.1%;
+  --shadcn-accent-foreground: 222.2 47.4% 11.2%;
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 210 40% 98%;
   --border-hsl: 214.3 31.8% 91.4%;
@@ -1789,8 +1801,8 @@ a.wayfind:focus-visible {
   --secondary-foreground: 210 40% 98%;
   --muted: 217.2 32.6% 17.5%;
   --muted-foreground: 215 20.2% 65.1%;
-  --accent: 217.2 32.6% 17.5%;
-  --accent-foreground: 210 40% 98%;
+  --shadcn-accent: 217.2 32.6% 17.5%;
+  --shadcn-accent-foreground: 210 40% 98%;
   --destructive: 0 62.8% 30.6%;
   --destructive-foreground: 210 40% 98%;
   --border-hsl: 217.2 32.6% 17.5%;
