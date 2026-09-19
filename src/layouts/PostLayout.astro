@@ -5,6 +5,7 @@ import RelatedContent from '../components/content/RelatedContent.astro';
 import AuthorProfile from '../components/content/AuthorProfile.astro';
 import ReadingCompanion from '../components/content/ReadingCompanion.astro';
 import FocusTemplates from '../components/content/FocusTemplates.astro';
+import FocusHost from '../components/content/FocusHost.astro';
 import SeriesWayfinding from '../components/content/SeriesWayfinding.astro';
 import ExecutiveSignal from '../components/content/ExecutiveSignal.astro';
 import { generateJsonLd, buildCanonicalUrl } from '../lib/seo';
@@ -313,10 +314,12 @@ const jsonLd = generateJsonLd('article', {
   </div>
   </article>
 
-  <!-- Inert <template> fragments for a future FocusHost controller (P0-C)
-       to clone — see FocusTemplates.astro's header comment. No-op for
-       posts without a thread. -->
+  <!-- <template> fragments FocusHost clones on open — see
+       FocusTemplates.astro's header comment. No-op for posts without a
+       thread. FocusHost is mounted right after so its dialog always has
+       this exact slug's templates to draw from (ARCHITECTURE.md §3). -->
   {slug && <FocusTemplates slug={slug} />}
+  {slug && <FocusHost slug={slug} />}
 
   <!-- Scroll to top button -->
   <button
