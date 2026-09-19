@@ -1,0 +1,99 @@
+---
+/**
+ * ReceiptIndex — Evidence Focus rail component (ARCHITECTURE.md §4, spec
+ * §8): source navigation across the full evidence set, pairing with
+ * `EvidenceGuide`'s class definitions. Each record links to its own
+ * canonical `/evidence/<id>/` route.
+ */
+import type { EvidenceRecord } from '../../data/evidence';
+
+interface Props {
+  records: EvidenceRecord[];
+  currentId?: string;
+}
+
+const { records, currentId } = Astro.props;
+---
+
+<nav class="receipt-index" aria-label="All receipts">
+  <p class="receipt-index__title font-mono">Receipts</p>
+  <ol class="receipt-index__list">
+    {
+      records.map((record) => (
+        <li>
+          <a
+            href={`/evidence/${record.id}/`}
+            class="receipt-index__link"
+            aria-current={record.id === currentId ? 'page' : undefined}
+          >
+            <span class="receipt-index__link-title">{record.title}</span>
+            <span class="receipt-index__link-class font-mono">{record.evidenceClass}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ol>
+</nav>
+
+<style>
+  .receipt-index {
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    background: var(--bg-subtle);
+    padding: 0.875rem 1rem;
+  }
+
+  .receipt-index__title {
+    margin: 0 0 0.6rem;
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent-text);
+  }
+
+  .receipt-index__list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .receipt-index__link {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
+    border-radius: var(--radius-sm);
+    padding: 0.4rem 0.5rem;
+    text-decoration: none;
+  }
+
+  .receipt-index__link:hover,
+  .receipt-index__link:focus-visible {
+    background: var(--accent-subtle);
+    outline: none;
+  }
+
+  .receipt-index__link:focus-visible {
+    box-shadow: 0 0 0 2px var(--accent);
+  }
+
+  .receipt-index__link[aria-current='page'] {
+    background: var(--accent-subtle);
+  }
+
+  .receipt-index__link-title {
+    font-size: 0.8125rem;
+    line-height: 1.35;
+    color: var(--text-primary);
+  }
+
+  .receipt-index__link-class {
+    font-size: 0.625rem;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+  }
+</style>

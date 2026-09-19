@@ -1,0 +1,64 @@
+---
+/**
+ * Essay-scoped Evidence Focus index (reading-experience-v2
+ * ARCHITECTURE.md §2): `/essays/<slug>/evidence/`. Only generated for
+ * posts that actually have a thread whose beats are cited by at least
+ * one evidence record — an essay with no grounded receipts gets no
+ * evidence route rather than an empty one.
+ *
+ * `/evidence/<record>/` (top-level, site-wide) is the record-level detail
+ * page; this route is the essay-scoped list into that same flat set
+ * (§2's "risk 2" naming: `relatedSceneIds` is `string[]`, not a per-post
+ * enum, precisely so a second essay's thread can reuse a record here).
+ */
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import EvidenceFocus from '../../../../components/content/EvidenceFocus.astro';
+import { threads } from '../../../../data/threads';
+import { evidence } from '../../../../data/evidence';
+import { buildCanonicalUrl } from '../../../../lib/seo';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts');
+  const paths: Array<{ params: { slug: string }; props: { postTitle: string } }> = [];
+
+  for (const post of posts) {
+    const thread = threads[post.id];
+    if (!thread) continue;
+    const beatIds = new Set(thread.beats.map((beat) => beat.id));
+    const hasRelatedEvidence = Object.values(evidence).some((record) =>
+      record.relatedSceneIds.some((id) => beatIds.has(id)),
+    );
+    if (!hasRelatedEvidence) continue;
+    paths.push({ params: { slug: post.id }, props: { postTitle: post.data.title } });
+  }
+
+  return paths;
+}
+
+const { slug } = Astro.params;
+const { postTitle } = Astro.props;
+const thread = slug ? threads[slug] : undefined;
+
+if (!thread) {
+  throw new Error(`No thread registered for essay slug "${slug}".`);
+}
+
+const beatIds = new Set(thread.beats.map((beat) => beat.id));
+const relatedRecords = Object.values(evidence).filter((record) =>
+  record.relatedSceneIds.some((id) => beatIds.has(id)),
+);
+
+const pageTitle = `Receipts behind ${postTitle}`;
+const canonicalUrl = buildCanonicalUrl(Astro.url.pathname);
+---
+
+<BaseLayout
+  title={pageTitle}
+  description={`The evidence records this essay's argument cites, with sources, support, and limits.`}
+  canonicalUrl={canonicalUrl}
+>
+  <div class="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
+    <EvidenceFocus records={relatedRecords} essaySlug={slug} standalone={true} />
+  </div>
+</BaseLayout>

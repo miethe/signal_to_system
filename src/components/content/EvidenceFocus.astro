@@ -1,0 +1,337 @@
+---
+/**
+ * EvidenceFocus — the shared Evidence Focus renderer (DIRECTION.md V3/V4,
+ * ARCHITECTURE.md §4, spec §8). Backs BOTH `/essays/<slug>/evidence/`
+ * (the essay-scoped index) and the flat, site-wide `/evidence/<record>/`
+ * route, plus the in-place overlay's `<template>` fragment — same
+ * component, same field set from `evidence.ts`'s `EvidenceRecord`, never
+ * a second hand-written summary.
+ *
+ * `records` is always the full evidence set (so the rail's `ReceiptIndex`
+ * can navigate anywhere); `selectedId` narrows the main pane to one
+ * record's full detail. Omitting it renders the full list.
+ */
+import EvidenceGuide from './EvidenceGuide.astro';
+import ReceiptIndex from './ReceiptIndex.astro';
+import type { EvidenceRecord } from '../../data/evidence';
+
+interface Props {
+  records: EvidenceRecord[];
+  selectedId?: string;
+  /** Real anchor text for a "Read in essay" link, when a related essay exists. */
+  essaySlug?: string;
+  standalone?: boolean;
+}
+
+const { records, selectedId, essaySlug, standalone = true } = Astro.props;
+const selected = selectedId ? records.find((record) => record.id === selectedId) : undefined;
+
+const formatDate = (value: string | null) => value ?? 'Not stated';
+---
+
+<div class="evidence-focus" data-focus-kind="evidence" data-focus-key={selectedId ?? 'all'}>
+  <div class="evidence-focus__grid">
+    <div class="evidence-focus__main">
+      <div class="evidence-focus__actions">
+        {essaySlug && (
+          <a class="evidence-focus__action" href={`/essays/${essaySlug}/`}>
+            &larr; Back to essay
+          </a>
+        )}
+        <span class="evidence-focus__action-label font-mono">Evidence focus</span>
+        {essaySlug && (
+          <a
+            class="evidence-focus__action evidence-focus__action--secondary"
+            href={`/essays/${essaySlug}/evidence/`}
+          >
+            Open in new tab
+          </a>
+        )}
+        {!standalone && (
+          <button type="button" class="evidence-focus__action evidence-focus__action--close" data-focus-close>
+            Close
+          </button>
+        )}
+      </div>
+
+      {selected ? (
+        <article class="evidence-focus__record">
+          <p class="evidence-focus__eyebrow font-mono">{selected.evidenceClass}</p>
+          <h2 class="evidence-focus__title font-serif">{selected.title}</h2>
+
+          <dl class="evidence-focus__facts">
+            <div>
+              <dt>Capture type</dt>
+              <dd>{selected.captureType}</dd>
+            </div>
+            <div>
+              <dt>Event date</dt>
+              <dd>{formatDate(selected.eventDate)}</dd>
+            </div>
+            <div>
+              <dt>Recorded date</dt>
+              <dd>{formatDate(selected.recordedDate)}</dd>
+            </div>
+            <div>
+              <dt>Verified at</dt>
+              <dd>{formatDate(selected.verifiedAt)}</dd>
+            </div>
+            <div>
+              <dt>Source</dt>
+              <dd>{selected.sourceUrl ?? 'Not stated'}</dd>
+            </div>
+            <div>
+              <dt>Source revision</dt>
+              <dd>{selected.sourceRevision ?? 'Not stated'}</dd>
+            </div>
+            <div>
+              <dt>Publicability</dt>
+              <dd>{selected.publicability}</dd>
+            </div>
+          </dl>
+
+          <div class="evidence-focus__section">
+            <p class="evidence-focus__section-label font-mono">What this supports</p>
+            <ul>
+              {selected.supports.map((line) => <li>{line}</li>)}
+            </ul>
+          </div>
+
+          <div class="evidence-focus__section">
+            <p class="evidence-focus__section-label font-mono">Limits</p>
+            <ul>
+              {selected.limitations.map((line) => <li>{line}</li>)}
+            </ul>
+          </div>
+
+          {selected.publicCapturePath ? (
+            <div class="evidence-focus__section">
+              <p class="evidence-focus__section-label font-mono">Capture</p>
+              <p class="evidence-focus__capture-path">{selected.publicCapturePath}</p>
+            </div>
+          ) : (
+            <p class="evidence-focus__no-capture">
+              No standalone capture asset is published for this record — its capture type is{' '}
+              <strong>{selected.captureType}</strong>.
+            </p>
+          )}
+        </article>
+      ) : (
+        <div class="evidence-focus__list">
+          <p class="evidence-focus__intro">The full receipt set behind this essay's argument.</p>
+          <ol>
+            {records.map((record) => (
+              <li class="evidence-focus__list-item">
+                <a href={`/evidence/${record.id}/`}>
+                  <span class="evidence-focus__list-title">{record.title}</span>
+                  <span class="evidence-focus__list-meta font-mono">
+                    {record.evidenceClass} &middot; {record.captureType}
+                  </span>
+                </a>
+              </li>
+            ))}
+          </ol>
+        </div>
+      )}
+    </div>
+
+    <aside class="evidence-focus__rail">
+      <EvidenceGuide />
+      <ReceiptIndex records={records} currentId={selectedId} />
+    </aside>
+  </div>
+</div>
+
+<style>
+  .evidence-focus__grid {
+    display: grid;
+    gap: 2rem;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  @media (min-width: 960px) {
+    .evidence-focus__grid {
+      grid-template-columns: minmax(0, 1fr) 18rem;
+    }
+  }
+
+  .evidence-focus__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.25rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .evidence-focus__action {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--accent);
+    text-decoration: none;
+    background: none;
+    border: 0;
+    cursor: pointer;
+  }
+
+  .evidence-focus__action:hover,
+  .evidence-focus__action:focus-visible {
+    text-decoration: underline;
+  }
+
+  .evidence-focus__action-label {
+    margin-left: auto;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+  }
+
+  .evidence-focus__action--secondary {
+    color: var(--text-secondary);
+  }
+
+  .evidence-focus__eyebrow {
+    margin: 0;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-text);
+  }
+
+  .evidence-focus__title {
+    margin: 0.3rem 0 1.25rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--text-primary);
+  }
+
+  .evidence-focus__facts {
+    display: grid;
+    gap: 0.75rem 1.5rem;
+    margin: 0 0 1.5rem;
+    padding: 1rem 1.125rem;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    background: var(--bg-subtle);
+  }
+
+  @media (min-width: 560px) {
+    .evidence-focus__facts {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .evidence-focus__facts dt {
+    margin: 0 0 0.15rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+  }
+
+  .evidence-focus__facts dd {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: var(--text-primary);
+    word-break: break-word;
+  }
+
+  .evidence-focus__section {
+    margin: 0 0 1.25rem;
+  }
+
+  .evidence-focus__section-label {
+    margin: 0 0 0.35rem;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+  }
+
+  .evidence-focus__section ul {
+    margin: 0;
+    padding-left: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: var(--text-secondary);
+  }
+
+  .evidence-focus__capture-path {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+  }
+
+  .evidence-focus__no-capture {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: var(--text-tertiary);
+  }
+
+  .evidence-focus__intro {
+    margin: 0 0 1rem;
+    font-size: 0.9375rem;
+    color: var(--text-secondary);
+  }
+
+  .evidence-focus__list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .evidence-focus__list ol {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .evidence-focus__list-item a {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+  }
+
+  .evidence-focus__list-item a:hover,
+  .evidence-focus__list-item a:focus-visible {
+    border-color: var(--accent);
+    background: var(--accent-subtle);
+  }
+
+  .evidence-focus__list-title {
+    color: var(--text-primary);
+    font-size: 0.9375rem;
+  }
+
+  .evidence-focus__list-meta {
+    color: var(--text-tertiary);
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .evidence-focus__rail {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+</style>

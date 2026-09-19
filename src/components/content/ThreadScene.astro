@@ -1,0 +1,235 @@
+---
+/**
+ * ThreadScene — inline per-beat rendering for a post's running thread,
+ * placed adjacent to matching prose at each of the six canonical anchors
+ * (reading-experience-v2 DIRECTION.md V3/V7, ARCHITECTURE.md §4). It looks
+ * up its own beat from `threads.ts` by `slug` + `beatId` and renders the
+ * canonical figure, the one real recap paragraph, a semantic kind label,
+ * and an "Explore thread" link to the standalone Thread Focus route.
+ *
+ * `ThreadFocus.astro` renders the fuller composition from the exact same
+ * beat record — recap is written once in `threads.ts` and both surfaces
+ * read it, never a second hand-written explanation (V3).
+ *
+ * `composition` follows DIRECTION V6's four main-pane types. `measure`
+ * (default) keeps the scene inside the article's prose measure; `pane`
+ * breaks the whole scene out wider, for the four dense technical PNGs
+ * named in this essay's build brief (incident, deployment, drift,
+ * outcome). `split`/`inset` are accepted for forward compatibility with
+ * V6's full set — this essay's six scenes use only `measure`/`pane` today,
+ * so those two get a lighter, documented treatment rather than a full
+ * adjacent-content slot this component doesn't have a use for yet.
+ */
+import Figure from './Figure.astro';
+import { threads } from '../../data/threads';
+
+interface Props {
+  slug: string;
+  beatId: string;
+  composition?: 'measure' | 'pane' | 'split' | 'inset';
+}
+
+const { slug, beatId, composition = 'measure' } = Astro.props;
+const thread = threads[slug];
+const beat = thread?.beats.find((candidate) => candidate.id === beatId);
+
+if (!thread || !beat) {
+  console.warn(
+    `[ThreadScene] Unable to resolve beat "${beatId}" for thread "${slug}". Rendering nothing.`,
+  );
+}
+
+const kindLabel: Record<string, string> = {
+  historical: 'Historical account',
+  conceptual: 'Conceptual branch',
+  mechanism: 'Mechanism',
+  proposed: 'Proposed',
+};
+
+// Restrained cyan/violet split (DIRECTION V10): conceptual/mechanism beats
+// (the two boundary-flagged, non-historical kinds) get the cyan structural
+// accent on their kind label; historical/proposed keep the primary violet
+// accent used everywhere else in the thread.
+const kindUsesCyan = beat?.kind === 'conceptual' || beat?.kind === 'mechanism';
+---
+
+{
+  thread && beat && (
+    <section
+      id={`thread-${beat.id}`}
+      class:list={[
+        'thread-scene lift-hover',
+        composition === 'pane' && 'thread-scene--pane',
+        composition === 'split' && 'thread-scene--split',
+        composition === 'inset' && 'thread-scene--inset',
+      ]}
+      aria-labelledby={`thread-${beat.id}-label`}
+    >
+      <span class="thread-scene__corner thread-scene__corner--tl" aria-hidden="true" />
+      <span class="thread-scene__corner thread-scene__corner--tr" aria-hidden="true" />
+      <span class="thread-scene__corner thread-scene__corner--bl" aria-hidden="true" />
+      <span class="thread-scene__corner thread-scene__corner--br" aria-hidden="true" />
+
+      <div class="thread-scene__body">
+        <div class="thread-scene__head">
+          <p class="thread-scene__eyebrow font-mono">
+            <span class="thread-scene__count">
+              {beat.n}/{thread.beats.length}
+            </span>
+            <span aria-hidden="true" class="thread-scene__eyebrow-sep">
+              &middot;
+            </span>
+            <span class:list={['thread-scene__kind', kindUsesCyan && 'thread-scene__kind--cyan']}>
+              {kindLabel[beat.kind] ?? beat.kind}
+            </span>
+          </p>
+          <h3 id={`thread-${beat.id}-label`} class="thread-scene__label font-serif">
+            {beat.label}
+          </h3>
+        </div>
+
+        <p class="thread-scene__recap">{beat.recap}</p>
+
+        <Figure
+          src={beat.image.src}
+          alt={beat.image.alt}
+          caption={beat.image.caption}
+          number={String(beat.n).padStart(2, '0')}
+          longDescription={beat.longDescription}
+          figureId={beat.id}
+          slug={slug}
+          variant={composition === 'pane' ? 'technical' : 'inline'}
+        />
+
+        <a class="thread-scene__explore" href={`/essays/${slug}/thread/${beat.id}/`}>
+          Explore this thread beat <span aria-hidden="true">&rarr;</span>
+        </a>
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .thread-scene {
+    position: relative;
+    margin: 2.75rem 0;
+    padding: 1.375rem 1.5rem 1.5rem;
+    border: 1px solid var(--border-strong);
+    background: var(--bg-surface);
+    border-radius: var(--radius-lg);
+    scroll-margin-top: 6rem;
+  }
+
+  .thread-scene--inset {
+    margin: 2rem 0;
+    padding: 1rem 1.25rem 1.25rem;
+    border-style: dashed;
+  }
+
+  .thread-scene--split {
+    background: var(--bg-subtle);
+  }
+
+  .thread-scene__corner {
+    position: absolute;
+    width: 9px;
+    height: 9px;
+    border: 1px solid var(--border-strong);
+    opacity: 0.65;
+    pointer-events: none;
+  }
+
+  .thread-scene__corner--tl { top: 6px; left: 6px; border-right: 0; border-bottom: 0; }
+  .thread-scene__corner--tr { top: 6px; right: 6px; border-left: 0; border-bottom: 0; }
+  .thread-scene__corner--bl { bottom: 6px; left: 6px; border-right: 0; border-top: 0; }
+  .thread-scene__corner--br { bottom: 6px; right: 6px; border-left: 0; border-top: 0; }
+
+  .thread-scene__body {
+    border-left: 2px solid var(--accent);
+    padding-left: 1.125rem;
+  }
+
+  .thread-scene__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.35rem 1rem;
+  }
+
+  .thread-scene__eyebrow {
+    display: flex;
+    align-items: baseline;
+    gap: 0.4rem;
+    margin: 0;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-text);
+  }
+
+  .thread-scene__eyebrow-sep {
+    color: var(--text-tertiary);
+  }
+
+  .thread-scene__kind--cyan {
+    color: var(--cyan-text);
+  }
+
+  .thread-scene__label {
+    margin: 0.2rem 0 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    line-height: 1.2;
+    color: var(--text-primary);
+  }
+
+  .thread-scene__recap {
+    margin: 0.85rem 0 0;
+    font-size: 0.9375rem;
+    line-height: 1.6;
+    color: var(--text-secondary);
+  }
+
+  .thread-scene__body :global(.figure-plate) {
+    margin: 1.25rem 0 0;
+  }
+
+  .thread-scene__explore {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.35rem;
+    margin-top: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--accent);
+    text-decoration: none;
+  }
+
+  .thread-scene__explore:hover,
+  .thread-scene__explore:focus-visible {
+    color: var(--accent-hover);
+    text-decoration: underline;
+  }
+
+  .thread-scene__explore:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  /* Pane composition (V6): the whole scene breaks out wider than the prose
+     measure, for the essay's four dense technical PNGs — same technique
+     the existing figure-plate wide/technical variants use. */
+  @media (min-width: 1024px) {
+    .prose-custom > .thread-scene.thread-scene--pane {
+      width: min(calc(100% + 6rem), calc(100vw - 2rem));
+      max-width: none;
+      margin-right: -3rem;
+      margin-left: -3rem;
+    }
+  }
+</style>

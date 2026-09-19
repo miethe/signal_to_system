@@ -25,6 +25,17 @@
  * `longDescription` is exposed to screen readers only, via `aria-describedby`
  * on the figure, for dense technical figures that need more than `alt` text.
  *
+ * `figureId` (paired with `slug`) is the opt-in reading-experience-v2 path
+ * (ARCHITECTURE.md §5, V7): when both are supplied, the enlarge trigger
+ * becomes a real link to `/essays/<slug>/figure/<figureId>/` (data-kind
+ * "figure", data-key `figureId`) instead of opening this component's own
+ * private `<dialog>` — no-JS/direct-link both work because the route is a
+ * real static page, and this component never renders its private dialog
+ * for a figureId figure (risk 3: never two dialog mechanisms open on one
+ * figure). `FocusHost` (P0-C) hijacks that link's click later; until then
+ * it behaves as an ordinary link to the standalone figure route. Every
+ * other figure on the site keeps using the private lightbox, untouched.
+ *
  * Every prop from the original component (`src`, `alt`, `caption`, `number`,
  * `credit`, `creditHref`, `variant: 'default' | 'hero'`) keeps working
  * unchanged — this file is an additive extension, not a rewrite.
@@ -42,6 +53,8 @@ interface Props {
   height?: number;
   mobileSrc?: string;
   longDescription?: string;
+  figureId?: string;
+  slug?: string;
 }
 
 const {
@@ -57,6 +70,8 @@ const {
   height,
   mobileSrc,
   longDescription,
+  figureId,
+  slug,
 } = Astro.props;
 
 const isHero = variant === 'hero';
@@ -65,6 +80,11 @@ const showCaption = !isHero && (number || caption || credit);
 // Every variant is expandable by default; the hero frontispiece is the one
 // exception (no caption today, so no lightbox unless one is supplied).
 const canExpand = expandable ?? (isHero ? Boolean(caption) : true);
+
+// Opt-in FocusHost path — see the header comment. Both props are required
+// together; a figureId without a slug (or vice versa) falls back to the
+// ordinary private lightbox rather than building a broken href.
+const focusHref = figureId && slug ? `/essays/${slug}/figure/${figureId}/` : undefined;
 
 // Only allocated when needed — most figures carry no long description.
 const descId = longDescription
@@ -94,10 +114,12 @@ const descId = longDescription
       canExpand ? (
         <a
           class="figure-plate__enlarge"
-          href={src}
+          href={focusHref ?? src}
           aria-label={`Enlarge: ${alt}`}
           aria-haspopup="dialog"
-          data-figure-trigger
+          data-figure-trigger={focusHref ? undefined : true}
+          data-kind={focusHref ? 'figure' : undefined}
+          data-key={focusHref ? figureId : undefined}
         >
           {mobileSrc ? (
             <picture>
@@ -147,7 +169,7 @@ const descId = longDescription
     <p id={descId} class="sr-only">{longDescription}</p>
   )}
 
-  {canExpand && (
+  {canExpand && !focusHref && (
     <dialog
       class="figure-lightbox"
       aria-label={`Enlarged figure: ${alt}`}

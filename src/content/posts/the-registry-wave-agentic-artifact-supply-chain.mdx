@@ -31,7 +31,7 @@ import Callout from '../../components/content/Callout';
 import Figure from '../../components/content/Figure.astro';
 import Term from '../../components/content/Term.astro';
 import WhereThisSits from '../../components/content/WhereThisSits.astro';
-import ThreadBeat from '../../components/content/ThreadBeat.astro';
+import ThreadScene from '../../components/content/ThreadScene.astro';
 import Evidence from '../../components/content/Evidence.astro';
 import EvidenceLegend from '../../components/content/EvidenceLegend.astro';
 import EditionBanner from '../../components/content/EditionBanner.astro';
@@ -44,7 +44,7 @@ import EditionBanner from '../../components/content/EditionBanner.astro';
 
 The reviewer was supposed to check the work. First I had to check the reviewer.
 
-<ThreadBeat slug="the-registry-wave-agentic-artifact-supply-chain" beat="incident" />
+<ThreadScene slug="the-registry-wave-agentic-artifact-supply-chain" beatId="incident" composition="pane" />
 
 A reviewer skill used across my projects was missing a mandatory guard, so I fixed it at the source: the `/.claude/skills/` directory in my most active project. My personal registry showed the fixed version. Inside the source repository, the reviewer (obviously) had the new instruction, but every other project on the machine loaded a deployed file copy, and that copy sat five days without the fix.[^drift]
 
@@ -140,7 +140,7 @@ A skill is small enough to install and large enough to carry intent. It can tell
 
 The lifecycle starts with **authoring**: the reviewer lives in one source repository, and a fix adds the missing guard. **Registration** makes that revision discoverable. **Approval** needs to attach to an exact revision and state its permitted use. The incident doesn't give me evidence of a complete approval record; it gives me a corrected source and a registry entry that didn't match deployment.
 
-<ThreadBeat slug="the-registry-wave-agentic-artifact-supply-chain" beat="deployment" />
+<ThreadScene slug="the-registry-wave-agentic-artifact-supply-chain" beatId="deployment" composition="pane" />
 
 **Deployment** is where I lost the thread. A file copy is a separate object. Updating its source doesn't update it, and a successful registration says nothing about the copy another project loads.
 
@@ -154,7 +154,7 @@ The remedy is a recorded, registry-driven deployment. No manual copy/paste, no s
   credit="Diagram: Nick Miethe, 2026-09"
 />
 
-<ThreadBeat slug="the-registry-wave-agentic-artifact-supply-chain" beat="use" />
+<ThreadScene slug="the-registry-wave-agentic-artifact-supply-chain" beatId="use" />
 
 I need three separate answers: what the project intended to use, what is present on disk, and what the runtime actually used. A deployment check can establish the second without establishing the third. If a session started before the update, inspecting the file afterward won't tell me what it loaded. The run needs its own observation; absent that, the loaded version stays unknown.
 
@@ -168,7 +168,7 @@ At **use**, the project loads the deployed copy in its own context. The supply-c
   credit="Diagram: Nick Miethe, 2026-09"
 />
 
-<ThreadBeat slug="the-registry-wave-agentic-artifact-supply-chain" beat="drift" />
+<ThreadScene slug="the-registry-wave-agentic-artifact-supply-chain" beatId="drift" composition="pane" />
 
 At **drift**, declared and actual state separate. The fix stayed in the source repository while every project outside it kept loading the pre-fix reviewer. For five days, “fixed” described one location.
 
@@ -199,7 +199,7 @@ Two redacted entries show the distinction:
   credit="Diagram: Nick Miethe, 2026-09"
 />
 
-<ThreadBeat slug="the-registry-wave-agentic-artifact-supply-chain" beat="detection" />
+<ThreadScene slug="the-registry-wave-agentic-artifact-supply-chain" beatId="detection" />
 
 At **detection**, a gate compares deployed state with its source. The August 6 drift check classifies deployed entries, distinguishing tracked copies, justified copies, and drift; it also identifies symlinks. Drift fails the check.[^drift] A justified copy needs an explicit reason to differ. Otherwise exceptions become another way to lose the deployment record.
 
@@ -290,7 +290,7 @@ Xia and colleagues' *Harnessing Agent Skills* describes a closely related archit
 
 The lab receipts establish narrower facts: a stale reviewer copy, a drift detector, and related checks for instruction parity and stale operating guidance. They don't establish a complete artifact-version-to-outcome measurement system.
 
-<ThreadBeat slug="the-registry-wave-agentic-artifact-supply-chain" beat="outcome" />
+<ThreadScene slug="the-registry-wave-agentic-artifact-supply-chain" beatId="outcome" composition="pane" />
 
 In the model I want to build, closing that loop requires a run record that identifies which reviewer version was loaded, alongside the model, context, tools, and policy state. Join that record to the review's findings, verification, and acceptance decision. Then ask which runs used the old copy and which outputs need re-review. Where the loaded identity wasn't captured, mark the run's version unknown. Don't reconstruct certainty from the current registry.
 

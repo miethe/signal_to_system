@@ -3,14 +3,13 @@ import BaseLayout from './BaseLayout.astro';
 import Figure from '../components/content/Figure.astro';
 import RelatedContent from '../components/content/RelatedContent.astro';
 import AuthorProfile from '../components/content/AuthorProfile.astro';
-import LeaderTakeaway from '../components/content/LeaderTakeaway.astro';
-import PostSidebar from '../components/content/PostSidebar.astro';
+import ReadingCompanion from '../components/content/ReadingCompanion.astro';
+import FocusTemplates from '../components/content/FocusTemplates.astro';
 import SeriesWayfinding from '../components/content/SeriesWayfinding.astro';
 import ExecutiveSignal from '../components/content/ExecutiveSignal.astro';
 import { generateJsonLd, buildCanonicalUrl } from '../lib/seo';
 import { formatDate, formatDateISO } from '../lib/utils';
 import { site } from '../data/site';
-import { threads } from '../data/threads';
 import type { Article } from '../lib/content';
 
 interface Heading {
@@ -39,7 +38,6 @@ interface Props {
     series?: string;
     seriesPart?: number;
     draft?: boolean;
-    takeawayPlacement?: 'body' | 'rail';
     heroPlacement?: 'default' | 'frontispiece';
   };
   // Optional: inject prev/next series posts from the page. `href` is
@@ -52,7 +50,6 @@ interface Props {
 }
 
 const { slug, headings = [], frontmatter, prevPost, nextPost, relatedItems = [] } = Astro.props;
-const thread = slug ? threads[slug] : undefined;
 
 const {
   title,
@@ -70,12 +67,10 @@ const {
   leaderTakeaway,
   series,
   seriesPart,
-  takeawayPlacement = 'body',
   heroPlacement = 'default',
 } = frontmatter;
 
 const isFrontispiece = heroPlacement === 'frontispiece';
-const showRailTakeaway = takeawayPlacement === 'rail';
 
 const pageDescription = description || excerpt || site.description;
 const canonicalUrl = buildCanonicalUrl(Astro.url.pathname);
@@ -207,14 +202,18 @@ const jsonLd = generateJsonLd('article', {
       }
     </header>
 
-    <!-- Desktop rail follows the header in source order and spans the article column: author card (collapsing to a badge on scroll), a live TOC in the space it frees, then the running-example thread. -->
-    <div class="no-scrollbar hidden xl:col-start-2 xl:row-span-2 xl:row-start-1 xl:block xl:self-start xl:sticky xl:top-24 xl:max-h-[calc(100vh-7rem)] xl:overflow-y-auto xl:pr-1">
-      <PostSidebar
-        slug={thread?.slug}
-        headings={headings}
-        takeaway={leaderTakeaway}
-        showTakeaway={showRailTakeaway}
-      />
+    <!-- Desktop rail follows the header in source order and spans the
+         article column. Reading-experience-v2 DIRECTION.md V5: the author
+         card sits in flow here and scrolls away with the page; only
+         ReadingCompanion (outline + ThreadDock + optional ContextualNote)
+         is the sticky surface at depth. -->
+    <div class="hidden xl:col-start-2 xl:row-span-2 xl:row-start-1 xl:block xl:self-start">
+      <div class="mb-4">
+        <AuthorProfile variant="sidebar" headingLevel="h2" />
+      </div>
+      <div class="no-scrollbar xl:sticky xl:top-24 xl:max-h-[calc(100vh-7rem)] xl:overflow-y-auto xl:pr-1">
+        <ReadingCompanion slug={slug} headings={headings} />
+      </div>
     </div>
 
     <div class="min-w-0 xl:col-start-1 xl:row-start-2">
@@ -236,23 +235,14 @@ const jsonLd = generateJsonLd('article', {
       )
     }
 
-    <!-- Executive signal: "why this matters" plus, when the essay places
-         its takeaway in the rail, the mobile-only "carry this forward"
-         half (PostSidebar's rail card is the xl+ home for that text). -->
+    <!-- Executive signal: "why this matters" plus "carry this forward",
+         always in flow at every breakpoint (DIRECTION.md V5) — there is
+         no more rail-only takeaway card to avoid duplicating. -->
     {
       whyItMatters && (
-        <ExecutiveSignal
-          whyItMatters={whyItMatters}
-          takeaway={leaderTakeaway}
-          showTakeaway={showRailTakeaway}
-        />
+        <ExecutiveSignal whyItMatters={whyItMatters} takeaway={leaderTakeaway} />
       )
     }
-
-    <!-- Leader Takeaway (executive summary card) — skipped when the essay
-         places its takeaway in the rail instead (ExecutiveSignal above
-         already carries it for mobile in that case). -->
-    {!showRailTakeaway && leaderTakeaway && <LeaderTakeaway text={leaderTakeaway} />}
 
     <!-- Article body -->
     <div class="prose-custom">
@@ -322,6 +312,11 @@ const jsonLd = generateJsonLd('article', {
     </footer>
   </div>
   </article>
+
+  <!-- Inert <template> fragments for a future FocusHost controller (P0-C)
+       to clone — see FocusTemplates.astro's header comment. No-op for
+       posts without a thread. -->
+  {slug && <FocusTemplates slug={slug} />}
 
   <!-- Scroll to top button -->
   <button

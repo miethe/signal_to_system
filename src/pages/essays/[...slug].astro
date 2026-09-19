@@ -35,7 +35,6 @@ const relatedItems = await getRelatedArticles(post);
     series: post.data.series,
     seriesPart: post.data.seriesOrder,
     draft: post.data.status === 'draft',
-    takeawayPlacement: post.data.takeawayPlacement,
     heroPlacement: post.data.heroPlacement,
   }}
   relatedItems={relatedItems}

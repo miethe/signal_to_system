@@ -1,26 +1,23 @@
 ---
 /**
  * ExecutiveSignal — the post-level executive read: "why this matters" and,
- * when the post wants it, "what to carry forward". Replaces the ad-hoc
+ * when the post has one, "what to carry forward". Replaces the ad-hoc
  * `whyItMatters` aside plus the in-body `LeaderTakeaway` render that used to
  * sit at the top of the body.
  *
- * Two columns at `sm:` and up when a takeaway is shown; stacks otherwise.
- * The takeaway half mirrors PostLayout's mobile-author-card pattern
- * (`xl:hidden`): below `xl` this is the only place the takeaway renders; at
- * `xl+`, PostSidebar's rail card takes over, so this half hides there
- * rather than showing the same text twice. `showTakeaway` only gates
- * whether the essay wants a takeaway at all (from `takeawayPlacement`) —
- * the viewport split is handled by CSS, not by this prop.
+ * Reading-experience-v2 DIRECTION.md V5: the takeaway now always renders
+ * in flow here, at every breakpoint — there is no more rail-only takeaway
+ * card to avoid duplicating (the old `takeawayPlacement`/`showRailTakeaway`
+ * split retired with `PostSidebar`). Two columns at `sm:` and up when a
+ * takeaway is present; stacks otherwise.
  */
 interface Props {
   whyItMatters: string;
   takeaway?: string;
-  showTakeaway?: boolean;
 }
 
-const { whyItMatters, takeaway, showTakeaway = false } = Astro.props;
-const hasTakeaway = Boolean(showTakeaway && takeaway);
+const { whyItMatters, takeaway } = Astro.props;
+const hasTakeaway = Boolean(takeaway);
 ---
 
 <aside
@@ -34,7 +31,7 @@ const hasTakeaway = Boolean(showTakeaway && takeaway);
   </div>
   {
     hasTakeaway && (
-      <div class="executive-signal__col executive-signal__col--takeaway xl:hidden">
+      <div class="executive-signal__col executive-signal__col--takeaway">
         <p class="executive-signal__eyebrow">Carry this forward</p>
         <p class="executive-signal__body">{takeaway}</p>
       </div>

@@ -119,6 +119,14 @@
   --accent-muted:   #c7d2fe;
   --accent-text:    #3730a3;
 
+  /* Restrained cyan structural accent (reading-experience-v2 DIRECTION V10,
+     from $H/contracts/design-tokens.css's --cyan). Used sparingly, next to
+     violet, for mechanism/detection-flavored structure (kind labels, the
+     figure-viewer chrome) — never as a second primary accent. */
+  --cyan:           #0e7490;
+  --cyan-text:      #0e7490;
+  --cyan-subtle:    #ecfeff;
+
   --code-bg:        #f1f5f9;
   --code-bg-block:  #f8fafc;
   --code-text:      #0f172a;
@@ -164,6 +172,12 @@
   --accent-subtle:  #464554;
   --accent-muted:   #6f00be;
   --accent-text:    #c0c1ff;
+
+  /* Restrained cyan structural accent — matches Tier A's midnight/navy/
+     violet/cyan language (see the :root block above for the rationale). */
+  --cyan:           #82d3ec;
+  --cyan-text:      #82d3ec;
+  --cyan-subtle:    rgba(130, 211, 236, 0.14);
 
   --code-bg:        #131b2e;
   --code-bg-block:  #060e20;

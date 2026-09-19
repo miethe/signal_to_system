@@ -1,0 +1,47 @@
+---
+/**
+ * Standalone Thread Focus route (reading-experience-v2 ARCHITECTURE.md §2):
+ * `/essays/<slug>/thread/<beat>/`. Renders fully without JS (N09) — the
+ * same `ThreadFocus` component this page uses also backs the in-place
+ * overlay's inline `<template>` fragment (see `PostLayout.astro`), so
+ * there is never a second hand-written explanation for a beat.
+ */
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import ThreadFocus from '../../../../components/content/ThreadFocus.astro';
+import { threads } from '../../../../data/threads';
+import { buildCanonicalUrl } from '../../../../lib/seo';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts');
+  const paths: Array<{ params: { slug: string; beat: string }; props: { postTitle: string } }> = [];
+
+  for (const post of posts) {
+    const thread = threads[post.id];
+    if (!thread) continue;
+    for (const beat of thread.beats) {
+      paths.push({ params: { slug: post.id, beat: beat.id }, props: { postTitle: post.data.title } });
+    }
+  }
+
+  return paths;
+}
+
+const { slug, beat: beatParam } = Astro.params;
+const { postTitle } = Astro.props;
+const thread = slug ? threads[slug] : undefined;
+const beat = thread?.beats.find((candidate) => candidate.id === beatParam);
+
+if (!thread || !beat) {
+  throw new Error(`No thread beat "${beatParam}" registered for essay slug "${slug}".`);
+}
+
+const pageTitle = `${beat.label} — ${postTitle}`;
+const canonicalUrl = buildCanonicalUrl(Astro.url.pathname);
+---
+
+<BaseLayout title={pageTitle} description={beat.recap} canonicalUrl={canonicalUrl}>
+  <div class="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
+    <ThreadFocus thread={thread} beatId={beat.id} standalone={true} />
+  </div>
+</BaseLayout>

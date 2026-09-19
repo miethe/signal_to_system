@@ -1,0 +1,119 @@
+---
+/**
+ * ThreadOverview — Thread Focus rail component (ARCHITECTURE.md §4, spec
+ * §7): the six real beat links plus a brief note that the thread is an
+ * editorial sequence, not six successive observed events. No article TOC
+ * appears here (spec §3) — this is the only navigation in Thread Focus.
+ */
+import type { Thread } from '../../data/threads';
+
+interface Props {
+  thread: Thread;
+  currentBeatId: string;
+}
+
+const { thread, currentBeatId } = Astro.props;
+---
+
+<nav class="thread-overview" aria-label="Thread beats">
+  <p class="thread-overview__eyebrow font-mono">Thread overview</p>
+
+  <ol class="thread-overview__list">
+    {
+      thread.beats.map((beat) => (
+        <li>
+          <a
+            href={`/essays/${thread.slug}/thread/${beat.id}/`}
+            class="thread-overview__link"
+            aria-current={beat.id === currentBeatId ? 'page' : undefined}
+          >
+            <span class="thread-overview__number font-mono" aria-hidden="true">
+              {beat.n}
+            </span>
+            <span>{beat.label}</span>
+          </a>
+        </li>
+      ))
+    }
+  </ol>
+
+  <p class="thread-overview__note">
+    This is an editorial sequence written to develop one argument in order — not a record of six
+    separately observed events in the same session.
+  </p>
+</nav>
+
+<style>
+  .thread-overview {
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    background: var(--bg-subtle);
+    padding: 0.875rem 1rem;
+  }
+
+  .thread-overview__eyebrow {
+    margin: 0 0 0.6rem;
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent-text);
+  }
+
+  .thread-overview__list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+    margin: 0 0 0.75rem;
+    padding: 0;
+    list-style: none;
+  }
+
+  .thread-overview__link {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    border-radius: var(--radius-sm);
+    padding: 0.35rem 0.4rem;
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+  }
+
+  .thread-overview__link:hover,
+  .thread-overview__link:focus-visible {
+    background: var(--accent-subtle);
+    color: var(--text-primary);
+    outline: none;
+  }
+
+  .thread-overview__link:focus-visible {
+    box-shadow: 0 0 0 2px var(--accent);
+  }
+
+  .thread-overview__link[aria-current='page'] {
+    background: var(--accent-subtle);
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  .thread-overview__number {
+    flex-shrink: 0;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    color: var(--text-tertiary);
+  }
+
+  .thread-overview__link[aria-current='page'] .thread-overview__number {
+    color: var(--accent-text);
+  }
+
+  .thread-overview__note {
+    margin: 0;
+    padding-top: 0.65rem;
+    border-top: 1px solid var(--border-subtle);
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--text-tertiary);
+  }
+</style>

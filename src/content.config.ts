@@ -33,9 +33,11 @@ const posts = defineCollection({
     featured: z.boolean().optional(),
     heroImage: z.string().optional(),
     heroAlt: z.string().optional(),
-    // Layout options (PostLayout). Both default to today's behavior when
+    // Layout option (PostLayout). Defaults to today's behavior when
     // omitted — additive, not a breaking change to any existing post.
-    takeawayPlacement: z.enum(["body", "rail"]).optional(),
+    // `takeawayPlacement` retired (reading-experience-v2 DIRECTION.md V5):
+    // ExecutiveSignal now always carries the takeaway in flow, at every
+    // breakpoint, so there is no more rail-vs-body choice to make.
     heroPlacement: z.enum(["default", "frontispiece"]).optional(),
 
     // Cross-collection discovery (shared vocab with the `stories` collection).

@@ -1,9 +1,10 @@
 /**
- * Shared by PostSidebar's TOC and ThreadRail's step list: given a full item
- * count and how many rows actually fit, pick a contiguous window around the
- * active item so the reader's current position is never scrolled out of
- * view. Both callers measure `maxVisible` themselves (their rows differ in
- * height) — this is just the centering arithmetic, once.
+ * Shared by ReadingCompanion's nearby-chapter outline (formerly
+ * PostSidebar's TOC): given a full item count and how many rows actually
+ * fit, pick a contiguous window around the active item so the reader's
+ * current position is never scrolled out of view. The caller measures
+ * `maxVisible` itself (rows differ in height) — this is just the
+ * centering arithmetic, once.
  */
 export interface ListWindow {
   /** First visible index (inclusive). */
