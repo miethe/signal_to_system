@@ -10,10 +10,10 @@
 // variant, and `ThreadRail.astro` currently read this same registry; P0-B
 // retires the first two and folds the third into `ThreadDock`.
 //
-// Beat order is the canonical six (DIRECTION.md V2): incident, deployment,
-// use, drift, detection, outcome. This reverts the prior W1 reorder
-// (incident, divergence, detection, reconcile, use, outcome) back to the
-// order the manuscript's own `<ThreadBeat beat="...">` calls already use.
+// Beat order is the canonical six (DIRECTION.md V12): Incident, Deployment,
+// Use, Drift, Detection, Outcome. The essay places each `ThreadScene` beside
+// its movement prose in exactly this order, while this record remains the
+// one shared account for inline and Thread Focus readers.
 //
 // Every `recap` / `establishes` / `doesNotEstablish` / `longDescription`
 // below is written fresh, grounded in the manuscript's own prose and figure
@@ -36,8 +36,8 @@ export interface ThreadBeatImage {
 export interface ThreadBeat {
   id: string; // anchor id is `thread-${id}`
   n: number;
-  label: string;
-  recap: string; // 1-2 sentences; the one real paragraph inline and Thread Focus both render
+  label: string; // display title, shared by inline and Thread Focus
+  recap: string; // one real paragraph; inline and Thread Focus both render it
   kind: ThreadBeatKind; // historical | conceptual | mechanism | proposed (thread-manifest.json's `mode`)
   establishes: string; // what this beat's evidence actually shows
   doesNotEstablish: string; // the boundary readers should not read past
