@@ -145,6 +145,17 @@ const formatDate = (value: string | null) => value ?? 'Not stated';
               <strong>{selected.captureType}</strong>.
             </p>
           )}
+
+          {essaySlug && selected.relatedSceneIds.length > 0 && (
+            <nav class="evidence-focus__figure-links" aria-label="Related figures">
+              <p class="evidence-focus__section-label font-mono">Related figures</p>
+              <ul>
+                {selected.relatedSceneIds.map((sceneId) => (
+                  <li><a href={`/essays/${essaySlug}/figure/${sceneId}/`}>View {sceneId} figure &rarr;</a></li>
+                ))}
+              </ul>
+            </nav>
+          )}
         </article>
       ) : <p class="evidence-focus__intro">No public receipts are available for this essay.</p>}
     </div>
@@ -326,6 +337,26 @@ const formatDate = (value: string | null) => value ?? 'Not stated';
     margin: 0 0 1rem;
     font-size: 0.9375rem;
     color: var(--text-secondary);
+  }
+
+  .evidence-focus__figure-links ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .evidence-focus__figure-links a {
+    color: var(--accent);
+    font-size: 0.8125rem;
+    text-decoration: none;
+  }
+
+  .evidence-focus__figure-links a:hover,
+  .evidence-focus__figure-links a:focus-visible {
+    text-decoration: underline;
   }
 
   .evidence-focus__list {

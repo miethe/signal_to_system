@@ -44,6 +44,8 @@ interface RootSnapshot {
   headingId: string | null;
   anchorId: string | null;
   offsetWithinAnchor: number;
+  viewportWidth: number;
+  viewportHeight: number;
 }
 
 type FocusAction =
@@ -104,6 +106,9 @@ export function initFocusHost(): void {
 
   const essaySlug = dialogEl.dataset.essaySlug ?? '';
   const docToken = Math.random().toString(36).slice(2);
+  // Browser history otherwise restores the root entry's old scroll position
+  // after our popstate handler, overwriting the explicit return snapshot.
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 
   const entries = new Map<string, FocusEntry>();
   let seq = 0;
@@ -187,8 +192,12 @@ export function initFocusHost(): void {
 
   const captureOrigin = (trigger: HTMLElement | null): RootSnapshot => {
     const anchors = Array.from(document.querySelectorAll<HTMLElement>('.section-marker > h2, .thread-scene'));
-    const anchor = anchors.filter((candidate) => candidate.getBoundingClientRect().top <= 96).at(-1) ?? anchors[0] ?? null;
-    return { x: window.scrollX, y: window.scrollY, trigger, headingId: trigger?.closest('section')?.querySelector('h2, h3')?.id ?? null, anchorId: anchor?.id ?? null, offsetWithinAnchor: anchor ? window.scrollY - (anchor.getBoundingClientRect().top + window.scrollY) : 0 };
+    // A scene trigger has a stable, explicit scene anchor. Prefer it over a
+    // preceding section heading so a viewport reflow restores the selected
+    // scene's relative position rather than a stale section offset.
+    const scene = trigger?.closest<HTMLElement>('.thread-scene') ?? null;
+    const anchor = scene ?? anchors.filter((candidate) => candidate.getBoundingClientRect().top <= 96).at(-1) ?? anchors[0] ?? null;
+    return { x: window.scrollX, y: window.scrollY, trigger, headingId: trigger?.closest('section')?.querySelector('h2, h3')?.id ?? null, anchorId: anchor?.id ?? null, offsetWithinAnchor: anchor ? window.scrollY - (anchor.getBoundingClientRect().top + window.scrollY) : 0, viewportWidth: window.innerWidth, viewportHeight: window.innerHeight };
   };
 
   const saveCurrentEntryState = () => {
@@ -257,21 +266,38 @@ export function initFocusHost(): void {
     }
   };
 
+  const scrollImmediately = (x: number, y: number) => {
+    const previous = document.documentElement.style.scrollBehavior;
+    document.documentElement.style.scrollBehavior = 'auto';
+    window.scrollTo({ left: x, top: y, behavior: 'auto' });
+    document.documentElement.style.scrollBehavior = previous;
+  };
+
   const restoreRoot = (afterRestore?: () => void) => {
     if (dialogEl.open) dialogEl.close();
     unlockScroll();
     const snapshot = origin;
-    if (snapshot) {
-      const anchor = snapshot.anchorId ? document.getElementById(snapshot.anchorId) : null;
-      const y = anchor ? anchor.getBoundingClientRect().top + window.scrollY + snapshot.offsetWithinAnchor : snapshot.y;
-      window.scrollTo(snapshot.x, Math.max(0, Math.min(y, document.documentElement.scrollHeight - window.innerHeight)));
-    }
     entries.clear();
     currentKey = null;
     rootKey = null;
     requestAnimationFrame(() => {
-      if (afterRestore) afterRestore();
-      else restoreFocusToOrigin(snapshot);
+      // `close()` and undoing the fixed-body lock do not make the essay's
+      // height available in the same frame. Restoring and clamping there
+      // turns any deep position into zero because scrollHeight is viewport
+      // height while the modal/lock transition is still being committed.
+      requestAnimationFrame(() => {
+        if (snapshot) {
+          const anchor = snapshot.anchorId ? document.getElementById(snapshot.anchorId) : null;
+          const viewportChanged = snapshot.viewportWidth !== window.innerWidth || snapshot.viewportHeight !== window.innerHeight;
+          const y = anchor
+            ? anchor.getBoundingClientRect().top + window.scrollY + (viewportChanged ? 0 : snapshot.offsetWithinAnchor)
+            : snapshot.y;
+          const maxY = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+          scrollImmediately(snapshot.x, Math.max(0, Math.min(y, maxY)));
+        }
+        if (afterRestore) afterRestore();
+        else restoreFocusToOrigin(snapshot);
+      });
     });
   };
 
@@ -279,7 +305,8 @@ export function initFocusHost(): void {
     const target = document.getElementById(anchorId);
     if (!target) return;
     writeHistory('replaceState', history.state, `#${anchorId}`);
-    target.scrollIntoView({ block: 'start', behavior: reduceMotion() ? 'auto' : 'smooth' });
+    const y = target.getBoundingClientRect().top + window.scrollY;
+    scrollImmediately(window.scrollX, y);
     const heading = target.querySelector<HTMLElement>('h2, h3') ?? target;
     requestAnimationFrame(() => {
       if (!heading.hasAttribute('tabindex')) heading.setAttribute('tabindex', '-1');
@@ -415,6 +442,27 @@ export function initFocusHost(): void {
   dialogEl.addEventListener('cancel', (event) => {
     event.preventDefault();
     closeOne();
+  });
+
+  dialogEl.addEventListener('keydown', (event) => {
+    if (event.key !== 'Tab') return;
+    const focusable = Array.from(
+      dialogEl.querySelectorAll<HTMLElement>(
+        'a[href], area[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      ),
+    ).filter((element) => !element.hidden && element.getClientRects().length > 0);
+    if (focusable.length === 0) {
+      event.preventDefault();
+      dialogEl.focus({ preventScroll: true });
+      return;
+    }
+    const first = focusable[0];
+    const last = focusable.at(-1) as HTMLElement;
+    const active = document.activeElement as HTMLElement | null;
+    if (event.shiftKey ? active === first || !dialogEl.contains(active) : active === last || !dialogEl.contains(active)) {
+      event.preventDefault();
+      (event.shiftKey ? last : first).focus({ preventScroll: true });
+    }
   });
 
   document.addEventListener('click', (event) => {

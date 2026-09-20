@@ -18,6 +18,7 @@
 import Figure from './Figure.astro';
 import RunningExampleCard from './RunningExampleCard.astro';
 import ThreadOverview from './ThreadOverview.astro';
+import { evidence } from '../../data/evidence';
 import type { Thread } from '../../data/threads';
 
 interface Props {
@@ -31,6 +32,7 @@ const beat = thread.beats.find((candidate) => candidate.id === beatId);
 const beatIndex = beat ? thread.beats.findIndex((candidate) => candidate.id === beatId) : -1;
 const prevBeat = beatIndex > 0 ? thread.beats[beatIndex - 1] : null;
 const nextBeat = beatIndex > -1 && beatIndex < thread.beats.length - 1 ? thread.beats[beatIndex + 1] : null;
+const relatedEvidence = beat ? beat.relatedEvidenceIds.map((id) => evidence[id]).filter(Boolean) : [];
 
 const kindLabel: Record<string, string> = {
   historical: 'Historical account',
@@ -85,6 +87,17 @@ const kindLabel: Record<string, string> = {
           <a class="thread-focus__figure-link" href={`/essays/${thread.slug}/figure/${beat.id}/`}>
             View this figure in the Figure Viewer &rarr;
           </a>
+
+          {relatedEvidence.length > 0 && (
+            <nav class="thread-focus__evidence-links" aria-label="Related evidence">
+              <p class="thread-focus__boundary-label font-mono">Related evidence</p>
+              <ul>
+                {relatedEvidence.map((record) => (
+                  <li><a href={`/evidence/${record.id}/`}>{record.title} &rarr;</a></li>
+                ))}
+              </ul>
+            </nav>
+          )}
 
           <div class="thread-focus__boundary">
             <div>
@@ -221,6 +234,30 @@ const kindLabel: Record<string, string> = {
 
   .thread-focus__figure-link:hover,
   .thread-focus__figure-link:focus-visible {
+    text-decoration: underline;
+  }
+
+  .thread-focus__evidence-links {
+    margin: 1.25rem 0 0;
+  }
+
+  .thread-focus__evidence-links ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .thread-focus__evidence-links a {
+    color: var(--accent);
+    font-size: 0.8125rem;
+    text-decoration: none;
+  }
+
+  .thread-focus__evidence-links a:hover,
+  .thread-focus__evidence-links a:focus-visible {
     text-decoration: underline;
   }
 

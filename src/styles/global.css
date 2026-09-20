@@ -373,6 +373,7 @@ hr {
 
 /* --- Code blocks --- */
 pre {
+  max-width: 100%;
   font-family: var(--font-mono);
   font-size: 0.875rem;
   line-height: 1.7;
@@ -588,17 +589,21 @@ pre code {
 }
 
 /* Keep the tooltip on-screen on narrow viewports instead of overflowing */
-@media (max-width: 480px) {
+@media (max-width: 900px) {
   .glossary-tooltip {
-    left: 50%;
-    transform: translate(-50%, 4px);
-    max-width: calc(100vw - 2rem);
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    left: 1rem;
+    width: auto;
+    max-width: none;
+    transform: translateY(4px);
   }
 
   .glossary-term:hover .glossary-tooltip,
   .glossary-term:focus-within .glossary-tooltip,
   .glossary-term dfn:focus-visible ~ .glossary-tooltip {
-    transform: translate(-50%, 0);
+    transform: translateY(0);
   }
 }
 
@@ -672,6 +677,9 @@ pre code {
 
 /* --- Code blocks --- */
 .prose-custom pre {
+  min-width: 0;
+  max-width: 100%;
+  contain: inline-size;
   font-family: var(--font-mono);
   font-size: 0.875rem;
   line-height: 1.7;
@@ -697,11 +705,13 @@ pre code {
 
 /* --- Tables --- */
 .prose-custom table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
   width: 100%;
   border-collapse: collapse;
   font-size: 0.9375rem;
   margin: 1.75rem 0;
-  overflow: hidden;
   border-radius: 0.5rem;
   border: 1px solid var(--border);
 }

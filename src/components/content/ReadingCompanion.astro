@@ -418,9 +418,27 @@ const toc = rawToc.map((heading) => {
       const showContextualNote = (sectionId: string | null) => {
         if (!noteRoot || noteRoot.contains(document.activeElement) || document.querySelector('[data-focus-dialog][open]')) return;
         const candidates = Array.from(noteRoot.querySelectorAll<HTMLElement>('[data-contextual-note-item]'));
-        const visible = candidates.find((item) => item.dataset.sectionId === sectionId && !dismissedNotes.has(item.dataset.noteId ?? ''));
+        const visible = candidates.find((item) => item.dataset.sectionId === sectionId && item.dataset.dismissed !== 'true' && !dismissedNotes.has(item.dataset.noteId ?? ''));
         noteRoot.hidden = !visible;
         candidates.forEach((item) => { item.hidden = item !== visible; });
+      };
+
+      // The outline's active marker deliberately follows a narrow reading
+      // line. A contextual note belongs to its authored section as soon as
+      // that section is visible, including after an anchor is brought merely
+      // into view rather than aligned to the reading line.
+      const syncContextualNote = () => {
+        if (!noteRoot || noteRoot.contains(document.activeElement) || document.querySelector('[data-focus-dialog][open]')) return;
+        const candidates = Array.from(noteRoot.querySelectorAll<HTMLElement>('[data-contextual-note-item]'));
+        const visibleSection = candidates
+          .map((item) => document.getElementById(item.dataset.sectionId ?? ''))
+          .filter((target): target is HTMLElement => Boolean(target))
+          .filter((target) => {
+            const rect = target.getBoundingClientRect();
+            return rect.bottom >= 0 && rect.top <= window.innerHeight;
+          })
+          .sort((a, b) => Math.abs(a.getBoundingClientRect().top) - Math.abs(b.getBoundingClientRect().top))[0];
+        showContextualNote(visibleSection?.id ?? resolveSection(pairs[activeIndex]?.target.id ?? '') ?? null);
       };
 
       document.addEventListener('reading-section-change', ((event: CustomEvent<{ sectionId: string | null }>) => {
@@ -430,6 +448,9 @@ const toc = rawToc.map((heading) => {
         button.addEventListener('click', () => {
           const note = button.closest<HTMLElement>('[data-contextual-note-item]');
           if (note?.dataset.noteId) dismissedNotes.add(note.dataset.noteId);
+          if (note) note.dataset.dismissed = 'true';
+          if (note) note.hidden = true;
+          if (noteRoot) noteRoot.hidden = true;
           showContextualNote(note?.dataset.sectionId ?? null);
         });
       });
@@ -487,6 +508,7 @@ const toc = rawToc.map((heading) => {
         requestAnimationFrame(() => {
           recomputeQueued = false;
           recomputeActive();
+          syncContextualNote();
         });
       };
 
