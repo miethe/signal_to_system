@@ -15,6 +15,7 @@
  * leg every action below is a real link, so the standalone route and the
  * eventual overlay share one navigable, no-JS-safe destination for each.
  */
+import '../../styles/registry-wave-v2.css';
 import Figure from './Figure.astro';
 import RunningExampleCard from './RunningExampleCard.astro';
 import ThreadOverview from './ThreadOverview.astro';
@@ -44,7 +45,7 @@ const kindLabel: Record<string, string> = {
 
 {
   beat && (
-    <div class="thread-focus" data-focus-kind="thread" data-focus-key={beat.id}>
+    <div class:list={['thread-focus', thread.slug === 'the-registry-wave-agentic-artifact-supply-chain' && 'registry-wave-focus']} data-focus-kind="thread" data-focus-key={beat.id}>
       <div class="thread-focus__grid">
         <div class="thread-focus__main">
           <div class="thread-focus__actions">

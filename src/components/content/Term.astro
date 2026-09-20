@@ -22,9 +22,6 @@ if (!entry) {
   );
 }
 
-const label = await Astro.slots.render('default');
-const displayText = label && label.trim().length > 0 ? label : entry.term;
-
 // Resolve the defining post, if any, and only link to it when it exists, is
 // published, and is NOT the page the reader is already on — otherwise the
 // tooltip omits the "Read more" link entirely. Every term is coined in the
@@ -48,7 +45,7 @@ const tooltipId = `glossary-tooltip-${id}`;
 ---
 
 <span class="glossary-term">
-  <dfn tabindex="0" aria-describedby={tooltipId} set:html={displayText} />
+  <dfn tabindex="0" aria-describedby={tooltipId}><slot>{entry.term}</slot></dfn>
   <span role="tooltip" id={tooltipId} class="glossary-tooltip">
     <span class="glossary-tooltip-definition">{entry.definition}</span>
     {readMoreHref && (

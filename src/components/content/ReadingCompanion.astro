@@ -443,15 +443,8 @@ const toc = rawToc.map((heading) => {
           rail.style.height = `${Math.max(0, pct)}%`;
         }
 
-        const activeLink = activeIndex > -1 ? pairs[activeIndex]?.link : null;
-        // The desktop companion is intentionally a visible, sticky rail,
-        // not a scroll container. Calling scrollIntoView on one of its links
-        // would therefore scroll the document and can pull a scene trigger
-        // out from under an in-progress pointer interaction.
-        const companionScroller = activeLink?.closest<HTMLElement>('[data-companion-scroll]');
-        if (companionScroller && companionScroller.scrollHeight > companionScroller.clientHeight) {
-          activeLink?.scrollIntoView({ block: 'nearest', behavior: reduceMotion() ? 'auto' : 'smooth' });
-        }
+        // This rail has no nested scroll area. Updating reading position
+        // must never move the article to reveal a companion link.
         lastFitSignature = ''; // active index changed — force a re-evaluation
         queueFit();
       };

@@ -1,4 +1,5 @@
 ---
+import '../styles/registry-wave-v2.css';
 import BaseLayout from './BaseLayout.astro';
 import Figure from '../components/content/Figure.astro';
 import RelatedContent from '../components/content/RelatedContent.astro';
@@ -121,8 +122,9 @@ const jsonLd = generateJsonLd('article', {
          resolvable. It remains ahead of the title/dek/meta at every size. -->
     {
       isFrontispiece && heroImage && (
-        <div class:list={['w-full pt-0', isRegistryWave ? 'xl:col-start-1 xl:row-start-1' : 'xl:col-span-2 xl:row-start-1']}>
+        <div class:list={['post-frontispiece w-full pt-0', isRegistryWave ? 'xl:col-start-1 xl:row-start-1' : 'xl:col-span-2 xl:row-start-1']}>
           <Figure src={heroImage} alt={resolvedHeroAlt} variant="hero" />
+          {isRegistryWave && <span class="post-frontispiece__caption">Editorial illustration</span>}
         </div>
       )
     }
@@ -137,7 +139,7 @@ const jsonLd = generateJsonLd('article', {
     >
       {
         category && (
-          <div>
+          <div class="post-category">
             <span class="font-mono inline-block rounded-full bg-[var(--accent-subtle)] px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[var(--accent-text)] ring-1 ring-inset ring-[var(--border-subtle)]">
               {category}
             </span>
@@ -171,7 +173,7 @@ const jsonLd = generateJsonLd('article', {
       }
 
       <!-- Meta row -->
-      <div class="font-mono flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-[var(--text-disabled)]">
+      <div class="post-meta font-mono flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-[var(--text-disabled)]">
         <time datetime={publishedISO} class="text-[var(--text-tertiary)]">
           {formatDate(date)}
         </time>
@@ -199,7 +201,7 @@ const jsonLd = generateJsonLd('article', {
       <!-- Tags -->
       {
         tags.length > 0 && (
-          <div class="flex flex-wrap gap-2 pt-1">
+          <div class="post-tags flex flex-wrap gap-2 pt-1">
             {tags.map((tag) => (
               <a
                 href={`/tags/${tag}`}

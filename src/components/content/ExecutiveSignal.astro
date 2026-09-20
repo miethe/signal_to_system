@@ -19,6 +19,7 @@ interface Props {
 
 const { whyItMatters, takeaway, placement = 'body' } = Astro.props;
 const hasTakeaway = Boolean(takeaway);
+const takeawayBreak = takeaway?.indexOf('. ') ?? -1;
 ---
 
 <aside
@@ -39,7 +40,7 @@ const hasTakeaway = Boolean(takeaway);
     hasTakeaway && (
       <div class="executive-signal__col executive-signal__col--takeaway">
         <p class="executive-signal__eyebrow">Carry this forward</p>
-        <p class="executive-signal__body">{takeaway}</p>
+        <p class="executive-signal__body">{takeawayBreak > -1 ? <><span class="executive-signal__lead">{takeaway?.slice(0, takeawayBreak + 1)}</span>{' '}<span class="executive-signal__continuation">{takeaway?.slice(takeawayBreak + 2)}</span></> : takeaway}</p>
       </div>
     )
   }

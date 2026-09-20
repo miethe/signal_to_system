@@ -20,7 +20,7 @@ interface Props {
 const { note, revisedDate, changelogHref } = Astro.props;
 ---
 
-<p class="revision-note">
+<div class="revision-note">
   <span class="revision-note__date">Revised {revisedDate}</span>
   <details class="revision-note__details">
     <summary>What&rsquo;s changed?</summary>
@@ -36,7 +36,7 @@ const { note, revisedDate, changelogHref } = Astro.props;
       }
     </span>
   </details>
-</p>
+</div>
 
 <style>
   .revision-note {

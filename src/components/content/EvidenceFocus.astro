@@ -11,6 +11,7 @@
  * can navigate anywhere); `selectedId` narrows the main pane to one
  * record's full detail. Omitting it renders the full list.
  */
+import '../../styles/registry-wave-v2.css';
 import EvidenceGuide from './EvidenceGuide.astro';
 import ReceiptIndex from './ReceiptIndex.astro';
 import ClaimBadge from './ClaimBadge.astro';
@@ -44,7 +45,7 @@ const claimBadgeKind = selected
 const formatDate = (value: string | null) => value ?? 'Not stated';
 ---
 
-<div class="evidence-focus" data-focus-kind="evidence" data-focus-key={selectedId ?? 'all'}>
+<div class:list={['evidence-focus', essaySlug === 'the-registry-wave-agentic-artifact-supply-chain' && 'registry-wave-focus']} data-focus-kind="evidence" data-focus-key={selectedId ?? 'all'}>
   <div class="evidence-focus__grid">
     <div class="evidence-focus__main">
       <div class="evidence-focus__actions">

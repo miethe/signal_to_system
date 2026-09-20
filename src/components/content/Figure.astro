@@ -40,6 +40,9 @@
  * `credit`, `creditHref`, `variant: 'default' | 'hero'`) keeps working
  * unchanged — this file is an additive extension, not a rewrite.
  */
+import { fileURLToPath } from 'node:url';
+import sharp from 'sharp';
+
 interface Props {
   src: string;
   alt: string;
@@ -73,6 +76,16 @@ const {
   figureId,
   slug,
 } = Astro.props;
+
+// Reserve the real aspect ratio before this essay's lazy artwork loads.
+// This prevents a scene link moving while the reader opens it.
+let resolvedWidth = width;
+let resolvedHeight = height;
+if (src.startsWith('/assets/posts/the-registry-wave-agentic-artifact-supply-chain/') && (!width || !height)) {
+  const metadata = await sharp(fileURLToPath(new URL(`../../../public${src}`, import.meta.url))).metadata();
+  resolvedWidth = metadata.width;
+  resolvedHeight = metadata.height;
+}
 
 const isHero = variant === 'hero';
 const showCaption = !isHero && (number || caption || credit);
@@ -125,10 +138,10 @@ const descId = longDescription
           {mobileSrc ? (
             <picture>
               <source media="(max-width: 640px)" srcset={mobileSrc} />
-              <img src={src} alt={alt} width={width} height={height} loading="lazy" decoding="async" />
+              <img src={src} alt={alt} width={resolvedWidth} height={resolvedHeight} loading="lazy" decoding="async" />
             </picture>
           ) : (
-            <img src={src} alt={alt} width={width} height={height} loading="lazy" decoding="async" />
+            <img src={src} alt={alt} width={resolvedWidth} height={resolvedHeight} loading="lazy" decoding="async" />
           )}
           <span class="figure-plate__enlarge-affordance" aria-hidden="true">
             <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -142,10 +155,10 @@ const descId = longDescription
       ) : mobileSrc ? (
         <picture>
           <source media="(max-width: 640px)" srcset={mobileSrc} />
-          <img src={src} alt={alt} width={width} height={height} loading="lazy" decoding="async" />
+          <img src={src} alt={alt} width={resolvedWidth} height={resolvedHeight} loading="lazy" decoding="async" />
         </picture>
       ) : (
-        <img src={src} alt={alt} width={width} height={height} loading="lazy" decoding="async" />
+        <img src={src} alt={alt} width={resolvedWidth} height={resolvedHeight} loading="lazy" decoding="async" />
       )
     }
   </div>
