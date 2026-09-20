@@ -53,10 +53,7 @@ const { note, revisedDate, changelogHref } = Astro.props;
     font-weight: 600;
   }
 
-  .revision-note__details {
-    display: inline;
-    margin-left: 0.5rem;
-  }
+  .revision-note__details { display: inline; margin-left: auto; }
 
   .revision-note__details summary {
     display: inline;
@@ -68,11 +65,6 @@ const { note, revisedDate, changelogHref } = Astro.props;
 
   .revision-note__details summary::-webkit-details-marker {
     display: none;
-  }
-
-  .revision-note__details summary::before {
-    content: '· ';
-    color: var(--text-tertiary);
   }
 
   .revision-note__details summary:hover {
@@ -99,7 +91,7 @@ const { note, revisedDate, changelogHref } = Astro.props;
     color: var(--accent-hover);
   }
 
-  :global(.post-layout--registry-wave .revision-note) { display: flex; align-items: center; min-height: 38px; margin: 0 0 18px; padding: 0 4px; border-top: 1px solid var(--border-subtle); border-bottom: 1px solid var(--border-subtle); font-size: 11px; line-height: 1; }
-  :global(.post-layout--registry-wave .revision-note__details) { margin-left: 8px; }
-  :global(.post-layout--registry-wave .revision-note__note) { line-height: 1.45; }
+  :global(.post-layout--registry-wave .revision-note) { display: flex; align-items: center; min-height: 38px; margin: 0 0 26px; padding: 0 4px; border-top: 1px solid var(--border-subtle); border-bottom: 1px solid var(--border-subtle); font-size: 11px; line-height: 1; }
+  :global(.post-layout--registry-wave .revision-note__details) { margin-left: auto; }
+  :global(.post-layout--registry-wave .revision-note__note) { position: absolute; z-index: 2; max-width: min(32rem, 90vw); margin-top: 32px; padding: 10px 12px; border: 1px solid var(--border-subtle); border-radius: 6px; background: var(--bg-surface); box-shadow: var(--shadow-md); line-height: 1.45; }
 </style>

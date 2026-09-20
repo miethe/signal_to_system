@@ -321,6 +321,23 @@ const toc = rawToc.map((heading) => {
 
       if (!outline || !body || items.length === 0 || !('IntersectionObserver' in window)) return;
 
+      // Entry cards are deliberately normal flow. This compact state makes
+      // the handoff from entry context to the sticky companion observable
+      // without promoting either card into a second sticky surface.
+      const entryRail = root.closest<HTMLElement>('[data-registry-rail]');
+      let railFrame = 0;
+      const syncEntryRail = () => {
+        railFrame = 0;
+        if (!entryRail) return;
+        entryRail.classList.toggle('is-companion-active', root.getBoundingClientRect().top <= 112);
+      };
+      const queueEntryRail = () => {
+        if (!railFrame) railFrame = requestAnimationFrame(syncEntryRail);
+      };
+      window.addEventListener('scroll', queueEntryRail, { passive: true });
+      window.addEventListener('resize', queueEntryRail, { passive: true });
+      syncEntryRail();
+
       const pairs = items
         .map((item) => {
           const link = item.querySelector<HTMLAnchorElement>('[data-companion-link]');

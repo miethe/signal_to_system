@@ -267,18 +267,38 @@ body {
    essays, project pages, or Dev Stories. */
 .post-layout--registry-wave {
   --measure: 46rem;
+  --bg-subtle: #f7f8fb;
+  --bg-surface: #ffffff;
+  --border-subtle: #e3e8f0;
+  --border-strong: #c8d1dc;
 }
 
-.post-layout--registry-wave .prose-custom > .executive-signal {
-  display: none;
+.dark .post-layout--registry-wave {
+  --bg-subtle: #0b1b30;
+  --bg-surface: #0d1d33;
+  --border-subtle: #203b5d;
+  --border-strong: #3a5274;
+}
+
+/* The body signal is the deliberate narrow-layout fallback. The rail owns
+   this content at xl and above, while no-JS narrow layouts retain it once. */
+@media (min-width: 1280px) {
+  .post-layout--registry-wave .prose-custom > .executive-signal {
+    display: none;
+  }
 }
 
 @media (min-width: 1280px) {
   .post-layout--registry-wave {
     grid-template-columns: minmax(0, 756px) 266px;
-    column-gap: 22px;
-    max-width: 1118px;
+    column-gap: 40px;
+    max-width: 1062px;
     padding-top: 1.5rem;
+  }
+
+  .post-layout--registry-wave > .registry-wave-rail {
+    padding-left: 20px;
+    border-left: 1px solid rgb(117 139 181 / 24%);
   }
 
   .post-layout--registry-wave #post-header {
@@ -291,7 +311,7 @@ body {
     max-width: 760px;
     margin: 2px 0 4px;
     font-size: 43px;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: -0.025em;
     line-height: 1.08;
   }
@@ -958,6 +978,25 @@ pre code {
   object-fit: cover;
 }
 
+/* Inline comparison plates inherit the reader's navy hierarchy. Accent is
+   reserved for status and controls, not the structural card edges. */
+.post-layout--registry-wave .managed-variation {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  margin: 22px 0;
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  background: var(--bg-surface);
+}
+
+.post-layout--registry-wave .managed-variation > div { padding: 14px 18px 16px; }
+.post-layout--registry-wave .managed-variation > div + div { border-left: 1px solid var(--border-subtle); }
+.dark .post-layout--registry-wave .managed-variation { border-color: #304c73; background: linear-gradient(180deg, rgb(14 31 57 / 78%) 0%, rgb(8 22 42 / 90%) 100%); box-shadow: inset 0 1px 0 rgb(130 171 255 / 6%), 0 10px 28px rgb(0 0 0 / 16%); }
+.dark .post-layout--registry-wave .managed-variation > div + div { border-color: #263e63; }
+@media (max-width: 640px) { .post-layout--registry-wave .managed-variation { grid-template-columns: 1fr; } .post-layout--registry-wave .managed-variation > div + div { border-top: 1px solid var(--border-subtle); border-left: 0; } }
+
 @media (max-width: 1279px) {
   .post-layout--registry-wave .figure-plate--hero {
     height: auto;
@@ -1277,7 +1316,7 @@ pre code {
 }
 
 @media (max-width: 640px) {
-  .post-layout--registry-wave .prose-custom { font-size: 15px; line-height: 1.48; }
+  .post-layout--registry-wave .prose-custom { font-size: 15px; line-height: 1.45; }
   .post-layout--registry-wave .prose-custom > p:first-child { font-size: 15px; line-height: 1.45; }
   .post-layout--registry-wave .figure-plate { margin: 18px 0; padding: 8px; border-radius: 7px; }
   .post-layout--registry-wave .thread-scene { margin: 22px 0; padding: 12px; }

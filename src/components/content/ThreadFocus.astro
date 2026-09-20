@@ -320,11 +320,14 @@ const kindLabel: Record<string, string> = {
     gap: 1rem;
   }
 
-  :global(.dark) .thread-focus__grid { gap: 28px; }
+  :global(.dark) .thread-focus__grid { gap: 24px; }
   @media (min-width: 960px) { :global(.dark) .thread-focus__grid { grid-template-columns: minmax(0, 720px) 287px; } }
-  :global(.dark) .thread-focus__title { margin: 8px 0 18px; color: #f5f1ea; font-size: 36px; line-height: 1.08; }
+  :global(.dark) .thread-focus__actions { gap: 10px; margin-bottom: 18px; padding-bottom: 10px; }
+  :global(.dark) .thread-focus__action:first-child { display: inline-flex; align-items: center; min-height: 31px; padding: 0 13px; border: 1px solid #294b69; border-radius: 6px; background: #0b2946; }
+  :global(.dark) .thread-focus__title { margin: 8px 0 12px; color: #f5f1ea; font-size: 32px; line-height: 1.08; }
   :global(.dark) .thread-focus__recap { color: #bbc7d8; font-size: 16px; line-height: 1.58; }
   :global(.dark) .thread-focus__boundary { padding: 9px 16px; border-color: #efbc68; border-width: 0 0 0 3px; border-radius: 0; background: linear-gradient(90deg, rgb(240 185 93 / 9%), transparent); }
   :global(.dark) .thread-focus__boundary-label { color: #efbc68; }
   :global(.dark) .thread-focus__rail > * { border-color: #294b6d; border-radius: 8px; background: linear-gradient(145deg, rgb(10 29 51 / 94%), rgb(6 21 39 / 90%)); box-shadow: 0 12px 32px rgb(0 0 0 / 18%); }
+  @media (max-width: 640px) { :global(.dark) .thread-focus__title { font-size: 26px; } :global(.dark) .thread-focus__recap { font-size: 15px; line-height: 1.45; } }
 </style>

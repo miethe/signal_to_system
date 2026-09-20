@@ -219,6 +219,8 @@ const jsonLd = generateJsonLd('article', {
          ReadingCompanion (outline + ThreadDock + optional ContextualNote)
          is the sticky surface at depth. -->
     <div
+      class="registry-wave-rail"
+      data-registry-rail={isRegistryWave ? 'true' : undefined}
       class:list={[
         isRegistryWave
           ? 'hidden xl:col-start-2 xl:row-span-3 xl:block xl:self-stretch'
@@ -232,7 +234,7 @@ const jsonLd = generateJsonLd('article', {
       {
         whyItMatters && (
           <div class="mb-4">
-            <ExecutiveSignal whyItMatters={whyItMatters} takeaway={leaderTakeaway} />
+            <ExecutiveSignal whyItMatters={whyItMatters} takeaway={leaderTakeaway} placement="rail" />
           </div>
         )
       }
@@ -268,7 +270,7 @@ const jsonLd = generateJsonLd('article', {
     <!-- The narrow layout has no rail, so it keeps the signal in flow here.
          Desktop places the same single signal under the author card above. -->
     {
-      whyItMatters && (
+      whyItMatters && !isRegistryWave && (
         <div class="xl:hidden">
           <ExecutiveSignal whyItMatters={whyItMatters} takeaway={leaderTakeaway} />
         </div>

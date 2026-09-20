@@ -14,14 +14,20 @@
 interface Props {
   whyItMatters: string;
   takeaway?: string;
+  placement?: 'body' | 'rail';
 }
 
-const { whyItMatters, takeaway } = Astro.props;
+const { whyItMatters, takeaway, placement = 'body' } = Astro.props;
 const hasTakeaway = Boolean(takeaway);
 ---
 
 <aside
-  class:list={['executive-signal', 'lift-hover', { 'executive-signal--split': hasTakeaway }]}
+  class:list={[
+    'executive-signal',
+    'lift-hover',
+    `executive-signal--${placement}`,
+    { 'executive-signal--split': hasTakeaway && placement === 'body' },
+  ]}
   role="note"
   aria-label="Executive signal"
 >
@@ -72,11 +78,30 @@ const hasTakeaway = Boolean(takeaway);
       gap: 1.1rem 1.75rem;
     }
 
-    .executive-signal__col--takeaway {
+    .executive-signal--split .executive-signal__col--takeaway {
       padding-left: 1.5rem;
       border-left: 1px solid var(--border-subtle);
     }
   }
+
+  .executive-signal--rail .executive-signal__col--takeaway {
+    margin-top: 0.8rem;
+    padding: 0.8rem 0 0;
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  :global(.post-layout--registry-wave) .executive-signal--rail {
+    min-height: 164px;
+    margin: 0;
+    padding: 17px 15px;
+    border-color: var(--border-strong);
+    border-radius: 9px;
+    background: var(--bg-surface);
+    box-shadow: var(--shadow-sm);
+  }
+
+  :global(.post-layout--registry-wave) .executive-signal--rail::before { display: none; }
+  :global(.post-layout--registry-wave) .executive-signal--rail .executive-signal__body { font-size: .75rem; line-height: 1.4; }
 
   .executive-signal__eyebrow {
     margin: 0 0 0.4rem;
@@ -107,8 +132,18 @@ const hasTakeaway = Boolean(takeaway);
   }
 
   :global(.dark) .executive-signal::before { display: none; }
-  :global(.dark) .executive-signal--split { display: block; }
-  :global(.dark) .executive-signal__col--takeaway { margin-top: .8rem; padding: .8rem 0 0; border-top: 1px solid rgb(185 172 255 / 20%); border-left: 0; }
+  :global(.dark) .executive-signal--rail .executive-signal__col--takeaway { border-top-color: rgb(185 172 255 / 20%); }
   :global(.dark) .executive-signal__eyebrow { color: #c5baff; }
   :global(.dark) .executive-signal__body { color: #c8d1e2; font-size: .75rem; line-height: 1.4; }
+
+  /* The entry signal remains normal flow. As the companion reaches its
+     sticky threshold it contracts briefly, then scrolls away with the
+     entry cards rather than becoming a second persistent rail surface. */
+  :global(.registry-wave-rail.is-companion-active) .executive-signal {
+    min-height: 0;
+    padding: 9px 12px;
+  }
+  :global(.registry-wave-rail.is-companion-active) .executive-signal__col--takeaway { display: none; }
+  :global(.registry-wave-rail.is-companion-active) .executive-signal__eyebrow { margin: 0; }
+  :global(.registry-wave-rail.is-companion-active) .executive-signal__body { display: none; }
 </style>
