@@ -305,7 +305,8 @@ export function initFocusHost(): void {
     const target = document.getElementById(anchorId);
     if (!target) return;
     writeHistory('replaceState', history.state, `#${anchorId}`);
-    const y = target.getBoundingClientRect().top + window.scrollY;
+    const scrollMargin = Number.parseFloat(getComputedStyle(target).scrollMarginTop) || 0;
+    const y = target.getBoundingClientRect().top + window.scrollY - scrollMargin;
     scrollImmediately(window.scrollX, y);
     const heading = target.querySelector<HTMLElement>('h2, h3') ?? target;
     requestAnimationFrame(() => {

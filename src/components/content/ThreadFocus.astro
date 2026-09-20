@@ -319,4 +319,12 @@ const kindLabel: Record<string, string> = {
     flex-direction: column;
     gap: 1rem;
   }
+
+  :global(.dark) .thread-focus__grid { gap: 28px; }
+  @media (min-width: 960px) { :global(.dark) .thread-focus__grid { grid-template-columns: minmax(0, 720px) 287px; } }
+  :global(.dark) .thread-focus__title { margin: 8px 0 18px; color: #f5f1ea; font-size: 36px; line-height: 1.08; }
+  :global(.dark) .thread-focus__recap { color: #bbc7d8; font-size: 16px; line-height: 1.58; }
+  :global(.dark) .thread-focus__boundary { padding: 9px 16px; border-color: #efbc68; border-width: 0 0 0 3px; border-radius: 0; background: linear-gradient(90deg, rgb(240 185 93 / 9%), transparent); }
+  :global(.dark) .thread-focus__boundary-label { color: #efbc68; }
+  :global(.dark) .thread-focus__rail > * { border-color: #294b6d; border-radius: 8px; background: linear-gradient(145deg, rgb(10 29 51 / 94%), rgb(6 21 39 / 90%)); box-shadow: 0 12px 32px rgb(0 0 0 / 18%); }
 </style>

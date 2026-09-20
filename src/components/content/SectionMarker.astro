@@ -99,6 +99,13 @@
   :global(.section-marker.is-active .section-marker__rule) { background: var(--accent); }
   :global(.section-marker.is-active .section-marker__ordinal) { border-color: var(--accent); color: var(--accent-text); }
 
+  :global(.dark .section-marker) { grid-template-columns: 40px minmax(0, 1fr); column-gap: 14px; margin-top: 26px; }
+  :global(.dark .section-marker__gutter) { align-items: stretch; gap: 0; padding: 0; }
+  :global(.dark .section-marker__ordinal) { width: 40px; height: 38px; border-color: #274a73; border-radius: 8px; color: #b9a7ff; font-size: 14px; }
+  :global(.dark .section-marker__rule) { width: 3px; min-height: 100%; margin: 8px 0 0 12px; background: #29476b; }
+  :global(.dark .section-marker.is-active .section-marker__rule) { background: #8f72ff; }
+  :global(.dark .section-marker > h2) { padding: 0; border: 0; font-size: 30px; line-height: 1.15; }
+
   @media (prefers-reduced-motion: reduce) {
     :global(.section-marker__rule) { transition: none; }
   }
@@ -108,5 +115,12 @@
       width: calc(100% + 3.875rem);
       margin-left: -3.875rem;
     }
+  }
+
+  @media (max-width: 640px) {
+    :global(.section-marker) { grid-template-columns: 32px minmax(0, 1fr); column-gap: 10px; margin-top: 24px; }
+    :global(.section-marker__ordinal) { width: 32px; height: 31px; font-size: 11px; }
+    :global(.section-marker__rule) { margin-left: 9px; }
+    :global(.section-marker > h2) { font-size: 27px; }
   }
 </style>

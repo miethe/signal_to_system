@@ -270,6 +270,23 @@ const toc = rawToc.map((heading) => {
     color: var(--accent-text);
   }
 
+  :global(.dark) .reading-companion__block {
+    overflow: hidden;
+    border-color: #29476b;
+    border-radius: 9px;
+    background: linear-gradient(180deg, #091a31 0%, #07162a 100%);
+    box-shadow: 0 12px 30px rgb(0 0 0 / 22%);
+  }
+
+  :global(.dark) .reading-companion__header { padding: 15px; border-color: #203b5d; color: #bfcaf0; }
+  :global(.dark) .reading-companion__body { padding: 9px 7px 12px 15px; }
+  :global(.dark) .reading-companion__rail { width: 2px; background: #29476b; }
+  :global(.dark) .reading-companion__rail-fill { background: #756cff; }
+  :global(.dark) .reading-companion__link { min-height: 25px; padding: 5px 8px 5px 28px; font-size: 11px; color: #aebdd1; }
+  :global(.dark) .reading-companion__index { margin-left: -22px; color: #7790b1; }
+  :global(.dark) .reading-companion__link[aria-current='location'] { background: #17294a; color: #f2efea; }
+  :global(.dark) .reading-companion__link[aria-current='location'] .reading-companion__index { color: #b9a7ff; }
+
   @media (prefers-reduced-motion: reduce) {
     .reading-companion__link,
     .reading-companion__rail-fill {
@@ -410,7 +427,14 @@ const toc = rawToc.map((heading) => {
         }
 
         const activeLink = activeIndex > -1 ? pairs[activeIndex]?.link : null;
-        activeLink?.scrollIntoView({ block: 'nearest', behavior: reduceMotion() ? 'auto' : 'smooth' });
+        // The desktop companion is intentionally a visible, sticky rail,
+        // not a scroll container. Calling scrollIntoView on one of its links
+        // would therefore scroll the document and can pull a scene trigger
+        // out from under an in-progress pointer interaction.
+        const companionScroller = activeLink?.closest<HTMLElement>('[data-companion-scroll]');
+        if (companionScroller && companionScroller.scrollHeight > companionScroller.clientHeight) {
+          activeLink?.scrollIntoView({ block: 'nearest', behavior: reduceMotion() ? 'auto' : 'smooth' });
+        }
         lastFitSignature = ''; // active index changed — force a re-evaluation
         queueFit();
       };

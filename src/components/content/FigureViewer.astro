@@ -211,4 +211,10 @@ const filename = beat?.image.src.split('/').pop() ?? '';
     color: var(--text-primary);
     word-break: break-word;
   }
+
+  :global(.dark) .figure-viewer { padding: 20px 32px; border: 1px solid rgb(104 82 255 / 72%); border-radius: 15px; background: linear-gradient(145deg, #071b33 0%, #06182f 58%, #081d36 100%); box-shadow: 0 24px 70px rgb(0 0 0 / 58%), 0 0 34px rgb(54 72 255 / 13%); }
+  :global(.dark) .figure-viewer__title { color: #f2f0ea; font-size: 27px; line-height: 1.08; }
+  :global(.dark) .figure-viewer__figure { padding: 0; border-color: #315071; background: #071a31; border-radius: 13px; overflow: hidden; }
+  :global(.dark) .figure-viewer__caption { color: #aebbd0; }
+  :global(.dark) .figure-viewer__long-description { color: #aebbd0; }
 </style>

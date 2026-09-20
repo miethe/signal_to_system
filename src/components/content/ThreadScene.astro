@@ -215,6 +215,11 @@ const kindUsesCyan = beat?.kind === 'conceptual' || beat?.kind === 'mechanism';
     text-decoration: underline;
   }
 
+  :global(.dark) .thread-scene { border-color: #29496d; border-radius: 8px; background: linear-gradient(180deg, #0b1b33 0%, #08162a 100%); box-shadow: 0 10px 30px rgb(0 0 0 / 18%); }
+  :global(.dark) .thread-scene__body { border-left-color: #8a63ff; }
+  :global(.dark) .thread-scene__eyebrow { color: #c0b5ff; }
+  :global(.dark) .thread-scene__recap { color: #b8c2d3; }
+
   .thread-scene__explore:focus-visible {
     outline: 2px solid var(--accent);
     outline-offset: 3px;

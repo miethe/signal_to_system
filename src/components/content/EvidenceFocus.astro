@@ -407,4 +407,13 @@ const formatDate = (value: string | null) => value ?? 'Not stated';
     flex-direction: column;
     gap: 1rem;
   }
+
+  :global(.dark) .evidence-focus__grid { gap: 20px; }
+  @media (min-width: 960px) { :global(.dark) .evidence-focus__grid { grid-template-columns: minmax(0, 818px) 299px; } }
+  :global(.dark) .evidence-focus__page-title { color: #f2f1f4; font-size: 40px; line-height: 1.02; }
+  :global(.dark) .evidence-focus__record { padding: 18px; border: 1px solid #29496d; border-radius: 12px; background: linear-gradient(145deg, #0b1b33 0%, #08162a 100%); box-shadow: 0 12px 32px rgb(0 0 0 / 22%), inset 0 1px 0 rgb(120 180 255 / 5%); }
+  :global(.dark) .evidence-focus__facts { border-color: #29496d; background: #09172a; }
+  :global(.dark) .evidence-focus__claim-split { gap: 0; }
+  @media (min-width: 700px) { :global(.dark) .evidence-focus__claim-split > :last-child { padding-left: 36px; border-left: 1px solid #24415f; } :global(.dark) .evidence-focus__claim-split > :first-child { padding-right: 36px; } }
+  :global(.dark) .evidence-focus__rail > * { padding: 18px 20px; border-color: #29496d; border-radius: 11px; background: linear-gradient(155deg, #0d1d35 0%, #09172a 100%); }
 </style>

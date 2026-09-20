@@ -35,8 +35,8 @@ const outline = headings.filter((heading) => heading.depth === 2 && heading.slug
   .mobile-contents__fallback { display: none; }
   .mobile-contents__section { display: none; }
   @media (max-width: 1279px) {
-    .mobile-contents__trigger { position: fixed; right: 1rem; bottom: calc(1rem + env(safe-area-inset-bottom)); z-index: 55; border: 1px solid var(--border-strong); border-radius: 999px; background: var(--bg-surface); box-shadow: var(--shadow-md); color: var(--accent-text); cursor: pointer; font: 700 .6875rem var(--font-mono); letter-spacing: .08em; padding: .65rem .9rem; text-transform: uppercase; }
-    .mobile-contents__fallback { display: inline-flex; position: fixed; right: 1rem; bottom: calc(1rem + env(safe-area-inset-bottom)); z-index: 54; border-radius: 999px; background: var(--bg-surface); color: var(--accent-text); font: 700 .6875rem var(--font-mono); padding: .65rem .9rem; text-decoration: none; }
+    .mobile-contents__trigger { position: fixed; right: 1rem; bottom: calc(1rem + env(safe-area-inset-bottom)); z-index: 55; border: 1px solid var(--border-strong); border-radius: 5px; background: var(--bg-surface); box-shadow: var(--shadow-md); color: var(--accent-text); cursor: pointer; font: 700 .6875rem var(--font-mono); letter-spacing: .08em; padding: .45rem .75rem; text-transform: uppercase; }
+    .mobile-contents__fallback { display: inline-flex; position: fixed; right: 1rem; bottom: calc(1rem + env(safe-area-inset-bottom)); z-index: 54; border: 1px solid var(--border-strong); border-radius: 5px; background: var(--bg-surface); color: var(--accent-text); font: 700 .6875rem var(--font-mono); padding: .45rem .75rem; text-decoration: none; }
     :global(html.mobile-contents-ready) .mobile-contents__trigger { display: inline-flex; z-index: 56; }
     :global(html.mobile-contents-ready) .mobile-contents__fallback { display: none; }
     .mobile-contents__section { display: block; margin: 3rem 0; padding: 1.25rem; border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); background: var(--bg-subtle); }

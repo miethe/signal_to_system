@@ -200,4 +200,17 @@ const socialLinks = [
   :global(html.perf-lite) .author-profile__extra {
     transition: none;
   }
+
+  :global(.dark) .author-profile {
+    padding: 16px;
+    border-color: #29476b;
+    border-radius: 9px;
+    background: linear-gradient(145deg, rgb(13 29 51 / 96%), rgb(10 23 42 / 92%));
+    box-shadow: 0 10px 28px rgb(0 0 0 / 20%);
+  }
+
+  :global(.dark) .author-profile img { width: 38px !important; height: 38px !important; }
+  :global(.dark) .author-profile :global(h2), :global(.dark) .author-profile :global(h3) { font-size: 18px; line-height: 1.15; }
+  :global(.dark) .author-profile__extra { margin-top: 12px !important; padding-top: 12px !important; }
+  :global(.dark) .author-profile__extra p { font-size: 12px; line-height: 1.45; }
 </style>

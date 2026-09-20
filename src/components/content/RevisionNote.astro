@@ -98,4 +98,8 @@ const { note, revisedDate, changelogHref } = Astro.props;
   .revision-note__note a:hover {
     color: var(--accent-hover);
   }
+
+  :global(.post-layout--registry-wave .revision-note) { display: flex; align-items: center; min-height: 38px; margin: 0 0 18px; padding: 0 4px; border-top: 1px solid var(--border-subtle); border-bottom: 1px solid var(--border-subtle); font-size: 11px; line-height: 1; }
+  :global(.post-layout--registry-wave .revision-note__details) { margin-left: 8px; }
+  :global(.post-layout--registry-wave .revision-note__note) { line-height: 1.45; }
 </style>

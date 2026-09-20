@@ -74,6 +74,7 @@ const {
 } = frontmatter;
 
 const isFrontispiece = heroPlacement === 'frontispiece';
+const isRegistryWave = slug === 'the-registry-wave-agentic-artifact-supply-chain';
 
 const pageDescription = description || excerpt || site.description;
 const canonicalUrl = buildCanonicalUrl(Astro.url.pathname);
@@ -110,12 +111,17 @@ const jsonLd = generateJsonLd('article', {
     aria-hidden="true"
   ></div>
 
-  <article class="post-layout mx-auto grid w-full max-w-[var(--measure)] items-start px-4 py-12 sm:px-6 lg:px-8 xl:max-w-7xl xl:grid-cols-[minmax(0,var(--measure))_minmax(14rem,18rem)] xl:justify-center xl:gap-x-12">
+  <article
+    class:list={[
+      'post-layout mx-auto grid w-full max-w-[var(--measure)] items-start px-4 py-12 sm:px-6 lg:px-8 xl:max-w-7xl xl:grid-cols-[minmax(0,var(--measure))_minmax(14rem,18rem)] xl:justify-center xl:gap-x-12',
+      isRegistryWave && 'post-layout--registry-wave',
+    ]}
+  >
     <!-- This lives inside .post-layout so the shared --measure token is
          resolvable. It remains ahead of the title/dek/meta at every size. -->
     {
       isFrontispiece && heroImage && (
-        <div class="w-full pt-0 xl:col-span-2 xl:row-start-1">
+        <div class:list={['w-full pt-0', isRegistryWave ? 'xl:col-start-1 xl:row-start-1' : 'xl:col-span-2 xl:row-start-1']}>
           <Figure src={heroImage} alt={resolvedHeroAlt} variant="hero" />
         </div>
       )
@@ -126,7 +132,7 @@ const jsonLd = generateJsonLd('article', {
       id="post-header"
       class:list={[
         'mb-16 min-w-0 space-y-6 pb-4 xl:col-start-1',
-        isFrontispiece ? 'xl:row-start-2' : 'xl:row-start-1',
+        isRegistryWave ? 'xl:row-start-2' : isFrontispiece ? 'xl:row-start-2' : 'xl:row-start-1',
       ]}
     >
       {
@@ -214,8 +220,10 @@ const jsonLd = generateJsonLd('article', {
          is the sticky surface at depth. -->
     <div
       class:list={[
-        'hidden xl:col-start-2 xl:row-span-2 xl:block xl:self-stretch',
-        isFrontispiece ? 'xl:row-start-2' : 'xl:row-start-1',
+        isRegistryWave
+          ? 'hidden xl:col-start-2 xl:row-span-3 xl:block xl:self-stretch'
+          : 'hidden xl:col-start-2 xl:row-span-2 xl:block xl:self-stretch',
+        isRegistryWave ? 'xl:row-start-1' : isFrontispiece ? 'xl:row-start-2' : 'xl:row-start-1',
       ]}
     >
       <div class="mb-4">
@@ -236,7 +244,7 @@ const jsonLd = generateJsonLd('article', {
     <div
       class:list={[
         'min-w-0 xl:col-start-1',
-        isFrontispiece ? 'xl:row-start-3' : 'xl:row-start-2',
+        isRegistryWave ? 'xl:row-start-3' : isFrontispiece ? 'xl:row-start-3' : 'xl:row-start-2',
       ]}
     >
 
