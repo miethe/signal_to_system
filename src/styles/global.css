@@ -1,5 +1,12 @@
 @import "tailwindcss";
 
+/* Bind Tailwind's `dark:` variant to the site's own `.dark` class instead of
+   the OS `prefers-color-scheme` media query (reading-experience-v2 FIX-LIST
+   A1). Without this, every `dark:` utility in the project (370+) is inert
+   whenever the reader's OS theme disagrees with the theme they picked on the
+   site. */
+@custom-variant dark (&:where(.dark, .dark *));
+
 /* Include @miethe/ui compiled classes in Tailwind's content scan.
    Without this, showcase demos render unstyled (Tailwind v4 JIT prunes them). */
 @source "../../node_modules/@miethe/ui/dist/**/*.js";
@@ -119,6 +126,14 @@
   --accent-muted:   #c7d2fe;
   --accent-text:    #3730a3;
 
+  /* Restrained cyan structural accent (reading-experience-v2 DIRECTION V10,
+     from $H/contracts/design-tokens.css's --cyan). Used sparingly, next to
+     violet, for mechanism/detection-flavored structure (kind labels, the
+     figure-viewer chrome) — never as a second primary accent. */
+  --cyan:           #0e7490;
+  --cyan-text:      #0e7490;
+  --cyan-subtle:    #ecfeff;
+
   --code-bg:        #f1f5f9;
   --code-bg-block:  #f8fafc;
   --code-text:      #0f172a;
@@ -130,31 +145,46 @@
   --shadow-md:  0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
   --shadow-lg:  0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   --shadow-ambient: 0px 32px 64px -12px rgba(11, 19, 38, 0.06);
+
+  /* Hover lift (see the HOVER LIFT section). Back-out curve overshoots
+     slightly then settles — the "bounce". */
+  --lift-y: -2px;
+  --lift-duration: 200ms;
+  --lift-ease: cubic-bezier(0.34, 1.4, 0.64, 1);
+  --lift-shadow:
+    0 2px 4px rgba(15, 23, 42, 0.05),
+    0 14px 30px -12px rgba(15, 23, 42, 0.22);
 }
 
 .dark {
   color-scheme: dark;
 
-  --bg-base:       #0b1326;
-  --bg-subtle:     #131b2e;
-  --bg-muted:      #171f33;
-  --bg-surface:    #222a3d;
+  --bg-base:       #071425;
+  --bg-subtle:     #0b1b30;
+  --bg-muted:      #101f36;
+  --bg-surface:    #0d1d33;
 
-  --border-subtle: rgba(70, 69, 84, 0.15); /* outline-variant at 15% */
-  --border:        #464554;
-  --border-strong: #908fa0;
+  --border-subtle: #203b5d;
+  --border:        #29476b;
+  --border-strong: #3a5274;
 
-  --text-primary:   #dae2fd;
-  --text-secondary: #c7c4d7;
-  --text-tertiary:  #908fa0;
-  --text-disabled:  #464554;
+  --text-primary:   #f2efea;
+  --text-secondary: #b8c2d3;
+  --text-tertiary:  #7790b1;
+  --text-disabled:  #526a88;
   --text-inverse:   #0b1326;
 
-  --accent:         #c0c1ff;
-  --accent-hover:   #8083ff;
-  --accent-subtle:  #464554;
-  --accent-muted:   #6f00be;
-  --accent-text:    #c0c1ff;
+  --accent:         #9b82ff;
+  --accent-hover:   #c0b0ff;
+  --accent-subtle:  #17294a;
+  --accent-muted:   #5548a8;
+  --accent-text:    #c9bdff;
+
+  /* Restrained cyan structural accent — matches Tier A's midnight/navy/
+     violet/cyan language (see the :root block above for the rationale). */
+  --cyan:           #82d3ec;
+  --cyan-text:      #82d3ec;
+  --cyan-subtle:    rgba(130, 211, 236, 0.14);
 
   --code-bg:        #131b2e;
   --code-bg-block:  #060e20;
@@ -167,6 +197,12 @@
   --shadow-md:  0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
   --shadow-lg:  0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.4);
   --shadow-ambient: 0px 32px 64px -12px rgba(11, 19, 38, 0.4);
+
+  /* A black drop shadow reads as dirt on a navy page, so the dark-mode lift
+     is a faint accent ring plus a coloured glow instead. */
+  --lift-shadow:
+    0 0 0 1px rgba(192, 193, 255, 0.16),
+    0 16px 34px -14px rgba(111, 0, 190, 0.5);
 }
 
 /* ============================================================
@@ -222,6 +258,93 @@ body {
     color 200ms ease;
 }
 
+.dark body {
+  background: radial-gradient(circle at 25% 0%, rgb(20 53 91 / 18%), transparent 42%), var(--bg-base);
+}
+
+/* Registry Wave v2 is deliberately scoped to its reading surface. The
+   values match the accepted two-pane composition without changing legacy
+   essays, project pages, or Dev Stories. */
+.post-layout--registry-wave {
+  --measure: 46rem;
+  --bg-subtle: #f7f8fb;
+  --bg-surface: #ffffff;
+  --border-subtle: #e3e8f0;
+  --border-strong: #c8d1dc;
+}
+
+.dark .post-layout--registry-wave {
+  --bg-subtle: #0b1b30;
+  --bg-surface: #0d1d33;
+  --border-subtle: #203b5d;
+  --border-strong: #3a5274;
+}
+
+/* The body signal is the deliberate narrow-layout fallback. The rail owns
+   this content at xl and above, while no-JS narrow layouts retain it once. */
+@media (min-width: 1280px) {
+  .post-layout--registry-wave .prose-custom > .executive-signal {
+    display: none;
+  }
+}
+
+@media (min-width: 1280px) {
+  .post-layout--registry-wave {
+    grid-template-columns: minmax(0, 756px) 266px;
+    column-gap: 40px;
+    max-width: 1062px;
+    padding-top: 1.5rem;
+  }
+
+  .post-layout--registry-wave > .registry-wave-rail {
+    padding-left: 20px;
+    border-left: 1px solid rgb(117 139 181 / 24%);
+  }
+
+  .post-layout--registry-wave #post-header {
+    margin: 18px 0 24px;
+    padding: 0;
+    row-gap: 10px;
+  }
+
+  .post-layout--registry-wave #post-header h1 {
+    max-width: 760px;
+    margin: 2px 0 4px;
+    font-size: 43px;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.08;
+  }
+
+  .post-layout--registry-wave #post-header > p {
+    font-size: 1rem;
+    line-height: 1.48;
+  }
+
+  .post-layout--registry-wave .prose-custom {
+    max-width: 100%;
+  }
+
+}
+
+@media (max-width: 1279px) {
+  .post-layout--registry-wave {
+    max-width: 430px;
+    padding-top: 8px;
+    padding-inline: 20px;
+  }
+
+  .post-layout--registry-wave #post-header {
+    margin-bottom: 1.25rem;
+    row-gap: 8px;
+  }
+
+  .post-layout--registry-wave #post-header h1 {
+    font-size: 26px;
+    line-height: 1.08;
+  }
+}
+
 /* Smooth color transitions for interactive elements */
 a,
 button,
@@ -266,6 +389,17 @@ select,
 
 .dark ::-webkit-scrollbar-thumb:hover {
   background: #475569;
+}
+
+/* An overflow region that should never show a track — used where layout is
+   designed to fit without scrolling and overflow:auto is kept only as an
+   invisible fallback (e.g. the post sidebar rail). */
+.no-scrollbar {
+  scrollbar-width: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
 }
 
 /* --- Typography base --- */
@@ -326,6 +460,7 @@ hr {
 
 /* --- Code blocks --- */
 pre {
+  max-width: 100%;
   font-family: var(--font-mono);
   font-size: 0.875rem;
   line-height: 1.7;
@@ -364,8 +499,20 @@ pre code {
    Used for article/essay body content
    ============================================================ */
 
+/* PostLayout owns this one reading measure. Keeping the layout and prose on
+   the same variable prevents a wider grid from leaving a narrow text column. */
+.post-layout {
+  --measure: 72ch;
+}
+
+@media (min-width: 1024px) {
+  .post-layout {
+    --measure: 84ch;
+  }
+}
+
 .prose-custom {
-  max-width: 72ch;
+  max-width: var(--measure, 72ch);
   font-size: 1.0625rem;
   line-height: 1.75;
   color: var(--text-secondary);
@@ -529,17 +676,21 @@ pre code {
 }
 
 /* Keep the tooltip on-screen on narrow viewports instead of overflowing */
-@media (max-width: 480px) {
+@media (max-width: 900px) {
   .glossary-tooltip {
-    left: 50%;
-    transform: translate(-50%, 4px);
-    max-width: calc(100vw - 2rem);
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    left: 1rem;
+    width: auto;
+    max-width: none;
+    transform: translateY(4px);
   }
 
   .glossary-term:hover .glossary-tooltip,
   .glossary-term:focus-within .glossary-tooltip,
   .glossary-term dfn:focus-visible ~ .glossary-tooltip {
-    transform: translate(-50%, 0);
+    transform: translateY(0);
   }
 }
 
@@ -613,6 +764,9 @@ pre code {
 
 /* --- Code blocks --- */
 .prose-custom pre {
+  min-width: 0;
+  max-width: 100%;
+  contain: inline-size;
   font-family: var(--font-mono);
   font-size: 0.875rem;
   line-height: 1.7;
@@ -638,11 +792,13 @@ pre code {
 
 /* --- Tables --- */
 .prose-custom table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
   width: 100%;
   border-collapse: collapse;
   font-size: 0.9375rem;
   margin: 1.75rem 0;
-  overflow: hidden;
   border-radius: 0.5rem;
   border: 1px solid var(--border);
 }
@@ -681,6 +837,42 @@ pre code {
   vertical-align: top;
 }
 
+/* --- Native disclosures --- */
+.prose-custom details {
+  margin: 1.25rem 0;
+  padding: 0.625rem 0 0.625rem 1rem;
+  border-left: 2px solid var(--border);
+  color: var(--text-secondary);
+}
+
+.prose-custom summary {
+  cursor: pointer;
+  color: var(--accent);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.5;
+  text-underline-offset: 0.18em;
+}
+
+.prose-custom summary::marker {
+  color: var(--accent);
+}
+
+.prose-custom summary:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
+.prose-custom details[open] > summary {
+  margin-bottom: 0.75rem;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .prose-custom details {
+    transition: border-color 150ms ease;
+  }
+}
+
 /* --- Horizontal rules --- */
 .prose-custom hr {
   border: none;
@@ -708,11 +900,23 @@ pre code {
   font-style: italic;
 }
 
+/* Supporting visual material can borrow a little of the surrounding grid at
+   laptop widths, while prose keeps its deliberate reading measure. */
+@media (min-width: 1024px) {
+  .prose-custom > .figure-plate,
+  .prose-custom > table {
+    width: calc(100% + 3rem);
+    max-width: none;
+    margin-right: -1.5rem;
+    margin-left: -1.5rem;
+  }
+}
+
 /* ============================================================
    FIGURE PLATE
    Editorial "engineering plate" treatment for schematic figures.
-   Paper background stays light in both themes by design — in dark
-   mode the plate reads as a luminous drawing card on the navy page.
+   Artwork stays light in its own frame; in dark mode the surrounding plate
+   becomes a restrained navy panel so it belongs to the page.
    Used via <Figure /> component, and by PostLayout for heroImage.
    ============================================================ */
 .figure-plate {
@@ -728,18 +932,118 @@ pre code {
 }
 
 .dark .figure-plate {
-  background: #f3f5fa;
-  border-color: rgba(99, 102, 241, 0.22);
+  background: linear-gradient(180deg, #081d34 0%, #06172b 100%);
+  border-color: #234b72;
   box-shadow:
     0 0 0 1px rgba(99, 102, 241, 0.12),
     0 2px 6px rgba(0, 0, 0, 0.35),
     0 22px 56px -14px rgba(79, 70, 229, 0.4);
 }
 
+.dark .figure-plate__frame { background: #07182d; }
+.dark .figure-plate__header { height: 34px; padding: 0 16px; align-items: center; color: #b8c5d9; background: rgb(8 29 52 / 95%); border-color: #214563; letter-spacing: .18em; }
+.dark .figure-plate__caption,
+.dark .prose-custom .figure-plate__caption { margin-top: 14px; padding: 10px 0 0; border-top: 1px solid #294b69; color: #aebcd0; }
+.dark .figure-plate__text,
+.dark .figure-plate__credit { color: #aebcd0; }
+.dark .figure-plate__label { color: #6fd8ff; }
+
 /* Hero variant — frontispiece on the post */
 .figure-plate--hero {
   margin: 0 0 3.5rem;
   padding: 1.5rem 1.5rem 1.25rem;
+}
+
+.post-layout--registry-wave .figure-plate--hero {
+  width: 100%;
+  height: 220px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgb(0 0 0 / 22%);
+}
+
+.post-layout--registry-wave .figure-plate--hero .figure-plate__corner,
+.post-layout--registry-wave .figure-plate--hero .figure-plate__header {
+  display: none;
+}
+
+.post-layout--registry-wave .figure-plate--hero .figure-plate__frame,
+.post-layout--registry-wave .figure-plate--hero img {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  object-fit: cover;
+}
+
+/* Inline comparison plates inherit the reader's navy hierarchy. Accent is
+   reserved for status and controls, not the structural card edges. */
+.post-layout--registry-wave .managed-variation {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  margin: 22px 0;
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  background: var(--bg-surface);
+}
+
+.post-layout--registry-wave .managed-variation > div { padding: 14px 18px 16px; }
+.post-layout--registry-wave .managed-variation > div + div { border-left: 1px solid var(--border-subtle); }
+.dark .post-layout--registry-wave .managed-variation { border-color: #304c73; background: linear-gradient(180deg, rgb(14 31 57 / 78%) 0%, rgb(8 22 42 / 90%) 100%); box-shadow: inset 0 1px 0 rgb(130 171 255 / 6%), 0 10px 28px rgb(0 0 0 / 16%); }
+.dark .post-layout--registry-wave .managed-variation > div + div { border-color: #263e63; }
+@media (max-width: 640px) { .post-layout--registry-wave .managed-variation { grid-template-columns: 1fr; } .post-layout--registry-wave .managed-variation > div + div { border-top: 1px solid var(--border-subtle); border-left: 0; } }
+
+@media (max-width: 1279px) {
+  .post-layout--registry-wave .figure-plate--hero {
+    height: auto;
+    aspect-ratio: 2.25 / 1;
+    margin-bottom: 12px;
+    border-radius: 6px;
+  }
+}
+
+/* Inline variant — stays within the prose measure, cancelling the grid
+   breakout the default plate gets at lg (see the `.prose-custom >
+   .figure-plate` rule below). For small supporting figures. */
+@media (min-width: 1024px) {
+  .prose-custom > .figure-plate.figure-plate--inline {
+    width: 100%;
+    max-width: 100%;
+    margin-right: 0;
+    margin-left: 0;
+  }
+}
+
+/* Wide / technical variants — break out further than the default plate for
+   diagrams that need more than the 72ch reading measure. */
+@media (min-width: 1024px) {
+  .prose-custom > .figure-plate.figure-plate--wide,
+  .prose-custom > .figure-plate.figure-plate--technical {
+    width: min(calc(100% + 6rem), calc(100vw - 2rem));
+    max-width: none;
+    margin-right: -3rem;
+    margin-left: -3rem;
+  }
+}
+
+/* Technical variant — a thinner, dashed "schematic" plate treatment,
+   distinct from the warm editorial plate used for photos/illustrations. */
+.figure-plate--technical {
+  border-width: 1px;
+  border-style: dashed;
+  border-color: #94a3b8;
+}
+
+.dark .figure-plate--technical {
+  border-color: rgba(45, 212, 191, 0.35);
+}
+
+.figure-plate--technical .figure-plate__label {
+  color: #0f766e;
 }
 
 /* Corner tick marks — four 10px L-brackets echoing drafting sheets */
@@ -758,9 +1062,63 @@ pre code {
 
 /* Image frame inside the plate — reset any inherited prose-custom img styling */
 .figure-plate__frame {
+  position: relative;
   border-radius: 0.375rem;
   overflow: hidden;
   background: #ffffff;
+}
+
+.figure-plate__header {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .45rem .65rem;
+  color: #334155;
+  background: rgb(246 248 251 / .92);
+  border-bottom: 1px solid #cbd5e1;
+  font: 700 .625rem var(--font-mono);
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.figure-plate__enlarge {
+  position: relative;
+  display: block;
+  color: var(--text-primary);
+  cursor: zoom-in;
+}
+
+.figure-plate__enlarge:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.figure-plate__enlarge-affordance {
+  position: absolute;
+  top: 0.625rem;
+  right: 0.625rem;
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  color: var(--text-primary);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.figure-plate__enlarge:hover .figure-plate__enlarge-affordance,
+.figure-plate__enlarge:focus-visible .figure-plate__enlarge-affordance {
+  opacity: 0.9;
 }
 
 .figure-plate__frame img,
@@ -780,15 +1138,22 @@ pre code {
 .figure-plate__caption,
 .prose-custom .figure-plate__caption {
   display: flex;
-  align-items: baseline;
-  gap: 0.75rem;
-  margin-top: 0.875rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+  margin-top: 0.625rem;
   padding: 0 0.125rem;
-  font-size: 0.8125rem;
-  line-height: 1.55;
+  font-size: 0.75rem;
+  line-height: 1.45;
   font-style: normal;
   text-align: left;
   color: #475569;
+}
+
+.figure-plate__caption-main {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
 }
 
 .figure-plate__label {
@@ -809,6 +1174,129 @@ pre code {
   font-weight: 400;
 }
 
+.figure-plate__credit {
+  color: #64748b;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  line-height: 1.4;
+}
+
+.figure-plate__credit a {
+  color: inherit;
+  text-underline-offset: 0.18em;
+}
+
+.figure-plate__credit a:hover {
+  color: #334155;
+}
+
+.figure-lightbox {
+  width: min(96vw, 100rem);
+  max-width: 96vw;
+  max-height: 92vh;
+  margin: auto;
+  padding: 0;
+  overflow: visible;
+  color: var(--text-primary);
+  background: transparent;
+  border: 0;
+  animation: figure-lightbox-in 160ms ease-out;
+}
+
+.figure-lightbox::backdrop {
+  background: var(--color-bg-overlay);
+  animation: figure-lightbox-backdrop-in 160ms ease-out;
+}
+
+.figure-lightbox__panel {
+  position: relative;
+  display: flex;
+  max-height: 92vh;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+
+.figure-lightbox__panel img,
+.prose-custom .figure-lightbox__panel img {
+  display: block;
+  width: auto;
+  max-width: calc(96vw - 2rem);
+  height: auto;
+  max-height: calc(92vh - 5rem);
+  margin: auto;
+  border: 0;
+  border-radius: var(--radius-md);
+  box-shadow: none;
+  object-fit: contain;
+}
+
+.figure-lightbox__close {
+  position: absolute;
+  z-index: 1;
+  top: 1.5rem;
+  right: 1.5rem;
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+  color: var(--text-primary);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+}
+
+.figure-lightbox__close:hover {
+  color: var(--accent-hover);
+}
+
+.figure-lightbox__close:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.figure-lightbox__caption {
+  margin: 0;
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
+@keyframes figure-lightbox-in {
+  from { opacity: 0; transform: scale(0.985); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes figure-lightbox-backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (hover: none) {
+  .figure-plate__enlarge-affordance {
+    opacity: 0.8;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .figure-plate__enlarge-affordance {
+    transition: none;
+  }
+
+  .figure-lightbox,
+  .figure-lightbox::backdrop {
+    animation: none;
+  }
+}
+
 @media (max-width: 640px) {
   .figure-plate {
     margin: 2rem 0;
@@ -819,9 +1307,19 @@ pre code {
     padding: 1.125rem 1.125rem 1rem;
   }
   .figure-plate__caption {
+    gap: 0.3rem;
+  }
+  .figure-plate__caption-main {
     flex-direction: column;
     gap: 0.25rem;
   }
+}
+
+@media (max-width: 640px) {
+  .post-layout--registry-wave .prose-custom { font-size: 15px; line-height: 1.45; }
+  .post-layout--registry-wave .prose-custom > p:first-child { font-size: 15px; line-height: 1.45; }
+  .post-layout--registry-wave .figure-plate { margin: 18px 0; padding: 8px; border-radius: 7px; }
+  .post-layout--registry-wave .thread-scene { margin: 22px 0; padding: 12px; }
 }
 
 /* --- Strong & em --- */
@@ -861,11 +1359,9 @@ pre code {
 /* --- Callout / aside pattern --- */
 .prose-custom aside,
 .prose-custom .callout {
-  background-color: var(--accent-subtle);
-  border: 1px solid var(--accent-muted);
-  border-radius: 0.5rem;
-  padding: 1rem 1.25rem;
-  margin: 1.75rem 0;
+  border-left: 2px solid var(--accent-muted);
+  padding: 0.25rem 0 0.25rem 1rem;
+  margin: 1.25rem 0;
   font-size: 0.9375rem;
 }
 
@@ -963,7 +1459,7 @@ pre code {
 /* Reading progress / prose container */
 .prose-container {
   width: 100%;
-  max-width: 72ch;
+  max-width: var(--measure, 72ch);
   margin-inline: auto;
   padding-inline: 1.5rem;
 }
@@ -1033,6 +1529,302 @@ pre code {
   background-color: rgb(239 68 68 / 0.05);
   border-color: rgb(239 68 68 / 0.3);
   color: #fca5a5;
+}
+
+/* ============================================================
+   HOVER LIFT — shared treatment for boxed in-body content
+   Add `lift-hover` to the ROOT element of a boxed MDX/body
+   component (callouts, figures, thread beats, the leader-takeaway
+   card). Never on sidebar cards, and never on inline markers
+   (Evidence, Term) — a baseline-aligned pill must not move.
+
+   The lift is a transform, so it never reflows its neighbours.
+   Surfaces that already carry a resting shadow re-declare
+   --lift-shadow so the hover state is a superset of it rather
+   than a replacement (see .figure-plate below).
+   ============================================================ */
+
+.lift-hover {
+  transition:
+    transform var(--lift-duration) var(--lift-ease),
+    box-shadow var(--lift-duration) ease-out;
+}
+
+/* Pointer devices only: a `:hover` that sticks after a tap is worse than no
+   hover at all. */
+@media (hover: hover) and (pointer: fine) {
+  .lift-hover:hover {
+    transform: translateY(var(--lift-y));
+    box-shadow: var(--lift-shadow);
+  }
+
+  /* A transformed ancestor can become the containing block for fixed
+     descendants; don't lift a figure whose lightbox is open. */
+  .lift-hover:hover:has(dialog[open]) {
+    transform: none;
+  }
+}
+
+/* Reduced motion / lite mode: keep the shadow (it isn't motion), drop the
+   lift and the transition. The global rules below only clamp transition
+   DURATION, so the transform itself has to be cancelled explicitly. */
+@media (prefers-reduced-motion: reduce) {
+  .lift-hover,
+  .lift-hover:hover {
+    transform: none;
+    transition: box-shadow var(--lift-duration) ease-out;
+  }
+}
+
+.perf-lite .lift-hover,
+.perf-lite .lift-hover:hover {
+  transform: none;
+  transition: none;
+}
+
+/* Figure plates keep their engineering-plate resting shadow underneath. */
+.figure-plate.lift-hover {
+  --lift-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 16px 38px -12px rgba(15, 23, 42, 0.22);
+}
+
+.dark .figure-plate.lift-hover {
+  --lift-shadow:
+    0 0 0 1px rgba(99, 102, 241, 0.22),
+    0 2px 6px rgba(0, 0, 0, 0.35),
+    0 28px 64px -14px rgba(79, 70, 229, 0.52);
+}
+
+/* Same reasoning for the leader-takeaway card's resting elevation. */
+.leader-takeaway.lift-hover {
+  --lift-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 16px 34px -14px rgba(15, 23, 42, 0.24);
+}
+
+.dark .leader-takeaway.lift-hover {
+  --lift-shadow:
+    0 0 0 1px rgba(192, 193, 255, 0.16),
+    0 18px 38px -16px rgba(111, 0, 190, 0.55);
+}
+
+/* ============================================================
+   SERIES WAYFINDING
+   The one-line "where does this sit?" element between a post's
+   dek and its tag row (components/content/SeriesWayfinding.astro).
+   Two chip kinds, deliberately different in weight: an Arc is a
+   narrative throughline across series (accent-forward), a Series
+   is a mini-series (quiet outline).
+   ============================================================ */
+
+.series-wayfinding {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.wayfind {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.34rem;
+  padding: 0.3rem 0.6875rem 0.32rem 0.5625rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 9999px;
+  background: var(--bg-subtle);
+  color: var(--text-tertiary);
+  font-size: 0.8125rem;
+  line-height: 1.3;
+  text-decoration: none;
+  transition:
+    border-color 150ms ease,
+    background-color 150ms ease,
+    color 150ms ease;
+}
+
+.wayfind__icon {
+  flex: none;
+  color: var(--text-disabled);
+  transition: color 150ms ease;
+}
+
+.wayfind__kicker {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.wayfind__sep {
+  color: var(--text-disabled);
+}
+
+.wayfind__name {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.wayfind__position {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The Arc — the throughline. Reads as the primary of the two. */
+.wayfind--arc {
+  border-color: var(--accent-muted);
+  background: var(--accent-subtle);
+  color: var(--accent-text);
+}
+
+.wayfind--arc .wayfind__icon,
+.wayfind--arc .wayfind__sep {
+  color: var(--accent);
+}
+
+.wayfind--arc .wayfind__kicker,
+.wayfind--arc .wayfind__name {
+  color: var(--accent-text);
+}
+
+.dark .wayfind--arc {
+  border-color: rgba(192, 193, 255, 0.28);
+  background: rgba(192, 193, 255, 0.09);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  a.wayfind:hover {
+    border-color: var(--accent);
+    color: var(--accent-text);
+  }
+
+  a.wayfind:hover .wayfind__name,
+  a.wayfind:hover .wayfind__icon {
+    color: var(--accent-text);
+  }
+
+  a.wayfind--arc:hover {
+    background: var(--accent-muted);
+  }
+
+  .dark a.wayfind--arc:hover {
+    background: rgba(192, 193, 255, 0.16);
+  }
+}
+
+a.wayfind:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* No series page to link to — same chip, no affordance. */
+.wayfind--static {
+  cursor: default;
+}
+
+@media (max-width: 640px) {
+  .wayfind {
+    font-size: 0.78125rem;
+  }
+}
+
+/* ============================================================
+   LEADER TAKEAWAY CARD
+   The post-level executive summary (frontmatter `leaderTakeaway`),
+   rendered by components/content/LeaderTakeaway.astro. Lives here
+   rather than in a scoped block because it needs `.dark` rules.
+   ============================================================ */
+
+.leader-takeaway {
+  position: relative;
+  overflow: hidden;
+  margin: 0 0 1.75rem;
+  padding: 1.125rem 1.25rem 1.1875rem 1.5rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.75rem;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(99, 102, 241, 0.07) 0%,
+      rgba(99, 102, 241, 0) 58%
+    ),
+    var(--bg-surface);
+  box-shadow:
+    0 1px 2px rgba(15, 23, 42, 0.04),
+    0 10px 24px -14px rgba(15, 23, 42, 0.16);
+}
+
+/* Inset accent edge. Clipped by the card's own overflow so it follows the
+   rounded corners instead of mitring against the 1px border. */
+.leader-takeaway::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 3px;
+  background: linear-gradient(
+    to bottom,
+    var(--accent) 0%,
+    var(--accent) 62%,
+    var(--accent-muted) 100%
+  );
+}
+
+.dark .leader-takeaway {
+  border-color: rgba(192, 193, 255, 0.14);
+  background:
+    linear-gradient(
+      135deg,
+      rgba(192, 193, 255, 0.09) 0%,
+      rgba(192, 193, 255, 0) 58%
+    ),
+    var(--bg-surface);
+  box-shadow:
+    0 0 0 1px rgba(192, 193, 255, 0.05),
+    0 14px 30px -18px rgba(0, 0, 0, 0.66);
+}
+
+.leader-takeaway__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0 0 0.5rem;
+  color: var(--accent-text);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.leader-takeaway__mark {
+  flex: none;
+  color: var(--accent);
+}
+
+.leader-takeaway__body {
+  margin: 0;
+  color: var(--text-secondary);
+  font-family: var(--font-serif);
+  font-size: 1.0625rem;
+  line-height: 1.62;
+}
+
+@media (max-width: 640px) {
+  .leader-takeaway {
+    padding: 1rem 1rem 1.0625rem 1.25rem;
+    border-radius: 0.625rem;
+  }
+
+  .leader-takeaway__body {
+    font-size: 1rem;
+    line-height: 1.6;
+  }
 }
 
 /* ============================================================
@@ -1142,8 +1934,8 @@ pre code {
   --color-secondary-foreground: hsl(var(--secondary-foreground));
   --color-muted: hsl(var(--muted));
   --color-muted-foreground: hsl(var(--muted-foreground));
-  --color-accent: hsl(var(--accent));
-  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-accent: hsl(var(--shadcn-accent));
+  --color-accent-foreground: hsl(var(--shadcn-accent-foreground));
   --color-destructive: hsl(var(--destructive));
   --color-destructive-foreground: hsl(var(--destructive-foreground));
   --color-border: hsl(var(--border-hsl));
@@ -1152,7 +1944,12 @@ pre code {
 }
 
 :root {
-  /* shadcn defaults, light */
+  /* shadcn defaults, light. `--accent`/`--accent-foreground` are namespaced
+     to `--shadcn-*` (FIX-LIST A2) — the bare names collided at equal
+     specificity with the real editorial `--accent` set above (:116), and as
+     an invalid HSL-triple color they clobbered it silently instead of
+     erroring. @miethe/ui components still resolve the same values through
+     the `@theme inline` mapping above; only the shared variable name moved. */
   --background: 0 0% 100%;
   --foreground: 222.2 47.4% 11.2%;
   --card: 0 0% 100%;
@@ -1165,8 +1962,8 @@ pre code {
   --secondary-foreground: 222.2 47.4% 11.2%;
   --muted: 210 40% 96.1%;
   --muted-foreground: 215.4 16.3% 46.9%;
-  --accent: 210 40% 96.1%;
-  --accent-foreground: 222.2 47.4% 11.2%;
+  --shadcn-accent: 210 40% 96.1%;
+  --shadcn-accent-foreground: 222.2 47.4% 11.2%;
   --destructive: 0 84.2% 60.2%;
   --destructive-foreground: 210 40% 98%;
   --border-hsl: 214.3 31.8% 91.4%;
@@ -1187,8 +1984,8 @@ pre code {
   --secondary-foreground: 210 40% 98%;
   --muted: 217.2 32.6% 17.5%;
   --muted-foreground: 215 20.2% 65.1%;
-  --accent: 217.2 32.6% 17.5%;
-  --accent-foreground: 210 40% 98%;
+  --shadcn-accent: 217.2 32.6% 17.5%;
+  --shadcn-accent-foreground: 210 40% 98%;
   --destructive: 0 62.8% 30.6%;
   --destructive-foreground: 210 40% 98%;
   --border-hsl: 217.2 32.6% 17.5%;

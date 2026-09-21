@@ -1,0 +1,122 @@
+---
+/**
+ * FocusHost — the reading-experience-v2 P0-C inspection controller
+ * (ARCHITECTURE.md §3, DIRECTION.md V4). Mounts the one native <dialog>
+ * every "Explore thread" / evidence / figure trigger on the essay page
+ * opens into, by cloning the matching `FocusTemplates.astro` fragment.
+ * The behavior (open/close/history/return semantics) lives in
+ * `src/lib/focus-host.ts` — this component only renders the dialog shell
+ * and starts the controller.
+ *
+ * Mounted once by `PostLayout`, immediately after `FocusTemplates` (same
+ * `slug`, so `data-essay-slug` always matches the templates it clones).
+ * Deliberately NOT mounted on the four standalone focus routes
+ * (`/essays/<slug>/thread/<beat>/` etc.): those pages render no
+ * `<template>` fragments of their own today, so a host there would have
+ * nothing to clone. If a later P0-B/P1 pass adds child templates to those
+ * routes (ARCHITECTURE.md §3's parenthetical about "a direct arrival...
+ * still has a working host"), mounting this component there too is a
+ * one-line addition — the controller itself already degrades safely to
+ * an ordinary navigation whenever `templateFor()` finds nothing to clone.
+ *
+ * Owns history directly (`pushState`/`replaceState`/one `popstate`
+ * listener) rather than integrating with Astro ClientRouter — see
+ * ARCHITECTURE.md §1's correction to its own brief: ClientRouter is not
+ * wired anywhere in this codebase today.
+ */
+import { threads } from '../../data/threads';
+
+interface Props {
+  slug: string;
+}
+
+const { slug } = Astro.props;
+const thread = threads[slug];
+---
+
+{
+  thread && (
+    <dialog data-focus-dialog data-essay-slug={slug} class="focus-host" aria-label="Reading focus view" />
+  )
+}
+
+{
+  thread && (
+    <script>
+      import { initFocusHost } from '../../lib/focus-host';
+
+      initFocusHost();
+    </script>
+  )
+}
+
+<style>
+  .focus-host {
+    box-sizing: border-box;
+    width: min(94vw, 72rem);
+    max-width: 94vw;
+    max-height: 90vh;
+    margin: auto;
+    padding: 1.75rem clamp(1.25rem, 4vw, 2.5rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    color: var(--text-primary);
+    background: var(--bg-surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    animation: focus-host-in 160ms ease-out;
+  }
+
+  .focus-host::backdrop {
+    background: var(--color-bg-overlay);
+    animation: focus-host-backdrop-in 160ms ease-out;
+  }
+
+  .focus-host:focus-visible {
+    outline: none;
+  }
+
+  @keyframes focus-host-in {
+    from {
+      opacity: 0;
+      transform: translateY(0.5rem) scale(0.99);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes focus-host-backdrop-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .focus-host,
+    .focus-host::backdrop {
+      animation: none;
+    }
+  }
+
+  :global(html.perf-lite) .focus-host,
+  :global(html.perf-lite) .focus-host::backdrop {
+    animation: none;
+  }
+
+  @media (max-width: 640px) {
+    .focus-host {
+      width: 100vw;
+      max-width: 100vw;
+      max-height: 100vh;
+      height: 100%;
+      border-radius: 0;
+      padding: 1.25rem 1rem 2rem;
+    }
+  }
+</style>

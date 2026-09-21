@@ -1,0 +1,43 @@
+---
+/**
+ * Flat, site-wide Evidence Focus detail route (reading-experience-v2
+ * ARCHITECTURE.md §2): `/evidence/<record>/`. Deliberately NOT nested
+ * under `/essays/<slug>/` — evidence records are a site-wide resource
+ * (V13), so a second essay's thread can cite the same record without a
+ * URL implying single-essay ownership. `/essays/<slug>/evidence/` is the
+ * essay-scoped index into this same flat set.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EvidenceFocus from '../../components/content/EvidenceFocus.astro';
+import { threads } from '../../data/threads';
+import { evidence } from '../../data/evidence';
+import { buildCanonicalUrl } from '../../lib/seo';
+
+export function getStaticPaths() {
+  return Object.values(evidence).map((record) => ({ params: { record: record.id } }));
+}
+
+const { record: recordId } = Astro.params;
+const records = Object.values(evidence);
+const selected = recordId ? evidence[recordId] : undefined;
+
+if (!selected) {
+  throw new Error(`No evidence record "${recordId}" registered in src/data/evidence.ts.`);
+}
+
+// Find the first thread (any essay) whose beats this record relates to, so
+// "Read in essay"/"Back to essay" have a real destination when one exists.
+// A record with no thread reference yet (relatedSceneIds: []) simply gets
+// no essay link — never a fabricated one.
+const relatedEssaySlug = Object.values(threads).find((thread) =>
+  thread.beats.some((beat) => selected.relatedSceneIds.includes(beat.id)),
+)?.slug;
+
+const canonicalUrl = buildCanonicalUrl(Astro.url.pathname);
+---
+
+<BaseLayout title={selected.title} description={selected.supports[0] ?? selected.title} canonicalUrl={canonicalUrl}>
+  <div class="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 lg:px-8">
+    <EvidenceFocus records={records} selectedId={selected.id} essaySlug={relatedEssaySlug} standalone={true} />
+  </div>
+</BaseLayout>

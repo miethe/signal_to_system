@@ -1,0 +1,94 @@
+---
+/**
+ * PullQuote — a wide-margin display quote pulled out of the prose flow.
+ * `variant="thesis-marker"` drops the quotation-mark/attribution chrome
+ * entirely (and renders a `<p>`, not a `<blockquote>` — it is a stated
+ * claim, not a quotation) so a line like "Trusted artifact ≠ trusted
+ * use." reads as thesis, not citation. No `lift-hover`: this is a
+ * typographic treatment, not a card. Use sparingly (this essay caps at
+ * four total, drawn only from the review's shortlist — a manuscript-level
+ * constraint, not enforced by this component).
+ */
+interface Props {
+  variant?: 'quote' | 'thesis-marker';
+}
+
+const { variant = 'quote' } = Astro.props;
+---
+
+<figure class:list={['pull-quote', `pull-quote--${variant}`]}>
+  {
+    variant === 'thesis-marker' ? (
+      <p class="pull-quote__text pull-quote__text--thesis">
+        <slot />
+      </p>
+    ) : (
+      <blockquote class="pull-quote__text">
+        <span class="pull-quote__mark" aria-hidden="true">
+          &ldquo;
+        </span>
+        <slot />
+      </blockquote>
+    )
+  }
+</figure>
+
+<style>
+  .pull-quote {
+    margin: 2.75rem 0;
+  }
+
+  .pull-quote__text {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-family: var(--font-serif);
+    font-size: 1.3125rem;
+    font-style: italic;
+    line-height: 1.5;
+    color: var(--text-primary);
+  }
+
+  @media (min-width: 640px) {
+    .pull-quote__text {
+      font-size: 1.5rem;
+    }
+  }
+
+  .pull-quote--quote .pull-quote__text {
+    padding-left: 1.5rem;
+    border-left: 3px solid var(--accent);
+  }
+
+  .pull-quote__mark {
+    margin-right: 0.3rem;
+    color: var(--accent);
+    font-family: var(--font-serif);
+    font-size: 1.3em;
+    font-style: normal;
+  }
+
+  .pull-quote--thesis-marker .pull-quote__text--thesis {
+    padding: 0.4rem 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    font-style: normal;
+    font-weight: 600;
+    text-align: center;
+    letter-spacing: 0.005em;
+  }
+
+  :global(.post-layout--registry-wave) .pull-quote--quote {
+    min-height: 106px;
+    margin: 22px 0 25px;
+    padding: 18px 28px 18px 52px;
+    border-left: 4px solid var(--accent);
+    background: var(--bg-subtle);
+  }
+  :global(.post-layout--registry-wave) .pull-quote--quote .pull-quote__text { padding: 0; border: 0; font-size: 28px; line-height: 1.35; }
+  :global(.post-layout--registry-wave) .pull-quote__mark { font-size: 42px; line-height: 0; }
+
+  :global(.dark) .pull-quote--quote { min-height: 106px; margin: 22px 0 25px; padding: 18px 28px 18px 52px; border-left: 4px solid #9d7cff; background: linear-gradient(100deg, rgb(27 55 91 / 72%) 0%, rgb(10 27 50 / 48%) 100%); }
+  :global(.dark) .pull-quote--quote .pull-quote__text { padding: 0; border: 0; color: #f1eef8; font-size: 28px; line-height: 1.35; }
+  :global(.dark) .pull-quote__mark { color: #7898ef; font-size: 42px; line-height: 0; }
+</style>

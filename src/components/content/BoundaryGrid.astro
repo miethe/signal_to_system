@@ -1,0 +1,90 @@
+---
+/**
+ * BoundaryGrid — the essay's non-equivalences ("Authenticity ≠ Safety",
+ * etc.) as a distinct grid of drafting-plate cells rather than a plain
+ * bullet list or table. Each cell borrows the corner-tick mark from
+ * `.figure-plate__corner` / `.thread-beat__corner` so the boundary spec
+ * reads as an engineering artifact, echoing the house diagram vocabulary
+ * instead of introducing a new one.
+ */
+interface Props {
+  items: Array<{ left: string; right: string }>;
+}
+
+const { items } = Astro.props;
+---
+
+<section class="boundary-grid lift-hover" aria-label="Non-equivalences">
+  <ul class="boundary-grid__list">
+    {
+      items.map(({ left, right }) => (
+        <li class="boundary-grid__item">
+          <span class="boundary-grid__corner boundary-grid__corner--tl" aria-hidden="true" />
+          <span class="boundary-grid__corner boundary-grid__corner--tr" aria-hidden="true" />
+          <span class="boundary-grid__corner boundary-grid__corner--bl" aria-hidden="true" />
+          <span class="boundary-grid__corner boundary-grid__corner--br" aria-hidden="true" />
+          <span class="boundary-grid__term">{left}</span>
+          <span class="boundary-grid__op">&ne;</span>
+          <span class="boundary-grid__term">{right}</span>
+        </li>
+      ))
+    }
+  </ul>
+</section>
+
+<style>
+  .boundary-grid {
+    margin: 2rem 0;
+  }
+
+  .boundary-grid__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    gap: 0.9rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .boundary-grid__item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6rem;
+    padding: 0.9rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    background: var(--bg-subtle);
+    text-align: center;
+  }
+
+  .boundary-grid__corner {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    border: 1px solid var(--border-strong);
+    opacity: 0.6;
+    pointer-events: none;
+  }
+
+  .boundary-grid__corner--tl { top: 6px; left: 6px; border-right: 0; border-bottom: 0; }
+  .boundary-grid__corner--tr { top: 6px; right: 6px; border-left: 0; border-bottom: 0; }
+  .boundary-grid__corner--bl { bottom: 6px; left: 6px; border-right: 0; border-top: 0; }
+  .boundary-grid__corner--br { right: 6px; bottom: 6px; border-left: 0; border-top: 0; }
+
+  .boundary-grid__term {
+    color: var(--text-primary);
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.01em;
+  }
+
+  .boundary-grid__op {
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 0.9375rem;
+    font-weight: 700;
+  }
+</style>

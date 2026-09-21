@@ -1,17 +1,30 @@
 ---
+import '../styles/registry-wave-v2.css';
 import BaseLayout from './BaseLayout.astro';
 import Figure from '../components/content/Figure.astro';
 import RelatedContent from '../components/content/RelatedContent.astro';
 import AuthorProfile from '../components/content/AuthorProfile.astro';
-import ThreadRail from '../components/content/ThreadRail.astro';
+import ReadingCompanion from '../components/content/ReadingCompanion.astro';
+import SectionMarker from '../components/content/SectionMarker.astro';
+import FocusTemplates from '../components/content/FocusTemplates.astro';
+import FocusHost from '../components/content/FocusHost.astro';
+import MobileContents from '../components/content/MobileContents.astro';
+import SeriesWayfinding from '../components/content/SeriesWayfinding.astro';
+import ExecutiveSignal from '../components/content/ExecutiveSignal.astro';
 import { generateJsonLd, buildCanonicalUrl } from '../lib/seo';
 import { formatDate, formatDateISO } from '../lib/utils';
 import { site } from '../data/site';
-import { threads } from '../data/threads';
 import type { Article } from '../lib/content';
+
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
 
 interface Props {
   slug?: string;
+  headings?: Heading[];
   frontmatter: {
     title: string;
     excerpt?: string;
@@ -29,6 +42,7 @@ interface Props {
     series?: string;
     seriesPart?: number;
     draft?: boolean;
+    heroPlacement?: 'default' | 'frontispiece';
   };
   // Optional: inject prev/next series posts from the page. `href` is
   // collection-aware (e.g. via hrefFor()) and falls back to /essays/<slug>/.
@@ -39,8 +53,7 @@ interface Props {
   relatedItems?: Article[];
 }
 
-const { slug, frontmatter, prevPost, nextPost, relatedItems = [] } = Astro.props;
-const thread = slug ? threads[slug] : undefined;
+const { slug, headings = [], frontmatter, prevPost, nextPost, relatedItems = [] } = Astro.props;
 
 const {
   title,
@@ -58,12 +71,20 @@ const {
   leaderTakeaway,
   series,
   seriesPart,
+  heroPlacement = 'default',
 } = frontmatter;
+
+const isFrontispiece = heroPlacement === 'frontispiece';
+const isRegistryWave = slug === 'the-registry-wave-agentic-artifact-supply-chain';
 
 const pageDescription = description || excerpt || site.description;
 const canonicalUrl = buildCanonicalUrl(Astro.url.pathname);
 const publishedISO = formatDateISO(date);
 const updatedISO = updatedDate ? formatDateISO(updatedDate) : undefined;
+const resolvedHeroAlt = heroAlt
+  || (heroImage === '/assets/posts/the-registry-wave-agentic-artifact-supply-chain/hero-governed-cube.png'
+    ? 'A shared capability pattern connects several project workbenches, each retaining a distinct adaptation.'
+    : `Hero illustration for ${title}`);
 
 const jsonLd = generateJsonLd('article', {
   title,
@@ -91,23 +112,34 @@ const jsonLd = generateJsonLd('article', {
     aria-hidden="true"
   ></div>
 
-  <article class="mx-auto grid w-full max-w-[72ch] items-start px-4 py-12 sm:px-6 lg:px-8 xl:max-w-7xl xl:grid-cols-[minmax(0,72ch)_18rem] xl:justify-center xl:gap-x-12">
-    <!-- Article header -->
-    <header class="mb-16 min-w-0 space-y-6 pb-4 xl:col-start-1 xl:row-start-1">
-      {
-        series && (
-          <div class="flex items-center gap-2 text-xs font-mono font-medium text-[var(--accent)]">
-            <span class="uppercase tracking-widest">Series</span>
-            <span class="text-[var(--text-disabled)]">/</span>
-            <span>{series}</span>
-            {seriesPart && <span class="text-[var(--text-disabled)]">Part {seriesPart}</span>}
-          </div>
-        )
-      }
+  <article
+    class:list={[
+      'post-layout mx-auto grid w-full max-w-[var(--measure)] items-start px-4 py-12 sm:px-6 lg:px-8 xl:max-w-7xl xl:grid-cols-[minmax(0,var(--measure))_minmax(14rem,18rem)] xl:justify-center xl:gap-x-12',
+      isRegistryWave && 'post-layout--registry-wave',
+    ]}
+  >
+    <!-- This lives inside .post-layout so the shared --measure token is
+         resolvable. It remains ahead of the title/dek/meta at every size. -->
+    {
+      isFrontispiece && heroImage && (
+        <div class:list={['post-frontispiece w-full pt-0', isRegistryWave ? 'xl:col-start-1 xl:row-start-1' : 'xl:col-span-2 xl:row-start-1']}>
+          <Figure src={heroImage} alt={resolvedHeroAlt} variant="hero" />
+          {isRegistryWave && <span class="post-frontispiece__caption">Editorial illustration</span>}
+        </div>
+      )
+    }
 
+    <!-- Article header -->
+    <header
+      id="post-header"
+      class:list={[
+        'mb-16 min-w-0 space-y-6 pb-4 xl:col-start-1',
+        isRegistryWave ? 'xl:row-start-2' : isFrontispiece ? 'xl:row-start-2' : 'xl:row-start-1',
+      ]}
+    >
       {
         category && (
-          <div>
+          <div class="post-category">
             <span class="font-mono inline-block rounded-full bg-[var(--accent-subtle)] px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[var(--accent-text)] ring-1 ring-inset ring-[var(--border-subtle)]">
               {category}
             </span>
@@ -125,8 +157,23 @@ const jsonLd = generateJsonLd('article', {
         )
       }
 
+      <!-- Series wayfinding: arc position and/or mini-series part. Grouped
+           with the dek (it answers "where does this sit?", which is editorial
+           context) and kept away from the grey tag chips below, so the two
+           chip rows never read as one muddled row. -->
+      {
+        slug && (
+          <SeriesWayfinding
+            slug={slug}
+            collection="posts"
+            series={series}
+            seriesPart={seriesPart}
+          />
+        )
+      }
+
       <!-- Meta row -->
-      <div class="font-mono flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-[var(--text-disabled)]">
+      <div class="post-meta font-mono flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-[var(--text-disabled)]">
         <time datetime={publishedISO} class="text-[var(--text-tertiary)]">
           {formatDate(date)}
         </time>
@@ -154,7 +201,7 @@ const jsonLd = generateJsonLd('article', {
       <!-- Tags -->
       {
         tags.length > 0 && (
-          <div class="flex flex-wrap gap-2 pt-1">
+          <div class="post-tags flex flex-wrap gap-2 pt-1">
             {tags.map((tag) => (
               <a
                 href={`/tags/${tag}`}
@@ -168,57 +215,74 @@ const jsonLd = generateJsonLd('article', {
       }
     </header>
 
-    <!-- Desktop byline follows the header in source order and spans the article rail. -->
-    <div class="hidden xl:col-start-2 xl:row-span-2 xl:row-start-1 xl:block xl:self-start xl:sticky xl:top-24 xl:max-h-[calc(100vh-7rem)] xl:overflow-y-auto xl:pr-1">
-      {thread && <ThreadRail slug={thread.slug} />}
-      <AuthorProfile variant="sidebar" headingLevel="h2" />
+    <!-- Desktop rail follows the header in source order and spans the
+         article column. Reading-experience-v2 DIRECTION.md V5: the author
+         card sits in flow here and scrolls away with the page; only
+         ReadingCompanion (outline + ThreadDock + optional ContextualNote)
+         is the sticky surface at depth. -->
+    <div
+      class="registry-wave-rail"
+      data-registry-rail={isRegistryWave ? 'true' : undefined}
+      class:list={[
+        isRegistryWave
+          ? 'hidden xl:col-start-2 xl:row-span-3 xl:block xl:self-stretch'
+          : 'hidden xl:col-start-2 xl:row-span-2 xl:block xl:self-stretch',
+        isRegistryWave ? 'xl:row-start-1' : isFrontispiece ? 'xl:row-start-2' : 'xl:row-start-1',
+      ]}
+    >
+      <div class="mb-4">
+        <AuthorProfile variant="sidebar" headingLevel="h2" />
+      </div>
+      {
+        whyItMatters && (
+          <div class="mb-4">
+            <ExecutiveSignal whyItMatters={whyItMatters} takeaway={leaderTakeaway} placement="rail" />
+          </div>
+        )
+      }
+      <div class="xl:sticky xl:top-24 xl:pr-1">
+        <ReadingCompanion slug={slug} headings={headings} />
+      </div>
     </div>
 
-    <div class="min-w-0 xl:col-start-1 xl:row-start-2">
+    <div
+      class:list={[
+        'min-w-0 xl:col-start-1',
+        isRegistryWave ? 'xl:row-start-3' : isFrontispiece ? 'xl:row-start-3' : 'xl:row-start-2',
+      ]}
+    >
 
     <!-- Compact author context remains in the reading flow below desktop. -->
     <div class="mb-10 xl:hidden">
       <AuthorProfile variant="compact" headingLevel="h2" />
     </div>
 
-    <!-- Hero illustration (engineering plate) -->
+    <!-- Hero illustration (engineering plate) — the frontispiece position
+         (above the header) is rendered earlier and skips this slot. -->
     {
-      heroImage && (
+      !isFrontispiece && heroImage && (
         <Figure
           src={heroImage}
-          alt={heroAlt || `Hero illustration for ${title}`}
+          alt={resolvedHeroAlt}
           variant="hero"
         />
       )
     }
 
-    <!-- Callout: Why It Matters (executive signal) -->
+    <!-- The narrow layout has no rail, so it keeps the signal in flow here.
+         Desktop places the same single signal under the author card above. -->
     {
-      whyItMatters && (
-        <aside class="mb-8 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-subtle)] p-6 shadow-sm">
-          <p class="font-mono mb-2 text-xs font-bold uppercase tracking-widest text-[var(--accent)]">
-            Why It Matters
-          </p>
-          <p class="text-sm leading-relaxed text-[var(--text-secondary)]">{whyItMatters}</p>
-        </aside>
-      )
-    }
-
-    <!-- Callout: Leader Takeaway -->
-    {
-      leaderTakeaway && (
-        <aside class="mb-8 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-subtle)] p-6 shadow-sm">
-          <p class="font-mono mb-2 text-xs font-bold uppercase tracking-widest text-[var(--text-primary)]">
-            Leader Takeaway
-          </p>
-          <p class="text-sm leading-relaxed text-[var(--text-secondary)]">{leaderTakeaway}</p>
-        </aside>
+      whyItMatters && !isRegistryWave && (
+        <div class="xl:hidden">
+          <ExecutiveSignal whyItMatters={whyItMatters} takeaway={leaderTakeaway} />
+        </div>
       )
     }
 
     <!-- Article body -->
-    <div class="prose-custom max-w-none">
+    <div class="prose-custom">
       <slot />
+      <SectionMarker />
     </div>
 
     <!-- Article footer: series nav + tags recap -->
@@ -284,6 +348,14 @@ const jsonLd = generateJsonLd('article', {
     </footer>
   </div>
   </article>
+
+  <!-- <template> fragments FocusHost clones on open — see
+       FocusTemplates.astro's header comment. No-op for posts without a
+       thread. FocusHost is mounted right after so its dialog always has
+       this exact slug's templates to draw from (ARCHITECTURE.md §3). -->
+  {slug && <FocusTemplates slug={slug} />}
+  {slug && <FocusHost slug={slug} />}
+  <MobileContents slug={slug} headings={headings} />
 
   <!-- Scroll to top button -->
   <button

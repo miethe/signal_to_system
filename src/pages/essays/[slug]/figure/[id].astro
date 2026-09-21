@@ -1,0 +1,47 @@
+---
+/**
+ * Standalone Figure Viewer route (reading-experience-v2 ARCHITECTURE.md
+ * §2): `/essays/<slug>/figure/<id>/`. Figure id === beat id for the six
+ * canonical thread scenes; the two closing figures (before/after estate,
+ * deep estate) are deliberately not routed here (V8) — they stay in the
+ * closing sequence, never an expandable.
+ */
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../../layouts/BaseLayout.astro';
+import FigureViewer from '../../../../components/content/FigureViewer.astro';
+import { threads } from '../../../../data/threads';
+import { buildCanonicalUrl } from '../../../../lib/seo';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('posts');
+  const paths: Array<{ params: { slug: string; id: string }; props: { postTitle: string } }> = [];
+
+  for (const post of posts) {
+    const thread = threads[post.id];
+    if (!thread) continue;
+    for (const beat of thread.beats) {
+      paths.push({ params: { slug: post.id, id: beat.id }, props: { postTitle: post.data.title } });
+    }
+  }
+
+  return paths;
+}
+
+const { slug, id } = Astro.params;
+const { postTitle } = Astro.props;
+const thread = slug ? threads[slug] : undefined;
+const beat = thread?.beats.find((candidate) => candidate.id === id);
+
+if (!thread || !beat) {
+  throw new Error(`No figure "${id}" registered for essay slug "${slug}".`);
+}
+
+const pageTitle = `Figure: ${beat.label} — ${postTitle}`;
+const canonicalUrl = buildCanonicalUrl(Astro.url.pathname);
+---
+
+<BaseLayout title={pageTitle} description={beat.image.caption ?? beat.image.alt} canonicalUrl={canonicalUrl}>
+  <div class="mx-auto w-full max-w-5xl px-4 py-12 sm:px-6 lg:px-8">
+    <FigureViewer thread={thread} beatId={beat.id} standalone={true} />
+  </div>
+</BaseLayout>

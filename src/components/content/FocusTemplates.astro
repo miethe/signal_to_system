@@ -1,0 +1,67 @@
+---
+/**
+ * FocusTemplates — mounts the inline `<template data-focus-view="...">`
+ * fragments a future `FocusHost` controller will clone into its dialog
+ * (reading-experience-v2 ARCHITECTURE.md §3). This component owns none of
+ * that controller's behavior — no `showModal()`, no history, no click
+ * hijacking (that is P0-C's job, gated on `DIRECTION.md`'s architecture
+ * decision) — it only renders the same `ThreadFocus`/`EvidenceFocus`/
+ * `FigureViewer` components the standalone routes use, each wrapped in an
+ * inert `<template>` so nothing inside is rendered, laid out, or
+ * fetched (a browser never fetches an `<img>` inside inactive template
+ * content) until some future script clones it.
+ *
+ * `standalone={false}` on every nested component swaps in the "Close"
+ * affordance those components reserve for an overlay context — inert
+ * today (no listener attaches to `data-focus-close` yet), but present so
+ * P0-C doesn't have to touch these three components again just to add
+ * the button.
+ *
+ * `PostLayout` mounts this once per post that has a thread; it is a
+ * no-op (renders nothing) for posts without one.
+ */
+import ThreadFocus from './ThreadFocus.astro';
+import EvidenceFocus from './EvidenceFocus.astro';
+import FigureViewer from './FigureViewer.astro';
+import { threads } from '../../data/threads';
+import { evidence } from '../../data/evidence';
+
+interface Props {
+  slug: string;
+}
+
+const { slug } = Astro.props;
+const thread = threads[slug];
+const beatIds = new Set(thread?.beats.map((beat) => beat.id) ?? []);
+const relatedRecords = thread
+  ? Object.values(evidence).filter((record) => record.relatedSceneIds.some((id) => beatIds.has(id)))
+  : [];
+---
+
+{
+  thread && (
+    <div hidden data-focus-templates aria-hidden="true">
+      {thread.beats.map((beat) => (
+        <template data-focus-view={`thread:${beat.id}`}>
+          <ThreadFocus thread={thread} beatId={beat.id} standalone={false} />
+        </template>
+      ))}
+
+      {thread.beats.map((beat) => (
+        <template data-focus-view={`figure:${beat.id}`}>
+          <FigureViewer thread={thread} beatId={beat.id} standalone={false} />
+        </template>
+      ))}
+
+      <template data-focus-view="evidence:all">
+        <EvidenceFocus records={relatedRecords} essaySlug={slug} standalone={false} />
+      </template>
+
+      {relatedRecords.map((record) => (
+        <template data-focus-view={`evidence:${record.id}`}>
+          <EvidenceFocus records={relatedRecords} selectedId={record.id} essaySlug={slug} standalone={false} />
+        </template>
+      ))}
+    </div>
+  )
+}

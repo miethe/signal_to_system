@@ -83,7 +83,7 @@ export default function Callout({ type = "info", title, children }: CalloutProps
   const displayTitle = title ?? cfg.label;
 
   return (
-    <aside className={`my-6 flex gap-4 rounded-xl border p-5 ${cfg.containerCls}`} role="note">
+    <aside className={`lift-hover my-5 flex gap-4 rounded-xl border p-4 ${cfg.containerCls}`} role="note">
       <div className={`mt-0.5 shrink-0 ${cfg.iconCls}`} aria-hidden="true">
         {icons[cfg.icon]}
       </div>

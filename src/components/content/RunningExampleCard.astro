@@ -1,0 +1,91 @@
+---
+/**
+ * RunningExampleCard — Thread Focus rail component (ARCHITECTURE.md §4,
+ * spec §7): the known artifact metadata behind the essay's running
+ * example. Per V7/the semantic boundaries in spec §7, this renders only
+ * verified fields already present on the `Thread` record — title and
+ * artifact identity (`thread.subject`) — and omits any field this build
+ * has no grounded value for (role, verified scope, provenance, or any
+ * health/approval badge) rather than inferring or inventing one.
+ */
+import type { Thread } from '../../data/threads';
+
+interface Props {
+  thread: Thread;
+}
+
+const { thread } = Astro.props;
+---
+
+<section class="running-example-card" aria-label="Running example artifact">
+  <p class="running-example-card__eyebrow font-mono">Running example</p>
+  <h3 class="running-example-card__title font-serif">{thread.title}</h3>
+
+  <dl class="running-example-card__facts">
+    <div class="running-example-card__fact">
+      <dt>Artifact identity</dt>
+      <dd class="font-mono">{thread.subject}</dd>
+    </div>
+  </dl>
+
+  <p class="running-example-card__note">
+    Role, verified scope, and provenance beyond the artifact identity above are not captured in
+    this build; nothing here infers a health or approval state from the registry.
+  </p>
+</section>
+
+<style>
+  .running-example-card {
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    background: var(--bg-subtle);
+    padding: 0.875rem 1rem;
+  }
+
+  .running-example-card__eyebrow {
+    margin: 0;
+    font-size: 0.625rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent-text);
+  }
+
+  .running-example-card__title {
+    margin: 0.2rem 0 0.75rem;
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .running-example-card__facts {
+    margin: 0 0 0.75rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .running-example-card__fact dt {
+    margin: 0 0 0.15rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+  }
+
+  .running-example-card__fact dd {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: var(--text-primary);
+  }
+
+  .running-example-card__note {
+    margin: 0;
+    padding-top: 0.65rem;
+    border-top: 1px solid var(--border-subtle);
+    font-size: 0.75rem;
+    line-height: 1.5;
+    color: var(--text-tertiary);
+  }
+</style>

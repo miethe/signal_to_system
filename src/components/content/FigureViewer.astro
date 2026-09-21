@@ -1,0 +1,226 @@
+---
+/**
+ * FigureViewer — the shared figure-viewer renderer (DIRECTION.md V7,
+ * ARCHITECTURE.md §4, spec §10). Backs both `/essays/<slug>/figure/<id>/`
+ * and the in-place overlay's `<template>` fragment: exact asset, exact
+ * caption, long description, and real file metadata read from disk at
+ * build time — never a fabricated size or dimension (V1).
+ *
+ * `sharp` is already a project dependency (Astro's own image pipeline
+ * uses it), so this reads genuine width/height via its metadata probe
+ * rather than falling back to an undocumented guess; file size comes from
+ * `fs.statSync`. A missing asset at build time leaves both fields `null`
+ * — a labeled pending slot, not a substitute value.
+ */
+import '../../styles/registry-wave-v2.css';
+import fs from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import sharp from 'sharp';
+import type { Thread } from '../../data/threads';
+
+interface Props {
+  thread: Thread;
+  beatId: string;
+  standalone?: boolean;
+}
+
+const { thread, beatId, standalone = true } = Astro.props;
+const beat = thread.beats.find((candidate) => candidate.id === beatId);
+
+let fileSizeBytes: number | null = null;
+let width: number | null = null;
+let height: number | null = null;
+
+if (beat) {
+  const absolutePath = fileURLToPath(new URL(`../../../public${beat.image.src}`, import.meta.url));
+  try {
+    const stat = fs.statSync(absolutePath);
+    fileSizeBytes = stat.size;
+    const metadata = await sharp(absolutePath).metadata();
+    width = metadata.width ?? null;
+    height = metadata.height ?? null;
+  } catch {
+    // Asset unreadable at build time — leave metadata null (V1: a missing
+    // input stays a labeled pending slot, never a fabricated value).
+  }
+}
+
+const formatBytes = (bytes: number | null) => {
+  if (bytes === null) return 'Not available in this build';
+  const kb = bytes / 1024;
+  return kb >= 1024 ? `${(kb / 1024).toFixed(2)} MB` : `${kb.toFixed(1)} KB`;
+};
+
+const dimensionsLabel =
+  width !== null && height !== null ? `${width} × ${height}px` : 'Not available in this build';
+
+const filename = beat?.image.src.split('/').pop() ?? '';
+---
+
+{
+  beat && (
+    <div class:list={['figure-viewer', thread.slug === 'the-registry-wave-agentic-artifact-supply-chain' && 'registry-wave-focus']} data-focus-kind="figure" data-focus-key={beat.id}>
+      <div class="figure-viewer__actions">
+        <a class="figure-viewer__action" href={`/essays/${thread.slug}/`}>
+          &larr; Back to essay
+        </a>
+        <a class="figure-viewer__action" href={`/essays/${thread.slug}/thread/${beat.id}/`}>
+          &larr; Back to thread focus
+        </a>
+        <span class="figure-viewer__action-label font-mono">Figure viewer</span>
+        <a class="figure-viewer__action figure-viewer__action--copy" href={`/essays/${thread.slug}/figure/${beat.id}/`} data-focus-copy-link>
+          Copy link
+        </a>
+        {!standalone && (
+          <button type="button" class="figure-viewer__action figure-viewer__action--close" data-focus-close>
+            Close
+          </button>
+        )}
+      </div>
+
+      <p class="figure-viewer__eyebrow font-mono">Figure {String(beat.n).padStart(2, '0')} · {beat.label}</p>
+      <h2 class="figure-viewer__title font-serif">{beat.image.caption}</h2>
+
+      <figure class="figure-viewer__figure">
+        <img src={beat.image.src} alt={beat.image.alt} loading="lazy" decoding="async" />
+        <figcaption>
+          <p class="figure-viewer__caption">{beat.image.caption}</p>
+          <p class="figure-viewer__long-description">{beat.longDescription}</p>
+        </figcaption>
+      </figure>
+
+      <dl class="figure-viewer__metadata">
+        <div>
+          <dt>Filename</dt>
+          <dd class="font-mono">{filename}</dd>
+        </div>
+        <div>
+          <dt>File size</dt>
+          <dd>{formatBytes(fileSizeBytes)}</dd>
+        </div>
+        <div>
+          <dt>Dimensions</dt>
+          <dd>{dimensionsLabel}</dd>
+        </div>
+      </dl>
+    </div>
+  )
+}
+
+<style>
+  .figure-viewer__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.25rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .figure-viewer__action {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--accent);
+    text-decoration: none;
+    background: none;
+    border: 0;
+    cursor: pointer;
+  }
+
+  .figure-viewer__action:hover,
+  .figure-viewer__action:focus-visible {
+    text-decoration: underline;
+  }
+
+  .figure-viewer__action-label {
+    margin-left: auto;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+  }
+
+  .figure-viewer__action--close {
+    color: var(--text-tertiary);
+  }
+
+  .figure-viewer__figure {
+    margin: 0 0 1.5rem;
+    padding: 1.25rem;
+    background: #f6f8fb;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+  }
+
+  .figure-viewer__figure img {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin: 0 0 0.875rem;
+    max-height: 52vh;
+    object-fit: contain;
+    border-radius: var(--radius-md);
+  }
+
+  .figure-viewer__caption {
+    margin: 0 0 0.35rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    color: #334155;
+  }
+  .figure-viewer__eyebrow { margin: 0 0 .35rem; color: var(--cyan-text); font-size: .6875rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+  .figure-viewer__title { margin: 0 0 1.25rem; color: var(--text-primary); font-size: clamp(1.25rem, 2.5vw, 2rem); line-height: 1.25; }
+
+  .figure-viewer__long-description {
+    margin: 0;
+    font-size: 0.8125rem;
+    line-height: 1.55;
+    color: #64748b;
+  }
+
+  .figure-viewer__metadata {
+    display: grid;
+    gap: 0.75rem 1.5rem;
+    margin: 0;
+    padding: 1rem 1.125rem;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    background: var(--bg-subtle);
+  }
+
+  @media (min-width: 560px) {
+    .figure-viewer__metadata {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+
+  .figure-viewer__metadata dt {
+    margin: 0 0 0.15rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+  }
+
+  .figure-viewer__metadata dd {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: var(--text-primary);
+    word-break: break-word;
+  }
+
+  :global(.dark) .figure-viewer { padding: 18px 24px; border: 1px solid rgb(104 82 255 / 72%); border-radius: 14px; background: linear-gradient(145deg, #091d38 0%, #06172e 58%, #08203d 100%); box-shadow: 0 24px 80px rgb(0 0 0 / 62%), 0 0 28px rgb(76 63 220 / 16%); }
+  :global(.dark) .figure-viewer__actions { gap: 8px 14px; margin-bottom: 14px; padding-bottom: 10px; }
+  :global(.dark) .figure-viewer__eyebrow { margin-bottom: 4px; color: #8fcce8; font-size: 10px; }
+  :global(.dark) .figure-viewer__title { margin-bottom: 14px; color: #f2f0ea; font-size: 24px; line-height: 1.12; }
+  :global(.dark) .figure-viewer__figure { padding: 12px; border-color: #315071; background: #071a31; border-radius: 10px; overflow: hidden; }
+  :global(.dark) .figure-viewer__figure img { max-height: min(52vh, 520px); margin-bottom: 10px; border-radius: 6px; }
+  :global(.dark) .figure-viewer__caption { color: #d1d9e5; }
+  :global(.dark) .figure-viewer__long-description { color: #aebbd0; }
+  :global(.dark) .figure-viewer__metadata { padding: 12px 14px; border-color: #29496d; background: rgb(5 20 38 / 56%); }
+  @media (max-width: 640px) { :global(.dark) .figure-viewer { padding: 14px; border-radius: 10px; } :global(.dark) .figure-viewer__title { font-size: 20px; } :global(.dark) .figure-viewer__figure { padding: 8px; } }
+</style>

@@ -1,0 +1,41 @@
+---
+import type { ContextualNoteRecord } from '../../data/contextual-notes';
+
+interface Props {
+  notes: ContextualNoteRecord[];
+}
+
+const { notes } = Astro.props;
+---
+
+{notes.length > 0 && (
+  <aside class="contextual-note" data-contextual-note hidden aria-live="polite">
+    {notes.map((note) => (
+      <section data-contextual-note-item data-section-id={note.sectionId} data-note-id={note.id} hidden>
+        <div class="contextual-note__header">
+          <span class="contextual-note__label font-mono">Contextual note</span>
+          <button type="button" class="contextual-note__dismiss focus-ring" data-contextual-note-dismiss aria-label={`Dismiss ${note.title}`}>
+            Dismiss
+          </button>
+        </div>
+        <h3 class="contextual-note__title font-serif">{note.title}</h3>
+        <p class="contextual-note__body">{note.body}</p>
+        <details class="contextual-note__details">
+          <summary>Why this distinction matters</summary>
+          <p>{note.detail}</p>
+        </details>
+      </section>
+    ))}
+  </aside>
+)}
+
+<style>
+  .contextual-note { border: 1px solid var(--border-subtle); border-left: 3px solid var(--accent); border-radius: var(--radius-lg); background: var(--bg-subtle); padding: .875rem 1rem 1rem; }
+  .contextual-note__header { display: flex; align-items: center; justify-content: space-between; gap: .75rem; }
+  .contextual-note__label { color: var(--accent-text); font-size: .625rem; font-weight: 700; letter-spacing: .14em; text-transform: uppercase; }
+  .contextual-note__dismiss { border: 0; background: transparent; color: var(--text-tertiary); cursor: pointer; font: 600 .625rem var(--font-mono); letter-spacing: .04em; text-transform: uppercase; }
+  .contextual-note__title { margin: .35rem 0 .25rem; color: var(--text-primary); font-size: 1rem; line-height: 1.3; }
+  .contextual-note__body, .contextual-note__details p { margin: 0; color: var(--text-secondary); font-size: .8125rem; line-height: 1.55; }
+  .contextual-note__details { margin-top: .65rem; color: var(--text-secondary); font-size: .75rem; }
+  .contextual-note__details summary { cursor: pointer; color: var(--accent-text); font-weight: 600; }
+</style>

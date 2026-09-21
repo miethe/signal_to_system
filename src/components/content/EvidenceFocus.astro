@@ -1,0 +1,424 @@
+---
+/**
+ * EvidenceFocus — the shared Evidence Focus renderer (DIRECTION.md V3/V4,
+ * ARCHITECTURE.md §4, spec §8). Backs BOTH `/essays/<slug>/evidence/`
+ * (the essay-scoped index) and the flat, site-wide `/evidence/<record>/`
+ * route, plus the in-place overlay's `<template>` fragment — same
+ * component, same field set from `evidence.ts`'s `EvidenceRecord`, never
+ * a second hand-written summary.
+ *
+ * `records` is always the full evidence set (so the rail's `ReceiptIndex`
+ * can navigate anywhere); `selectedId` narrows the main pane to one
+ * record's full detail. Omitting it renders the full list.
+ */
+import '../../styles/registry-wave-v2.css';
+import EvidenceGuide from './EvidenceGuide.astro';
+import ReceiptIndex from './ReceiptIndex.astro';
+import ClaimBadge from './ClaimBadge.astro';
+import type { EvidenceRecord } from '../../data/evidence';
+
+interface Props {
+  records: EvidenceRecord[];
+  selectedId?: string;
+  /** Real anchor text for a "Read in essay" link, when a related essay exists. */
+  essaySlug?: string;
+  standalone?: boolean;
+}
+
+const { records, selectedId, essaySlug, standalone = true } = Astro.props;
+// The essay index is a receipt surface, not a bare directory. When no record
+// is named in the route, introduce the first related receipt in full and let
+// the rail provide the rest of the index.
+const selected = selectedId ? records.find((record) => record.id === selectedId) : records[0];
+const selectedRecordId = selected?.id;
+const receiptDate = selected?.recordedDate ?? selected?.eventDate ?? selected?.verifiedAt ?? null;
+const claimBadgeKind = selected
+  ? ({
+      observed: 'observed',
+      measured: 'measured',
+      proposed: 'proposed',
+      'externally-reported': 'external',
+      illustrative: 'hypothesis',
+    }[selected.evidenceClass] as 'observed' | 'measured' | 'proposed' | 'external' | 'hypothesis')
+  : undefined;
+
+const formatDate = (value: string | null) => value ?? 'Not stated';
+---
+
+<div class:list={['evidence-focus', essaySlug === 'the-registry-wave-agentic-artifact-supply-chain' && 'registry-wave-focus']} data-focus-kind="evidence" data-focus-key={selectedId ?? 'all'}>
+  <div class="evidence-focus__grid">
+    <div class="evidence-focus__main">
+      <div class="evidence-focus__actions">
+        {essaySlug && (
+          <a class="evidence-focus__action" href={`/essays/${essaySlug}/`}>
+            &larr; Back to essay
+          </a>
+        )}
+        <span class="evidence-focus__action-label font-mono">Evidence focus</span>
+        {essaySlug && (
+          <a
+            class="evidence-focus__action evidence-focus__action--secondary"
+            href={`/essays/${essaySlug}/evidence/`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Open in new tab
+          </a>
+        )}
+        {!standalone && (
+          <button type="button" class="evidence-focus__action evidence-focus__action--close" data-focus-close>
+            Close
+          </button>
+        )}
+      </div>
+
+      <h1 class="evidence-focus__page-title font-serif">
+        {selectedId && selected ? selected.title : 'Receipts behind the argument'}
+      </h1>
+
+      {selected ? (
+        <article class="evidence-focus__record">
+          <p class="evidence-focus__eyebrow font-mono">
+            {claimBadgeKind && <ClaimBadge kind={claimBadgeKind} />}
+            <span>{selected.evidenceClass}</span>
+          </p>
+          {!selectedId && <h2 class="evidence-focus__title font-serif">{selected.title}</h2>}
+
+          <p class="evidence-focus__receipt-date font-mono">
+            Receipt date: {formatDate(receiptDate)}
+          </p>
+
+          <dl class="evidence-focus__facts">
+            <div>
+              <dt>Capture type</dt>
+              <dd>{selected.captureType}</dd>
+            </div>
+            <div>
+              <dt>Event date</dt>
+              <dd>{formatDate(selected.eventDate)}</dd>
+            </div>
+            <div>
+              <dt>Recorded date</dt>
+              <dd>{formatDate(selected.recordedDate)}</dd>
+            </div>
+            <div>
+              <dt>Verified at</dt>
+              <dd>{formatDate(selected.verifiedAt)}</dd>
+            </div>
+            <div>
+              <dt>Source</dt>
+              <dd>{selected.sourceUrl ?? 'Not stated'}</dd>
+            </div>
+            <div>
+              <dt>Source revision</dt>
+              <dd>{selected.sourceRevision ?? 'Not stated'}</dd>
+            </div>
+            <div>
+              <dt>Publicability</dt>
+              <dd>{selected.publicability}</dd>
+            </div>
+          </dl>
+
+          <div class="evidence-focus__claim-split">
+            <div class="evidence-focus__section">
+              <p class="evidence-focus__section-label font-mono">What this supports</p>
+              <ul>
+                {selected.supports.map((line) => <li>{line}</li>)}
+              </ul>
+            </div>
+
+            <div class="evidence-focus__section">
+              <p class="evidence-focus__section-label font-mono">Limits</p>
+              <ul>
+                {selected.limitations.map((line) => <li>{line}</li>)}
+              </ul>
+            </div>
+          </div>
+
+          {selected.publicCapturePath ? (
+            <div class="evidence-focus__section">
+              <p class="evidence-focus__section-label font-mono">Capture</p>
+              <p class="evidence-focus__capture-path">{selected.publicCapturePath}</p>
+            </div>
+          ) : (
+            <p class="evidence-focus__no-capture">
+              No standalone capture asset is published for this record; its capture type is{' '}
+              <strong>{selected.captureType}</strong>.
+            </p>
+          )}
+
+          {essaySlug && selected.relatedSceneIds.length > 0 && (
+            <nav class="evidence-focus__figure-links" aria-label="Related figures">
+              <p class="evidence-focus__section-label font-mono">Related figures</p>
+              <ul>
+                {selected.relatedSceneIds.map((sceneId) => (
+                  <li><a href={`/essays/${essaySlug}/figure/${sceneId}/`}>View {sceneId} figure &rarr;</a></li>
+                ))}
+              </ul>
+            </nav>
+          )}
+        </article>
+      ) : <p class="evidence-focus__intro">No public receipts are available for this essay.</p>}
+    </div>
+
+    <aside class="evidence-focus__rail">
+      <EvidenceGuide />
+      <ReceiptIndex records={records} currentId={selectedRecordId} />
+    </aside>
+  </div>
+</div>
+
+<style>
+  .evidence-focus__grid {
+    display: grid;
+    gap: 2rem;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  @media (min-width: 960px) {
+    .evidence-focus__grid {
+      grid-template-columns: minmax(0, 1fr) 18rem;
+    }
+  }
+
+  .evidence-focus__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem 1.25rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .evidence-focus__action {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--accent);
+    text-decoration: none;
+    background: none;
+    border: 0;
+    cursor: pointer;
+  }
+
+  .evidence-focus__action:hover,
+  .evidence-focus__action:focus-visible {
+    text-decoration: underline;
+  }
+
+  .evidence-focus__action-label {
+    margin-left: auto;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+  }
+
+  .evidence-focus__action--secondary {
+    color: var(--text-secondary);
+  }
+
+  .evidence-focus__eyebrow {
+    margin: 0;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-text);
+  }
+
+  .evidence-focus__title {
+    margin: 0.3rem 0 1.25rem;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1.2;
+    color: var(--text-primary);
+  }
+
+  .evidence-focus__page-title {
+    margin: 0 0 0.35rem;
+    color: var(--text-primary);
+    font-size: clamp(2rem, 4vw, 3.25rem);
+    line-height: 1.1;
+  }
+
+  .evidence-focus__receipt-date {
+    margin: -0.35rem 0 1.25rem;
+    color: var(--text-tertiary);
+    font-size: 0.6875rem;
+    font-weight: 650;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .evidence-focus__claim-split {
+    display: grid;
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+
+  @media (min-width: 700px) {
+    .evidence-focus__claim-split {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .evidence-focus__facts {
+    display: grid;
+    gap: 0.75rem 1.5rem;
+    margin: 0 0 1.5rem;
+    padding: 1rem 1.125rem;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    background: var(--bg-subtle);
+  }
+
+  @media (min-width: 560px) {
+    .evidence-focus__facts {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  .evidence-focus__facts dt {
+    margin: 0 0 0.15rem;
+    font-size: 0.6875rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+  }
+
+  .evidence-focus__facts dd {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: var(--text-primary);
+    word-break: break-word;
+  }
+
+  .evidence-focus__section {
+    margin: 0 0 1.25rem;
+  }
+
+  .evidence-focus__section-label {
+    margin: 0 0 0.35rem;
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+  }
+
+  .evidence-focus__section ul {
+    margin: 0;
+    padding-left: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    font-size: 0.875rem;
+    line-height: 1.55;
+    color: var(--text-secondary);
+  }
+
+  .evidence-focus__capture-path {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.8125rem;
+    color: var(--text-secondary);
+  }
+
+  .evidence-focus__no-capture {
+    margin: 0;
+    font-size: 0.8125rem;
+    color: var(--text-tertiary);
+  }
+
+  .evidence-focus__intro {
+    margin: 0 0 1rem;
+    font-size: 0.9375rem;
+    color: var(--text-secondary);
+  }
+
+  .evidence-focus__figure-links ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .evidence-focus__figure-links a {
+    color: var(--accent);
+    font-size: 0.8125rem;
+    text-decoration: none;
+  }
+
+  .evidence-focus__figure-links a:hover,
+  .evidence-focus__figure-links a:focus-visible {
+    text-decoration: underline;
+  }
+
+  .evidence-focus__list {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .evidence-focus__list ol {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .evidence-focus__list-item a {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.5rem 1rem;
+    padding: 0.75rem 1rem;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    text-decoration: none;
+  }
+
+  .evidence-focus__list-item a:hover,
+  .evidence-focus__list-item a:focus-visible {
+    border-color: var(--accent);
+    background: var(--accent-subtle);
+  }
+
+  .evidence-focus__list-title {
+    color: var(--text-primary);
+    font-size: 0.9375rem;
+  }
+
+  .evidence-focus__list-meta {
+    color: var(--text-tertiary);
+    font-size: 0.6875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .evidence-focus__rail {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  :global(.dark) .evidence-focus__grid { gap: 20px; }
+  @media (min-width: 960px) { :global(.dark) .evidence-focus__grid { grid-template-columns: minmax(0, 818px) 299px; } }
+  :global(.dark) .evidence-focus__page-title { color: #f2f1f4; font-size: 40px; line-height: 1.02; }
+  :global(.dark) .evidence-focus__record { padding: 18px; border: 1px solid #29496d; border-radius: 12px; background: linear-gradient(145deg, #0b1b33 0%, #08162a 100%); box-shadow: 0 12px 32px rgb(0 0 0 / 22%), inset 0 1px 0 rgb(120 180 255 / 5%); }
+  :global(.dark) .evidence-focus__facts { border-color: #29496d; background: #09172a; }
+  :global(.dark) .evidence-focus__claim-split { gap: 0; }
+  @media (min-width: 700px) { :global(.dark) .evidence-focus__claim-split > :last-child { padding-left: 36px; border-left: 1px solid #24415f; } :global(.dark) .evidence-focus__claim-split > :first-child { padding-right: 36px; } }
+  :global(.dark) .evidence-focus__rail > * { padding: 18px 20px; border-color: #29496d; border-radius: 11px; background: linear-gradient(155deg, #0d1d35 0%, #09172a 100%); }
+  :global(.dark) .evidence-focus__actions { gap: 10px; margin-bottom: 16px; padding-bottom: 10px; }
+  :global(.dark) .evidence-focus__action:first-child { display: inline-flex; align-items: center; min-height: 31px; padding: 0 13px; border: 1px solid #294b69; border-radius: 6px; background: #0b2946; }
+  :global(.dark) .evidence-focus__facts { padding: 14px; gap: 12px 20px; }
+  @media (max-width: 640px) { :global(.dark) .evidence-focus__page-title { font-size: 26px; line-height: 1.08; } :global(.dark) .evidence-focus__record { padding: 14px; border-radius: 8px; } }
+</style>

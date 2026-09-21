@@ -1,0 +1,115 @@
+---
+/**
+ * RelatedWork — one always-visible sentence placing this piece among
+ * adjacent work, plus a `<details>` disclosure listing 2-4 citations.
+ * Citations are data the caller supplies; this component never invents
+ * one — sourcing them from the essay's prior-art/sources research files
+ * is the manuscript leg's job, not this component's.
+ */
+interface Citation {
+  text: string;
+  href?: string;
+}
+
+interface Props {
+  summary: string;
+  citations: Citation[];
+}
+
+const { summary, citations } = Astro.props;
+---
+
+<aside class="related-work lift-hover" role="note" aria-label="Related work">
+  <p class="related-work__summary">{summary}</p>
+  <details class="related-work__details">
+    <summary>Related work &amp; prior art</summary>
+    <ul class="related-work__list">
+      {
+        citations.map(({ text, href }) => (
+          <li>{href ? <a href={href}>{text}</a> : <span>{text}</span>}</li>
+        ))
+      }
+    </ul>
+  </details>
+</aside>
+
+<style>
+  .related-work {
+    margin: 1.75rem 0;
+    padding: 1rem 1.125rem;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    background: var(--bg-subtle);
+  }
+
+  .related-work__summary {
+    margin: 0 0 0.6rem;
+    color: var(--text-secondary);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+  }
+
+  .related-work__details summary {
+    cursor: pointer;
+    color: var(--accent);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    list-style: none;
+  }
+
+  .related-work__details summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .related-work__details summary::before {
+    content: '▸ ';
+  }
+
+  .related-work__details[open] summary::before {
+    content: '▾ ';
+  }
+
+  .related-work__details[open] summary {
+    margin-bottom: 0.6rem;
+  }
+
+  .related-work__details summary:hover {
+    color: var(--accent-hover);
+  }
+
+  .related-work__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .related-work__list li {
+    padding-left: 1.1rem;
+    position: relative;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    line-height: 1.55;
+  }
+
+  .related-work__list li::before {
+    content: '—';
+    position: absolute;
+    left: 0;
+    color: var(--text-tertiary);
+  }
+
+  .related-work__list a {
+    color: var(--accent);
+    text-underline-offset: 0.18em;
+  }
+
+  .related-work__list a:hover {
+    color: var(--accent-hover);
+  }
+</style>

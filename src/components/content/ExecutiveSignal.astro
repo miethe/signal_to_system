@@ -1,0 +1,150 @@
+---
+/**
+ * ExecutiveSignal — the post-level executive read: "why this matters" and,
+ * when the post has one, "what to carry forward". Replaces the ad-hoc
+ * `whyItMatters` aside plus the in-body `LeaderTakeaway` render that used to
+ * sit at the top of the body.
+ *
+ * Reading-experience-v2 DIRECTION.md V5: the takeaway now always renders
+ * in flow here, at every breakpoint — there is no more rail-only takeaway
+ * card to avoid duplicating (the old `takeawayPlacement`/`showRailTakeaway`
+ * split retired with `PostSidebar`). Two columns at `sm:` and up when a
+ * takeaway is present; stacks otherwise.
+ */
+interface Props {
+  whyItMatters: string;
+  takeaway?: string;
+  placement?: 'body' | 'rail';
+}
+
+const { whyItMatters, takeaway, placement = 'body' } = Astro.props;
+const hasTakeaway = Boolean(takeaway);
+const takeawayBreak = takeaway?.indexOf('. ') ?? -1;
+---
+
+<aside
+  class:list={[
+    'executive-signal',
+    'lift-hover',
+    `executive-signal--${placement}`,
+    { 'executive-signal--split': hasTakeaway && placement === 'body' },
+  ]}
+  role="note"
+  aria-label="Executive signal"
+>
+  <div class="executive-signal__col">
+    <p class="executive-signal__eyebrow">Why this matters</p>
+    <p class="executive-signal__body">{whyItMatters}</p>
+  </div>
+  {
+    hasTakeaway && (
+      <div class="executive-signal__col executive-signal__col--takeaway">
+        <p class="executive-signal__eyebrow">Carry this forward</p>
+        <p class="executive-signal__body">{takeawayBreak > -1 ? <><span class="executive-signal__lead">{takeaway?.slice(0, takeawayBreak + 1)}</span>{' '}<span class="executive-signal__continuation">{takeaway?.slice(takeawayBreak + 2)}</span></> : takeaway}</p>
+      </div>
+    )
+  }
+</aside>
+
+<style>
+  .executive-signal {
+    position: relative;
+    margin: 0 0 1.75rem;
+    padding: 1.125rem 1.25rem 1.1875rem 1.5rem;
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-xl);
+    background: var(--bg-surface);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .executive-signal::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 3px;
+    border-radius: var(--radius-xl) 0 0 var(--radius-xl);
+    background: var(--accent);
+  }
+
+  .executive-signal--split {
+    display: grid;
+    gap: 1.1rem;
+  }
+
+  @media (min-width: 640px) {
+    .executive-signal--split {
+      grid-template-columns: 1fr 1fr;
+      gap: 1.1rem 1.75rem;
+    }
+
+    .executive-signal--split .executive-signal__col--takeaway {
+      padding-left: 1.5rem;
+      border-left: 1px solid var(--border-subtle);
+    }
+  }
+
+  .executive-signal--rail .executive-signal__col--takeaway {
+    margin-top: 0.8rem;
+    padding: 0.8rem 0 0;
+    border-top: 1px solid var(--border-subtle);
+  }
+
+  :global(.post-layout--registry-wave) .executive-signal--rail {
+    min-height: 164px;
+    margin: 0;
+    padding: 17px 15px;
+    border-color: var(--border-strong);
+    border-radius: 9px;
+    background: var(--bg-surface);
+    box-shadow: var(--shadow-sm);
+  }
+
+  :global(.post-layout--registry-wave) .executive-signal--rail::before { display: none; }
+  :global(.post-layout--registry-wave) .executive-signal--rail .executive-signal__body { font-size: .75rem; line-height: 1.4; }
+
+  .executive-signal__eyebrow {
+    margin: 0 0 0.4rem;
+    color: var(--accent-text);
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  .executive-signal__body {
+    margin: 0;
+    color: var(--text-secondary);
+    font-size: 0.9375rem;
+    line-height: 1.6;
+  }
+
+  :global(.dark) .executive-signal {
+    min-height: 164px;
+    margin: 0;
+    padding: 17px 15px;
+    border-color: #5548a8;
+    border-radius: 9px;
+    background: linear-gradient(145deg, #191a48 0%, #15143b 58%, #101d3b 100%);
+    box-shadow: inset 0 0 28px rgb(108 74 255 / 12%), 0 8px 22px rgb(0 0 0 / 20%);
+  }
+
+  :global(.dark) .executive-signal::before { display: none; }
+  :global(.dark) .executive-signal--rail .executive-signal__col--takeaway { border-top-color: rgb(185 172 255 / 20%); }
+  :global(.dark) .executive-signal__eyebrow { color: #c5baff; }
+  :global(.dark) .executive-signal__body { color: #c8d1e2; font-size: .75rem; line-height: 1.4; }
+
+  /* The entry signal remains normal flow. As the companion reaches its
+     sticky threshold it contracts briefly, then scrolls away with the
+     entry cards rather than becoming a second persistent rail surface. */
+  :global(.registry-wave-rail.is-companion-active) .executive-signal {
+    min-height: 0;
+    padding: 9px 12px;
+  }
+  :global(.registry-wave-rail.is-companion-active) .executive-signal__col--takeaway { display: none; }
+  :global(.registry-wave-rail.is-companion-active) .executive-signal__eyebrow { margin: 0; }
+  :global(.registry-wave-rail.is-companion-active) .executive-signal__body { display: none; }
+</style>

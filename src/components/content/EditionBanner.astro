@@ -1,0 +1,43 @@
+---
+import Callout from './Callout.astro';
+
+interface Props {
+  edition: string;
+  revisedDate: string;
+  note: string;
+  changelogHref?: string;
+}
+
+const { edition, revisedDate, note, changelogHref } = Astro.props;
+---
+
+<Callout type="info" title={edition}>
+  <p>{note}</p>
+  <p class="edition-banner__meta">
+    Revised {revisedDate}
+    {changelogHref && (
+      <>
+        <span aria-hidden="true"> · </span>
+        <a href={changelogHref}>View changelog</a>
+      </>
+    )}
+  </p>
+</Callout>
+
+<style>
+  .edition-banner__meta {
+    margin: 0.6rem 0 0;
+    color: var(--text-tertiary);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+  }
+
+  .edition-banner__meta a {
+    color: inherit;
+    text-underline-offset: 0.18em;
+  }
+
+  .edition-banner__meta a:hover {
+    color: var(--text-primary);
+  }
+</style>
