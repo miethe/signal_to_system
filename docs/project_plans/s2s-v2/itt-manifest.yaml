@@ -1,0 +1,1259 @@
+# IntentTree filing for the S2S v2 program. Generated from the bulk batch; ids read from --json output.
+# Plan: docs/project_plans/s2s-v2/00-adoption-plan.md
+# Re-anchored 2026-09-22: visual authority is docs/design/s2s-v2-visual/ (the visual pack), not the
+# build-handoff prototype. Titles/descriptions below reflect the corrected brand pick (waveform-diamond
+# primary lockup, favicon-idea-01, 05-monogram secondary) and the Studio-scoped (not global) language
+# switcher. See 00-adoption-plan.md "Visual authority" and analysis/02-visual-system-and-assets.md.
+schema_version: 1
+workspace: ws_01M35C31RAPJX22B33PC4YF7YY  # slug signal-to-system
+filed: 2026-09-22
+tags: [s2s-v2, corpus-chat-2026-09-22]
+node_count: 115
+dependency_links: 92
+trees:
+  - key: spine
+    id: tree_01M35C7JNDE3EMXSVGE46X6JJ9
+    name: "S2S v2 — Program spine"
+    node_count: 19
+    nodes:
+      - ref: m0
+        id: node_01M35CKM1NRC4GX1D6HHZFCP52
+        title: "M0 — Baseline, safety & migration manifest"
+        kind: epic
+        milestone: M0
+        size: l
+        repo: miethe/signal_to_system
+        lane: cc-native
+        external_ref: "S2S-001..007"
+      - ref: m0-baseline
+        id: node_01M35CKM29W93YFC6MEKNVFM6T
+        title: "Pin baseline, cut integration branch, inventory build outputs"
+        kind: task
+        parent: m0
+        milestone: M0
+        size: s
+        repo: miethe/signal_to_system
+        lane: ica
+        external_ref: "S2S-001"
+      - ref: m0-manifest
+        id: node_01M35CKM2ZWSM3SVP318XA4KJG
+        title: "Route and ID migration manifest (every legacy route, incl. evidence/figure/thread family)"
+        kind: task
+        parent: m0
+        milestone: M0
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-terra
+        external_ref: "S2S-002"
+      - ref: m0-draft-gate
+        id: node_01M35CKM3JKBQNKDX6YWV4KRQE
+        title: "Publication-eligibility gate: fix essay getStaticPaths draft leak"
+        kind: task
+        parent: m0
+        milestone: M0
+        size: s
+        repo: miethe/signal_to_system
+        lane: codex-terra
+        external_ref: "S2S-003"
+      - ref: m0-jsonld
+        id: node_01M35CKM44SXSMZKJPM5F0JYT5
+        title: "Safe JSON-LD serialization in BaseLayout"
+        kind: task
+        parent: m0
+        milestone: M0
+        size: xs
+        repo: miethe/signal_to_system
+        lane: ica
+        external_ref: "S2S-004"
+      - ref: m0-harness
+        id: node_01M35CKM4QSXMYVMG2NSDN420Y
+        title: "Regression harness: route snapshot, link check, blocking astro check, reader visual baseline"
+        kind: task
+        parent: m0
+        milestone: M0
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-terra
+        external_ref: "S2S-005"
+      - ref: m0-contracts
+        id: node_01M35CKM5A51N6YXCHZZQGZTEW
+        title: "Freeze public DTO and service-ownership contracts"
+        kind: task
+        parent: m0
+        milestone: M0
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-sol
+        external_ref: "S2S-007"
+      - ref: m0-analytics-audit
+        id: node_01M35CKM5YRG1XZY5Z2BZEC6F0
+        title: "Audit analytics wiring and operating economics"
+        kind: task
+        parent: m0
+        milestone: M0
+        size: s
+        repo: miethe/signal_to_system
+        lane: ica
+        external_ref: "S2S-006"
+      - ref: decisions
+        id: node_01M35CKM6GHQWAXDGQ1S80N2YN
+        title: "Owner decisions (HumanRequests)"
+        kind: epic
+        milestone: M0
+        size: xs
+        repo: miethe/signal_to_system
+        lane: cc-native
+      - ref: m5
+        id: node_01M35CKM70DBAG6H8GTZ5AEJTP
+        title: "M5 — Launch, QA, analytics & agent-native read surface"
+        kind: epic
+        milestone: M5
+        size: l
+        repo: miethe/signal_to_system
+        lane: cc-native
+        external_ref: "S2S-027,038,049,050,055,057,058"
+      - ref: m5-collector
+        id: node_01M35CKM7HTFJBHHRJTNMZRKZY
+        title: "Wire one consent-aware analytics collector"
+        kind: task
+        parent: m5
+        milestone: M5
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-terra
+        external_ref: "S2S-027"
+      - ref: m5-agent
+        id: node_01M35CKM86X13AB7E9GETZMY9R
+        title: "Static agent-native read surface: /data/v1 catalog, Agent Guide, Pagefind facets"
+        kind: task
+        parent: m5
+        milestone: M5
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-terra
+        external_ref: "S2S-049,S2S-050"
+      - ref: m5-qual
+        id: node_01M35CKM8VKSCGKMZJE0D6TGR8
+        title: "Cross-surface accessibility and performance qualification"
+        kind: task
+        parent: m5
+        milestone: M5
+        size: m
+        repo: miethe/signal_to_system
+        lane: cc-native
+        external_ref: "S2S-038,S2S-057"
+      - ref: m5-colophon
+        id: node_01M35CKM9K3E7VDCNXJE0HCNFZ
+        title: "Colophon, corrections page and change feed"
+        kind: task
+        parent: m5
+        milestone: M5
+        size: s
+        repo: miethe/signal_to_system
+        lane: ica
+        external_ref: "S2S-055"
+      - ref: m5-release
+        id: node_01M35CKMAADPS6W76WPFV4VRXV
+        title: "Controlled production release and operator handoff"
+        kind: task
+        parent: m5
+        milestone: M5
+        size: m
+        repo: miethe/signal_to_system
+        lane: cc-native
+        external_ref: "S2S-058"
+      - ref: deferred
+        id: node_01M35CKMAVNQWNC63Z27TR9AS5
+        title: "Deferred: community, programs and impact dashboard"
+        kind: epic
+        milestone: post-launch
+        size: l
+        repo: miethe/signal_to_system
+        lane: cc-native
+        external_ref: "S2S-046,047,048,054,056"
+        status: deferred
+      - ref: def-contrib
+        id: node_01M35CKMBPAEGCB06RQVFW9CNQ
+        title: "Structured contribution intake + reviewed replication/correction records"
+        kind: task
+        parent: deferred
+        milestone: post-launch
+        size: l
+        repo: miethe/signal_to_system
+        lane: codex-terra
+        external_ref: "S2S-046,S2S-047"
+        status: deferred
+      - ref: def-discuss
+        id: node_01M35CKMCA3DR3TSXJNTDMKGXF
+        title: "Optional discussion (giscus) with non-GitHub alternative"
+        kind: task
+        parent: deferred
+        milestone: post-launch
+        size: s
+        repo: miethe/signal_to_system
+        lane: ica
+        external_ref: "S2S-048"
+        status: deferred
+      - ref: def-programs
+        id: node_01M35CKMD1JGSFGGV8HHR6VQGA
+        title: "Programs, open questions and private impact dashboard"
+        kind: task
+        parent: deferred
+        milestone: post-launch
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-terra
+        external_ref: "S2S-054,S2S-056"
+        status: deferred
+  - key: shell
+    id: tree_01M35C7TYRBQN16X6H4FXN5Z6J
+    name: "S2S v2 — Shell, Brand & Design System"
+    node_count: 26
+    nodes:
+      - ref: tok
+        id: node_01M35CKMDSFK3NPJR54FV8JPXD
+        title: "Design tokens and the three languages"
+        kind: epic
+        milestone: M1
+        size: l
+        repo: miethe/signal_to_system
+        lane: cc-native
+        external_ref: "S2S-034"
+      - ref: tok-semantic
+        id: node_01M35CKMECHFV15T6WXN6DTBWH
+        title: "Semantic token layer: collapse the three current vocabularies + palette-literal lint"
+        kind: task
+        parent: tok
+        milestone: M1
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-sol
+      - ref: tok-langs
+        id: node_01M35CKMF79NYM3VSV71WRGHQW
+        title: "Observatory, Folio, Instrument token files (Observatory palette mockup-sampled per 02 §2)"
+        kind: task
+        parent: tok
+        milestone: M1
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-terra
+      - ref: tok-type
+        id: node_01M35CKMFYJQWW91QEP980XVC2
+        title: "Type system: serif display, grotesque UI, mono meta (audit + self-host)"
+        kind: task
+        parent: tok
+        milestone: M1
+        size: s
+        repo: miethe/signal_to_system
+        lane: cc-native
+      - ref: brand
+        id: node_01M35CKMGQD415X398BSCXH5C6
+        title: "Brand identity: waveform-diamond primary lockup, S/S monogram secondary, favicon-01, OG template"
+        kind: epic
+        milestone: M1
+        size: m
+        repo: miethe/signal_to_system
+        lane: cc-native
+      - ref: brand-logo
+        id: node_01M35CKMH93KCJ67GWMNTHGVV0
+        title: "Waveform-diamond primary lockup + wordmark (horizontal, stacked) + S/S monogram secondary"
+        kind: task
+        parent: brand
+        milestone: M1
+        size: m
+        repo: miethe/signal_to_system
+        lane: cc-native
+      - ref: brand-favicon
+        id: node_01M35CKMHYGMM403YSXQ46AYRA
+        title: "Favicon set: favicon.svg with prefers-color-scheme + PNG 16/32/180/192/512 + maskable 512"
+        kind: task
+        parent: brand
+        milestone: M1
+        size: s
+        repo: miethe/signal_to_system
+        lane: codex-terra
+      - ref: brand-og
+        id: node_01M35CKMJJR1SDS6N5YWWWQVKK
+        title: "OG image template (1200x630, Observatory-dark, format kicker, serif H1, Lab status pill)"
+        kind: task
+        parent: brand
+        milestone: M1
+        size: s
+        repo: miethe/signal_to_system
+        lane: codex-terra
+      - ref: assets
+        id: node_01M35CKMK6CYVVH9Q74QBD4W32
+        title: "Asset pipeline and SVG recreations (02 §4 top-10)"
+        kind: epic
+        milestone: M1
+        size: l
+        repo: miethe/signal_to_system
+        lane: codex-terra
+      - ref: assets-pipeline
+        id: node_01M35CKMKN8BX2XXAAKS2DQWZJ
+        title: "Asset pipeline: crop boxes, AVIF/WebP, hero backgrounds, keeper stickers, drop list"
+        kind: task
+        parent: assets
+        milestone: M1
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-terra
+      - ref: svg-icons-nav
+        id: node_01M35CKMM6FNKM3101PW1HF83A
+        title: "SVG icons: nav + action set (Writing, Essays, Field Notes, Dev Stories, Guides, Labs, Reproduce, Projects, Notebooks, Studio, Search, Topics)"
+        kind: task
+        parent: assets
+        milestone: M1
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-terra
+      - ref: svg-icons-evidence
+        id: node_01M35CKMMXM51RQSF5KDSEFB3S
+        title: "SVG icons: evidence + rail set (Claims, Evidence, Sources, Methods, Datasets, Figures, Reading Paths, Research Programs, Timeline, Artifacts, Discussion, Download)"
+        kind: task
+        parent: assets
+        milestone: M1
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-terra
+      - ref: svg-loop
+        id: node_01M35CKMNJD94JJMBKJHYM519S
+        title: "SVG: ProcessLoopDiagram (ideas -> evidence -> systems)"
+        kind: task
+        parent: assets
+        milestone: M1
+        size: s
+        repo: miethe/signal_to_system
+        lane: codex-terra
+      - ref: svg-dividers
+        id: node_01M35CKMP7GYCXW74MTNKS2ARX
+        title: "SVG: SectionDivider ornaments (sparkle, waveform, moon-phase)"
+        kind: task
+        parent: assets
+        milestone: M1
+        size: s
+        repo: miethe/signal_to_system
+        lane: ica
+      - ref: svg-datastack
+        id: node_01M35CKMQ1GYEQGKE9HVDCANAQ
+        title: "SVG: layered-diamond data-stack motif (parameterized layer count)"
+        kind: task
+        parent: assets
+        milestone: M1
+        size: s
+        repo: miethe/signal_to_system
+        lane: ica
+      - ref: svg-arch
+        id: node_01M35CKMQMX3HZKTCH2QDDMG0Z
+        title: "SVG: SystemArchitectureDiagram (orbit/constellation node-edge, data-driven)"
+        kind: task
+        parent: assets
+        milestone: M1
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-terra
+      - ref: svg-timeline
+        id: node_01M35CKMR59GM20Z3WJPPYKTQV
+        title: "SVG + code: numbered dot-timeline (About timeline, Dev Stories execution-to-published flow)"
+        kind: task
+        parent: assets
+        milestone: M1
+        size: s
+        repo: miethe/signal_to_system
+        lane: codex-terra
+      - ref: shell
+        id: node_01M35CKMRWXB90MZ9XG8DRTQJA
+        title: "App shell, pages and component primitives"
+        kind: epic
+        milestone: M1
+        size: xl
+        repo: miethe/signal_to_system
+        lane: cc-native
+        external_ref: "S2S-011,S2S-053"
+      - ref: shell-base
+        id: node_01M35CKMSCDJZC1GF658D5YPGE
+        title: "BaseLayout v2: head/SEO, safe JSON-LD, Observatory-default boot, skip link"
+        kind: task
+        parent: shell
+        milestone: M1
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-terra
+      - ref: shell-nav
+        id: node_01M35CKMT510HF59HAYZZYMSDA
+        title: "Header, primary + secondary nav, mobile nav, footer"
+        kind: task
+        parent: shell
+        milestone: M1
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-terra
+        external_ref: "S2S-011"
+      - ref: shell-switch
+        id: node_01M35CKMTWWPWA3DJNSGR930A6
+        title: "Studio Design Languages preview control (Studio-scoped, does not replace header sun/moon toggle)"
+        kind: task
+        parent: shell
+        milestone: M1
+        size: s
+        repo: miethe/signal_to_system
+        lane: codex-terra
+      - ref: shell-templates
+        id: node_01M35CKMVG6T9S7W24XXQZWJWS
+        title: "Section layout templates: Hub, Index+rail, Detail+rail, Folio page"
+        kind: task
+        parent: shell
+        milestone: M1
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-terra
+      - ref: shell-home
+        id: node_01M35CKMWBR6YJ06DBNZY6AW5V
+        title: "Homepage v2 (hero, method ladder, featured investigation, stat panel, teasers)"
+        kind: task
+        parent: shell
+        milestone: M1
+        size: l
+        repo: miethe/signal_to_system
+        lane: cc-native
+        external_ref: "S2S-053"
+      - ref: shell-about
+        id: node_01M35CKMX2NGE49N5YQP0ADT4E
+        title: "About page v2"
+        kind: task
+        parent: shell
+        milestone: M1
+        size: m
+        repo: miethe/signal_to_system
+        lane: cc-native
+        external_ref: "S2S-053"
+      - ref: shell-prims
+        id: node_01M35CKMXVASGB9TCJB9RNZDCJ
+        title: "Component primitives: card family, stat tile, pills/chips, filter toolbar, facet rail, tabs"
+        kind: task
+        parent: shell
+        milestone: M1
+        size: l
+        repo: miethe/signal_to_system
+        lane: codex-terra
+      - ref: shell-gaps
+        id: node_01M35CKMYGY080GKHKBGR7F1J2
+        title: "Design pass for unmocked templates: mobile, article page, empty/error/withdrawn, search, series/tag, 404"
+        kind: task
+        parent: shell
+        milestone: M1
+        size: m
+        repo: miethe/signal_to_system
+        lane: cc-native
+  - key: writing
+    id: tree_01M35C7V6QS7J6CV8PS528GJ01
+    name: "S2S v2 — Writing"
+    node_count: 17
+    nodes:
+      - ref: reader
+        id: node_01M35CKMZ5DF2AADW9FMX3RQZP
+        title: "Reader lift and re-token (the house we keep)"
+        kind: epic
+        milestone: M2
+        size: xl
+        repo: miethe/signal_to_system
+        lane: cc-native
+      - ref: reader-css
+        id: node_01M35CKMZPHM4JJSWHJCZ4R0B5
+        title: "Extract reader stylesheet: prose-custom, figure plates, glossary into a reader token layer"
+        kind: task
+        parent: reader
+        milestone: M2
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-terra
+      - ref: reader-shell
+        id: node_01M35CKN0DEBE6NBR4ERB40XCJ
+        title: "Unified ReaderShell from PostLayout + StoryLayout (ReadingPathNav wins)"
+        kind: task
+        parent: reader
+        milestone: M2
+        size: l
+        repo: miethe/signal_to_system
+        lane: codex-sol
+      - ref: reader-core
+        id: node_01M35CKN12RHGWXBY4M3EVBFMJ
+        title: "Lift + re-token: Figure, FigureViewer, Term, WhereThisSits, AuthorProfile; rewrite Callout"
+        kind: task
+        parent: reader
+        milestone: M2
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-terra
+      - ref: reader-thread
+        id: node_01M35CKN1RJ1RR5WA0Z5HE4TTM
+        title: "Lift + re-token: thread system (ThreadBeat, ThreadRail, ThreadDock, ThreadFocus, ThreadScene, ThreadOverview)"
+        kind: task
+        parent: reader
+        milestone: M2
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-terra
+      - ref: reader-evidence
+        id: node_01M35CKN2FHCF1G1S6879BBP45
+        title: "Lift + re-token: evidence and receipt family (Evidence*, Receipt*, ClaimBadge, FocusHost, FocusTemplates)"
+        kind: task
+        parent: reader
+        milestone: M2
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-terra
+      - ref: reader-editorial
+        id: node_01M35CKN33DXC2N7BK2CK0BXP1
+        title: "Lift + re-token: editorial set (EditionBanner, RevisionNote, PullQuote, SectionMarker, ExecutiveSignal, LeaderTakeaway, ReadingCompanion, MobileContents, SeriesWayfinding, RelatedContent, RelatedWork, TagList, StoryMetaHeader, AutomatedDisclaimer)"
+        kind: task
+        parent: reader
+        milestone: M2
+        size: m
+        repo: miethe/signal_to_system
+        lane: ica
+      - ref: reader-islands
+        id: node_01M35CKN3SW1T4C77C37CQBXGM
+        title: "Re-token interactive islands and page-specific CSS (ArtifactTaxonomy, ArtifactControlPlane, AgenticOperationsFlow)"
+        kind: task
+        parent: reader
+        milestone: M2
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-terra
+      - ref: reader-specimen
+        id: node_01M35CKN4F3B4DFAJYV3YJFDD8
+        title: "Registry Wave acceptance specimen: parity review on the new shell"
+        kind: task
+        parent: reader
+        milestone: M2
+        size: s
+        repo: miethe/signal_to_system
+        lane: cc-native
+      - ref: ia
+        id: node_01M35CKN54BXEC745CYEYNGZE8
+        title: "Writing IA consolidation"
+        kind: epic
+        milestone: M2
+        size: l
+        repo: miethe/signal_to_system
+        lane: codex-terra
+        external_ref: "S2S-008..010,015,016"
+      - ref: ia-model
+        id: node_01M35CKN5MMCFQ866YYE08DS6N
+        title: "Writing read model (PublicationSummary) + format classification"
+        kind: task
+        parent: ia
+        milestone: M2
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-terra
+        external_ref: "S2S-008"
+      - ref: ia-hub
+        id: node_01M35CKN6AXH9A0PAZXY7GKXFE
+        title: "/writing hub page"
+        kind: task
+        parent: ia
+        milestone: M2
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-terra
+        external_ref: "S2S-009"
+      - ref: ia-devstories
+        id: node_01M35CKN6XRP0ZRD7R8HRR2NW0
+        title: "Dev Stories on the new shell: builder notes vs automated AARs, provenance pills"
+        kind: task
+        parent: ia
+        milestone: M2
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-terra
+        external_ref: "S2S-010"
+      - ref: ia-facets
+        id: node_01M35CKN7GTP6JSNT4V8QP3W9F
+        title: "Series, reading paths, tags/topics/systems/AOS facets and feeds/search on the new shell"
+        kind: task
+        parent: ia
+        milestone: M2
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-terra
+        external_ref: "S2S-015,S2S-016"
+      - ref: cont
+        id: node_01M35CKN87TAE04GDCRM2E5EYQ
+        title: "Route continuity and content backfill"
+        kind: epic
+        milestone: M2
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-terra
+        external_ref: "S2S-002,S2S-017"
+      - ref: cont-routes
+        id: node_01M35CKN8R7RH3AH8XR9MGXQGC
+        title: "Apply migration manifest: renders, aliases, redirect emitter with collision/chain/loop tests"
+        kind: task
+        parent: cont
+        milestone: M2
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-terra
+        external_ref: "S2S-002"
+      - ref: cont-backfill
+        id: node_01M35CKN9CFNQC1AM7K43PJC42
+        title: "Reclassify existing content + authoring templates and public review workflow"
+        kind: task
+        parent: cont
+        milestone: M2
+        size: m
+        repo: miethe/signal_to_system
+        lane: ica
+        external_ref: "S2S-017"
+  - key: labs
+    id: tree_01M35C7VGM7T1BCE089Q3SD0YQ
+    name: "S2S v2 — Labs"
+    node_count: 14
+    nodes:
+      - ref: rec
+        id: node_01M35CKNA0WWQ15YPM4AQDFC4H
+        title: "Investigation record, methods and reproduce"
+        kind: epic
+        milestone: M3
+        size: l
+        repo: miethe/signal_to_system
+        lane: codex-sol
+        external_ref: "S2S-019,023,025,026"
+      - ref: rec-coll
+        id: node_01M35CKNAJH5MKJKPKFFAE68H8
+        title: "Investigation, Run, Release collections"
+        kind: task
+        parent: rec
+        milestone: M3
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-sol
+        external_ref: "S2S-019"
+      - ref: rec-method
+        id: node_01M35CKNBEKCP6VJB6YKNSDXDY
+        title: "Method profiles and provenance timeline"
+        kind: task
+        parent: rec
+        milestone: M3
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-terra
+        external_ref: "S2S-023"
+      - ref: rec-repro
+        id: node_01M35CKNC8E61YP1JQ7W2N5WYH
+        title: "Reproduction package and validation entry"
+        kind: task
+        parent: rec
+        milestone: M3
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-terra
+        external_ref: "S2S-025"
+      - ref: rec-capsule
+        id: node_01M35CKNCSQSJAWWYYF6GW6Q7W
+        title: "Per-Lab JSON, Markdown and context capsules"
+        kind: task
+        parent: rec
+        milestone: M3
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-terra
+        external_ref: "S2S-026"
+      - ref: lens
+        id: node_01M35CKNDGTC84B14SGSW5P0TC
+        title: "Evidence lens and claims UI"
+        kind: epic
+        milestone: M3
+        size: xl
+        repo: miethe/signal_to_system
+        lane: cc-native
+        external_ref: "S2S-020,021,024"
+      - ref: lens-index
+        id: node_01M35CKNE3K7XAATDH2BH9WD7D
+        title: "/labs index"
+        kind: task
+        parent: lens
+        milestone: M3
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-terra
+        external_ref: "S2S-020"
+      - ref: lens-detail
+        id: node_01M35CKNETK1PAB591HVHTYVYF
+        title: "Lab detail template: bounded conclusion, metadata strip, Overview/Evidence/Method/Reproduce"
+        kind: task
+        parent: lens
+        milestone: M3
+        size: l
+        repo: miethe/signal_to_system
+        lane: cc-native
+        external_ref: "S2S-020"
+      - ref: lens-claims
+        id: node_01M35CKNFHMWQSAE94659SMT5V
+        title: "ClaimRef, ClaimCard, KeyClaim and receipts extension + caveat labeling contract"
+        kind: task
+        parent: lens
+        milestone: M3
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-sol
+        external_ref: "S2S-021"
+      - ref: lens-figures
+        id: node_01M35CKNGGNABT6SB9DSXEPF3N
+        title: "FigureWithData: data, code, units, uncertainty, download"
+        kind: task
+        parent: lens
+        milestone: M3
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-terra
+        external_ref: "S2S-024"
+      - ref: first
+        id: node_01M35CKNH98H2HYKGZNKR8C1D8
+        title: "First real Lab"
+        kind: epic
+        milestone: M3
+        size: l
+        repo: miethe/signal_to_system
+        lane: cc-native
+        external_ref: "S2S-018,S2S-028"
+      - ref: first-select
+        id: node_01M35CKNHTQVVZCDDR2BEBBP45
+        title: "Select and approve the flagship investigation"
+        kind: task
+        parent: first
+        milestone: M3
+        size: xs
+        repo: miethe/signal_to_system
+        lane: cc-native
+        external_ref: "S2S-018"
+      - ref: first-author
+        id: node_01M35CKNJKPG82WDETS949V7YJ
+        title: "Author, release and qualify the first Lab (understand-inspect-reuse journey)"
+        kind: task
+        parent: first
+        milestone: M3
+        size: l
+        repo: miethe/signal_to_system
+        lane: cc-native
+        external_ref: "S2S-028"
+      - ref: first-film
+        id: node_01M35CKNKBQVSVYGB1EHPJN9A3
+        title: "Procedural-film bundle for a Lab (deferred)"
+        kind: task
+        parent: first
+        milestone: M3+
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-terra
+        external_ref: "S2S-036"
+        status: deferred
+  - key: notebooks
+    id: tree_01M35C7VVP3EDPPBWT9WTW7WS4
+    name: "S2S v2 — Notebooks"
+    node_count: 7
+    nodes:
+      - ref: nb
+        id: node_01M35CKNM33RFZ47QCEBB074F5
+        title: "Folio notebooks"
+        kind: epic
+        milestone: M3
+        size: l
+        repo: miethe/signal_to_system
+        lane: codex-terra
+        external_ref: "S2S-029..031,S2S-037"
+      - ref: nb-model
+        id: node_01M35CKNMMT6HPP42TETJ945AE
+        title: "Leaf, Folio, Amendment, development-link collections + capture workflow"
+        kind: task
+        parent: nb
+        milestone: M3
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-terra
+        external_ref: "S2S-029"
+      - ref: nb-leaf
+        id: node_01M35CKNNER2BKNHDK7QYS1MC4
+        title: "NotebookLeaf + Folio page layouts and six accessible block types"
+        kind: task
+        parent: nb
+        milestone: M3
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-terra
+        external_ref: "S2S-030"
+      - ref: nb-index
+        id: node_01M35CKNP9YV7SXJVA2DYJW3ZJ
+        title: "/notebooks index: faceted grid, maturity legend, search"
+        kind: task
+        parent: nb
+        milestone: M3
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-terra
+      - ref: nb-links
+        id: node_01M35CKNPVB5190AB0NPK7H09X
+        title: "Developed-into links: leaf to Lab/Writing/Project backlinks"
+        kind: task
+        parent: nb
+        milestone: M3
+        size: s
+        repo: miethe/signal_to_system
+        lane: codex-terra
+      - ref: nb-preview
+        id: node_01M35CKNQE3PT6KCAH9JS6NPD7
+        title: "Sandboxed sketch/mockup previews (optional)"
+        kind: task
+        parent: nb
+        milestone: M3+
+        size: s
+        repo: miethe/signal_to_system
+        lane: codex-sol
+        external_ref: "S2S-031"
+        status: deferred
+      - ref: nb-publish
+        id: node_01M35CKNR3EXDR9R481Z1QTKTP
+        title: "Publish the first real notebook leaves"
+        kind: task
+        parent: nb
+        milestone: M3
+        size: m
+        repo: miethe/signal_to_system
+        lane: cc-native
+        external_ref: "S2S-037"
+  - key: projects
+    id: tree_01M35C7W5QSEB3QQH2GJ6TJ7FC
+    name: "S2S v2 — Projects & Studio"
+    node_count: 11
+    nodes:
+      - ref: cat
+        id: node_01M35CKNRQRRTJ79W7X4NBXN5D
+        title: "Canonical project catalog"
+        kind: epic
+        milestone: M4
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-terra
+        external_ref: "S2S-012"
+      - ref: cat-reconcile
+        id: node_01M35CKNS9NWKW2F7W5VKVWNHN
+        title: "Reconcile projects collection and portfolioItems into one catalog"
+        kind: task
+        parent: cat
+        milestone: M4
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-terra
+        external_ref: "S2S-012"
+      - ref: cat-schema
+        id: node_01M35CKNT40H4C9DAVHVBR84YA
+        title: "Project record schema: typed destinations, visibility incl. private summary"
+        kind: task
+        parent: cat
+        milestone: M4
+        size: s
+        repo: miethe/signal_to_system
+        lane: codex-terra
+      - ref: port
+        id: node_01M35CKNTXJ5TE64GEDG7E0MDY
+        title: "Projects index, Portfolio view and dossier"
+        kind: epic
+        milestone: M4
+        size: l
+        repo: miethe/signal_to_system
+        lane: codex-terra
+        external_ref: "S2S-013,S2S-014"
+      - ref: port-index
+        id: node_01M35CKNVJXWWVJG1ATGTFQEJX
+        title: "/projects index v2"
+        kind: task
+        parent: port
+        milestone: M4
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-terra
+        external_ref: "S2S-014"
+      - ref: port-portfolio
+        id: node_01M35CKNW846AD4A924PJZ5Z5B
+        title: "/portfolio curated professional view"
+        kind: task
+        parent: port
+        milestone: M4
+        size: s
+        repo: miethe/signal_to_system
+        lane: ica
+        external_ref: "S2S-014"
+      - ref: port-dossier
+        id: node_01M35CKNWWMMEY5E3JNRFY7E9B
+        title: "Project dossier template + first dossier (Research Foundry)"
+        kind: task
+        parent: port
+        milestone: M4
+        size: l
+        repo: miethe/signal_to_system
+        lane: cc-native
+        external_ref: "S2S-013"
+      - ref: studio
+        id: node_01M35CKNXHGQVEQYB3DBS2J6FP
+        title: "Studio: component gallery and languages"
+        kind: epic
+        milestone: M4
+        size: l
+        repo: miethe/signal_to_system
+        lane: codex-terra
+        external_ref: "S2S-032..035"
+      - ref: studio-inv
+        id: node_01M35CKNY48WM02P3TWZZ7QJD6
+        title: "Component reuse inventory (prototype behavior to native components)"
+        kind: task
+        parent: studio
+        milestone: M4
+        size: s
+        repo: miethe/signal_to_system
+        lane: ica
+        external_ref: "S2S-032"
+      - ref: studio-gallery
+        id: node_01M35CKNYVCXFRKSQJM265ZCYJ
+        title: "Studio galleries with real component stories"
+        kind: task
+        parent: studio
+        milestone: M4
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-terra
+        external_ref: "S2S-033"
+      - ref: studio-langs
+        id: node_01M35CKNZHK481CB3F5WKNPEY3
+        title: "Languages tab: live switcher, token export, packaged design-language artifact"
+        kind: task
+        parent: studio
+        milestone: M4
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-terra
+        external_ref: "S2S-034,S2S-035"
+  - key: projection
+    id: tree_01M35C7WHCFXY33MQQN7HCS22A
+    name: "S2S v2 — AOS Public Projection"
+    node_count: 21
+    nodes:
+      - ref: gate
+        id: node_01M35CKP0729ERJPB5KKZ24A0N
+        title: "Release gate and approval receipts"
+        kind: epic
+        milestone: M3
+        size: l
+        repo: miethe/signal_to_system
+        lane: codex-sol
+        external_ref: "S2S-004,S2S-022,S2S-026"
+      - ref: gate-manifest
+        id: node_01M35CKP0SQ025CM4MEX32EAFK
+        title: "Release manifest, approval receipt, semantic gate (fail closed)"
+        kind: task
+        parent: gate
+        milestone: M3
+        size: l
+        repo: miethe/signal_to_system
+        lane: codex-sol
+      - ref: gate-snapshot
+        id: node_01M35CKP1HN77SFEGADFDDH1SX
+        title: "Snapshot store in repo + /data/v1 generation from approved snapshots"
+        kind: task
+        parent: gate
+        milestone: M3
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-terra
+        external_ref: "S2S-026"
+      - ref: gate-adapter
+        id: node_01M35CKP28KY03HXYSBGV5FAYZ
+        title: "Site adapter interface (catalog, getRecord, getLifecycle, getDependencies, getReleaseManifest)"
+        kind: task
+        parent: gate
+        milestone: M3
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-sol
+      - ref: rf
+        id: node_01M35CKP2T5ZP8K6S7F5C22FDG
+        title: "RF claim projection"
+        kind: epic
+        milestone: M3
+        size: l
+        repo: miethe/research-foundry
+        lane: codex-sol
+        external_ref: "S2S-022"
+      - ref: rf-profile
+        id: node_01M35CKP3E2RF3201T8R31DCCX
+        title: "RF: s2s-public export profile (selected run/claim/source/review fields + source revision receipt)"
+        kind: task
+        parent: rf
+        milestone: M3
+        size: m
+        repo: miethe/research-foundry
+        lane: codex-sol
+      - ref: rf-tests
+        id: node_01M35CKP417C2TNEFNYGZBE0HB
+        title: "RF: fixtures + contract tests (redaction, dangling refs, mixed/contradicted, exact versions, withdrawn sources)"
+        kind: task
+        parent: rf
+        milestone: M3
+        size: s
+        repo: miethe/research-foundry
+        lane: codex-terra
+      - ref: rf-bridge
+        id: node_01M35CKP4P7715PDYWQ6JZYRY9
+        title: "S2S: RF snapshot bridge (profile output to claim-card DTOs)"
+        kind: task
+        parent: rf
+        milestone: M3
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-terra
+        external_ref: "S2S-022"
+      - ref: sm
+        id: node_01M35CKP5DD02Z4H6QQ72CXKYY
+        title: "SkillMeat artifact projection"
+        kind: epic
+        milestone: M4
+        size: l
+        repo: miethe/skillmeat
+        lane: codex-sol
+        external_ref: "S2S-041,S2S-042"
+      - ref: sm-proj
+        id: node_01M35CKP5Z113KNADRVC7BSTSX
+        title: "SkillMeat: public artifact-version projection (version/digest, license, capability, compatibility, destinations, lifecycle)"
+        kind: task
+        parent: sm
+        milestone: M4
+        size: m
+        repo: miethe/skillmeat
+        lane: codex-sol
+      - ref: sm-export
+        id: node_01M35CKP6PFT30C0QC8HXB9870
+        title: "SkillMeat: receiptable export/fixture path + runtime-use evidence"
+        kind: task
+        parent: sm
+        milestone: M4
+        size: m
+        repo: miethe/skillmeat
+        lane: codex-terra
+      - ref: sm-panel
+        id: node_01M35CKP7D27YC44624ARAB358
+        title: "S2S: artifact panels and uses/produced relations"
+        kind: task
+        parent: sm
+        milestone: M4
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-terra
+        external_ref: "S2S-042"
+      - ref: mw
+        id: node_01M35CKP85RGENGBZ08FAG7HZY
+        title: "MeatyWiki reference projection"
+        kind: epic
+        milestone: M3
+        size: s
+        repo: miethe/meatywiki
+        lane: codex-terra
+      - ref: mw-marker
+        id: node_01M35CKP8SMKXY1Z03KRFHJPCD
+        title: "MeatyWiki: editorial export candidate/approval marker for note/folio material"
+        kind: task
+        parent: mw
+        milestone: M3
+        size: s
+        repo: miethe/meatywiki
+        lane: codex-terra
+      - ref: wd
+        id: node_01M35CKP9G1CTYC17C26N2QGD0
+        title: "Withdrawal and corrections"
+        kind: epic
+        milestone: M4
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-sol
+        external_ref: "S2S-043,S2S-044"
+      - ref: wd-correct
+        id: node_01M35CKPA3YP4K4JJ1XNK3XS70
+        title: "Corrections: new public version + corrects/supersedes edge + notice"
+        kind: task
+        parent: wd
+        milestone: M4
+        size: s
+        repo: miethe/signal_to_system
+        lane: codex-terra
+      - ref: wd-purge
+        id: node_01M35CKPAVF3G1VG4NHAFMGZPZ
+        title: "Withdrawal: tombstone, reverse-dependency index, purge of pages/search/data/assets"
+        kind: task
+        parent: wd
+        milestone: M4
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-sol
+        external_ref: "S2S-043"
+      - ref: wd-drill
+        id: node_01M35CKPBGXHYEYPYWCN3094ED
+        title: "Rights withdrawal and restore drill"
+        kind: task
+        parent: wd
+        milestone: M4
+        size: s
+        repo: miethe/signal_to_system
+        lane: cc-native
+        external_ref: "S2S-044"
+      - ref: later
+        id: node_01M35CKPC46KM79KW0FWFNRSHE
+        title: "Deferred: public resolver/API, remote MCP, MediaWiki"
+        kind: epic
+        milestone: post-launch
+        size: xl
+        repo: miethe/signal_to_system
+        lane: cc-native
+        external_ref: "S2S-039,040,045,051"
+        status: deferred
+      - ref: later-resolver
+        id: node_01M35CKPCNY4E4MZNN0AC6A5SC
+        title: "Isolated public resolver/catalog service over the projection store"
+        kind: task
+        parent: later
+        milestone: post-launch
+        size: l
+        repo: miethe/signal_to_system
+        lane: codex-sol
+        external_ref: "S2S-039,S2S-040"
+        status: deferred
+      - ref: later-mcp
+        id: node_01M35CKPDDWZDB0M1JWYFD27F7
+        title: "Remote read-only MCP over the public store (and MediaWiki only if justified)"
+        kind: task
+        parent: later
+        milestone: post-launch
+        size: m
+        repo: miethe/signal_to_system
+        lane: codex-sol
+        external_ref: "S2S-051,S2S-045"
+        status: deferred
+depends_on:  # source waits on target
+  - [m0-manifest, m0-baseline]  # manifest built from baseline inventory
+  - [m0-draft-gate, m0-baseline]
+  - [m0-harness, m0-manifest]  # route snapshot asserts the manifest
+  - [m0-contracts, m0-jsonld]  # safe serializer at the DTO boundary
+  - [tok, m0]  # M0 gates all build work
+  - [brand, m0]  # M0 gates all build work
+  - [assets, m0]  # M0 gates all build work
+  - [shell, m0]  # M0 gates all build work
+  - [reader, m0]  # M0 gates all build work
+  - [ia, m0]  # M0 gates all build work
+  - [cont, m0]  # M0 gates all build work
+  - [rec, m0]  # M0 gates all build work
+  - [lens, m0]  # M0 gates all build work
+  - [nb, m0]  # M0 gates all build work
+  - [cat, m0]  # M0 gates all build work
+  - [port, m0]  # M0 gates all build work
+  - [studio, m0]  # M0 gates all build work
+  - [gate, m0]  # M0 gates all build work
+  - [shell, tok]  # tokens before sections
+  - [reader, tok]  # tokens before sections
+  - [ia, tok]  # tokens before sections
+  - [lens, tok]  # tokens before sections
+  - [nb, tok]  # tokens before sections
+  - [port, tok]  # tokens before sections
+  - [studio, tok]  # tokens before sections
+  - [shell-nav, brand-logo]  # header needs the mark
+  - [shell-home, assets-pipeline]  # hero art
+  - [shell-about, svg-loop]
+  - [shell-about, svg-timeline]
+  - [ia-devstories, svg-timeline]
+  - [studio-gallery, svg-arch]
+  - [port-dossier, svg-arch]
+  - [shell-nav, svg-icons-nav]
+  - [lens-detail, svg-icons-evidence]
+  - [brand-favicon, brand-logo]
+  - [brand-og, brand-logo]
+  - [reader, shell-gaps]  # article page design before re-skin
+  - [shell-switch, tok-langs]
+  - [reader, shell-base]  # reader sits on BaseLayout v2
+  - [ia-hub, shell-templates]
+  - [ia-hub, ia-model]
+  - [ia-model, m0-draft-gate]  # read model goes through the eligibility gate
+  - [cont-routes, m0-manifest]
+  - [reader-specimen, reader-shell]
+  - [reader-specimen, reader-thread]
+  - [reader-specimen, reader-evidence]
+  - [reader-specimen, m0-harness]  # baseline captures
+  - [lens-claims, reader-evidence]  # claims UI extends the lifted evidence family
+  - [lens-figures, reader-core]  # extends Figure/FigureViewer
+  - [lens, shell-prims]
+  - [rec-coll, m0-contracts]
+  - [first-author, first-select]
+  - [first-author, gate-manifest]  # projection gate before any Labs claim embed
+  - [lens-claims, gate-manifest]  # projection gate before any Labs claim embed
+  - [first-author, rf-bridge]
+  - [first-author, lens-detail]
+  - [first-author, rec-repro]
+  - [rf-bridge, rf-profile]  # cross-repo handshake
+  - [rf-bridge, rf-tests]  # fixtures before first release
+  - [rf-bridge, gate-adapter]
+  - [gate-manifest, m0-contracts]
+  - [rec-capsule, gate-snapshot]
+  - [nb-model, m0-contracts]
+  - [nb-publish, mw-marker]  # vault material only via marker
+  - [nb-publish, nb-leaf]
+  - [cat-reconcile, m0-manifest]  # stable ids from the manifest
+  - [port-dossier, cat-schema]
+  - [port-index, cat-reconcile]
+  - [sm-panel, sm-proj]  # cross-repo handshake
+  - [sm-panel, sm-export]
+  - [sm-panel, gate-manifest]
+  - [port-dossier, sm-panel]  # artifacts panel
+  - [studio-gallery, shell-prims]
+  - [studio-langs, tok-langs]
+  - [wd-purge, gate-snapshot]
+  - [wd-drill, wd-purge]
+  - [wd-drill, wd-correct]
+  - [m5-collector, m0-analytics-audit]
+  - [m5-agent, gate-snapshot]
+  - [m5-qual, reader]  # qualify all surfaces
+  - [m5-qual, ia]  # qualify all surfaces
+  - [m5-qual, cont]  # qualify all surfaces
+  - [m5-qual, first]  # qualify all surfaces
+  - [m5-qual, nb]  # qualify all surfaces
+  - [m5-qual, port]  # qualify all surfaces
+  - [m5-qual, studio]  # qualify all surfaces
+  - [m5-qual, wd]  # qualify all surfaces
+  - [m5-release, m5-qual]
+  - [m5-release, wd-drill]  # withdrawal drill before launch
+  - [m5-release, m5-collector]
+  - [m5-release, m5-colophon]
+  - [m5-release, m5-agent]
+human_requests:  # assigned to human:nick; attached to spine decisions node unless noted
+  - id: req_01M35C53MSYM0R8A1MG0D77EF8
+    topic: "which real investigation becomes the first flagship Lab? (filed by the front)"
+    attached_node: node_01M35CKNHTQVVZCDDR2BEBBP45  # first-select
+  - id: req_01M35CNRR6NEYW1VRVXWRRV9QH
+    topic: "confirm primary logo pick (RESOLVED 2026-09-22: logo board 01 waveform-diamond primary, favicon-idea-01 favicon, 05 monogram secondary; supersedes the orbit/trail mark)"
+    attached_node: node_01M35CKM6GHQWAXDGQ1S80N2YN  # decisions
+    status: answered
+  - id: req_01M35CNRYAWVA3A4191C9J08WZ
+    topic: "who approves projection releases and withdrawals"
+    attached_node: node_01M35CKM6GHQWAXDGQ1S80N2YN  # decisions
+  - id: req_01M35CNS3D4E862G28M8EHE4PE
+    topic: "which RF runs are eligible for the first Labs release"
+    attached_node: node_01M35CKM6GHQWAXDGQ1S80N2YN  # decisions
+  - id: req_01M35CNS8EDMHMAMSJJQG165ZD
+    topic: "where snapshots live and reader freshness promise"
+    attached_node: node_01M35CKM6GHQWAXDGQ1S80N2YN  # decisions
+  - id: req_01M35CNSDFG8V2NG77VSTJAESY
+    topic: "canonical domain and data path layout"
+    attached_node: node_01M35CKM6GHQWAXDGQ1S80N2YN  # decisions
+  - id: req_01M35CNSJEN2W411HBBT7XVYF1
+    topic: "analytics collector and budget"
+    attached_node: node_01M35CKM6GHQWAXDGQ1S80N2YN  # decisions
+  - id: req_01M35CNSR6GSC4FTB5D4P3YNK6
+    topic: "any public runtime service (resolver/MCP/MediaWiki) in v2"
+    attached_node: node_01M35CKM6GHQWAXDGQ1S80N2YN  # decisions
