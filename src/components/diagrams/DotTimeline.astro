@@ -79,7 +79,7 @@ const {
     padding: 0;
     display: grid;
     position: relative;
-    color: var(--ink, currentColor);
+    color: var(--s2s-ink, currentColor);
     font-family: var(--font-sans, system-ui, sans-serif);
   }
   .s2s-timeline--horizontal {
@@ -95,7 +95,7 @@ const {
   .s2s-timeline__item::before {
     content: '';
     position: absolute;
-    background: var(--rule, currentColor);
+    background: var(--s2s-rule-strong, currentColor);
     opacity: 0.9;
   }
   .s2s-timeline--horizontal .s2s-timeline__item::before {
@@ -113,24 +113,24 @@ const {
   .s2s-timeline__item:last-child::before { display: none; }
 
   .s2s-timeline__marker { flex-shrink: 0; position: relative; }
-  .tone-accent { --tl-tone: var(--accent, currentColor); }
-  .tone-secondary { --tl-tone: var(--secondary, currentColor); }
-  .tone-muted { --tl-tone: var(--muted, currentColor); }
+  .tone-accent { --tl-tone: var(--s2s-accent, currentColor); }
+  .tone-secondary { --tl-tone: var(--s2s-secondary, currentColor); }
+  .tone-muted { --tl-tone: var(--s2s-ink-muted, currentColor); }
   .pip { fill: var(--tl-tone); stroke: var(--tl-tone); stroke-width: 1.5; }
-  .is-next .pip { fill: var(--canvas, transparent); }
+  .is-next .pip { fill: var(--s2s-canvas, transparent); }
   .halo { fill: none; stroke: var(--tl-tone); stroke-width: 1; opacity: 0.45; }
-  .num-ring { fill: var(--canvas, transparent); stroke: var(--tl-tone); stroke-width: 1.5; }
+  .num-ring { fill: var(--s2s-canvas, transparent); stroke: var(--tl-tone); stroke-width: 1.5; }
   .is-done .num-ring { fill: var(--tl-tone); }
   .num { font: 600 10px var(--font-mono, ui-monospace, monospace); fill: var(--tl-tone); }
-  .is-done .num { fill: var(--canvas, currentColor); }
+  .is-done .num { fill: var(--s2s-canvas, currentColor); }
 
   .s2s-timeline__text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
   .s2s-timeline--vertical .s2s-timeline__text { padding-top: 2px; }
   .s2s-timeline__date {
     font: 600 13px var(--font-sans, system-ui, sans-serif);
-    color: var(--ink, currentColor);
+    color: var(--s2s-ink, currentColor);
   }
-  .s2s-timeline__label { font-size: 13px; line-height: 1.35; color: var(--ink, currentColor); }
-  .s2s-timeline__detail { font-size: 12px; line-height: 1.35; color: var(--muted, currentColor); }
-  .is-next .s2s-timeline__label { color: var(--muted, currentColor); }
+  .s2s-timeline__label { font-size: 13px; line-height: 1.35; color: var(--s2s-ink, currentColor); }
+  .s2s-timeline__detail { font-size: 12px; line-height: 1.35; color: var(--s2s-ink-muted, currentColor); }
+  .is-next .s2s-timeline__label { color: var(--s2s-ink-muted, currentColor); }
 </style>
