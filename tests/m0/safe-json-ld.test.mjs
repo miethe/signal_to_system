@@ -6,8 +6,8 @@ test('JSON-LD cannot close its script element or start an HTML comment', () => {
   const serialized = serializeJsonLd({ title: '</script><script>alert(1)</script>', note: '<!-- comment -->' });
   assert.equal(serialized.includes('</script>'), false);
   assert.equal(serialized.includes('<!--'), false);
-  assert.match(serialized, /\\u003c\\/script>/);
-  assert.match(serialized, /\\u003c!--/);
+  assert.ok(serialized.includes('\\u003c/script>'));
+  assert.ok(serialized.includes('\\u003c!--'));
 });
 
 test('JSON-LD escapes JavaScript line separators', () => {
