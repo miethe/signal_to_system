@@ -1,0 +1,41 @@
+---
+/** /studio/templates/folio/ (noindex) — exercises the Folio page template. */
+import FolioLayout from '../../../layouts/templates/FolioLayout.astro';
+import Tabs from '../../../components/primitives/Tabs.astro';
+import { templateTabs } from '../../../lib/studio-preview';
+---
+
+<FolioLayout
+  title="Templates: Folio page"
+  description="Section template preview (Folio page)."
+  kicker="Studio · Templates · Folio page"
+  heading="A leaf, not a post."
+  noindex
+>
+  <p>
+    Notebooks hold thinking that is not finished yet: sketches, working notes, questions still being shaped. The Folio
+    page gives each leaf a paper sheet inside the dark Observatory shell, so it reads as a different kind of object
+    from an essay without leaving the site.
+  </p>
+  <p>
+    The sheet is scoped with <code>data-skin="folio"</code>. Its colors come from the Folio token stub, which the M3
+    Notebook design pass owns; only the scope and the ruled measure are fixed here.
+  </p>
+  <p>
+    Marginalia sit in their own column to the right: dates, links, amendments. Below 1024px they drop under the leaf.
+  </p>
+
+  <Fragment slot="margin">
+    <p>Template · Folio page</p>
+    <p>Skin · folio (stub)</p>
+    <p>Measure · 62ch on a 28px rule</p>
+  </Fragment>
+
+  <div slot="after" class="after">
+    <Tabs label="Templates" items={templateTabs('/studio/templates/folio/')} />
+  </div>
+</FolioLayout>
+
+<style>
+  .after { padding-top: 8px; }
+</style>

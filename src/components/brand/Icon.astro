@@ -20,7 +20,9 @@ interface Props {
 
 const { name, size = 24, label, glow = false, class: className } = Astro.props;
 const { attrs, inner } = loadSvg('icons', name);
-const a11y = label ? { role: 'img', 'aria-label': label } : { 'aria-hidden': 'true', focusable: 'false' };
+const a11y = label
+  ? { role: 'img' as const, 'aria-label': label }
+  : { 'aria-hidden': 'true' as const, focusable: 'false' as const };
 const body = label ? `<title>${label}</title>${inner}` : inner;
 ---
 

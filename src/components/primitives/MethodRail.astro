@@ -1,0 +1,41 @@
+---
+/**
+ * MethodRail — the hero's vertical tracked-caps trail with a hairline
+ * ("OBSERVE / INVESTIGATE / BUILD / SHARE / REPEAT"), optionally followed
+ * by a short motto block. Decorative repetition of the site's method, so it
+ * is presented as a list, not as navigation.
+ */
+interface Props {
+  steps?: string[];
+  motto?: string[];
+  class?: string;
+}
+const {
+  steps = ['Observe', 'Investigate', 'Build', 'Share', 'Repeat'],
+  motto,
+  class: className,
+} = Astro.props;
+---
+
+<div class:list={['s2s-method', className]}>
+  <ol class="s2s-method__steps" aria-label="Method">
+    {steps.map((s) => <li>{s}</li>)}
+  </ol>
+  {motto && <p class="s2s-method__motto">{motto.map((m, i) => <>{i > 0 && <br />}{m}</>)}</p>}
+</div>
+
+<style>
+  .s2s-method { display: flex; flex-direction: column; justify-content: space-between; height: 100%; align-items: flex-end; }
+  .s2s-method__steps,
+  .s2s-method__motto {
+    margin: 0;
+    padding: 2px 0 2px 12px;
+    border-left: 1px solid var(--s2s-rule-emphasis);
+    list-style: none;
+    font: 500 0.5625rem / 2.1 var(--font-sans);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--s2s-ink-subtle);
+  }
+  .s2s-method__motto { line-height: 1.8; margin-top: 24px; }
+</style>

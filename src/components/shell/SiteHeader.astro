@@ -1,0 +1,336 @@
+---
+/**
+ * v2 site header — the chrome every mockup in 01-site-mockups shares:
+ * lockup (mark + serif wordmark + tracked byline) at left, the five primary
+ * sections, a search field, an About link and the sun/moon switch.
+ *
+ * Mockup geometry at 1448 (frame x=103): bar 62px tall, lockup inset 34px,
+ * nav at x~519 with ~26px gaps, search 235x30 at x~931, switch 54x30 with a
+ * 38px right inset, 1px rule under the bar. Active section: ink text with a
+ * 2px accent underline (Writing mockup).
+ *
+ * Below 1024px the nav and field collapse to icon controls and a menu sheet.
+ */
+import Lockup from '../brand/Lockup.astro';
+import Icon from '../brand/Icon.astro';
+import ThemeSwitch from './ThemeSwitch.astro';
+import SearchBox from '../global/SearchBox';
+import { site } from '../../data/site';
+import { isNavActive } from '../../lib/nav';
+
+const { pathname } = Astro.url;
+const utilityActive = isNavActive({ ...site.navUtility, match: ['/about'] }, pathname);
+---
+
+<header id="site-header" class="s2s-header">
+  <div class="s2s-header__bar">
+    <Lockup layout="header" size={30} href="/" class="s2s-header__brand s2s-focus" />
+
+    <nav class="s2s-nav" aria-label="Primary">
+      <ul>
+        {site.nav.map((item) => {
+          const active = isNavActive(item, pathname);
+          return (
+            <li>
+              <a href={item.href} class="s2s-nav__link s2s-focus" aria-current={active ? 'page' : undefined}>
+                {item.label}
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
+
+    <div class="s2s-header__tools">
+      <SearchBox client:idle />
+      <a
+        href={site.navUtility.href}
+        class="s2s-header__utility s2s-focus"
+        aria-current={utilityActive ? 'page' : undefined}>{site.navUtility.label}</a
+      >
+      <ThemeSwitch />
+      <button
+        type="button"
+        class="s2s-header__menu s2s-focus"
+        aria-expanded="false"
+        aria-controls="s2s-mobile-menu"
+        aria-label="Open menu"
+        data-menu-toggle
+      >
+        <svg viewBox="0 0 20 20" width="18" height="18" aria-hidden="true" focusable="false">
+          <path class="bars" d="M3 6h14M3 10h14M3 14h14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+          <path class="close" d="M5 5l10 10M15 5L5 15" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div id="s2s-mobile-menu" class="s2s-sheet" hidden>
+    <nav aria-label="Primary (menu)">
+      <ul class="s2s-sheet__primary">
+        {site.nav.map((item) => {
+          const active = isNavActive(item, pathname);
+          return (
+            <li>
+              <a href={item.href} class="s2s-focus" aria-current={active ? 'page' : undefined}>
+                <span>{item.label}</span>
+                <Icon name="sparkle" size={12} class="s2s-sheet__dot" />
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+      <p class="s2s-eyebrow s2s-sheet__heading">More</p>
+      <ul class="s2s-sheet__more">
+        <li><a href={site.navUtility.href} class="s2s-focus">{site.navUtility.label}</a></li>
+        {site.navMore.map((item) => <li><a href={item.href} class="s2s-focus">{item.label}</a></li>)}
+      </ul>
+    </nav>
+    <button type="button" class="s2s-sheet__lite s2s-focus" aria-pressed="false" data-perf-toggle>
+      <span>Lite mode</span>
+      <span class="s2s-sheet__lite-state" data-perf-state>Off</span>
+    </button>
+  </div>
+</header>
+
+<script>
+  import { togglePerformanceMode } from '../../store/themeStore';
+
+  const toggle = document.querySelector<HTMLButtonElement>('[data-menu-toggle]');
+  const sheet = document.getElementById('s2s-mobile-menu');
+
+  function setOpen(open: boolean) {
+    if (!toggle || !sheet) return;
+    sheet.hidden = !open;
+    toggle.setAttribute('aria-expanded', String(open));
+    toggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    document.documentElement.classList.toggle('s2s-menu-open', open);
+  }
+
+  toggle?.addEventListener('click', () => setOpen(sheet?.hidden ?? false));
+  sheet?.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => setOpen(false)));
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && sheet && !sheet.hidden) {
+      setOpen(false);
+      toggle?.focus();
+    }
+  });
+  window.matchMedia('(min-width: 1024px)').addEventListener('change', (e) => e.matches && setOpen(false));
+
+  const perf = document.querySelector<HTMLButtonElement>('[data-perf-toggle]');
+  const perfState = document.querySelector('[data-perf-state]');
+  function syncPerf() {
+    const lite = document.documentElement.classList.contains('perf-lite');
+    perf?.setAttribute('aria-pressed', String(lite));
+    if (perfState) perfState.textContent = lite ? 'On' : 'Off';
+  }
+  perf?.addEventListener('click', () => {
+    togglePerformanceMode();
+    syncPerf();
+  });
+  syncPerf();
+</script>
+
+<style>
+  .s2s-header {
+    --mark-top: var(--s2s-mark-top);
+    --mark-mid: var(--s2s-mark-mid);
+    --mark-bottom: var(--s2s-mark-bottom);
+    --mark-dot: var(--s2s-mark-dot);
+    --mark-glow: var(--s2s-mark-glow);
+    --ink: var(--s2s-ink);
+    --muted: var(--s2s-ink-subtle);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: var(--s2s-canvas-raised);
+    border-bottom: 1px solid var(--s2s-rule);
+  }
+
+  .s2s-header__bar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    height: var(--s2s-header-h);
+    padding: 0 16px 0 18px;
+  }
+
+  :global(a.s2s-lockup.s2s-header__brand) {
+    gap: 14px;
+    border-radius: var(--s2s-radius-control);
+    white-space: nowrap;
+  }
+  :global(.s2s-header__brand .s2s-lockup__title) {
+    color: var(--s2s-ink);
+  }
+  :global(.s2s-header__brand .s2s-lockup__byline) {
+    display: none;
+    color: var(--s2s-ink-subtle);
+  }
+
+  /* ---- Primary nav ---- */
+  .s2s-nav {
+    display: none;
+  }
+  .s2s-nav ul {
+    display: flex;
+    gap: 26px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .s2s-nav__link,
+  .s2s-header__utility {
+    position: relative;
+    display: inline-block;
+    padding: 6px 0;
+    font: var(--type-ui-weight) var(--type-nav) / 1 var(--font-sans);
+    letter-spacing: 0.01em;
+    color: var(--s2s-ink-soft);
+    text-decoration: none;
+    border-radius: 2px;
+    transition: color var(--s2s-dur) ease;
+  }
+  .s2s-nav__link:hover,
+  .s2s-header__utility:hover {
+    color: var(--s2s-ink);
+  }
+  .s2s-nav__link[aria-current='page'],
+  .s2s-header__utility[aria-current='page'] {
+    color: var(--s2s-ink);
+  }
+  .s2s-nav__link[aria-current='page']::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: -10px;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--s2s-accent);
+  }
+
+  /* ---- Tools ---- */
+  .s2s-header__tools {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto;
+  }
+  .s2s-header__utility {
+    display: none;
+  }
+
+  .s2s-header__menu {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid var(--s2s-rule-strong);
+    border-radius: var(--s2s-radius-control);
+    background: transparent;
+    color: var(--s2s-ink-soft);
+    cursor: pointer;
+  }
+  .s2s-header__menu .close { display: none; }
+  .s2s-header__menu[aria-expanded='true'] .bars { display: none; }
+  .s2s-header__menu[aria-expanded='true'] .close { display: inline; }
+
+  /* ---- Mobile sheet ---- */
+  .s2s-sheet {
+    padding: 8px 18px 22px;
+    border-top: 1px solid var(--s2s-rule);
+    background: var(--s2s-canvas-raised);
+    max-height: calc(100dvh - var(--s2s-header-h));
+    overflow-y: auto;
+  }
+  .s2s-sheet[hidden] { display: none; }
+  .s2s-sheet ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .s2s-sheet__primary a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 2px;
+    border-bottom: 1px solid var(--s2s-rule);
+    font: 400 1.375rem / 1.1 var(--font-display);
+    color: var(--s2s-ink);
+    text-decoration: none;
+  }
+  :global(.s2s-sheet__dot) {
+    color: var(--s2s-accent);
+    opacity: 0;
+  }
+  .s2s-sheet__primary a[aria-current='page'] :global(.s2s-sheet__dot) { opacity: 1; }
+  .s2s-sheet__primary a[aria-current='page'] { color: var(--s2s-accent-hover); }
+  .s2s-sheet__heading {
+    margin: 22px 0 8px;
+  }
+  .s2s-sheet__more {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2px 16px;
+  }
+  .s2s-sheet__more a {
+    display: block;
+    padding: 8px 0;
+    font: 400 var(--type-body-s) / 1.3 var(--font-sans);
+    color: var(--s2s-ink-muted);
+    text-decoration: none;
+  }
+  .s2s-sheet__more a:hover { color: var(--s2s-ink); }
+  .s2s-sheet__lite {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 18px;
+    padding: 10px 12px;
+    border: 1px solid var(--s2s-rule-strong);
+    border-radius: var(--s2s-radius-control);
+    background: var(--s2s-inset);
+    font: 450 var(--type-ui) / 1 var(--font-sans);
+    color: var(--s2s-ink-soft);
+    cursor: pointer;
+  }
+  .s2s-sheet__lite-state {
+    font-family: var(--font-mono);
+    color: var(--s2s-ink-subtle);
+  }
+  .s2s-sheet__lite[aria-pressed='true'] .s2s-sheet__lite-state { color: var(--s2s-secondary); }
+
+  @media (min-width: 640px) {
+    :global(.s2s-header__brand .s2s-lockup__byline) { display: inline; }
+    .s2s-header__bar { padding: 0 24px; }
+  }
+
+  @media (min-width: 1024px) {
+    .s2s-header__bar {
+      gap: 0;
+      padding: 0 38px 0 34px;
+    }
+    .s2s-nav {
+      display: block;
+      margin-left: clamp(32px, 6.8vw, 97px);
+    }
+    .s2s-header__tools { gap: 28px; }
+    .s2s-header__utility { display: inline-block; }
+    .s2s-header__menu,
+    .s2s-sheet { display: none; }
+  }
+
+  @media (min-width: 1024px) and (max-width: 1199px) {
+    :global(.s2s-header__brand .s2s-lockup__byline) { display: none; }
+    .s2s-nav ul { gap: 22px; }
+    .s2s-header__tools { gap: 18px; }
+  }
+
+  @media (min-width: 1280px) {
+    :global(.s2s-frame:not(.s2s-frame--reader)) > .s2s-header {
+      border-radius: var(--s2s-radius-frame) var(--s2s-radius-frame) 0 0;
+    }
+  }
+</style>

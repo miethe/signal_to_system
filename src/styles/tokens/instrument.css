@@ -1,0 +1,22 @@
+/* ============================================================
+   INSTRUMENT — STUB (Studio-scoped skin, not a global theme)
+
+   Seen once, as the Studio mockup's "Design Languages" thumbnail: a dark
+   green-grid technical surface. Values are provisional (no full-page mockup
+   exists to sample); a dedicated design pass owns them. Nothing in the shell
+   applies this skin.
+   ============================================================ */
+[data-skin='instrument'] {
+  color-scheme: dark;
+  --s2s-canvas: #0f1318;
+  --s2s-surface: #12161c;
+  --s2s-rule: #2c3b37;
+  --s2s-rule-strong: #34463f;
+  --s2s-ink: #e6e9ee;
+  --s2s-ink-muted: #c6c8d0;
+  --s2s-ink-subtle: #868e9a;
+  --s2s-accent: #6cc79a;
+  --s2s-accent-label: #6cc79a;
+  --s2s-secondary: #6cc79a;
+  --s2s-grid: rgb(64 90 81 / 0.13);
+}

@@ -1,0 +1,65 @@
+---
+/**
+ * Detail + rail template — one record (a project dossier, a Lab
+ * investigation): a compact hero with meta chips, a reading-width body and
+ * a sticky right rail of facts, then related work across the full width.
+ *
+ * Slot contract
+ *   meta      optional  chips/badges under the lede (status, tags)
+ *   default   required  body; constrained to --s2s-measure (720px)
+ *   rail      required  sticky right rail: StatTiles in a Card, links, TOC
+ *   related   optional  full-width band after body + rail
+ */
+import BaseLayout from '../BaseLayout.astro';
+import PageHero from '../../components/primitives/PageHero.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  heading: string;
+  eyebrow?: string[];
+  lede?: string;
+  noindex?: boolean;
+  railLabel?: string;
+}
+const { title, description, heading, eyebrow, lede, noindex, railLabel = 'At a glance' } = Astro.props;
+---
+
+<BaseLayout title={title} description={description} noindex={noindex}>
+  <PageHero heading={heading} eyebrow={eyebrow} lede={lede} compact>
+    {Astro.slots.has('meta') && <Fragment slot="actions"><slot name="meta" /></Fragment>}
+  </PageHero>
+  <div class="s2s-dr">
+    <article class="s2s-dr__body">
+      <slot />
+    </article>
+    <aside class="s2s-dr__rail" aria-label={railLabel}>
+      <slot name="rail" />
+    </aside>
+    {Astro.slots.has('related') && <div class="s2s-dr__related"><slot name="related" /></div>}
+  </div>
+</BaseLayout>
+
+<style>
+  .s2s-dr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+    padding: 24px 16px 0;
+  }
+  .s2s-dr__body {
+    max-width: var(--s2s-measure);
+    font: 400 var(--type-body) / var(--type-leading-body) var(--font-sans);
+    color: var(--s2s-ink-muted);
+  }
+  .s2s-dr__rail { display: flex; flex-direction: column; gap: 14px; }
+  @media (min-width: 1024px) {
+    .s2s-dr {
+      grid-template-columns: minmax(0, 1fr) var(--s2s-rail);
+      gap: 32px 48px;
+      padding: 28px var(--s2s-frame-gutter) 0;
+    }
+    .s2s-dr__rail { position: sticky; top: calc(var(--s2s-header-h) + 16px); align-self: start; }
+    .s2s-dr__related { grid-column: 1 / -1; }
+  }
+</style>

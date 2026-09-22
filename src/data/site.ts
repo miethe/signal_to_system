@@ -26,18 +26,46 @@ export const site = {
     },
   },
 
+  /**
+   * Primary navigation (S2S v2 shell; every mockup header shows exactly these
+   * five). Sections that do not exist yet point at the nearest existing route
+   * so the nav never 404s; `match` lists the path prefixes that light the
+   * item up. Swap `href` when the real section ships:
+   *   Writing   -> /writing/   (M2)   interim /essays/
+   *   Labs      -> /labs/      (M3b)  interim /aos/ (the AOS research program)
+   *   Notebooks -> /notebooks/ (M3b)  interim /dev-stories/ (build notes)
+   *   Studio    -> /studio/    (M1b+) interim /portfolio/ui/ (component library)
+   */
   nav: [
-    { label: "Home", href: "/" },
-    { label: "Essays", href: "/essays" },
-    { label: "Dev Stories", href: "/dev-stories" },
-    { label: "Series", href: "/series" },
-    { label: "Projects", href: "/projects" },
-    { label: "Portfolio", href: "/portfolio" },
-    { label: "Other Sites", href: "/other-sites" },
-    { label: "About", href: "/about" },
+    { label: "Writing", href: "/essays/", match: ["/essays", "/series", "/tags", "/topics", "/start-here", "/glossary"] },
+    { label: "Labs", href: "/aos/", match: ["/aos", "/systems", "/evidence", "/workflow-showcase"] },
+    { label: "Projects", href: "/projects/", match: ["/projects", "/portfolio/"], exclude: ["/portfolio/ui"] },
+    { label: "Notebooks", href: "/dev-stories/", match: ["/dev-stories"] },
+    { label: "Studio", href: "/portfolio/ui/", match: ["/portfolio/ui", "/studio"] },
+  ],
+
+  /** Utility link right of search in the header (mockup: "About"). */
+  navUtility: { label: "About", href: "/about/" },
+
+  /** Secondary destinations, listed in the mobile menu only. */
+  navMore: [
+    { label: "Start here", href: "/start-here/" },
+    { label: "Series", href: "/series/" },
+    { label: "Portfolio", href: "/portfolio/" },
+    { label: "Other sites", href: "/other-sites/" },
   ],
 
   footer: {
+    /** Mockup footer copy (center tagline, right-edge two-line motto). */
+    tagline: "Research deeper. Build what matters.",
+    motto: ["A brighter tomorrow", "through better questions."],
+    /** Mockup footer utility row. */
+    bar: [
+      { label: "About", href: "/about/" },
+      { label: "RSS", href: "/rss.xml" },
+      { label: "GitHub", href: "https://github.com/miethe", external: true },
+      { label: "LinkedIn", href: "https://linkedin.com/in/nickmiethe", external: true },
+    ],
     links: [
       { label: "Essays", href: "/essays" },
       { label: "Dev Stories", href: "/dev-stories" },

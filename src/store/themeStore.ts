@@ -18,7 +18,8 @@ const PERF_KEY = "s2s-performance-mode";
 // Atoms
 // ---------------------------------------------------------------------------
 
-export const $theme = atom<Theme>("light");
+// Observatory dark is the S2S v2 default (every mockup); light is opt-in.
+export const $theme = atom<Theme>("dark");
 export const $performanceMode = atom<PerformanceMode>("rich");
 
 // ---------------------------------------------------------------------------
@@ -32,14 +33,11 @@ export const $performanceMode = atom<PerformanceMode>("rich");
 export function initTheme(): void {
   if (typeof window === "undefined") return;
 
-  // Theme: stored value → system preference → default 'light'
+  // Theme: stored value → default 'dark'. The OS preference is deliberately
+  // not consulted: the site's identity is the dark Observatory shell, and a
+  // visitor who wants light chooses it once (persisted).
   const storedTheme = localStorage.getItem(THEME_KEY) as Theme | null;
-  if (storedTheme === "light" || storedTheme === "dark") {
-    $theme.set(storedTheme);
-  } else {
-    const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    $theme.set(prefersDark ? "dark" : "light");
-  }
+  $theme.set(storedTheme === "light" ? "light" : "dark");
 
   // Performance mode: stored value → network hint → default 'rich'
   const storedPerf = localStorage.getItem(PERF_KEY) as PerformanceMode | null;

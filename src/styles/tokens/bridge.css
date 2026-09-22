@@ -1,0 +1,192 @@
+/* ============================================================
+   BRIDGE — the legacy vocabularies, collapsed onto the role layer
+
+   Before v2 the site carried three color vocabularies:
+     1. Tailwind @theme scales   --color-bg-*, --color-border-*, --color-text-*
+     2. editorial vars           --bg-*, --border*, --text-*, --accent*, --cyan*, --code-*
+     3. shadcn HSL triples       --background, --primary, --muted, ... (@miethe/ui)
+
+   (1) and (2) are now ALIASES of the Observatory roles (./observatory.css):
+   existing markup keeps its class names and picks up the new palette. They
+   are declared on `:root, .light, .dark` so a nested theme scope re-resolves
+   them (and on `[data-skin]`, for the Studio-scoped skins). New code uses --s2s-* roles directly; do not add consumers of these
+   names.
+
+   (3) is kept VERBATIM (values unchanged) so @miethe/ui components, which
+   read `hsl(var(--muted))` etc. at runtime, render exactly as before. This
+   is the alias bridge the adoption plan calls for ("Where I disagree" #3):
+   it goes away when the library is migrated to the role layer.
+
+   The essay reader is pinned to its pre-v2 values in ../reader-legacy.css
+   until M2 re-tokens it.
+   ============================================================ */
+
+/* ---------- (1) Tailwind scale names -> roles ---------- */
+@theme inline {
+  --color-bg-base: var(--s2s-canvas);
+  --color-bg-subtle: var(--s2s-canvas-raised);
+  --color-bg-muted: var(--s2s-chip);
+  --color-bg-surface: var(--s2s-surface);
+  --color-bg-overlay: var(--s2s-scrim);
+  --color-border-subtle: var(--s2s-rule);
+  --color-border-default: var(--s2s-rule-strong);
+  --color-border-strong: var(--s2s-rule-emphasis);
+  --color-text-primary: var(--s2s-ink);
+  --color-text-secondary: var(--s2s-ink-muted);
+  --color-text-tertiary: var(--s2s-ink-subtle);
+  --color-text-disabled: var(--s2s-ink-faint);
+  --color-text-inverse: var(--s2s-canvas);
+
+  /* Role utilities for new markup: bg-canvas, text-ink, border-rule, ... */
+  --color-canvas: var(--s2s-canvas);
+  --color-surface: var(--s2s-surface);
+  --color-inset: var(--s2s-inset);
+  --color-chip: var(--s2s-chip);
+  --color-rule: var(--s2s-rule);
+  --color-rule-strong: var(--s2s-rule-strong);
+  --color-ink: var(--s2s-ink);
+  --color-ink-soft: var(--s2s-ink-soft);
+  --color-ink-muted: var(--s2s-ink-muted);
+  --color-ink-subtle: var(--s2s-ink-subtle);
+  --color-accent-strong: var(--s2s-accent-strong);
+  --color-accent-soft: var(--s2s-accent-soft);
+  --color-on-accent: var(--s2s-on-accent);
+  --color-sage: var(--s2s-secondary);
+}
+
+/* ---------- (2) editorial vars -> roles ---------- */
+/* [data-skin] is listed so a Folio/Instrument subtree re-resolves them too. */
+:root,
+.light,
+.dark,
+[data-skin] {
+  --bg-base: var(--s2s-canvas);
+  --bg-subtle: var(--s2s-canvas-raised);
+  --bg-muted: var(--s2s-chip);
+  --bg-surface: var(--s2s-surface);
+
+  --border-subtle: var(--s2s-rule);
+  --border: var(--s2s-rule-strong);
+  --border-default: var(--s2s-rule-strong);
+  --border-strong: var(--s2s-rule-emphasis);
+
+  --text-primary: var(--s2s-ink);
+  --text-secondary: var(--s2s-ink-muted);
+  --text-tertiary: var(--s2s-ink-subtle);
+  --text-disabled: var(--s2s-ink-faint);
+  --text-inverse: var(--s2s-canvas);
+
+  --accent: var(--s2s-accent);
+  --accent-hover: var(--s2s-accent-hover);
+  --accent-subtle: var(--s2s-accent-soft);
+  --accent-muted: var(--s2s-accent-label);
+  --accent-text: var(--s2s-accent);
+
+  /* The pre-v2 cyan structural accent collapses onto the sage secondary:
+     the mockups carry violet + sage, no cyan. */
+  --cyan: var(--s2s-secondary);
+  --cyan-text: var(--s2s-secondary);
+  --cyan-subtle: var(--s2s-secondary-soft);
+
+  --code-bg: var(--s2s-inset);
+  --code-bg-block: var(--s2s-canvas-raised);
+  --code-text: var(--s2s-ink-soft);
+  --code-text-block: var(--s2s-ink-soft);
+  --code-border: var(--s2s-rule);
+
+  --lift-y: -2px;
+  --lift-duration: 200ms;
+  --lift-ease: cubic-bezier(0.34, 1.4, 0.64, 1);
+}
+
+/* Depth effects: unchanged values, per theme. */
+:root,
+.light {
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-ambient: 0px 32px 64px -12px rgba(11, 19, 38, 0.06);
+  --lift-shadow: 0 2px 4px rgba(15, 23, 42, 0.05), 0 14px 30px -12px rgba(15, 23, 42, 0.22);
+}
+
+.dark {
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.3);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+  --shadow-ambient: 0px 32px 64px -12px rgba(0, 0, 0, 0.5);
+  /* A black drop shadow reads as dirt on a dark field, so the lift is a
+     faint violet ring plus a soft glow. */
+  --lift-shadow: 0 0 0 1px rgb(187 160 244 / 0.18), 0 16px 34px -14px rgb(90 63 201 / 0.45);
+}
+
+/* ---------- (3) shadcn HSL bridge for @miethe/ui (values unchanged) ---------- */
+@theme inline {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-accent: hsl(var(--shadcn-accent));
+  --color-accent-foreground: hsl(var(--shadcn-accent-foreground));
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-border: hsl(var(--border-hsl));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+}
+
+:root {
+  /* `--accent`/`--accent-foreground` are namespaced to `--shadcn-*` (FIX-LIST
+     A2): the bare names collided with the editorial `--accent`. @miethe/ui
+     still resolves them through the `@theme inline` mapping above. */
+  --background: 0 0% 100%;
+  --foreground: 222.2 47.4% 11.2%;
+  --card: 0 0% 100%;
+  --card-foreground: 222.2 47.4% 11.2%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222.2 47.4% 11.2%;
+  --primary: 222.2 47.4% 11.2%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 210 40% 96.1%;
+  --secondary-foreground: 222.2 47.4% 11.2%;
+  --muted: 210 40% 96.1%;
+  --muted-foreground: 215.4 16.3% 46.9%;
+  --shadcn-accent: 210 40% 96.1%;
+  --shadcn-accent-foreground: 222.2 47.4% 11.2%;
+  --destructive: 0 84.2% 60.2%;
+  --destructive-foreground: 210 40% 98%;
+  --border-hsl: 214.3 31.8% 91.4%;
+  --input: 214.3 31.8% 91.4%;
+  --ring: 222.2 84% 4.9%;
+}
+
+.dark {
+  --background: 222.2 47.4% 11.2%;
+  --foreground: 210 40% 98%;
+  --card: 222.2 47.4% 11.2%;
+  --card-foreground: 210 40% 98%;
+  --popover: 222.2 47.4% 11.2%;
+  --popover-foreground: 210 40% 98%;
+  --primary: 210 40% 98%;
+  --primary-foreground: 222.2 47.4% 11.2%;
+  --secondary: 217.2 32.6% 17.5%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 217.2 32.6% 17.5%;
+  --muted-foreground: 215 20.2% 65.1%;
+  --shadcn-accent: 217.2 32.6% 17.5%;
+  --shadcn-accent-foreground: 210 40% 98%;
+  --destructive: 0 62.8% 30.6%;
+  --destructive-foreground: 210 40% 98%;
+  --border-hsl: 217.2 32.6% 17.5%;
+  --input: 217.2 32.6% 17.5%;
+  --ring: 212.7 26.8% 83.9%;
+}

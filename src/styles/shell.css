@@ -1,0 +1,188 @@
+/* ============================================================
+   SHELL — page field, site frame, shared chrome primitives
+
+   Mockup anatomy (every page in 01-site-mockups, 1448px wide): the site
+   sits in a framed 1240px panel (1px rule, 16px radius) floating on a
+   darker atmospheric backdrop lit violet from the top edge. Below 1280px
+   the frame goes full-bleed and the backdrop disappears.
+
+   Roles only: this file must stay free of raw palette literals.
+   ============================================================ */
+
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--s2s-canvas);
+  color: var(--s2s-ink);
+  transition: background-color var(--s2s-dur) ease, color var(--s2s-dur) ease;
+}
+
+.s2s-frame {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  background: var(--s2s-canvas);
+}
+
+.s2s-main {
+  flex: 1 0 auto;
+}
+
+/* Reader pages (PostLayout, StoryLayout) run flush: no frame, and the frame
+   is transparent so an essay's own page field (e.g. Registry Wave's) shows
+   through exactly as before. Header and footer content keep the frame's
+   1240px measure. */
+.s2s-frame--reader {
+  background: transparent;
+}
+
+.s2s-frame--reader :is(.s2s-header__bar, .s2s-footer__bar, .s2s-footer__fine) {
+  max-width: var(--s2s-frame-max);
+  margin-inline: auto;
+}
+
+@media (min-width: 1280px) {
+  body {
+    /* Anchored to the top of the page (not fixed): a violet bloom over the
+       frame's top edge, as in every mockup, fading into the backdrop. */
+    background:
+      radial-gradient(760px 240px at 58% -60px, var(--s2s-backdrop-glow), transparent 75%),
+      radial-gradient(1400px 320px at 50% -80px, var(--s2s-backdrop-haze), transparent 80%),
+      linear-gradient(180deg, var(--s2s-backdrop-shade), transparent 900px),
+      var(--s2s-backdrop);
+    padding: 16px 0 24px;
+  }
+
+  body.s2s-body--reader {
+    padding: 0;
+    background: var(--s2s-canvas);
+  }
+
+  .s2s-frame:not(.s2s-frame--reader) {
+    max-width: var(--s2s-frame-max);
+    min-height: calc(100dvh - 40px);
+    margin-inline: auto;
+    border: 1px solid var(--s2s-frame-rule);
+    border-radius: var(--s2s-radius-frame);
+    box-shadow: var(--s2s-shadow-frame);
+  }
+}
+
+/* ---------- Skip link ---------- */
+.skip-link {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 200;
+  padding: 10px 16px;
+  border-radius: var(--s2s-radius-control);
+  background: var(--s2s-accent-strong);
+  color: var(--s2s-on-accent);
+  font: 500 var(--type-ui) / 1 var(--font-sans);
+  text-decoration: none;
+  transform: translateY(-160%);
+  transition: transform var(--s2s-dur) var(--s2s-ease);
+}
+
+.skip-link:focus,
+.skip-link:focus-visible {
+  transform: none;
+  color: var(--s2s-on-accent);
+  outline: 2px solid var(--s2s-focus);
+  outline-offset: 2px;
+}
+
+/* ---------- Shared text roles ---------- */
+.s2s-eyebrow {
+  font: 500 var(--type-micro) / 1.2 var(--font-sans);
+  letter-spacing: var(--type-tracking-caps);
+  text-transform: uppercase;
+  color: var(--s2s-ink-subtle);
+}
+
+.s2s-label {
+  font: 600 0.625rem / 1.2 var(--font-sans);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--s2s-accent-label);
+}
+
+.s2s-display {
+  font-family: var(--font-display);
+  font-weight: var(--type-display-weight);
+  letter-spacing: var(--type-tracking-display);
+  line-height: var(--type-leading-display);
+  color: var(--s2s-ink);
+}
+
+.s2s-meta {
+  font: 400 var(--type-meta) / 1.4 var(--font-mono);
+  color: var(--s2s-ink-subtle);
+}
+
+/* Focus ring for shell controls. */
+.s2s-focus:focus-visible {
+  outline: 2px solid var(--s2s-focus);
+  outline-offset: 2px;
+}
+
+/* ---------- Header search trigger (SearchBox.tsx, closed state) ---------- */
+.s2s-search {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 1px solid var(--s2s-rule-strong);
+  border-radius: var(--s2s-radius-control);
+  background: var(--s2s-inset);
+  color: var(--s2s-ink-soft);
+  cursor: pointer;
+  transition: border-color var(--s2s-dur) ease;
+}
+
+.s2s-search:hover {
+  border-color: var(--s2s-rule-emphasis);
+}
+
+.s2s-search__lens {
+  width: 15px;
+  height: 15px;
+  flex-shrink: 0;
+}
+
+.s2s-search__placeholder {
+  display: none;
+  overflow: hidden;
+  font: 400 0.65625rem / 1 var(--font-sans);
+  letter-spacing: 0;
+  color: var(--s2s-ink-subtle);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (min-width: 1024px) {
+  .s2s-search {
+    justify-content: flex-start;
+    gap: 8px;
+    width: clamp(180px, 16.3vw, 235px);
+    height: 30px;
+    padding: 0 10px 0 11px;
+  }
+
+  .s2s-search__lens {
+    width: 14px;
+    height: 14px;
+    color: var(--s2s-ink-muted);
+  }
+
+  .s2s-search__placeholder {
+    display: block;
+  }
+}
+
+.s2s-main:focus {
+  outline: none;
+}

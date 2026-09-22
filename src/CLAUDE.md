@@ -7,7 +7,9 @@ This directory contains all site source code. For content authoring, see `conten
 ```
 src/
   components/
-    global/       # Navigation, Footer, ThemeToggle, ModeToggle, SearchBox
+    shell/        # v2 shell: SiteHeader, SiteFooter, ThemeSwitch (see docs/design/shell.md)
+    primitives/   # v2 primitives: Card, SectionHeading, StatTile, FilterToolbar, FacetRail, Tabs, PageHero
+    global/       # SearchBox (header search dialog)
     interactive/  # React islands: InteractiveNetwork, AgenticDiagram, etc.
     content/      # Callout, TagList, RelatedContent, ReadingPathNav, StoryMetaHeader, AutomatedDisclaimer
     cards/        # EssayCard, ProjectCard, SeriesCard, SiteLinkCard, StoryCard
@@ -15,10 +17,11 @@ src/
   content/        # MDX content files (posts/, projects/, series/, stories/)
   data/           # Site config, taxonomy, external-sites, portfolio
   layouts/        # BaseLayout, PostLayout, ProjectLayout, SeriesLayout, PageLayout, StoryLayout
+                  # templates/: HubLayout, IndexRailLayout, DetailRailLayout, FolioLayout
   lib/            # Helpers: content.ts, seo.ts, tags.ts, search.ts, reading-paths.ts
   pages/          # Astro routes, incl. dev-stories/, systems/, aos/
   store/          # Nanostores: themeStore.ts, performanceStore.ts
-  styles/         # global.css (Tailwind v4)
+  styles/         # global.css (Tailwind v4), shell.css, tokens/ (roles, type, bridge), reader-legacy.css
 ```
 
 ## Dev Stories
@@ -43,7 +46,8 @@ Dev Stories are automated agentic build notes (after-action reports, feature com
 Nanostores for cross-island state:
 - `$theme` — `'light' | 'dark'`, persisted to localStorage
 - `$performanceMode` — `'rich' | 'lite'`, persisted to localStorage
-- Theme initialized via inline script in BaseLayout (prevents flash)
+- Theme initialized via inline script in BaseLayout (prevents flash); Observatory dark is the default
+- Colors: consume `--s2s-*` roles from `styles/tokens/observatory.css`; `npm run check:palette` blocks new raw colors
 
 ## Interactive Islands
 
@@ -56,7 +60,7 @@ React components in `components/interactive/` mount with `client:idle` or `clien
 
 - Uses `@import "tailwindcss"` (not `@tailwind` directives)
 - Custom design tokens via `@theme { }` blocks in `styles/global.css`
-- Dark mode via `.dark` class on `<html>`
+- Dark mode via `.dark` class on `<html>` (default; `.light` when chosen)
 - **`@tailwindcss/typography` is NOT installed.** Do not use `prose`, `prose-slate`, `prose-invert`, or `prose-headings:*` / `prose-p:*` modifier classes — they compile to nothing and leave content unstyled (no heading margins, broken tables, etc.).
 - Long-form article/MDX body content must use the `.prose-custom` class defined in `styles/global.css`. All MDX-rendering layouts (`PostLayout`, `ProjectLayout`, `SeriesLayout`, `PageLayout`) wrap `<slot />` in `<div class="prose-custom max-w-none">`. Preserve that pattern when creating new layouts.
 - To extend prose styles (new element, new variant), edit the `.prose-custom` block in `styles/global.css` rather than reaching for `prose-*` utility modifiers.

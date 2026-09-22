@@ -1,0 +1,65 @@
+---
+/**
+ * Card — the one card chrome every mockup uses: a surface one step above
+ * the canvas, a 1px rule, a 10px radius and generous inner padding.
+ *
+ * variant  panel    default container (Featured Investigation, Evidence at a glance)
+ *          feature  a highlighted panel: a faint accent wash along the top edge
+ *          tile     compact inner card (project cards, grid items)
+ *          inset    a card nested inside a panel (the essay row inside "Featured Writing")
+ * href     renders an <a>; hover lifts the rule to --s2s-rule-emphasis
+ *
+ * Slot contract: default slot only. Compose SectionHeading, StatTile, Badge
+ * and Button inside it; the card owns chrome, never content.
+ */
+interface Props {
+  as?: 'article' | 'div' | 'section' | 'li' | 'aside';
+  variant?: 'panel' | 'feature' | 'tile' | 'inset';
+  href?: string;
+  class?: string;
+  [key: string]: unknown;
+}
+const { as = 'div', variant = 'panel', href, class: className, ...rest } = Astro.props;
+const Tag = href ? 'a' : as;
+---
+
+<Tag href={href} class:list={['s2s-card', `s2s-card--${variant}`, href && 's2s-card--link s2s-focus', className]} {...rest}>
+  <slot />
+</Tag>
+
+<style>
+  .s2s-card {
+    position: relative;
+    display: block;
+    min-width: 0;
+    padding: 20px 22px;
+    border: 1px solid var(--s2s-rule);
+    border-radius: var(--s2s-radius-card);
+    background: var(--s2s-surface);
+    box-shadow: var(--s2s-shadow-card);
+    color: var(--s2s-ink);
+    text-decoration: none;
+  }
+  .s2s-card--feature {
+    padding: 24px 26px;
+    background:
+      linear-gradient(180deg, var(--s2s-accent-soft), transparent 42%),
+      var(--s2s-surface);
+  }
+  .s2s-card--tile {
+    padding: 14px 16px;
+  }
+  .s2s-card--inset {
+    padding: 14px;
+    background: var(--s2s-canvas);
+    box-shadow: none;
+  }
+  .s2s-card--link {
+    transition: border-color var(--s2s-dur) ease, background-color var(--s2s-dur) ease;
+  }
+  .s2s-card--link:hover {
+    border-color: var(--s2s-rule-emphasis);
+    background-color: var(--s2s-surface-hover);
+    color: var(--s2s-ink);
+  }
+</style>

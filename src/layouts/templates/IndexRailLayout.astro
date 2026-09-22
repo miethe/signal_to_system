@@ -1,0 +1,67 @@
+---
+/**
+ * Index + rail template — a filterable listing with a right rail (the
+ * Writing hub's collection grid + "Start here" / "Popular topics" rail;
+ * Labs, Dev Stories and Projects indexes share it).
+ *
+ * Slot contract
+ *   hero-actions  optional  CTA Buttons under the lede
+ *   toolbar       optional  a FilterToolbar (or Tabs) above the index
+ *   default       required  the index: cards/rows, any layout
+ *   rail          required  280px right rail: FacetRail and rail Cards, stacked
+ *   after         optional  full-width band under both columns
+ *
+ * Below 1024px the rail drops under the index.
+ */
+import BaseLayout from '../BaseLayout.astro';
+import PageHero from '../../components/primitives/PageHero.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  heading: string;
+  accent?: string;
+  eyebrow?: string[];
+  lede?: string;
+  noindex?: boolean;
+  /** Accessible name for the rail landmark. */
+  railLabel?: string;
+}
+const { title, description, heading, accent, eyebrow, lede, noindex, railLabel = 'Related' } = Astro.props;
+---
+
+<BaseLayout title={title} description={description} noindex={noindex}>
+  <PageHero heading={heading} accent={accent} eyebrow={eyebrow} lede={lede} compact>
+    {Astro.slots.has('hero-actions') && <Fragment slot="actions"><slot name="hero-actions" /></Fragment>}
+  </PageHero>
+  <div class="s2s-ir">
+    <div class="s2s-ir__main">
+      {Astro.slots.has('toolbar') && <div class="s2s-ir__toolbar"><slot name="toolbar" /></div>}
+      <slot />
+    </div>
+    <aside class="s2s-ir__rail" aria-label={railLabel}>
+      <slot name="rail" />
+    </aside>
+    {Astro.slots.has('after') && <div class="s2s-ir__after"><slot name="after" /></div>}
+  </div>
+</BaseLayout>
+
+<style>
+  .s2s-ir {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+    padding: 20px 16px 0;
+  }
+  .s2s-ir__toolbar { margin-bottom: 16px; }
+  .s2s-ir__rail { display: flex; flex-direction: column; gap: 14px; }
+  @media (min-width: 1024px) {
+    .s2s-ir {
+      grid-template-columns: minmax(0, 1fr) var(--s2s-rail);
+      gap: 24px 22px;
+      padding: 16px 22px 0 28px;
+    }
+    .s2s-ir__rail { position: sticky; top: calc(var(--s2s-header-h) + 16px); align-self: start; }
+    .s2s-ir__after { grid-column: 1 / -1; }
+  }
+</style>

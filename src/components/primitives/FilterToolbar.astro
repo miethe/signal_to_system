@@ -1,0 +1,99 @@
+---
+/**
+ * FilterToolbar — the Writing mockup's filter row: boxed dropdowns
+ * (icon · small caption · current value · chevron) and a result count at
+ * the right. Each control is a real native <select> (keyboard and screen
+ * reader behave natively, works without JS); the page listens for `change`
+ * on [data-filter] to apply it. A `name` makes the row usable in a GET form.
+ */
+import Icon from '../brand/Icon.astro';
+
+interface Option { value: string; label: string }
+interface Filter {
+  id: string;
+  label: string;
+  icon?: string;
+  options: Option[];
+  value?: string;
+}
+interface Props {
+  filters: Filter[];
+  count?: string;
+  label?: string;
+  class?: string;
+}
+const { filters, count, label = 'Filter', class: className } = Astro.props;
+---
+
+<div class:list={['s2s-filters', className]} role="group" aria-label={label}>
+  {filters.map((f) => (
+    <label class="s2s-filter">
+      {f.icon && <span class="s2s-filter__icon"><Icon name={f.icon} size={18} /></span>}
+      <span class="s2s-filter__text">
+        <span class="s2s-filter__caption">{f.label}</span>
+        <select class="s2s-filter__select" name={f.id} data-filter={f.id}>
+          {f.options.map((o) => <option value={o.value} selected={o.value === f.value}>{o.label}</option>)}
+        </select>
+      </span>
+      <svg class="s2s-filter__chev" viewBox="0 0 12 12" width="11" height="11" aria-hidden="true" focusable="false">
+        <path d="M2.5 4.5 6 8l3.5-3.5" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </label>
+  ))}
+  {count && <p class="s2s-filters__count" aria-live="polite">{count}</p>}
+</div>
+
+<style>
+  .s2s-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+  }
+  .s2s-filter {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-width: 172px;
+    height: 44px;
+    padding: 0 12px 0 14px;
+    border: 1px solid var(--s2s-rule);
+    border-radius: 8px;
+    background: var(--s2s-surface);
+    cursor: pointer;
+    transition: border-color var(--s2s-dur) ease;
+  }
+  .s2s-filter:hover { border-color: var(--s2s-rule-emphasis); }
+  .s2s-filter:focus-within { outline: 2px solid var(--s2s-focus); outline-offset: 2px; }
+  .s2s-filter__icon { display: inline-flex; color: var(--s2s-ink-muted); --icon-accent: var(--s2s-accent); }
+  .s2s-filter__text { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; overflow: hidden; }
+  .s2s-filter__caption {
+    font: 400 0.625rem / 1 var(--font-sans);
+    color: var(--s2s-ink-subtle);
+  }
+  .s2s-filter__select {
+    appearance: none;
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+    padding: 0 18px 0 0;
+    border: 0;
+    background: transparent;
+    font: 450 var(--type-micro) / 1.1 var(--font-sans);
+    color: var(--s2s-ink);
+    cursor: pointer;
+  }
+  .s2s-filter__select:focus { outline: none; }
+  .s2s-filter__select option { background: var(--s2s-surface); color: var(--s2s-ink); }
+  .s2s-filter__chev { position: absolute; right: 12px; color: var(--s2s-ink-muted); pointer-events: none; }
+  .s2s-filters__count {
+    margin: 0 0 0 auto;
+    font: 400 var(--type-micro) / 1 var(--font-sans);
+    color: var(--s2s-ink-muted);
+  }
+  @media (max-width: 639px) {
+    .s2s-filter { flex: 1 1 calc(50% - 5px); min-width: 0; }
+    .s2s-filters__count { flex-basis: 100%; margin: 2px 0 0; }
+  }
+</style>

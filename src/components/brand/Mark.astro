@@ -41,7 +41,9 @@ interface Props {
 const { size = 32, variant = 'wave', label = 'Signal to System', decorative = false, x, y, class: className } = Astro.props;
 const scalable = variant === 'wave' || variant === 'mono';
 const cut: Variant = scalable && size <= 24 ? 'small' : scalable && size <= 40 ? 'medium' : variant;
-const a11y = decorative ? { 'aria-hidden': 'true', focusable: 'false' } : { role: 'img', 'aria-label': label };
+const a11y = decorative
+  ? { 'aria-hidden': 'true' as const, focusable: 'false' as const }
+  : { role: 'img' as const, 'aria-label': label };
 const gid = nextId('s2s-wave');
 const glow = cut === 'wave' && variant === 'wave' && size >= 48;
 const monoDisplay = cut === 'monogram' && size > 48;

@@ -1,0 +1,169 @@
+---
+/**
+ * /studio/primitives/ (noindex) — the v2 component primitives on the
+ * Observatory shell, each with the reuse decision that produced it
+ * (ADR 004, reuse-first): Badge and Button are the existing site components
+ * extended with v2 variants; the rest are new thin Astro primitives because
+ * no existing site or @miethe/ui component carries the mockup chrome.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/primitives/PageHero.astro';
+import Card from '../../components/primitives/Card.astro';
+import SectionHeading from '../../components/primitives/SectionHeading.astro';
+import StatTile from '../../components/primitives/StatTile.astro';
+import FilterToolbar from '../../components/primitives/FilterToolbar.astro';
+import FacetRail from '../../components/primitives/FacetRail.astro';
+import Tabs from '../../components/primitives/Tabs.astro';
+import Badge from '../../components/ui/Badge.astro';
+import Button from '../../components/ui/Button.astro';
+import { previewData } from '../../lib/studio-preview';
+
+const data = await previewData();
+const post = data.posts[0];
+---
+
+<BaseLayout title="Primitives" description="v2 component primitives preview." noindex>
+  <PageHero
+    eyebrow={['Studio', 'Primitives']}
+    heading="Small pieces, bigger truths."
+    accent="bigger truths."
+    lede="The v2 primitives in the Observatory language: the card family, stat tiles, pills and chips, the filter toolbar, the facet rail and tabs."
+    compact
+  >
+    <Fragment slot="actions">
+      <Button variant="signal" size="lg" href="/studio/templates/">See them in templates <span aria-hidden="true">→</span></Button>
+      <Button variant="outline" size="lg" href="/studio/brand-preview/">Brand preview</Button>
+    </Fragment>
+  </PageHero>
+
+  <div class="page">
+    <section aria-labelledby="tabs-h">
+      <h2 id="tabs-h" class="k">Tabs <span>new · navigation tabs (Studio mockup)</span></h2>
+      <Tabs
+        label="Studio sections"
+        aside="Reusable. Composable. Open by design."
+        items={[
+          { label: 'Components', sub: 'Building blocks', icon: 'studio', href: '/studio/primitives/', current: true },
+          { label: 'Patterns', sub: 'Compositions & layouts', icon: 'topics', href: '/studio/templates/' },
+          { label: 'Brand', sub: 'Marks & icons', icon: 'sparkle', href: '/studio/brand-preview/' },
+          { label: 'Library', sub: '@miethe/ui', icon: 'artifacts', href: '/portfolio/ui/' },
+        ]}
+      />
+    </section>
+
+    <section aria-labelledby="filters-h">
+      <h2 id="filters-h" class="k">Filter toolbar <span>new · native selects</span></h2>
+      <FilterToolbar
+        label="Filter writing"
+        count={`${data.counts.posts + data.counts.stories} pieces`}
+        filters={[
+          { id: 'format', label: 'Format', icon: 'writing', options: [{ value: 'all', label: 'All formats' }, { value: 'essay', label: 'Essays' }] },
+          { id: 'domain', label: 'Domain', icon: 'datasets', options: [{ value: 'all', label: 'All domains' }] },
+          { id: 'program', label: 'Program', icon: 'research-programs', options: [{ value: 'all', label: 'All programs' }] },
+          { id: 'sort', label: 'Sort', icon: 'timeline', options: [{ value: 'new', label: 'Newest first' }] },
+        ]}
+      />
+    </section>
+
+    <div class="grid">
+      <section aria-labelledby="cards-h" class="wide">
+        <h2 id="cards-h" class="k">Card family <span>new · panel · feature · tile · inset</span></h2>
+        <Card variant="panel">
+          <SectionHeading
+            icon="labs"
+            title="Featured Investigation"
+            label="Panel + SectionHeading"
+            description="The card owns the chrome; content composes inside."
+            action={{ label: 'View all', href: '/aos/' }}
+          />
+          {post && (
+            <Card variant="inset" href={post.href}>
+              <div class="row">
+                {post.tags.slice(0, 3).map((t) => <Badge variant="chip" text={t} />)}
+                <Badge variant="live" text="Published" class="push" />
+              </div>
+              <h3 class="title">{post.title}</h3>
+              <p class="excerpt">{post.excerpt}</p>
+              <p class="s2s-meta">{post.date} · inset card, whole card is the link</p>
+            </Card>
+          )}
+        </Card>
+        <div class="tiles">
+          <Card variant="feature"><p class="s2s-label">Feature</p><p class="tt">Accent wash along the top edge.</p></Card>
+          <Card variant="tile"><p class="s2s-label">Tile</p><p class="tt">Compact inner card.</p></Card>
+          <Card variant="tile" href="/studio/templates/"><p class="s2s-label">Tile · link</p><p class="tt">Hover lifts the rule.</p></Card>
+        </div>
+      </section>
+
+      <section aria-labelledby="stats-h" class="narrow">
+        <h2 id="stats-h" class="k">Stat tile <span>new</span></h2>
+        <Card variant="panel">
+          <SectionHeading icon="evidence" title="The site at a glance" level={3} action={{ label: 'View all', href: '/start-here/' }} />
+          <StatTile icon="essays" value={data.counts.posts} label="Essays" note="Published long-form" href="/essays/" />
+          <StatTile icon="dev-stories" value={data.counts.stories} label="Dev Stories" note="Reviewed build notes" href="/dev-stories/" />
+          <StatTile icon="reading-paths" value={data.counts.series} label="Series" note="Multi-part arcs" />
+          <StatTile icon="topics" value={data.counts.topics} label="Topics" note="Tags in use" />
+        </Card>
+      </section>
+
+      <section aria-labelledby="pills-h" class="wide">
+        <h2 id="pills-h" class="k">Pills, chips and buttons <span>extended · Badge + Button v2 variants</span></h2>
+        <Card variant="panel">
+          <div class="row wrap">
+            <Badge variant="chip" text="Environment" />
+            <Badge variant="chip" text="Data Science" />
+            <Badge variant="chip" text="Open Source" href="/tags/" />
+            <Badge variant="live" text="Active" />
+            <Badge variant="count" text="24" />
+            <Badge variant="label" text="Featured essay" />
+          </div>
+          <div class="row wrap">
+            <Button variant="signal">View Investigation <span aria-hidden="true">→</span></Button>
+            <Button variant="outline">See Evidence</Button>
+            <Button variant="signal" size="sm">Small</Button>
+            <Button variant="outline" size="sm">Small outline</Button>
+          </div>
+          <p class="s2s-meta">v1 variants are untouched: <Badge text="default" /> <Badge variant="category" text="category" /></p>
+        </Card>
+      </section>
+
+      <section aria-labelledby="facets-h" class="narrow">
+        <h2 id="facets-h" class="k">Facet rail <span>new</span></h2>
+        <FacetRail heading="Popular topics" icon="topics" action={{ label: 'View all', href: '/tags/' }} items={data.topics.slice(0, 6)} />
+      </section>
+    </div>
+
+    <section aria-labelledby="folio-h">
+      <h2 id="folio-h" class="k">Folio skin scope <span>stub · data-skin="folio"</span></h2>
+      <div data-skin="folio" class="folio">
+        <Card variant="panel">
+          <SectionHeading title="The same card inside a Folio leaf" label="Folio (stub tokens)" description="Roles re-resolve inside the scope; no component changes." />
+          <div class="row"><Badge variant="chip" text="Notebook" /><Badge variant="live" text="Working" /></div>
+        </Card>
+      </div>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .page { display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; padding: 24px 16px 0; }
+  .page > * { min-width: 0; }
+  .k { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; margin: 0 0 12px; font: 400 1.125rem / 1.2 var(--font-display); color: var(--s2s-ink); }
+  .k span { font: 500 0.625rem / 1 var(--font-sans); letter-spacing: 0.18em; text-transform: uppercase; color: var(--s2s-ink-subtle); }
+  .grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px 22px; }
+  .grid > * { min-width: 0; }
+  .row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .wrap { flex-wrap: wrap; }
+  .push { margin-left: auto; }
+  .title { margin: 0 0 6px; font: 400 var(--type-title) / 1.15 var(--font-display); color: var(--s2s-ink); }
+  .excerpt { margin: 0 0 10px; font: 400 var(--type-body-s) / 1.5 var(--font-sans); color: var(--s2s-ink-muted); }
+  .tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-top: 14px; }
+  .tt { margin: 6px 0 0; font: 400 var(--type-meta) / 1.4 var(--font-sans); color: var(--s2s-ink-muted); }
+  .folio { padding: 20px; border-radius: 8px; background: var(--s2s-canvas); }
+  @media (min-width: 1024px) {
+    .page { padding: 24px 32px 0; }
+    .grid { grid-template-columns: repeat(12, minmax(0, 1fr)); }
+    .wide { grid-column: span 7; }
+    .narrow { grid-column: span 5; }
+  }
+</style>
