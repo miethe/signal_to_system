@@ -10,7 +10,7 @@
  *   tags        — string[]
  *   slug        — links to /projects/[slug]/
  *   featured    — featured variant
- *   visibility  — "full" | "summary-only"
+ *   visibility  — "public" | "summary-only"
  */
 
 import Badge from "../ui/Badge.astro";
@@ -24,7 +24,7 @@ interface Props {
   tags?: string[];
   slug: string;
   featured?: boolean;
-  visibility?: "full" | "summary-only";
+  visibility?: "public" | "summary-only";
 }
 
 const {
@@ -35,7 +35,7 @@ const {
   tags = [],
   slug,
   featured = false,
-  visibility = "full",
+  visibility = "public",
 } = Astro.props;
 
 const href = `/projects/${slug}/`;
