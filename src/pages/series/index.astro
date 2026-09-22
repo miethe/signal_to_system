@@ -1,33 +1,49 @@
 ---
+/**
+ * Series index (v2 re-skin, node_01M35CKMYGY080GKHKBGR7F1J2).
+ * Reference language: src/pages/index.astro (home-status dot pattern),
+ * PageHero/Card/SectionHeading/Badge primitives from M1a.
+ *
+ * All counts below are computed from the `series`/`posts`/`stories`
+ * collections and `src/data/reading-paths.json` — never invented.
+ */
+import StateNotice from '../../components/primitives/StateNotice.astro';
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import SeriesCard from '../../components/cards/SeriesCard.astro';
-import InteractiveNetwork from '../../components/interactive/InteractiveNetwork';
-
-// ---------------------------------------------------------------------------
-// Data
-// ---------------------------------------------------------------------------
+import PageHero from '../../components/primitives/PageHero.astro';
+import Card from '../../components/primitives/Card.astro';
+import SectionHeading from '../../components/primitives/SectionHeading.astro';
+import { hrefFor } from '../../lib/content';
+import pathsData from '../../data/reading-paths.json';
 
 const allSeries = await getCollection('series');
 const allPosts = await getCollection('posts');
 const allStories = await getCollection('stories');
 
-// Compute post + story count per series
-const seriesPostCounts = new Map<string, number>();
-for (const post of allPosts) {
-  if (post.data.status !== 'draft' && post.data.series) {
-    seriesPostCounts.set(post.data.series, (seriesPostCounts.get(post.data.series) ?? 0) + 1);
-  }
-}
-for (const story of allStories) {
-  if (story.data.status !== 'draft' && story.data.series) {
-    seriesPostCounts.set(story.data.series, (seriesPostCounts.get(story.data.series) ?? 0) + 1);
-  }
+/** Published posts + stories belonging to a series, ordered by seriesOrder. */
+function entriesFor(seriesId: string) {
+  const posts = allPosts.filter((p) => p.data.status !== 'draft' && p.data.series === seriesId);
+  const stories = allStories.filter((s) => s.data.status !== 'draft' && s.data.series === seriesId);
+  return [...posts, ...stories].sort((a, b) => (a.data.seriesOrder ?? 999) - (b.data.seriesOrder ?? 999));
 }
 
-// Sort: active first, featured second, then alphabetical
+function parseMinutes(readTime?: string): number | undefined {
+  const n = parseInt(readTime ?? '', 10);
+  return Number.isFinite(n) ? n : undefined;
+}
+
+/** "N parts · M min" if every entry's readTime parses, else just "N parts". */
+function metaFor(entries: ReturnType<typeof entriesFor>): string {
+  const parts = entries.length;
+  if (parts === 0) return 'No parts yet';
+  const minutes = entries.map((e) => parseMinutes(e.data.readTime));
+  const allParse = minutes.every((m): m is number => m !== undefined);
+  const partsLabel = `${parts} ${parts === 1 ? 'part' : 'parts'}`;
+  return allParse ? `${partsLabel} · ${minutes.reduce((a, b) => a + b, 0)} min` : partsLabel;
+}
+
+const statusOrder = { active: 0, planned: 1, complete: 2 } as const;
 const sortedSeries = [...allSeries].sort((a, b) => {
-  const statusOrder = { active: 0, planned: 1, complete: 2 };
   const sa = statusOrder[a.data.status] ?? 3;
   const sb = statusOrder[b.data.status] ?? 3;
   if (sa !== sb) return sa - sb;
@@ -36,129 +52,172 @@ const sortedSeries = [...allSeries].sort((a, b) => {
   return a.data.title.localeCompare(b.data.title);
 });
 
-const activeSeries = sortedSeries.filter((s) => s.data.status === 'active');
-const plannedSeries = sortedSeries.filter((s) => s.data.status === 'planned');
-const completeSeries = sortedSeries.filter((s) => s.data.status === 'complete');
+const seriesCards = sortedSeries.map((s) => {
+  const entries = entriesFor(s.id);
+  return {
+    id: s.id,
+    title: s.data.title,
+    excerpt: s.data.excerpt,
+    status: s.data.status,
+    meta: metaFor(entries),
+    parts: entries.length,
+    startHref: entries[0] ? hrefFor(entries[0]) : `/series/${s.id}/`,
+  };
+});
+
+const activeSeries = seriesCards.filter((s) => s.status === 'active');
+const plannedSeries = seriesCards.filter((s) => s.status === 'planned');
+const completeSeries = seriesCards.filter((s) => s.status === 'complete');
+
+const totalInSeries = sortedSeries.reduce((sum, s) => sum + entriesFor(s.id).length, 0);
+
+// The one hand-authored reading path (not a `series` collection entry — see
+// src/pages/series/agentic-systems-engineering.astro, untouched by this pass).
+const readingPath = pathsData.paths.find((p) => p.pageSlug === 'agentic-systems-engineering');
+
+const statusLabel: Record<string, string> = { active: 'Active', planned: 'Planned', complete: 'Complete' };
 ---
 
 <BaseLayout
   title="Series"
-  description="Multi-part essay series on AI agents, agentic SDLC, architecture, and technical leadership."
+  description="Multi-part reading paths on AI agents, agentic SDLC, architecture, and technical leadership."
 >
-  <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-    <!-- Page header -->
-    <header class="dark relative mb-16 overflow-hidden rounded-3xl border border-[var(--border-subtle)] shadow-sm bg-[var(--bg-surface)]">
-      <div class="absolute inset-0 z-0 opacity-80" aria-hidden="true">
-        <InteractiveNetwork className="w-full h-full" client:idle />
-      </div>
-      <div class="relative z-10 px-8 py-16 sm:px-12 sm:py-24">
-        <h1 class="font-serif text-5xl font-bold tracking-tight text-[var(--text-primary)] sm:text-6xl mb-6">
-          <span class="italic text-[var(--accent)]">Signal</span> Series
-        </h1>
-        <p class="text-xl text-[var(--text-secondary)] max-w-2xl leading-relaxed">
-          Structured multi-part explorations of complex topics. Each series builds a complete picture across several interconnected essays.
-        </p>
-      </div>
-    </header>
+  <PageHero
+    compact
+    eyebrow={['Writing', 'Series']}
+    heading="Series"
+    lede={`Structured, multi-part explorations that build a complete picture across several pieces. ${sortedSeries.length} series${totalInSeries > 0 ? `, ${totalInSeries} ${totalInSeries === 1 ? 'part' : 'parts'} published` : ''}.`}
+  />
 
-    <div class="space-y-16">
-      <!-- Reading paths -->
-      <section>
-        <div class="flex items-center gap-3 mb-6">
-          <span class="h-2 w-2 rounded-full bg-violet-500" aria-hidden="true" />
-          <h2 class="font-mono text-xs font-bold uppercase tracking-widest text-[var(--text-disabled)]">
-            Reading Paths
-          </h2>
-        </div>
-        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          <SeriesCard
-            title="Agentic Systems Engineering"
-            excerpt="One guided path through five essays across several parallel series: the throughline argument for how agentic delivery actually has to work."
-            status="active"
-            slug="agentic-systems-engineering"
-            postCount={5}
-            featured
-          />
+  <div class="series-body">
+    {readingPath && (
+      <section class="series-section" aria-labelledby="series-paths">
+        <SectionHeading id="series-paths" icon="reading-paths" title="Reading Paths" level={2} description="One guided throughline across several series at once." />
+        <div class="series-grid">
+          <Card variant="panel" class="series-card">
+            <span class:list={['series-status', 'series-status--active']}>
+              <span class="series-status__dot" aria-hidden="true"></span>{statusLabel.active}
+            </span>
+            <h3 class="series-card__title">{readingPath.umbrellaTerm}</h3>
+            <p class="series-card__excerpt">{readingPath.rationale}</p>
+            <p class="s2s-meta series-card__meta">{readingPath.steps.length} parts</p>
+            <a class="series-card__cta s2s-focus" href="/series/agentic-systems-engineering/">Start reading <span aria-hidden="true">→</span></a>
+          </Card>
         </div>
       </section>
+    )}
 
-      <!-- Active -->
-      {activeSeries.length > 0 && (
-        <section>
-          <div class="flex items-center gap-3 mb-6">
-            <span class="h-2 w-2 rounded-full bg-emerald-500" aria-hidden="true" />
-            <h2 class="font-mono text-xs font-bold uppercase tracking-widest text-[var(--text-disabled)]">
-              Active — {activeSeries.length}
-            </h2>
-          </div>
-          <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {activeSeries.map((s) => (
-              <SeriesCard
-                title={s.data.title}
-                excerpt={s.data.excerpt}
-                status={s.data.status}
-                slug={s.id}
-                postCount={seriesPostCounts.get(s.id) ?? 0}
-                featured={s.data.featured ?? false}
-              />
-            ))}
-          </div>
-        </section>
-      )}
-
-      <!-- Complete -->
-      {completeSeries.length > 0 && (
-        <section>
-          <div class="flex items-center gap-3 mb-6">
-            <span class="h-2 w-2 rounded-full bg-sky-500" aria-hidden="true" />
-            <h2 class="font-mono text-xs font-bold uppercase tracking-widest text-[var(--text-disabled)]">
-              Complete — {completeSeries.length}
-            </h2>
-          </div>
-          <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {completeSeries.map((s) => (
-              <SeriesCard
-                title={s.data.title}
-                excerpt={s.data.excerpt}
-                status={s.data.status}
-                slug={s.id}
-                postCount={seriesPostCounts.get(s.id) ?? 0}
-                featured={s.data.featured ?? false}
-              />
-            ))}
-          </div>
-        </section>
-      )}
-
-      <!-- Planned -->
-      {plannedSeries.length > 0 && (
-        <section>
-          <div class="flex items-center gap-3 mb-6">
-            <span class="h-2 w-2 rounded-full bg-amber-500" aria-hidden="true" />
-            <h2 class="font-mono text-xs font-bold uppercase tracking-widest text-[var(--text-disabled)]">
-              Planned — {plannedSeries.length}
-            </h2>
-          </div>
-          <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {plannedSeries.map((s) => (
-              <SeriesCard
-                title={s.data.title}
-                excerpt={s.data.excerpt}
-                status={s.data.status}
-                slug={s.id}
-                postCount={seriesPostCounts.get(s.id) ?? 0}
-                featured={s.data.featured ?? false}
-              />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {sortedSeries.length === 0 && (
-        <div class="rounded-xl border border-dashed border-[var(--border)] p-16 text-center">
-          <p class="text-[var(--text-secondary)] text-lg">No series published yet. Check back soon.</p>
+    {activeSeries.length > 0 && (
+      <section class="series-section" aria-labelledby="series-active">
+        <SectionHeading id="series-active" title={`Active — ${activeSeries.length}`} level={2} />
+        <div class="series-grid">
+          {activeSeries.map((s) => (
+            <Card variant="panel" class="series-card">
+              <span class:list={['series-status', 'series-status--active']}>
+                <span class="series-status__dot" aria-hidden="true"></span>{statusLabel.active}
+              </span>
+              <h3 class="series-card__title">{s.title}</h3>
+              <p class="series-card__excerpt">{s.excerpt}</p>
+              <p class="s2s-meta series-card__meta">{s.meta}</p>
+              {s.parts > 0 && <a class="series-card__cta s2s-focus" href={s.startHref}>Start reading <span aria-hidden="true">→</span></a>}
+            </Card>
+          ))}
         </div>
-      )}
-    </div>
+      </section>
+    )}
+
+    {completeSeries.length > 0 && (
+      <section class="series-section" aria-labelledby="series-complete">
+        <SectionHeading id="series-complete" title={`Complete — ${completeSeries.length}`} level={2} />
+        <div class="series-grid">
+          {completeSeries.map((s) => (
+            <Card variant="panel" class="series-card">
+              <span class:list={['series-status', 'series-status--complete']}>
+                <span class="series-status__dot" aria-hidden="true"></span>{statusLabel.complete}
+              </span>
+              <h3 class="series-card__title">{s.title}</h3>
+              <p class="series-card__excerpt">{s.excerpt}</p>
+              <p class="s2s-meta series-card__meta">{s.meta}</p>
+              {s.parts > 0 && <a class="series-card__cta s2s-focus" href={s.startHref}>Start reading <span aria-hidden="true">→</span></a>}
+            </Card>
+          ))}
+        </div>
+      </section>
+    )}
+
+    {plannedSeries.length > 0 && (
+      <section class="series-section" aria-labelledby="series-planned">
+        <SectionHeading id="series-planned" title={`Planned — ${plannedSeries.length}`} level={2} />
+        <div class="series-grid">
+          {plannedSeries.map((s) => (
+            <Card variant="panel" class="series-card">
+              <span class:list={['series-status', 'series-status--planned']}>
+                <span class="series-status__dot" aria-hidden="true"></span>{statusLabel.planned}
+              </span>
+              <h3 class="series-card__title">{s.title}</h3>
+              <p class="series-card__excerpt">{s.excerpt}</p>
+              <p class="s2s-meta series-card__meta">{s.meta}</p>
+              {s.parts > 0 && <a class="series-card__cta s2s-focus" href={s.startHref}>Start reading <span aria-hidden="true">→</span></a>}
+            </Card>
+          ))}
+        </div>
+      </section>
+    )}
+
+    {sortedSeries.length === 0 && !readingPath && (
+      <StateNotice kind="empty" compact title="No series yet." body="Series collect essays and build notes into reading paths. None are published yet." />
+    )}
   </div>
 </BaseLayout>
+
+<style>
+  .series-body { max-width: 1180px; margin: 0 auto; padding: 24px 16px 64px; }
+  .series-section + .series-section { margin-top: 40px; }
+
+  .series-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+  }
+  @media (min-width: 720px) {
+    .series-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+
+  .series-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 12px;
+    font: 450 var(--type-micro) / 1 var(--font-sans);
+    color: var(--s2s-ink-muted);
+  }
+  .series-status__dot { width: 6px; height: 6px; border-radius: 999px; background: currentColor; }
+  .series-status--active .series-status__dot { background: var(--s2s-secondary); box-shadow: 0 0 6px var(--s2s-secondary); }
+  .series-status--planned .series-status__dot { background: transparent; border: 1px solid var(--s2s-accent); }
+  .series-status--complete .series-status__dot { background: var(--s2s-ink-muted); }
+
+  .series-card__title {
+    margin: 0 0 8px;
+    font: var(--type-heading-weight) var(--type-title) / 1.2 var(--font-display);
+    color: var(--s2s-ink);
+  }
+  .series-card__excerpt {
+    margin: 0 0 14px;
+    font: 400 var(--type-ui) / 1.5 var(--font-sans);
+    color: var(--s2s-ink-muted);
+  }
+  .series-card__meta { margin: 0 0 16px; }
+  .series-card__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font: 500 var(--type-ui) / 1 var(--font-sans);
+    color: var(--s2s-accent);
+    text-decoration: none;
+  }
+  .series-card__cta:hover { color: var(--s2s-accent-strong); }
+
+  @media (min-width: 1024px) {
+    .series-body { padding: 24px var(--s2s-frame-gutter) 72px; }
+  }
+</style>

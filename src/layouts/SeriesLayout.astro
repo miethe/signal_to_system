@@ -1,8 +1,23 @@
 ---
+/**
+ * SeriesLayout — the reading-path detail body (v2 re-skin,
+ * node_01M35CKMYGY080GKHKBGR7F1J2). IndexRailLayout-like: a left column of
+ * ordered part rows, a right "About this path" rail (desktop only).
+ *
+ * Consumed by src/pages/series/[...slug].astro, which supplies the frontmatter
+ * (title/excerpt/status/ogImage/topic — all real `series` collection data)
+ * and the ordered posts/stories in the series.
+ */
+import StateNotice from '../components/primitives/StateNotice.astro';
 import BaseLayout from './BaseLayout.astro';
+import PageHero from '../components/primitives/PageHero.astro';
+import Card from '../components/primitives/Card.astro';
+import SectionHeading from '../components/primitives/SectionHeading.astro';
+import Badge from '../components/ui/Badge.astro';
 import { buildCanonicalUrl } from '../lib/seo';
 import { formatDate, formatDateISO } from '../lib/utils';
 import { site } from '../data/site';
+import { TOPIC_HUBS } from '../data/taxonomy';
 
 interface SeriesPost {
   slug: string;
@@ -13,6 +28,8 @@ interface SeriesPost {
   part?: number;
   /** Collection-aware URL (e.g. via hrefFor()). Falls back to /essays/<slug>/ for callers that don't pass one. */
   href?: string;
+  /** Row kind chip: "essay" (posts) vs "story" (dev stories/build notes). */
+  kind?: 'essay' | 'story';
 }
 
 interface Props {
@@ -24,6 +41,8 @@ interface Props {
     status?: 'active' | 'planned' | 'complete';
     tags?: string[];
     ogImage?: string;
+    /** Series `topic` field (a Category label) — links the rail to its topic hub when matched. */
+    topic?: string;
   };
   posts: SeriesPost[];
 }
@@ -34,34 +53,17 @@ const {
   title,
   excerpt,
   description,
-  date,
   status = 'active',
   tags = [],
   ogImage,
+  topic,
 } = frontmatter;
 
 const pageDescription = description || excerpt || site.description;
 const canonicalUrl = buildCanonicalUrl(Astro.url.pathname);
 
-const statusConfig: Record<string, { label: string; classes: string; dot: string }> = {
-  active: {
-    label: 'Active Series',
-    classes: 'bg-emerald-500/10 text-emerald-400 ring-1 ring-emerald-500/20',
-    dot: 'bg-emerald-400',
-  },
-  planned: {
-    label: 'Coming Soon',
-    classes: 'bg-sky-500/10 text-sky-400 ring-1 ring-sky-500/20',
-    dot: 'bg-sky-400',
-  },
-  complete: {
-    label: 'Complete',
-    classes: 'bg-slate-500/10 text-slate-400 ring-1 ring-slate-500/20',
-    dot: 'bg-slate-400',
-  },
-};
-
-const sc = statusConfig[status] || statusConfig.active;
+const statusLabel: Record<string, string> = { active: 'Active', planned: 'Planned', complete: 'Complete' };
+const kindLabel: Record<string, string> = { essay: 'Essay', story: 'Build note' };
 
 // Sort posts by part number, then by date
 const sortedPosts = [...posts].sort((a, b) => {
@@ -69,6 +71,8 @@ const sortedPosts = [...posts].sort((a, b) => {
   if (a.date && b.date) return new Date(a.date).getTime() - new Date(b.date).getTime();
   return 0;
 });
+
+const topicHub = topic ? TOPIC_HUBS.find((h) => h.label.toLowerCase() === topic.toLowerCase()) : undefined;
 ---
 
 <BaseLayout
@@ -77,136 +81,155 @@ const sortedPosts = [...posts].sort((a, b) => {
   ogImage={ogImage}
   canonicalUrl={canonicalUrl}
 >
-  <div class="mx-auto max-w-3xl px-4 py-12 sm:px-6 lg:px-8">
-    <!-- Series header -->
-    <header class="mb-16 space-y-6 pb-6">
-      <div class="font-mono flex items-center gap-3">
-        <span class="text-xs font-semibold uppercase tracking-widest text-[var(--text-disabled)]">
-          Series
-        </span>
-        <span class="text-[var(--border)]">/</span>
-        <span
-          class:list={[
-            'inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-widest border border-[var(--border-subtle)]',
-            sc.classes,
-          ]}
-        >
-          <span class:list={['h-1.5 w-1.5 rounded-full', sc.dot]}></span>
-          {sc.label}
-        </span>
-      </div>
+  <PageHero
+    compact
+    eyebrow={['Writing', 'Series', title]}
+    heading={title}
+    lede={excerpt}
+  />
 
-      <h1 class="font-serif text-4xl font-bold leading-[1.1] tracking-tight text-[var(--text-primary)] sm:text-5xl lg:text-6xl">
-        {title}
-      </h1>
-
-      {
-        excerpt && (
-          <p class="text-lg leading-relaxed text-[var(--text-tertiary)] sm:text-xl">{excerpt}</p>
-        )
-      }
-
-      <div class="font-mono flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-[var(--text-disabled)]">
-        {
-          date && (
-            <time datetime={formatDateISO(date)}>{formatDate(date)}</time>
-          )
-        }
-        <span>{sortedPosts.length} {sortedPosts.length === 1 ? 'entry' : 'entries'}</span>
-      </div>
-
-      {
-        tags.length > 0 && (
-          <div class="flex flex-wrap gap-2 pt-1">
-            {tags.map((tag) => (
-              <a
-                href={`/tags/${tag}`}
-                class="rounded-full bg-[var(--bg-muted)] px-3 py-0.5 text-xs font-medium text-[var(--text-tertiary)] transition-colors hover:bg-[var(--bg-surface)] hover:text-[var(--text-secondary)]"
-              >
-                #{tag}
-              </a>
-            ))}
-          </div>
-        )
-      }
-    </header>
-
-    <!-- Series overview content (MDX body) -->
-    {
-      Astro.slots.has('default') && (
-        <div class="prose-custom mb-12 max-w-none">
-          <slot />
-        </div>
-      )
-    }
-
-    <!-- Ordered post list -->
-    <section>
-      <h2 class="font-mono mb-8 text-xs font-bold uppercase tracking-widest text-[var(--text-disabled)]">
-        All Entries
-      </h2>
-
-      <ol class="space-y-4">
-        {
-          sortedPosts.map((post, index) => (
+  <div class="sl-ir">
+    <div class="sl-ir__main">
+      {sortedPosts.length === 0 ? (
+        <StateNotice kind="empty" compact title="No parts published yet." body="This reading path is planned; its first part has not been published." />
+      ) : (
+        <ol class="sl-list">
+          {sortedPosts.map((post, index) => (
             <li>
-              <a
-                href={post.href ?? `/essays/${post.slug}/`}
-                class="group relative flex items-start gap-5 rounded-2xl bg-[var(--bg-surface)] p-6 transition-all duration-300 hover:z-10 hover:shadow-[var(--shadow-ambient)] hover:bg-[var(--bg-subtle)] border border-[var(--border-subtle)]"
-              >
-                <!-- Part number -->
-                <span class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-[var(--border)] bg-[var(--bg-subtle)] text-sm font-bold text-[var(--text-disabled)] transition-colors group-hover:border-indigo-500/60 group-hover:text-[var(--accent)]">
-                  {post.part ?? index + 1}
-                </span>
-
-                <!-- Content -->
-                <div class="min-w-0 flex-1">
-                  <h3 class="font-semibold text-[var(--text-secondary)] transition-colors group-hover:text-[var(--text-primary)]">
-                    {post.title}
-                  </h3>
-                  {post.excerpt && (
-                    <p class="mt-1 text-sm leading-relaxed text-[var(--text-disabled)]">
-                      {post.excerpt}
-                    </p>
-                  )}
-                  <div class="font-mono mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] uppercase tracking-wider text-[var(--text-disabled)]">
-                    {post.date && (
-                      <time datetime={formatDateISO(post.date)}>
-                        {formatDate(post.date)}
-                      </time>
-                    )}
-                    {post.readTime && (
-                      <span>{post.readTime} min read</span>
-                    )}
+              <Card as="article" variant="panel" href={post.href ?? `/essays/${post.slug}/`} class="sl-row">
+                <span class="sl-row__n" aria-hidden="true">{String(post.part ?? index + 1).padStart(2, '0')}</span>
+                <div class="sl-row__body">
+                  <div class="sl-row__top">
+                    {post.kind && <Badge variant="chip" text={kindLabel[post.kind]} />}
+                    {post.date && <time class="s2s-meta" datetime={formatDateISO(post.date)}>{formatDate(post.date)}</time>}
                   </div>
+                  <h3 class="sl-row__title">{post.title}</h3>
+                  {post.excerpt && <p class="sl-row__excerpt">{post.excerpt}</p>}
+                  {post.readTime && <p class="s2s-meta sl-row__read">{post.readTime} min read</p>}
                 </div>
-
-                <!-- Arrow -->
-                <svg
-                  class="mt-0.5 h-5 w-5 shrink-0 text-[var(--border)] transition-colors group-hover:text-[var(--accent)]"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  aria-hidden="true"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
-              </a>
+              </Card>
             </li>
-          ))
-        }
-      </ol>
-    </section>
+          ))}
+        </ol>
+      )}
+    </div>
 
-    <!-- Back link -->
-    <footer class="mt-12 border-t border-[var(--border-subtle)] pt-8">
-      <a
-        href="/series"
-        class="text-sm text-[var(--accent)] transition-colors hover:text-[var(--accent-hover)]"
-      >
-        &larr; All Series
-      </a>
-    </footer>
+    <aside class="sl-ir__rail" aria-label="About this path">
+      <Card variant="panel">
+        <SectionHeading title="About this path" level={3} />
+        <dl class="sl-about">
+          <div class="sl-about__row">
+            <dt>Status</dt>
+            <dd>
+              <span class:list={['sl-status', `sl-status--${status}`]}>
+                <span class="sl-status__dot" aria-hidden="true"></span>{statusLabel[status]}
+              </span>
+            </dd>
+          </div>
+          <div class="sl-about__row">
+            <dt>Parts</dt>
+            <dd>{sortedPosts.length}</dd>
+          </div>
+          {topicHub && (
+            <div class="sl-about__row">
+              <dt>Topic</dt>
+              <dd><a class="s2s-focus" href={`/topics/${topicHub.slug}/`}>{topicHub.label}</a></dd>
+            </div>
+          )}
+        </dl>
+        {tags.length > 0 && (
+          <div class="sl-about__tags">
+            {tags.map((tag) => <Badge variant="chip" href={`/tags/${tag}/`} text={`#${tag}`} />)}
+          </div>
+        )}
+      </Card>
+      <Card variant="panel">
+        <SectionHeading title="Browse" level={3} />
+        <ul class="sl-browse">
+          <li><a class="s2s-focus" href="/series/">All series</a></li>
+          <li><a class="s2s-focus" href="/tags/">All tags</a></li>
+        </ul>
+      </Card>
+    </aside>
   </div>
+
+  {Astro.slots.has('default') && (
+    <div class="sl-body-slot">
+      <slot />
+    </div>
+  )}
 </BaseLayout>
+
+<style>
+  .sl-ir {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+    padding: 20px 16px 48px;
+    max-width: 1180px;
+    margin: 0 auto;
+  }
+  .sl-ir__rail { display: flex; flex-direction: column; gap: 14px; }
+
+  .sl-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 12px; }
+  .sl-row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 16px;
+    align-items: start;
+    color: inherit;
+    text-decoration: none;
+  }
+  .sl-row__n {
+    font: 400 1.5rem / 1 var(--font-mono);
+    color: var(--s2s-ink-subtle);
+    letter-spacing: 0.02em;
+  }
+  .sl-row__body { min-width: 0; }
+  .sl-row__top { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+  .sl-row__title {
+    margin: 0 0 6px;
+    font: var(--type-heading-weight) var(--type-card) / 1.25 var(--font-display);
+    color: var(--s2s-ink);
+  }
+  .sl-row__excerpt {
+    margin: 0;
+    font: 400 var(--type-ui) / 1.5 var(--font-sans);
+    color: var(--s2s-ink-muted);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .sl-row__read { margin: 8px 0 0; }
+
+  .sl-about { margin: 0; }
+  .sl-about__row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 6px 0; font: 400 var(--type-meta) / 1.3 var(--font-sans); }
+  .sl-about__row dt { color: var(--s2s-ink-subtle); }
+  .sl-about__row dd { margin: 0; color: var(--s2s-ink-soft); }
+  .sl-about__row a { color: var(--s2s-accent); text-decoration: none; }
+  .sl-about__row a:hover { color: var(--s2s-accent-strong); }
+  .sl-about__tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+
+  .sl-status { display: inline-flex; align-items: center; gap: 6px; }
+  .sl-status__dot { width: 6px; height: 6px; border-radius: 999px; background: currentColor; }
+  .sl-status--active .sl-status__dot { background: var(--s2s-secondary); box-shadow: 0 0 6px var(--s2s-secondary); }
+  .sl-status--planned .sl-status__dot { background: transparent; border: 1px solid var(--s2s-accent); }
+  .sl-status--complete .sl-status__dot { background: var(--s2s-ink-muted); }
+
+  .sl-browse { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+  .sl-browse a { font: 400 var(--type-ui) / 1.3 var(--font-sans); color: var(--s2s-accent); text-decoration: none; }
+  .sl-browse a:hover { color: var(--s2s-accent-strong); }
+
+  .sl-body-slot { max-width: 1180px; margin: 0 auto; padding: 0 16px 48px; }
+
+  @media (min-width: 1024px) {
+    .sl-ir {
+      grid-template-columns: minmax(0, 1fr) var(--s2s-rail);
+      gap: 24px 22px;
+      padding: 16px 22px 56px 28px;
+    }
+    .sl-ir__rail { position: sticky; top: calc(var(--s2s-header-h) + 16px); align-self: start; }
+    .sl-body-slot { padding: 0 22px 56px 28px; }
+  }
+</style>

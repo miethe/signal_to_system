@@ -25,7 +25,7 @@ interface Props {
   eyebrow?: string[];
   lede?: string;
   compact?: boolean;
-  /** Pipeline hero id (public/images/v2/manifest.json), e.g. "observatory". */
+  /** Pipeline hero id (src/data/v2-images.json), e.g. "observatory". */
   photo?: string;
   quote?: { text: string; by?: string };
   /** Tracked caps rail at the right edge; `railFoot` is the lower group. */
@@ -50,7 +50,7 @@ const hasBuiltInAside = Boolean(quote || rail?.length || railFoot?.length);
   <div class="s2s-hero__main">
     {eyebrow && (
       <p class="s2s-eyebrow s2s-hero__eyebrow">
-        {eyebrow.map((e, i) => (
+        {eyebrow.map((e: string, i: number) => (
           <>
             {i > 0 && <span aria-hidden="true" class="s2s-hero__arrow">→</span>}
             <span>{e}</span>
@@ -75,8 +75,8 @@ const hasBuiltInAside = Boolean(quote || rail?.length || railFoot?.length);
       )}
       {(rail?.length || railFoot?.length) && (
         <div class="s2s-hero__rail" aria-hidden="true">
-          {rail?.length ? <ul>{rail.map((r) => <li>{r}</li>)}</ul> : <span />}
-          {railFoot?.length ? <ul class="s2s-hero__rail-foot">{railFoot.map((r) => <li>{r}</li>)}</ul> : null}
+          {rail?.length ? <ul>{rail.map((r: string) => <li>{r}</li>)}</ul> : <span />}
+          {railFoot?.length ? <ul class="s2s-hero__rail-foot">{railFoot.map((r: string) => <li>{r}</li>)}</ul> : null}
         </div>
       )}
     </div>

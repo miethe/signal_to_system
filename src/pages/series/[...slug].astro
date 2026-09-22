@@ -34,7 +34,8 @@ const { seriesEntry, seriesEntries } = Astro.props;
     title: seriesEntry.data.title,
     excerpt: seriesEntry.data.excerpt,
     status: seriesEntry.data.status,
-    ogImage: seriesEntry.data.heroImage,
+    ogImage: seriesEntry.data.ogImage ?? `/og/series/${seriesEntry.id}.png`,
+    topic: seriesEntry.data.topic,
   }}
   posts={seriesEntries.map((entry) => ({
     slug: entry.id,
@@ -44,5 +45,6 @@ const { seriesEntry, seriesEntries } = Astro.props;
     readTime: entry.data.readTime ? parseInt(entry.data.readTime) : undefined,
     part: entry.data.seriesOrder,
     href: hrefFor(entry),
+    kind: entry.collection === 'stories' ? 'story' : 'essay',
   }))}
 />

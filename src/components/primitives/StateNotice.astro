@@ -1,0 +1,205 @@
+---
+/**
+ * StateNotice — the one panel for every non-content state: an empty
+ * collection, a filtered-to-nothing search, a broken fetch, a withdrawn
+ * piece, a Labs investigation not yet published, or a page that doesn't
+ * exist. A Card-like surface with, on wide screens, an icon well, a
+ * tracked-caps label, a Newsreader title, a muted body and an actions row.
+ *
+ * Status reads as a 2px left rule, never a red panel for anything but a
+ * genuine error: withdrawn is a serious editorial notice (the warn rule,
+ * `meta` rendered as "Withdrawn <meta>" in mono), not an error look.
+ *
+ * Slot: actions (Buttons). role="status" for empty/no-results (a live
+ * region that isn't urgent); role="alert" only for error.
+ */
+import Icon from '../brand/Icon.astro';
+import V2Image from '../media/V2Image.astro';
+
+type Kind = 'empty' | 'no-results' | 'error' | 'withdrawn' | 'in-preparation' | 'not-found';
+
+interface Props {
+  kind: Kind;
+  title: string;
+  body?: string;
+  /** Show the notebook-vista hero band. Defaults on for not-found/in-preparation only. */
+  art?: boolean;
+  compact?: boolean;
+  /** e.g. a withdrawal date; rendered as "Withdrawn <meta>" in mono. */
+  meta?: string;
+  class?: string;
+}
+
+const ICON: Record<Kind, string> = {
+  empty: 'notebooks',
+  'no-results': 'search',
+  error: 'reproduce',
+  withdrawn: 'claims',
+  'in-preparation': 'labs',
+  'not-found': 'sparkle',
+};
+
+const LABEL: Record<Kind, string> = {
+  empty: 'Empty',
+  'no-results': 'No results',
+  error: 'Something broke',
+  withdrawn: 'Withdrawn',
+  'in-preparation': 'In preparation',
+  'not-found': 'Not found',
+};
+
+const DEFAULT_ART: Record<Kind, boolean> = {
+  empty: false,
+  'no-results': false,
+  error: false,
+  withdrawn: false,
+  'in-preparation': true,
+  'not-found': true,
+};
+
+const {
+  kind,
+  title,
+  body,
+  art = DEFAULT_ART[kind],
+  compact = false,
+  meta,
+  class: className,
+} = Astro.props;
+
+const role = kind === 'error' ? 'alert' : kind === 'empty' || kind === 'no-results' ? 'status' : undefined;
+---
+
+<div
+  class:list={[
+    's2s-notice',
+    `s2s-notice--${kind}`,
+    compact && 's2s-notice--compact',
+    art && 's2s-notice--art',
+    className,
+  ]}
+  role={role}
+>
+  {art && (
+    <div class="s2s-notice__hero" aria-hidden="true">
+      <V2Image kind="hero" id="notebook-vista" sizes="(min-width: 1024px) 900px, 100vw" imgClass="s2s-notice__hero-img" />
+    </div>
+  )}
+  <div class="s2s-notice__body">
+    <span class="s2s-notice__well"><Icon name={ICON[kind]} size={20} /></span>
+    <div class="s2s-notice__text">
+      <p class="s2s-label s2s-notice__label">{LABEL[kind]}</p>
+      <h2 class="s2s-notice__title">{title}</h2>
+      {kind === 'withdrawn' && meta ? (
+        <p class="s2s-notice__meta">Withdrawn {meta}</p>
+      ) : null}
+      {body && <p class="s2s-notice__desc">{body}</p>}
+      {Astro.slots.has('actions') && (
+        <div class="s2s-notice__actions">
+          <slot name="actions" />
+        </div>
+      )}
+    </div>
+  </div>
+</div>
+
+<style>
+  .s2s-notice {
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--s2s-rule);
+    border-radius: var(--s2s-radius-card);
+    background: var(--s2s-surface);
+    box-shadow: var(--s2s-shadow-card);
+  }
+  /* Status tint: a 2px rule at the leading edge. Neutral kinds get none. */
+  .s2s-notice::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 2px;
+    background: transparent;
+  }
+  .s2s-notice--withdrawn::before { background: var(--s2s-status-warn); }
+  .s2s-notice--error::before { background: var(--s2s-status-danger); }
+  .s2s-notice--in-preparation::before { background: var(--s2s-accent); }
+
+  .s2s-notice__hero {
+    position: relative;
+    height: 140px;
+    overflow: hidden;
+  }
+  .s2s-notice__hero :global(picture) { display: block; height: 100%; }
+  .s2s-notice__hero :global(.s2s-notice__hero-img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .s2s-notice__hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, transparent 0%, var(--s2s-surface) 96%);
+  }
+
+  .s2s-notice__body {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 22px 22px 24px;
+  }
+  .s2s-notice--art .s2s-notice__body { padding-top: 16px; }
+  .s2s-notice--compact .s2s-notice__body { padding: 18px 20px 20px; gap: 12px; }
+
+  .s2s-notice__well {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--s2s-rule-strong);
+    border-radius: var(--s2s-radius-control);
+    background: var(--s2s-inset);
+    color: var(--s2s-ink-soft);
+    --icon-accent: var(--s2s-accent);
+  }
+  .s2s-notice--compact .s2s-notice__well { width: 34px; height: 34px; }
+
+  .s2s-notice__text { min-width: 0; }
+  .s2s-notice__label { margin: 2px 0 8px; }
+  .s2s-notice--compact .s2s-notice__label { margin-bottom: 6px; }
+  .s2s-notice__title {
+    margin: 0 0 8px;
+    font: var(--type-heading-weight) var(--type-title) / 1.2 var(--font-display);
+    color: var(--s2s-ink);
+    text-wrap: balance;
+  }
+  .s2s-notice--compact .s2s-notice__title { font-size: var(--type-card, 1.125rem); margin-bottom: 6px; }
+  .s2s-notice__meta {
+    margin: 0 0 10px;
+    font: 400 var(--type-meta) / 1.4 var(--font-mono);
+    color: var(--s2s-status-warn);
+  }
+  .s2s-notice__desc {
+    max-width: 60ch;
+    margin: 0;
+    font: 400 var(--type-ui) / 1.55 var(--font-sans);
+    color: var(--s2s-ink-muted);
+  }
+  .s2s-notice__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 6px;
+  }
+
+  @media (min-width: 640px) {
+    .s2s-notice__hero { height: 180px; }
+    .s2s-notice__body {
+      flex-direction: row;
+      align-items: flex-start;
+      gap: 18px;
+    }
+  }
+</style>
