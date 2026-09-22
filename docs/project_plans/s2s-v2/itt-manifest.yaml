@@ -1,5 +1,9 @@
 # IntentTree filing for the S2S v2 program. Generated from the bulk batch; ids read from --json output.
 # Plan: docs/project_plans/s2s-v2/00-adoption-plan.md
+# Re-anchored 2026-09-22: visual authority is docs/design/s2s-v2-visual/ (the visual pack), not the
+# build-handoff prototype. Titles/descriptions below reflect the corrected brand pick (waveform-diamond
+# primary lockup, favicon-idea-01, 05-monogram secondary) and the Studio-scoped (not global) language
+# switcher. See 00-adoption-plan.md "Visual authority" and analysis/02-visual-system-and-assets.md.
 schema_version: 1
 workspace: ws_01M35C31RAPJX22B33PC4YF7YY  # slug signal-to-system
 filed: 2026-09-22
@@ -226,7 +230,7 @@ trees:
         lane: codex-sol
       - ref: tok-langs
         id: node_01M35CKMF79NYM3VSV71WRGHQW
-        title: "Observatory, Folio, Instrument token files (Observatory desaturated per 02 §2)"
+        title: "Observatory, Folio, Instrument token files (Observatory palette mockup-sampled per 02 §2)"
         kind: task
         parent: tok
         milestone: M1
@@ -244,7 +248,7 @@ trees:
         lane: cc-native
       - ref: brand
         id: node_01M35CKMGQD415X398BSCXH5C6
-        title: "Brand identity: orbit/trail mark, wordmark, favicons, OG template"
+        title: "Brand identity: waveform-diamond primary lockup, S/S monogram secondary, favicon-01, OG template"
         kind: epic
         milestone: M1
         size: m
@@ -252,7 +256,7 @@ trees:
         lane: cc-native
       - ref: brand-logo
         id: node_01M35CKMH93KCJ67GWMNTHGVV0
-        title: "Orbit/trail mark + wordmark lockups (horizontal, stacked) + reserve constellation-triangle variant"
+        title: "Waveform-diamond primary lockup + wordmark (horizontal, stacked) + S/S monogram secondary"
         kind: task
         parent: brand
         milestone: M1
@@ -368,7 +372,7 @@ trees:
         external_ref: "S2S-011,S2S-053"
       - ref: shell-base
         id: node_01M35CKMSCDJZC1GF658D5YPGE
-        title: "BaseLayout v2: head/SEO, safe JSON-LD, three-language boot, skip link"
+        title: "BaseLayout v2: head/SEO, safe JSON-LD, Observatory-default boot, skip link"
         kind: task
         parent: shell
         milestone: M1
@@ -387,7 +391,7 @@ trees:
         external_ref: "S2S-011"
       - ref: shell-switch
         id: node_01M35CKMTWWPWA3DJNSGR930A6
-        title: "Language switcher control (replaces sun/moon) with persistence"
+        title: "Studio Design Languages preview control (Studio-scoped, does not replace header sun/moon toggle)"
         kind: task
         parent: shell
         milestone: M1
@@ -1232,8 +1236,9 @@ human_requests:  # assigned to human:nick; attached to spine decisions node unle
     topic: "which real investigation becomes the first flagship Lab? (filed by the front)"
     attached_node: node_01M35CKNHTQVVZCDDR2BEBBP45  # first-select
   - id: req_01M35CNRR6NEYW1VRVXWRRV9QH
-    topic: "confirm orbit/trail mark as primary logo"
+    topic: "confirm primary logo pick (RESOLVED 2026-09-22: logo board 01 waveform-diamond primary, favicon-idea-01 favicon, 05 monogram secondary; supersedes the orbit/trail mark)"
     attached_node: node_01M35CKM6GHQWAXDGQ1S80N2YN  # decisions
+    status: answered
   - id: req_01M35CNRYAWVA3A4191C9J08WZ
     topic: "who approves projection releases and withdrawals"
     attached_node: node_01M35CKM6GHQWAXDGQ1S80N2YN  # decisions

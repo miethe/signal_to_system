@@ -12,6 +12,7 @@ created: 2026-09-22
 intenttree_workspace: ws_01M35C31RAPJX22B33PC4YF7YY
 itt_manifest: docs/project_plans/s2s-v2/itt-manifest.yaml
 related_documents:
+  - docs/design/s2s-v2-visual/README.md
   - docs/project_plans/s2s-v2/analysis/01-build-handoff-digest.md
   - docs/project_plans/s2s-v2/analysis/02-visual-system-and-assets.md
   - docs/project_plans/s2s-v2/analysis/03-current-repo-audit.md
@@ -36,7 +37,7 @@ wave_plan:
   waves: [["M0"], ["M1"], ["M2", "M3a"], ["M3b", "M4"], ["M5"]]
   phases:
     - {id: M0, title: "Baseline, safety, migration manifest", depends_on: [], gate_lens: [security, validator], gate_lens_reason: untrusted-input, exit_criteria: ["draft leak + JSON-LD fixed with tests", "manifest covers every dist route", "CI can fail"]}
-    - {id: M1, title: "Design system, brand, shell", depends_on: [M0], gate_lens: [validator], exit_criteria: ["three languages switch without meaning change", "shell renders every section route"]}
+    - {id: M1, title: "Design system, brand, shell", depends_on: [M0], gate_lens: [validator], exit_criteria: ["every section route matches its authoritative mockup (re-anchored 2026-09-22)", "shell renders every section route"]}
     - {id: M2, title: "Writing on the new shell", depends_on: [M1], gate_lens: [validator], exit_criteria: ["Registry Wave parity signed off", "every manifest route resolves"]}
     - {id: M3a, title: "Projection gate + RF claim projection", depends_on: [M0], gate_lens: [security, validator], gate_lens_reason: irreversible-outward, exit_criteria: ["build fails closed without a receipt"]}
     - {id: M3b, title: "Labs + Notebooks", depends_on: [M1, M3a], gate_lens: [validator], exit_criteria: ["one real Lab released with receipts", "6 real leaves"]}
@@ -45,6 +46,31 @@ wave_plan:
 ---
 
 # Signal to System v2 — adoption plan
+
+## Visual authority *(added 2026-09-22, re-anchored)*
+
+The **visual pack** — 10 page mockups, 4 transparent asset sheets, 2 hero backgrounds, 3
+reference boards, committed at `docs/design/s2s-v2-visual/` (see its README for the full index) —
+is the **design authority** for S2S v2: palette, type, layout, brand marks, iconography. The
+separate build-handoff's prototype/design-board material (`approved-prototype.html`,
+`approved-design-board.jpg`, `design/*.png`, the Observatory/Folio/Instrument three-language
+system as that prototype names it, and its "orbit/trail" header mark) is **behavior/contract
+reference only** — interaction patterns, DTO shapes, build tooling — never a visual source.
+
+Two corrections this re-anchoring makes to the sections below:
+
+1. **Primary brand mark is the logo board's "01 Primary Lockup"** (waveform-diamond icon +
+   serif wordmark), **not** the prototype's orbit/trail header mark. Favicon is favicon-idea-01
+   (waveform bars). Secondary mark is "05 Monogram" (S/S, slash + sparkle). See "Asset and brand
+   plan" below and `analysis/02-visual-system-and-assets.md` §3.
+2. **The three-language switcher is Studio-scoped, not a global control.** Every mockup header
+   (all 10 pages, including the Studio mockup itself) shows only a plain sun/moon dark/light
+   toggle. The Observatory/Folio/Instrument 3-up switcher appears exactly once, as a bottom-of-page
+   "Design Languages" documentation section on the Studio mockup — a showcase of the design
+   system, not a header control visitors use site-wide. Folio is realized in the Notebooks mockup
+   as individually cream-toned `NotebookLeaf` cards inside the still-dark shell, not a full-page
+   reskin. Treat the three languages as real named skins worth building, but the header keeps its
+   single dark/light toggle. See `analysis/02-visual-system-and-assets.md` §2.
 
 Today the site is a polished Astro 6 blog (5 collections, 30 route modules, GitHub Pages) whose
 best asset is the essay reader. At the end it is a public practice with primary navigation
@@ -73,11 +99,20 @@ the layout; BaseLayout emits JSON.stringify inside set:html. Both are real, and 
   /essays/*, /dev-stories/*, /series/*, /aos/*, /systems/*, /tags/*, /topics/*, /glossary,
   /evidence/*, /portfolio/ui/*, /rss.xml, /search.json keep rendering; redirects only where the
   manifest says so, after collision/chain/loop tests. /workflow-showcase stays unlisted.
-- **Tokens and languages.** One semantic role set (canvas, surface, ink, muted, accent,
-  secondary, rule, status.*) replaces today's three vocabularies and feeds @miethe/ui through an
-  alias layer. Languages are value sets under data-language: Observatory (dark default, accent
-  desaturated into #7C6FE0-#9B87F5), Folio (Notebooks default), Instrument (Studio/methods).
-  Meaning never depends on language. Shared: 4..64 space scale, 720 reading width, 280 rail (02 §2).
+- **Tokens and languages** *(re-anchored 2026-09-22: palette sourced from the mockups, not the
+  build-handoff prototype tokens; switcher demoted to Studio-scoped)*. One semantic role set
+  (canvas, surface, ink, muted, accent, secondary, rule, status.*) replaces today's three
+  vocabularies and feeds @miethe/ui through an alias layer. Pixel-sampled from the mockups
+  (02 §2): canvas ~#0d1015, card surface ~#0f1317-#141820, chip surface ~#25282d-#26282e, rule
+  ~#363a3f, ink near-white, muted ~#b7bac0, accent core in the #7C6FE0-#9B87F5 range (matches the
+  logo lockup's own gradient core, ~#915de7), secondary sage ~#8fdca4-#98e8ad. Observatory (dark)
+  is the site-wide default shown in every mockup header, which carries only a plain sun/moon
+  dark/light toggle — **not** a three-way switcher. Folio and Instrument are real named skins
+  (Folio realized as cream-toned `NotebookLeaf` cards inside the Observatory shell on Notebooks;
+  Instrument seen only in the Studio mockup's bottom-of-page "Design Languages" showcase, not as
+  a full-page route) rather than global themes visitors toggle; that showcase section is
+  Studio-scoped design-system documentation, not the shell's header control. Meaning never
+  depends on language. Shared: 4..64 space scale, 720 reading width, 280 rail (02 §2).
 - **Reader lift.** Extract reader CSS from the 1,197-line global.css into a reader layer;
   collapse two parallel layouts into one ReaderShell; re-token per 03 §3. Registry Wave is the
   acceptance specimen, including the evidence/figure/thread focus flows.
@@ -98,12 +133,20 @@ link check, Registry Wave visual baseline; frozen DTO/ownership contracts; analy
 **AC:** a draft fixture yields no HTML/RSS/search/sitemap output; a </script> title is inert;
 every dist route appears once in the manifest; CI fails on a type error.
 
-**M1 — Design system, brand, shell** (Shell tree). Tokens + three languages; orbit/trail mark,
-favicon set, OG template; asset pipeline and the 02 §4 top-10 SVG recreations; BaseLayout v2,
-nav, switcher, templates, Home, About, primitives; a design pass for everything 02 §6 lists as
-unmocked (mobile, the article page, empty/error/withdrawn states, search, series/tag, 404).
-**AC:** every section route renders in the new shell in all three languages; no diagram or UI
-text ships as raster; lint blocks new palette literals; inspected captures at 1440/390.
+**M1 — Design system, brand, shell** (Shell tree) *(re-anchored 2026-09-22: brand marks and AC
+corrected)*. Tokens + Observatory default (Folio/Instrument as named skins, not a global
+switcher); waveform-diamond primary lockup, favicon-01 favicon, S/S-monogram secondary mark, OG
+template; asset pipeline and the 02 §4 top-10 SVG recreations; BaseLayout v2, nav, dark/light
+toggle, templates, Home, About, primitives; a design pass for everything 02 §6 lists as unmocked
+(mobile, the article page, empty/error/withdrawn states, search, series/tag, 404).
+**AC (per-page, matches its authoritative mockup — 02 §0):** `/` matches
+`signal_to_system_better_questions_brighter_futur.png`; `/about` matches
+`signal_to_system_about_nick_miethe.png`; `/labs` matches `signal_to_system_labs_index.png`;
+`/notebooks` matches `signal_to_system_notebooks.png`; `/studio` matches
+`signal_to_system_observatory_components.png`; `/projects` matches
+`signal_to_system_portfolio_dashboard.png`; `/writing` matches
+`writing_that_turns_observations_into_systems.png`. Plus: no diagram or UI text ships as raster;
+lint blocks new palette literals; inspected captures at 1440/390.
 
 **M2 — Writing on the new shell** (Writing tree). Reader lifted and re-tokened; /writing hub,
 Dev Stories zones, facets/feeds; manifest applied; content reclassified; authoring templates.
@@ -154,19 +197,27 @@ any Labs claim embed. Wired as depends_on links in IntentTree (92 edges).
 
 Per node, meta.lane records the start lane. A leg that misses its bar twice moves up one step.
 
-## Asset and brand plan
+## Asset and brand plan *(re-anchored 2026-09-22 — primary mark corrected to the visual pack's logo board pick)*
 
-Primary mark is the **orbit/trail** mark (02 §3), with geometry given there: hand-authored SVG,
-two strokes on var(--accent)/var(--secondary), so each language recolors it with no new asset.
-The constellation-triangle lockup is kept in reserve; the other exploration concepts are dropped
-for UI. Favicons: favicon.svg with prefers-color-scheme plus PNG 16/32/180/192/512 and maskable
-512, all rendered from the master. OG cards are 1200x630 and always Observatory-dark. The asset
-list follows 02 §4: two hero backgrounds and four keeper stickers go through a crop-manifest
-pipeline to AVIF/WebP. All baked-in hero copy and diagrams are dropped and rebuilt live. Pills,
-badges, tabs and chips are code, not images. SVG recreations follow the 02 §4 top-10: nav/action
-icons, evidence/rail icons, ProcessLoopDiagram, SectionDivider ornaments, the data-stack motif,
-SystemArchitectureDiagram, and the dot-timeline. They are Shell tree nodes, owner decision
-req_01M35CNRR6NEYW1VRVXWRRV9QH.
+Primary mark is the logo exploration board's **"01 Primary Lockup"** — a waveform-diamond icon
+paired with the serif wordmark (02 §3), traced/vectorized from
+`docs/design/s2s-v2-visual/02-visual-assets-transparent/signal_to_system_logo_exploration_board.png`
+(transparent background). Favicon is the **favicon-ideas strip, icon 01** (waveform bars) from
+the same board. Secondary mark is **"05 Monogram"** (interlocked S/S, slash + sparkle) for
+square-format contexts. The board's other three concepts — "02 Observatory Lockup"
+(dome-on-mountain), "03 Constellation Lockup" (node/line network), "04 Compass Lockup" (star
+compass) — are alternates, not promoted for UI. This replaces the earlier recommendation to ship
+the build-handoff prototype's orbit/trail header mark as primary, which read the prototype as
+visual authority; it is behavior/contract reference only (see "Visual authority" above).
+Favicons: favicon.svg (favicon-01 waveform bars) with prefers-color-scheme plus PNG
+16/32/180/192/512 and maskable 512, all rendered from the master. OG cards are 1200x630 and
+always Observatory-dark. The asset list follows 02 §4: two hero backgrounds and four keeper
+stickers go through a crop-manifest pipeline to AVIF/WebP. All baked-in hero copy and diagrams
+are dropped and rebuilt live. Pills, badges, tabs and chips are code, not images. SVG
+recreations follow the 02 §4 top-10: nav/action icons, evidence/rail icons, ProcessLoopDiagram,
+SectionDivider ornaments, the data-stack motif, SystemArchitectureDiagram, and the dot-timeline.
+They are Shell tree nodes, owner decision req_01M35CNRR6NEYW1VRVXWRRV9QH (resolved 2026-09-22 —
+see "Owner decisions" below).
 
 ## Risks (sharpest first)
 
@@ -192,7 +243,7 @@ req_01M35CNRR6NEYW1VRVXWRRV9QH.
 | Decision | Recommended default | Request |
 |---|---|---|
 | First flagship Lab | Pick one real RF investigation (candidates: Registry Wave republish, Metis-film) | req_01M35C53MSYM0R8A1MG0D77EF8 |
-| Primary logo | Orbit/trail mark; constellation-triangle in reserve | req_01M35CNRR6NEYW1VRVXWRRV9QH |
+| Primary logo | **Resolved 2026-09-22 (re-anchored):** logo board "01 Primary Lockup" (waveform-diamond); favicon = favicon-idea-01 (waveform bars); secondary = "05 Monogram" (S/S) | req_01M35CNRR6NEYW1VRVXWRRV9QH |
 | Approver for releases/withdrawals | Nick is the sole approver; models never self-approve | req_01M35CNRYAWVA3A4191C9J08WZ |
 | First Labs RF eligibility | Curated public-sensitivity runs with source-reuse review | req_01M35CNS3D4E862G28M8EHE4PE |
 | Snapshot store + freshness | Versioned JSON/MDX in repo; show snapshot time; not "live" | req_01M35CNS8EDMHMAMSJJQG165ZD |
