@@ -1,0 +1,90 @@
+---
+/**
+ * /studio/templates/ (noindex) — exercises the Hub template with the v2
+ * primitives and real collection data. Links to the other three templates.
+ */
+import HubLayout from '../../../layouts/templates/HubLayout.astro';
+import Card from '../../../components/primitives/Card.astro';
+import SectionHeading from '../../../components/primitives/SectionHeading.astro';
+import StatTile from '../../../components/primitives/StatTile.astro';
+import Tabs from '../../../components/primitives/Tabs.astro';
+import MethodRail from '../../../components/primitives/MethodRail.astro';
+import Badge from '../../../components/ui/Badge.astro';
+import Button from '../../../components/ui/Button.astro';
+import { previewData, templateTabs } from '../../../lib/studio-preview';
+
+const data = await previewData();
+const lead = data.posts[0];
+const more = data.posts.slice(1, 4);
+---
+
+<HubLayout
+  title="Templates: Hub"
+  description="Section template preview (Hub)."
+  eyebrow={['Studio', 'Templates', 'Hub']}
+  heading="Section templates for a more rigorous site."
+  accent="rigorous site."
+  lede="Four layouts carry every v2 section: Hub, Index + rail, Detail + rail and the Folio page. This page is the Hub, filled with the v2 primitives and the site's real collections."
+  noindex
+>
+  <Fragment slot="hero-actions">
+    <Button variant="signal" size="lg" href="/studio/primitives/">Browse primitives <span aria-hidden="true">→</span></Button>
+    <Button variant="outline" size="lg" href="/studio/templates/index-rail/">Next template</Button>
+  </Fragment>
+  <MethodRail slot="hero-aside" motto={['Small pieces', 'Bigger truths']} />
+
+  <Tabs label="Templates" items={templateTabs('/studio/templates/')} aside="One slot contract per template." />
+
+  <Card variant="panel" class="s2s-span-wide">
+    <SectionHeading
+      icon="writing"
+      title="Featured Writing"
+      label="Essays"
+      description="Long-form thinking on agents, systems and delivery."
+      action={{ label: 'View all writing', href: '/essays/' }}
+    />
+    {lead && (
+      <Card variant="inset" href={lead.href}>
+        <div class="row">
+          <Badge variant="label" text={lead.kind} />
+          <span class="s2s-meta">{lead.date}</span>
+        </div>
+        <h3 class="title">{lead.title}</h3>
+        <p class="excerpt">{lead.excerpt}</p>
+        <div class="chips">{lead.tags.map((t) => <Badge variant="chip" text={t} />)}</div>
+      </Card>
+    )}
+  </Card>
+
+  <Card variant="panel" class="s2s-span-narrow">
+    <SectionHeading icon="evidence" title="The site at a glance" level={2} action={{ label: 'Start here', href: '/start-here/' }} />
+    <StatTile icon="essays" value={data.counts.posts} label="Essays" note="Published long-form" href="/essays/" />
+    <StatTile icon="dev-stories" value={data.counts.stories} label="Dev Stories" note="Build notes, reviewed" href="/dev-stories/" />
+    <StatTile icon="reading-paths" value={data.counts.series} label="Series" note="Multi-part arcs" href="/series/" />
+    <StatTile icon="topics" value={data.counts.topics} label="Topics" note="Tags in use" href="/tags/" />
+  </Card>
+
+  <section class="s2s-span-full" aria-labelledby="more-h">
+    <SectionHeading id="more-h" icon="field-notes" title="More writing" label="Recent" action={{ label: 'View all', href: '/essays/' }} />
+    <ul class="grid3">
+      {more.map((p) => (
+        <li>
+          <Card variant="tile" href={p.href}>
+            <span class="s2s-meta">{p.date}</span>
+            <h3 class="tile-title">{p.title}</h3>
+            <div class="chips">{p.tags.slice(0, 2).map((t) => <Badge variant="chip" text={t} />)}</div>
+          </Card>
+        </li>
+      ))}
+    </ul>
+  </section>
+</HubLayout>
+
+<style>
+  .row { display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
+  .title { margin: 0 0 6px; font: 400 var(--type-title) / 1.15 var(--font-display); color: var(--s2s-ink); }
+  .excerpt { margin: 0 0 12px; font: 400 var(--type-body-s) / 1.5 var(--font-sans); color: var(--s2s-ink-muted); }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin: 0; padding: 0; list-style: none; }
+  .tile-title { margin: 6px 0 10px; font: 400 var(--type-card) / 1.25 var(--font-display); color: var(--s2s-ink); }
+</style>

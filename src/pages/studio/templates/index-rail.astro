@@ -1,0 +1,77 @@
+---
+/** /studio/templates/index-rail/ (noindex) — exercises the Index + rail template. */
+import IndexRailLayout from '../../../layouts/templates/IndexRailLayout.astro';
+import Card from '../../../components/primitives/Card.astro';
+import SectionHeading from '../../../components/primitives/SectionHeading.astro';
+import FilterToolbar from '../../../components/primitives/FilterToolbar.astro';
+import FacetRail from '../../../components/primitives/FacetRail.astro';
+import Tabs from '../../../components/primitives/Tabs.astro';
+import Badge from '../../../components/ui/Badge.astro';
+import { previewData, templateTabs } from '../../../lib/studio-preview';
+
+const data = await previewData();
+const items = [...data.posts, ...data.stories].slice(0, 8);
+---
+
+<IndexRailLayout
+  title="Templates: Index + rail"
+  description="Section template preview (Index + rail)."
+  eyebrow={['Studio', 'Templates', 'Index + rail']}
+  heading="Writing that turns observations into systems."
+  accent="systems."
+  lede="A filterable index with a 280px rail. The toolbar is real native selects; the rail stacks facets and guidance."
+  railLabel="Writing guides"
+  noindex
+>
+  <FilterToolbar
+    slot="toolbar"
+    label="Filter writing"
+    count={`${items.length} pieces`}
+    filters={[
+      { id: 'format', label: 'Format', icon: 'writing', options: [{ value: 'all', label: 'All formats' }, { value: 'essay', label: 'Essays' }, { value: 'story', label: 'Dev Stories' }] },
+      { id: 'domain', label: 'Domain', icon: 'datasets', options: [{ value: 'all', label: 'All domains' }] },
+      { id: 'program', label: 'Program', icon: 'research-programs', options: [{ value: 'all', label: 'All programs' }] },
+      { id: 'sort', label: 'Sort', icon: 'timeline', options: [{ value: 'new', label: 'Newest first' }, { value: 'old', label: 'Oldest first' }] },
+    ]}
+  />
+
+  <div class="s2s-tabs-row"><Tabs label="Templates" items={templateTabs('/studio/templates/index-rail/')} /></div>
+
+  <ul class="list">
+    {items.map((p) => (
+      <li>
+        <Card variant="panel" href={p.href}>
+          <div class="row"><Badge variant="label" text={p.kind} /><span class="s2s-meta">{p.date}</span></div>
+          <h2 class="title">{p.title}</h2>
+          <p class="excerpt">{p.excerpt}</p>
+          <div class="chips">{p.tags.map((t) => <Badge variant="chip" text={t} />)}</div>
+        </Card>
+      </li>
+    ))}
+  </ul>
+
+  <Fragment slot="rail">
+    <Card variant="panel">
+      <SectionHeading icon="reading-paths" title="Start here" level={3} description="New to the writing? Three places to begin." />
+      <ol class="steps">
+        {data.posts.slice(0, 3).map((p, i) => (
+          <li><a class="s2s-focus" href={p.href}><span class="n">{i + 1}</span><span>{p.title}</span></a></li>
+        ))}
+      </ol>
+    </Card>
+    <FacetRail heading="Popular topics" icon="topics" action={{ label: 'View all topics', href: '/tags/' }} items={data.topics} />
+  </Fragment>
+</IndexRailLayout>
+
+<style>
+  .s2s-tabs-row { margin-bottom: 16px; }
+  .list { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; margin: 0; padding: 0; list-style: none; }
+  .row { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+  .title { margin: 0 0 6px; font: 400 1.25rem / 1.2 var(--font-display); color: var(--s2s-ink); }
+  .excerpt { margin: 0 0 12px; font: 400 var(--type-meta) / 1.5 var(--font-sans); color: var(--s2s-ink-muted); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+  .steps { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+  .steps a { display: flex; align-items: center; gap: 12px; padding: 8px; border: 1px solid var(--s2s-rule); border-radius: 8px; font: 400 0.875rem / 1.25 var(--font-display); color: var(--s2s-ink); text-decoration: none; }
+  .steps a:hover { border-color: var(--s2s-rule-emphasis); }
+  .n { display: inline-flex; flex-shrink: 0; align-items: center; justify-content: center; width: 28px; height: 28px; border: 1px solid var(--s2s-rule-emphasis); border-radius: 50%; font: 400 0.8125rem / 1 var(--font-sans); color: var(--s2s-ink-soft); }
+</style>

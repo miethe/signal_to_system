@@ -4,7 +4,7 @@
     "commit": "78de390",
     "buildCommand": "npm run build",
     "generatedAt": "2026-09-22",
-    "routeCount": 122
+    "routeCount": 128
   },
   "policy": {
     "defaultAction": "preserve",
@@ -473,6 +473,48 @@
       "family": "site",
       "action": "preserve",
       "target": "/start-here/"
+    },
+    {
+      "path": "/studio/brand-preview/",
+      "output": "studio/brand-preview/index.html",
+      "family": "studio-preview",
+      "action": "preserve",
+      "target": "/studio/brand-preview/"
+    },
+    {
+      "path": "/studio/primitives/",
+      "output": "studio/primitives/index.html",
+      "family": "studio-preview",
+      "action": "preserve",
+      "target": "/studio/primitives/"
+    },
+    {
+      "path": "/studio/templates/detail-rail/",
+      "output": "studio/templates/detail-rail/index.html",
+      "family": "studio-preview",
+      "action": "preserve",
+      "target": "/studio/templates/detail-rail/"
+    },
+    {
+      "path": "/studio/templates/folio/",
+      "output": "studio/templates/folio/index.html",
+      "family": "studio-preview",
+      "action": "preserve",
+      "target": "/studio/templates/folio/"
+    },
+    {
+      "path": "/studio/templates/index-rail/",
+      "output": "studio/templates/index-rail/index.html",
+      "family": "studio-preview",
+      "action": "preserve",
+      "target": "/studio/templates/index-rail/"
+    },
+    {
+      "path": "/studio/templates/",
+      "output": "studio/templates/index.html",
+      "family": "studio-preview",
+      "action": "preserve",
+      "target": "/studio/templates/"
     },
     {
       "path": "/systems/agentic-node/",

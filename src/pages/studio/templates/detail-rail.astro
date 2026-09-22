@@ -1,0 +1,74 @@
+---
+/** /studio/templates/detail-rail/ (noindex) — exercises the Detail + rail template. */
+import DetailRailLayout from '../../../layouts/templates/DetailRailLayout.astro';
+import Card from '../../../components/primitives/Card.astro';
+import SectionHeading from '../../../components/primitives/SectionHeading.astro';
+import StatTile from '../../../components/primitives/StatTile.astro';
+import Tabs from '../../../components/primitives/Tabs.astro';
+import Badge from '../../../components/ui/Badge.astro';
+import Button from '../../../components/ui/Button.astro';
+import { previewData, templateTabs } from '../../../lib/studio-preview';
+
+const data = await previewData();
+const [record, ...others] = data.posts;
+---
+
+<DetailRailLayout
+  title="Templates: Detail + rail"
+  description="Section template preview (Detail + rail)."
+  eyebrow={['Studio', 'Templates', 'Detail + rail']}
+  heading={record?.title ?? 'A single record'}
+  lede={record?.excerpt}
+  noindex
+>
+  <Fragment slot="meta">
+    <Badge variant="live" text="Published" />
+    {record?.tags.map((t) => <Badge variant="chip" text={t} />)}
+  </Fragment>
+
+  <Tabs label="Templates" items={templateTabs('/studio/templates/detail-rail/')} />
+  <h2 class="h">What this template is for</h2>
+  <p>
+    One record per page: a project dossier, a Lab investigation, a release. The hero names the record and carries its
+    status and tags; the body holds the argument at a 720px reading measure; the rail keeps the facts in reach while
+    the reader scrolls.
+  </p>
+  <h2 class="h">Slot contract</h2>
+  <p>
+    <code>meta</code> takes badges under the lede. The default slot is the body. <code>rail</code> is required and
+    sticks below the header on wide screens, dropping under the body on narrow ones. <code>related</code> spans the
+    full width after both.
+  </p>
+  <p>The record shown here is the newest published essay, read straight from the collection.</p>
+  {record && <p><Button variant="signal" href={record.href}>Read the essay <span aria-hidden="true">→</span></Button></p>}
+
+  <Fragment slot="rail">
+    <Card variant="panel">
+      <SectionHeading icon="evidence" title="At a glance" level={2} />
+      <StatTile icon="timeline" value={record?.date ?? '—'} label="Published" />
+      <StatTile icon="topics" value={record?.tags.length ?? 0} label="Tags" note="On this record" />
+      <StatTile icon="essays" value={data.counts.posts} label="Essays" note="In the collection" href="/essays/" />
+    </Card>
+  </Fragment>
+
+  <section slot="related" aria-labelledby="rel-h">
+    <SectionHeading id="rel-h" icon="reading-paths" title="Related work" label="Writing" action={{ label: 'View all', href: '/essays/' }} />
+    <ul class="grid3">
+      {others.slice(0, 3).map((p) => (
+        <li>
+          <Card variant="tile" href={p.href}>
+            <span class="s2s-meta">{p.date}</span>
+            <h3 class="t">{p.title}</h3>
+          </Card>
+        </li>
+      ))}
+    </ul>
+  </section>
+</DetailRailLayout>
+
+<style>
+  .h { margin: 28px 0 10px; font: 400 1.375rem / 1.2 var(--font-display); color: var(--s2s-ink); }
+  p { color: var(--s2s-ink-muted); }
+  .grid3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin: 0; padding: 0; list-style: none; }
+  .t { margin: 6px 0 0; font: 400 var(--type-card) / 1.25 var(--font-display); color: var(--s2s-ink); }
+</style>

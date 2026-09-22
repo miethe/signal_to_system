@@ -1,0 +1,79 @@
+---
+/**
+ * Folio page template — a notebook leaf: the page stays in the dark
+ * Observatory shell (as in the Notebooks mockup) and the content sits on a
+ * cream paper sheet scoped with [data-skin="folio"], with a marginalia
+ * column beside it. The Folio skin tokens are stubs (./styles/tokens/folio.css)
+ * until the M3 Notebook design pass.
+ *
+ * Slot contract
+ *   default   required  the leaf's content (prose, figures)
+ *   margin    optional  marginalia: dates, links, amendments (right of the leaf)
+ *   after     optional  below the leaf, back in the Observatory shell
+ */
+import BaseLayout from '../BaseLayout.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  heading: string;
+  kicker?: string;
+  noindex?: boolean;
+}
+const { title, description, heading, kicker, noindex } = Astro.props;
+---
+
+<BaseLayout title={title} description={description} noindex={noindex}>
+  <div class="s2s-folio">
+    <div class="s2s-folio__leaf" data-skin="folio">
+      <header class="s2s-folio__head">
+        {kicker && <p class="s2s-eyebrow">{kicker}</p>}
+        <h1 class="s2s-display s2s-folio__title">{heading}</h1>
+      </header>
+      <div class="s2s-folio__body"><slot /></div>
+    </div>
+    {Astro.slots.has('margin') && <aside class="s2s-folio__margin" aria-label="Margin notes"><slot name="margin" /></aside>}
+    {Astro.slots.has('after') && <div class="s2s-folio__after"><slot name="after" /></div>}
+  </div>
+</BaseLayout>
+
+<style>
+  .s2s-folio {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+    padding: 24px 12px 0;
+  }
+  .s2s-folio__leaf {
+    padding: 28px 22px 32px;
+    border: 1px solid var(--s2s-rule);
+    border-radius: 4px;
+    background: var(--s2s-surface);
+    color: var(--s2s-ink);
+    box-shadow: var(--s2s-shadow-pop);
+  }
+  .s2s-folio__title { margin: 6px 0 18px; font-size: var(--type-display); }
+  .s2s-folio__body {
+    max-width: 62ch;
+    /* A 28px rule under every line of the leaf's text. */
+    background: repeating-linear-gradient(180deg, transparent 0 27px, var(--s2s-rule) 27px 28px);
+    font: 400 1.0625rem / 28px var(--font-serif);
+    color: var(--s2s-ink-soft);
+  }
+  .s2s-folio__body :global(p) { margin: 0 0 28px; color: inherit; }
+  .s2s-folio__margin {
+    font: 400 var(--type-micro) / 1.6 var(--font-mono);
+    color: var(--s2s-ink-subtle);
+  }
+  @media (min-width: 1024px) {
+    .s2s-folio {
+      grid-template-columns: minmax(0, 760px) 220px;
+      justify-content: center;
+      gap: 32px;
+      padding: 40px var(--s2s-frame-gutter) 0;
+    }
+    .s2s-folio__leaf { padding: 44px 56px 52px 72px; }
+    .s2s-folio__margin { padding-top: 56px; }
+    .s2s-folio__after { grid-column: 1 / -1; }
+  }
+</style>
