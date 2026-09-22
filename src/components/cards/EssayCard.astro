@@ -10,7 +10,7 @@
  *   category     — category string
  *   tags         — string[]
  *   slug         — URL slug (links to /essays/[slug]/)
- *   contentType  — "essay" | "field-note"
+ *   contentType  — "essay" | "field-note" | "companion"
  *   featured     — larger featured variant
  */
 
@@ -25,7 +25,7 @@ interface Props {
   category?: string;
   tags?: string[];
   slug: string;
-  contentType?: "essay" | "field-note";
+  contentType?: "essay" | "field-note" | "companion";
   featured?: boolean;
 }
 

@@ -7,6 +7,9 @@ node_modules/
 # astro
 .astro/
 
+# local Agentic Operator run state
+.operator/
+
 # environment
 .env
 .env.*

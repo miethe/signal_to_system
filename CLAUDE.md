@@ -48,7 +48,7 @@ External directories provide research and drafting context:
 
 Canonical schema: `src/content.config.ts` (NOT `src/content/config.ts`).
 
-Three collections: **posts** (essays/field notes), **projects** (portfolio artifacts), **series** (multi-post sequences). All in `src/content/` as `.mdx`.
+Five collections: **posts** (essays/field notes), **projects** (portfolio artifacts), **series** (multi-post sequences), **stories** (automated build notes), and **ui** (@miethe/ui documentation). All are in `src/content/` as `.mdx`.
 
 For full content authoring guidance, see `src/content/CLAUDE.md`.
 
@@ -56,7 +56,7 @@ For full content authoring guidance, see `src/content/CLAUDE.md`.
 
 - **GitHub Pages** via `.github/workflows/deploy.yml`
 - Triggers on push to `main` or manual dispatch
-- Site URL: `https://signaltosystem.com`
+- Site URL: `https://nickmiethe.com`
 - CI checks on PRs via `.github/workflows/ci.yml`
 
 ## Key Files

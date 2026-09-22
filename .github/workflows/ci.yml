@@ -18,7 +18,9 @@ jobs:
       - name: Build
         run: npm run build
       - name: Type check (astro check)
-        run: npx astro check || true
+        run: npm run check
+      - name: M0 safety and route regression harness
+        run: npm run test:m0 && npm run test:routes && npm run check:links
       - name: Editorial gate (em dash check)
         run: npm run check:prose
       - name: Lint

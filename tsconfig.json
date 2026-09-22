@@ -6,7 +6,8 @@
   ],
   "exclude": [
     "dist",
-    "demo"
+    "demo",
+    "Nick Miethe Blog.ts"
   ],
   "compilerOptions": {
     "jsx": "react-jsx",
