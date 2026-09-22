@@ -9,26 +9,37 @@
  *   hero-aside    optional  right side of the hero (quote, MethodRail)
  *   default       required  sections; each direct child is a grid item.
  *                           Add class `s2s-span-wide` (7/12), `s2s-span-narrow`
- *                           (5/12), `s2s-span-half` or `s2s-span-full` (default).
+ *                           (5/12), `s2s-span-half`, `s2s-span-major` (8/12),
+ *                           `s2s-span-minor` (4/12) or `s2s-span-full` (default).
  *   after         optional  full-width closing band (newsletter, CTA)
  */
 import BaseLayout from '../BaseLayout.astro';
 import PageHero from '../../components/primitives/PageHero.astro';
 
 interface Props {
-  title: string;
+  /** Omit on the homepage: the document title is then just the site name. */
+  title?: string;
   description?: string;
   heading: string;
   accent?: string;
   eyebrow?: string[];
   lede?: string;
   noindex?: boolean;
+  /** Photo hero pass-through (PageHero): Home and About use the observatory band. */
+  hero?: {
+    photo?: string;
+    subheading?: string;
+    quote?: { text: string; by?: string };
+    rail?: string[];
+    railFoot?: string[];
+  };
+  ogImage?: string;
 }
-const { title, description, heading, accent, eyebrow, lede, noindex } = Astro.props;
+const { title, description, heading, accent, eyebrow, lede, noindex, hero = {}, ogImage } = Astro.props;
 ---
 
-<BaseLayout title={title} description={description} noindex={noindex}>
-  <PageHero heading={heading} accent={accent} eyebrow={eyebrow} lede={lede}>
+<BaseLayout title={title} description={description} noindex={noindex} ogImage={ogImage}>
+  <PageHero heading={heading} accent={accent} eyebrow={eyebrow} lede={lede} {...hero}>
     {Astro.slots.has('hero-actions') && <Fragment slot="actions"><slot name="hero-actions" /></Fragment>}
     {Astro.slots.has('hero-aside') && <Fragment slot="aside"><slot name="hero-aside" /></Fragment>}
   </PageHero>
@@ -56,6 +67,8 @@ const { title, description, heading, accent, eyebrow, lede, noindex } = Astro.pr
     .s2s-hub > :global(.s2s-span-wide) { grid-column: span 7; }
     .s2s-hub > :global(.s2s-span-narrow) { grid-column: span 5; }
     .s2s-hub > :global(.s2s-span-half) { grid-column: span 6; }
+    .s2s-hub > :global(.s2s-span-major) { grid-column: span 8; }
+    .s2s-hub > :global(.s2s-span-minor) { grid-column: span 4; }
     .s2s-hub__after { padding: 24px 32px 0; }
   }
 </style>

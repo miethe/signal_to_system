@@ -1,415 +1,464 @@
 ---
-import { getCollection } from 'astro:content';
-import BaseLayout from '../layouts/BaseLayout.astro';
-import EssayCard from '../components/cards/EssayCard.astro';
-import ProjectCard from '../components/cards/ProjectCard.astro';
-import SeriesCard from '../components/cards/SeriesCard.astro';
-import StoryCard from '../components/cards/StoryCard.astro';
-import AuthorProfile from '../components/content/AuthorProfile.astro';
+/**
+ * Homepage v2 (node_01M35CKMWBR6YJ06DBNZY6AW5V).
+ * Visual authority: 01-site-mockups/signal_to_system_better_questions_brighter_futur.png
+ *
+ * Every figure on this page is counted from a real collection or data file.
+ * Labs has no published investigation yet, so its slot is an honest
+ * "in preparation" state that points at the program that does exist, never
+ * a mocked dataset. Projects show status and stack, never invented stars.
+ */
+import HubLayout from '../layouts/templates/HubLayout.astro';
+import Card from '../components/primitives/Card.astro';
+import SectionHeading from '../components/primitives/SectionHeading.astro';
+import StatTile from '../components/primitives/StatTile.astro';
+import Badge from '../components/ui/Badge.astro';
 import Button from '../components/ui/Button.astro';
-import InteractiveNetwork from '../components/interactive/InteractiveNetwork';
+import Icon from '../components/brand/Icon.astro';
+import V2Image from '../components/media/V2Image.astro';
+import { getCollection } from 'astro:content';
 import { site } from '../data/site';
-import { TOPIC_HUBS } from '../data/taxonomy';
-import { getPublishedStories } from '../lib/content';
+import { evidence } from '../data/evidence';
+import { portfolioItems } from '../data/portfolio';
+import { getPublishedPosts, getPublishedStories, hrefFor } from '../lib/content';
+import { getTagLabel } from '../lib/tags';
+import { formatDate } from '../lib/utils';
 
-// ---------------------------------------------------------------------------
-// Data
-// ---------------------------------------------------------------------------
+const posts = await getPublishedPosts();
+const stories = await getPublishedStories();
+const uiDocs = await getCollection('ui');
 
-const allPosts = await getCollection('posts');
-const allProjects = await getCollection('projects');
-const allSeries = await getCollection('series');
+const featuredPost = posts.find((p) => p.data.featured) ?? posts[0];
+const latestStory = stories[0];
 
-const publishedPosts = allPosts
-  .filter((p) => p.data.status !== 'draft')
-  .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
+const STUDIO_PROJECT = '@miethe/ui Component Library';
+const SELF = 'Signal to System Blog';
+const projectPool = portfolioItems.filter((p) => !p.private && p.title !== SELF && p.title !== STUDIO_PROJECT);
+const selectedProjects = [
+  ...projectPool.filter((p) => p.featured),
+  ...projectPool.filter((p) => !p.featured && p.status !== 'archived'),
+].slice(0, 3);
+const studio = portfolioItems.find((p) => p.title === STUDIO_PROJECT);
 
-const featuredPosts = publishedPosts.filter((p) => p.data.featured).slice(0, 3);
-const recentPosts = featuredPosts.length < 3
-  ? publishedPosts.slice(0, 3)
-  : featuredPosts;
-
-const activeSeries = allSeries
-  .filter((s) => s.data.status === 'active' || s.data.featured)
-  .slice(0, 3);
-
-const featuredProjects = allProjects.filter((p) => p.data.featured).slice(0, 3);
-
-const recentStories = (await getPublishedStories()).slice(0, 3);
-
-// Compute post count per series for SeriesCard
-const seriesPostCounts = new Map<string, number>();
-for (const post of publishedPosts) {
-  if (post.data.series) {
-    seriesPostCounts.set(post.data.series, (seriesPostCounts.get(post.data.series) ?? 0) + 1);
-  }
-}
-
-// Topic hub icons (inline SVG paths keyed by slug)
-const topicIcons: Record<string, string> = {
-  'ai-agents': 'M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8zm1-11v2h2v2h-2v2h-2v-2H9v-2h2V9z',
-  'agentic-sdlc': 'M4 4h16v2H4zm0 4h10v2H4zm0 4h16v2H4zm0 4h10v2H4z',
-  'technical-leadership': 'M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm14 10v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75',
-  'cto': 'M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5',
-  'architecture': 'M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z',
-  'platform-engineering': 'M20 7H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2zM12 15a2 2 0 1 1 0-4 2 2 0 0 1 0 4z',
-  'projects': 'M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2zM14 2v6h6',
+const statusLabel: Record<string, string> = {
+  active: 'Active',
+  'in-progress': 'In progress',
+  planned: 'Planned',
+  archived: 'Archived',
 };
-
-const topicColors: Record<string, string> = {
-  'ai-agents': 'from-indigo-500/20 to-violet-500/10 border-indigo-500/30 hover:border-indigo-400/60',
-  'agentic-sdlc': 'from-violet-500/20 to-purple-500/10 border-violet-500/30 hover:border-violet-400/60',
-  'technical-leadership': 'from-sky-500/20 to-cyan-500/10 border-sky-500/30 hover:border-sky-400/60',
-  'cto': 'from-amber-500/20 to-orange-500/10 border-amber-500/30 hover:border-amber-400/60',
-  'architecture': 'from-emerald-500/20 to-teal-500/10 border-emerald-500/30 hover:border-emerald-400/60',
-  'platform-engineering': 'from-rose-500/20 to-pink-500/10 border-rose-500/30 hover:border-rose-400/60',
-  'projects': 'from-zinc-500/20 to-slate-500/10 border-zinc-500/30 hover:border-zinc-400/60',
+const projectIcon: Record<string, string> = {
+  'AI Agents': 'research-programs',
+  'Developer Tools': 'reproduce',
+  Apps: 'projects',
 };
+const githubOf = (p: (typeof portfolioItems)[number]) =>
+  p.links.find((l) => l.label.toLowerCase().startsWith('github'))?.href ?? p.links[0]?.href;
 
-const topicIconColors: Record<string, string> = {
-  'ai-agents': 'text-indigo-400',
-  'agentic-sdlc': 'text-violet-400',
-  'technical-leadership': 'text-sky-400',
-  'cto': 'text-amber-400',
-  'architecture': 'text-emerald-400',
-  'platform-engineering': 'text-rose-400',
-  'projects': 'text-zinc-400',
-};
+const readLabel = (t: string) => `${t.replace(/\s*read$/i, '')} read`;
+
+const stats = [
+  { value: posts.length, label: 'Essays', note: 'Long-form, argued in public', icon: 'essays', href: '/essays/' },
+  { value: stories.length, label: 'Build notes', note: 'Execution records, reviewed', icon: 'field-notes', href: '/dev-stories/' },
+  { value: Object.keys(evidence).length, label: 'Evidence records', note: 'Claims with their receipts', icon: 'evidence', href: '/aos/' },
+  { value: portfolioItems.filter((p) => !p.private).length, label: 'Projects', note: 'Code, tools and systems', icon: 'projects', href: '/portfolio/' },
+];
 ---
 
-<BaseLayout
-  title={undefined}
+<HubLayout
   description={site.description}
+  heading="A more rigorous relationship with reality."
+  eyebrow={['Ideas', 'Evidence', 'Systems']}
+  lede="Signal to System is a public research and engineering practice by Nick Miethe that investigates questions, exposes evidence, and builds systems, from first principles to real-world impact."
+  hero={{
+    photo: 'observatory',
+    quote: { text: 'Better questions.\nClearer evidence.\nMore useful systems.', by: 'Nick Miethe' },
+    rail: ['Observe', 'Investigate', 'Build', 'Share', 'Repeat'],
+    railFoot: ['A quieter', 'brighter', 'tomorrow'],
+  }}
 >
-  <!-- =========================================================
-       HERO
-       ========================================================= -->
-  <section class="relative overflow-hidden bg-[var(--bg-base)]">
-    <!-- Network visualization background -->
-    <div class="absolute inset-0 z-0 opacity-60" aria-hidden="true">
-      <InteractiveNetwork className="w-full h-full" client:idle />
-    </div>
+  <Fragment slot="hero-actions">
+    <Button href="/aos/" variant="signal" size="lg">Explore Labs <span aria-hidden="true">→</span></Button>
+    <Button href="/essays/" variant="outline" size="lg"><Icon name="essays" size={16} /> Read Essays</Button>
+  </Fragment>
 
-    <!-- Radial gradient overlay for readability -->
-    <div class="absolute inset-0 z-10 bg-gradient-to-b from-[var(--bg-base)]/30 via-[var(--bg-base)]/70 to-[var(--bg-base)]" aria-hidden="true" />
-
-    <!-- Content (hero is always light-on-dark regardless of theme) -->
-    <div class="relative z-20 mx-auto max-w-6xl px-4 pb-24 pt-28 sm:px-6 sm:pb-36 sm:pt-40 lg:px-8">
-      <div class="grid items-start gap-12 lg:grid-cols-[minmax(0,1fr)_20rem] xl:gap-16">
-        <div>
-          <!-- Eyebrow -->
-          <p class="font-mono mb-6 inline-flex items-center gap-2 rounded-full border border-[var(--border-subtle)] bg-[var(--accent-subtle)] px-3 py-1 text-xs font-semibold uppercase tracking-widest text-[var(--accent-text)]">
-            <span class="h-1.5 w-1.5 rounded-full bg-[var(--accent)] animate-pulse" aria-hidden="true" />
-            Technical Publication
-          </p>
-
-          <h1 class="font-serif mb-8 max-w-4xl text-5xl font-bold leading-[1.05] tracking-tight text-[var(--text-primary)] sm:text-7xl lg:text-[4.5rem] xl:text-[5rem]">
-            Signal to
-            <span class="italic text-[var(--accent)]"> System</span>
-          </h1>
-
-          <p class="mb-4 max-w-2xl text-xl leading-relaxed text-[var(--text-secondary)]">
-            {site.subtitle}
-          </p>
-          <p class="mb-12 max-w-xl text-base leading-relaxed text-[var(--text-tertiary)]">
-            Long-form essays and practical frameworks for technical executives, architects, and builders navigating the agent-era shift in software delivery.
-          </p>
-
-          <div class="flex flex-wrap gap-4">
-            <Button href="/essays/" variant="primary" size="lg">
-              Read the Essays
-            </Button>
-            <Button href="/start-here/" variant="secondary" size="lg">
-              Start Here
-            </Button>
-            <Button href="/rss.xml" variant="ghost" size="lg">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/>
-              </svg>
-              RSS Feed
-            </Button>
-          </div>
+  <!-- Featured investigation: Labs is in preparation -->
+  <section class="s2s-span-major home-block home-scope" aria-labelledby="home-labs">
+    <SectionHeading
+      id="home-labs"
+      icon="labs"
+      title="Featured Investigation"
+      label="Labs"
+      description="Deep dives with evidence, not hot takes."
+      action={{ label: 'View all labs', href: '/aos/' }}
+    />
+    <Card variant="panel" class="home-lab">
+      <div class="home-lab__art">
+        <V2Image kind="sticker" id="mountain-arc" class="home-lab__sticker" />
+        <p class="home-lab__art-caption s2s-meta" aria-hidden="true">Investigation 001<br />in preparation</p>
+      </div>
+      <div class="home-lab__body">
+        <div class="home-chips">
+          <Badge variant="chip" text="Labs" />
+          <Badge variant="chip" text="Evidence-first" />
+          <span class="home-status home-status--pending"><span class="home-status__dot" aria-hidden="true"></span>In preparation</span>
         </div>
-
-        <div class="lg:sticky lg:top-24">
-          <AuthorProfile variant="featured" />
+        <h3 class="home-lab__title">The first investigation is on the bench.</h3>
+        <p class="home-lab__desc">
+          Labs will publish investigations with their datasets, methods and findings attached, so every
+          claim can be traced back to its evidence. Until the first one ships, the Agentic OS program is
+          where that evidence lives today.
+        </p>
+        <ul class="home-lab__meta" aria-label="What each investigation will carry">
+          <li><Icon name="datasets" size={15} /> Datasets</li>
+          <li><Icon name="methods" size={15} /> Methods</li>
+          <li><Icon name="reproduce" size={15} /> Reproducible</li>
+        </ul>
+        <div class="home-lab__actions">
+          <Button href="/aos/" variant="signal" size="md">Follow the AOS program <span aria-hidden="true">→</span></Button>
+          <Button href="/start-here/" variant="outline" size="md"><Icon name="reading-paths" size={15} /> Start here</Button>
         </div>
       </div>
-    </div>
+    </Card>
   </section>
 
-  <!-- =========================================================
-       POSITIONING / SIGNAL STATEMENT
-       ========================================================= -->
-  <section class="animate-on-scroll bg-[var(--bg-base)] pb-8 pt-12">
-    <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16">
-      <dl class="grid grid-cols-1 gap-8 sm:grid-cols-3">
-        {[
-          {
-            label: 'Depth over volume',
-            value: 'Long-form',
-            desc: 'Essays that earn their word count. No hot takes, no summaries of summaries.',
-          },
-          {
-            label: 'Real systems experience',
-            value: 'Practitioner-first',
-            desc: 'Written from the seat of someone who has shipped systems, led organizations, and built alongside AI.',
-          },
-          {
-            label: 'Architecture through leadership',
-            value: 'Full-stack thinking',
-            desc: 'From agent context engineering to org design to platform strategy — the full technical executive stack.',
-          },
-        ].map(({ label, value, desc }) => (
-          <div class="tilt-card transform-gpu ease-out will-change-transform border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6 rounded-2xl shadow-sm transition-all hover:border-[var(--accent)] hover:shadow-ambient">
-            <dt class="font-mono text-[11px] font-bold uppercase tracking-widest text-[var(--accent)] mb-2">{label}</dt>
-            <dd class="text-2xl font-bold text-[var(--text-primary)] mb-2">{value}</dd>
-            <p class="text-sm text-[var(--text-secondary)] leading-relaxed">{desc}</p>
-          </div>
-        ))}
-      </dl>
+  <!-- Evidence at a glance -->
+  <Card as="section" variant="panel" class="s2s-span-minor home-glance" aria-labelledby="home-glance">
+    <SectionHeading id="home-glance" icon="datasets" title="Evidence at a glance" level={2} action={{ label: 'View all', href: '/aos/' }} />
+    <div class="home-glance__list">
+      {stats.map((s) => <StatTile {...s} />)}
     </div>
-  </section>
+    <p class="home-glance__quote">“Claims deserve evidence. Here’s the trail.”</p>
+  </Card>
 
-  <!-- =========================================================
-       FEATURED SERIES
-       ========================================================= -->
-  {activeSeries.length > 0 && (
-    <section class="animate-on-scroll bg-[var(--bg-subtle)] py-24">
-      <div class="max-w-7xl mx-auto px-8 lg:px-12">
-        <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
-          <div>
-            <h2 class="text-4xl font-serif text-[var(--text-primary)] mb-4">Featured Series</h2>
-            <div class="h-1 w-24 bg-[var(--accent)]"></div>
+  <!-- Featured writing -->
+  {featuredPost && (
+    <section class="s2s-span-half home-block home-scope" aria-labelledby="home-writing">
+      <SectionHeading
+        id="home-writing"
+        icon="essays"
+        title="Featured Writing"
+        label="Essays"
+        description="Long-form thinking on agents, systems and delivery."
+        action={{ label: 'View all writing', href: '/essays/' }}
+      />
+      <Card variant="panel" href={hrefFor(featuredPost)} class="home-essay">
+        {featuredPost.data.heroImage && (
+          <img class="home-essay__img" src={featuredPost.data.heroImage} alt="" width="280" height="190" loading="lazy" decoding="async" />
+        )}
+        <div class="home-essay__body">
+          <div class="home-essay__top">
+            <div class="home-chips">
+              {featuredPost.data.tags.slice(0, 3).map((t) => <Badge variant="chip" text={getTagLabel(t)} />)}
+            </div>
+            {featuredPost.data.readTime && <span class="s2s-meta home-nowrap">{readLabel(featuredPost.data.readTime)}</span>}
           </div>
-          <a class="font-mono text-sm uppercase tracking-widest text-[var(--accent)] hover:text-[var(--text-primary)] transition-colors flex items-center gap-2" href="/series/">
-            View All Series <span class="material-symbols-outlined text-sm">arrow_forward</span>
-          </a>
+          <h3 class="home-card-title">{featuredPost.data.title}</h3>
+          <p class="home-card-desc">{featuredPost.data.excerpt}</p>
+          <p class="s2s-meta home-essay__date">
+            <time datetime={featuredPost.data.date.toISOString()}>{formatDate(featuredPost.data.date)}</time>
+            {featuredPost.data.category && <span>· {featuredPost.data.category}</span>}
+          </p>
         </div>
-        
-        <a href={`/series/${activeSeries[0].id}/`} class="tilt-card transform-gpu ease-out will-change-transform block relative group overflow-hidden rounded-xl bg-[var(--bg-surface)] shadow-ambient border-none">
-          <div class="grid grid-cols-1 lg:grid-cols-2">
-            <div class="p-10 sm:p-12 flex flex-col justify-center relative overflow-hidden">
-              <div class="absolute top-0 left-0 w-1 h-full bg-[var(--accent)]"></div>
-              <div class="font-mono text-xs tracking-tighter text-[var(--accent)] mb-4 uppercase">Volume 01 / Deep Dive</div>
-              <h3 class="text-4xl sm:text-5xl font-serif text-[var(--text-primary)] mb-6 leading-tight group-hover:text-[var(--accent)] transition-colors">{activeSeries[0].data.title}</h3>
-              <p class="text-[var(--text-secondary)] font-sans text-lg leading-relaxed mb-8">
-                  {activeSeries[0].data.excerpt}
-              </p>
-              <div class="flex items-center gap-6">
-                  <span class="text-sm font-mono text-[var(--text-tertiary)]">{seriesPostCounts.get(activeSeries[0].id) ?? 0} Part Series</span>
-              </div>
-            </div>
-            
-            <div class="relative min-h-[400px] bg-[var(--bg-base)] overflow-hidden">
-                {activeSeries[0].data.heroImage ? (
-                  <img src={activeSeries[0].data.heroImage} alt={activeSeries[0].data.title} class="absolute inset-0 w-full h-full object-cover opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700" />
-                ) : (
-                  <div class="absolute inset-0 opacity-20 bg-gradient-to-tr from-[var(--bg-base)] via-[var(--bg-subtle)] to-[var(--accent-muted)]">
-                      <div class="h-full w-full bg-[linear-gradient(to_right,var(--bg-surface)_1px,transparent_1px),linear-gradient(to_bottom,var(--bg-surface)_1px,transparent_1px)] bg-[size:40px_40px]"></div>
-                  </div>
-                )}
-                <div class="absolute inset-0 bg-gradient-to-r from-[var(--bg-surface)] via-transparent to-transparent"></div>
-            </div>
-          </div>
-        </a>
-      </div>
+      </Card>
     </section>
   )}
 
-  <!-- =========================================================
-       CORE CONTENT PILLARS
-       ========================================================= -->
-  <section class="animate-on-scroll py-24 bg-[var(--bg-base)]">
-    <div class="max-w-7xl mx-auto px-8 lg:px-12">
-      <div class="mb-16">
-        <h2 class="text-sm font-mono uppercase tracking-[0.3em] text-[var(--text-tertiary)] mb-2">The Architecture</h2>
-        <h3 class="text-4xl font-serif text-[var(--text-primary)]">Core Content Pillars</h3>
-      </div>
-      
-      <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {TOPIC_HUBS.slice(0, 3).map((hub, i) => (
-          <a href={`/topics/${hub.slug}/`} class={`tilt-card transform-gpu ease-out will-change-transform group p-8 rounded-xl transition-all flex flex-col justify-between border-none ${i === 0 ? 'md:col-span-2 lg:col-span-2 bg-[var(--bg-surface)] hover:bg-[var(--bg-subtle)] aspect-video md:aspect-auto' : 'bg-[var(--bg-subtle)] hover:bg-[var(--bg-surface)]'}`}>
-            <div>
-              <span class={`material-symbols-outlined text-4xl mb-6 ${topicIconColors[hub.slug] ?? 'text-[var(--accent)]'}`}>
-                  {i === 0 ? 'smart_toy' : i === 1 ? 'groups' : 'architecture'}
+  <!-- Selected projects -->
+  <section class="s2s-span-half home-block home-scope" aria-labelledby="home-projects">
+    <SectionHeading
+      id="home-projects"
+      icon="projects"
+      title="Selected Projects"
+      label="Build"
+      description="From research to working systems."
+      action={{ label: 'View all projects', href: '/portfolio/' }}
+    />
+    <ul class="home-projects">
+      {selectedProjects.map((p) => (
+        <li>
+          <Card variant="tile" href={githubOf(p)} class="home-project">
+            <span class="home-project__icon"><Icon name={projectIcon[p.category] ?? 'projects'} size={22} /></span>
+            <h3 class="home-project__title">{p.title}</h3>
+            <p class="home-project__desc">{p.description}</p>
+            <div class="home-chips home-project__foot">
+              <Badge variant="chip" text={p.category} />
+              <span class:list={['home-status', p.status === 'active' ? 'home-status--live' : 'home-status--pending']}>
+                <span class="home-status__dot" aria-hidden="true"></span>{statusLabel[p.status]}
               </span>
-              <h4 class="text-2xl font-serif text-[var(--text-primary)] mb-4">{hub.label}</h4>
-              <p class="text-[var(--text-secondary)] font-sans text-sm leading-relaxed">{hub.description}</p>
             </div>
-            <div class={`mt-8 font-mono text-xs uppercase tracking-widest flex items-center gap-2 ${topicIconColors[hub.slug] ?? 'text-[var(--accent)]'}`}>
-                Explore <span class="material-symbols-outlined text-xs">north_east</span>
-            </div>
-          </a>
-        ))}
-        
-        <!-- Pillar 4 (Special Bottom) -->
-        <div class="tilt-card transform-gpu ease-out will-change-transform md:col-span-3 lg:col-span-4 p-8 rounded-xl bg-[var(--bg-base)] border border-[var(--border-subtle)] flex flex-col md:flex-row items-center justify-between gap-8 hover:border-[var(--accent)] transition-colors">
-            <div class="flex items-center gap-6">
-                <span class="material-symbols-outlined text-5xl text-[var(--text-tertiary)] opacity-50">terminal</span>
-                <div>
-                    <h4 class="text-2xl font-serif text-[var(--text-primary)] mb-1">Side Projects & Lab</h4>
-                    <p class="text-[var(--text-secondary)] font-sans text-sm">Where theory meets the metal. Open source tools and experiments from the builder's desk.</p>
-                </div>
-            </div>
-            <a href="/projects/" class="whitespace-nowrap px-6 py-3 bg-[var(--bg-surface)] text-[var(--text-primary)] font-mono text-xs uppercase tracking-widest rounded-md hover:bg-[var(--accent-subtle)] hover:text-[#000] focus:ring focus:ring-[var(--accent)] focus:outline-none transition-all">
-                Browse the Lab
-            </a>
-        </div>
-      </div>
-    </div>
+          </Card>
+        </li>
+      ))}
+    </ul>
   </section>
 
-  <!-- =========================================================
-       LATEST ESSAYS
-       ========================================================= -->
-  <section class="animate-on-scroll py-24 bg-[var(--bg-surface)]">
-    <div class="max-w-7xl mx-auto px-8 lg:px-12">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-16">
-            <div class="lg:col-span-4">
-                <div class="sticky top-32">
-                    <h2 class="text-4xl sm:text-5xl font-serif text-[var(--text-primary)] mb-8">Latest <br/><span class="text-[var(--accent)] italic">Essays</span></h2>
-                    <p class="text-[var(--text-secondary)] font-sans mb-8 leading-relaxed">
-                        Regular transmissions on the intersection of management, engineering, and systems thinking.
-                    </p>
-                    <div class="flex flex-col gap-4">
-                        <div class="flex items-center gap-3 text-[var(--text-tertiary)]">
-                            <span class="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"></span>
-                            <span class="font-mono text-xs uppercase tracking-widest">Deep Dives & Frameworks</span>
-                        </div>
-                         <div class="flex items-center gap-3 text-[var(--text-tertiary)]">
-                            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                            <span class="font-mono text-xs uppercase tracking-widest">Field Notes</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="lg:col-span-8">
-                <div class="flex flex-col">
-                    {publishedPosts.slice(0, 5).map((post, i) => (
-                        <article class="group relative py-8 border-b border-[var(--border-subtle)] last:border-0 hover:bg-[var(--bg-subtle)] -mx-6 px-6 rounded-xl transition-colors">
-                            <div class="flex flex-col sm:flex-row sm:items-baseline justify-between gap-4 mb-4">
-                                <div class="flex gap-4 items-center">
-                                    <span class="font-mono text-[10px] text-[var(--text-tertiary)] uppercase tracking-tight">
-                                        {post.data.date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                                    </span>
-                                    <div class="h-px w-8 bg-[var(--border-subtle)]"></div>
-                                    <span class="px-2 py-0.5 rounded bg-[var(--accent-subtle)] text-[var(--accent)] text-[10px] font-mono uppercase tracking-widest">
-                                        {post.data.category}
-                                    </span>
-                                </div>
-                                <span class="font-mono text-[10px] text-[var(--text-tertiary)] uppercase tracking-widest">{post.data.readTime}</span>
-                            </div>
-                            <h3 class="text-3xl font-serif text-[var(--text-primary)] mb-4 group-hover:text-[var(--accent)] transition-colors">
-                                <a href={`/essays/${post.id}/`} class="focus:outline-none">
-                                    <span class="absolute inset-0" aria-hidden="true"></span>
-                                    {post.data.title}
-                                </a>
-                            </h3>
-                            <p class="text-[var(--text-secondary)] font-sans mb-6 max-w-2xl leading-relaxed">{post.data.excerpt}</p>
-                            <span class="inline-flex items-center gap-2 font-mono text-xs uppercase tracking-widest text-[var(--text-primary)] group-hover:underline underline-offset-4 pointer-events-none">Read Full Transmission <span class="material-symbols-outlined text-sm">arrow_outward</span></span>
-                        </article>
-                    ))}
-                </div>
-            </div>
-        </div>
-    </div>
-  </section>
-
-  <!-- =========================================================
-       FROM THE BUILD LOOP (recent dev stories)
-       ========================================================= -->
-  {recentStories.length > 0 && (
-    <section class="animate-on-scroll py-24 bg-[var(--bg-base)]">
-      <div class="max-w-7xl mx-auto px-8 lg:px-12">
-        <div class="flex items-end justify-between mb-16 gap-6">
-          <div>
-            <h2 class="text-sm font-mono uppercase tracking-[0.3em] text-[var(--text-tertiary)] mb-2">Agentic Build Notes</h2>
-            <h3 class="text-4xl font-serif text-[var(--text-primary)]">From the Build Loop</h3>
+  <!-- Notebook -->
+  {latestStory && (
+    <section class="s2s-span-half home-block home-scope" aria-labelledby="home-notebook">
+      <SectionHeading
+        id="home-notebook"
+        icon="notebooks"
+        title="Notebook"
+        label="Build notes"
+        description="Work in progress, written down as it happens."
+        action={{ label: 'View all notebooks', href: '/dev-stories/' }}
+      />
+      <Card variant="panel" href={hrefFor(latestStory)} class="home-note">
+        <V2Image kind="sticker" id="notebook" class="home-note__art" />
+        <div class="home-note__body">
+          <h3 class="home-card-title home-card-title--sm">{latestStory.data.title}</h3>
+          <p class="s2s-meta">
+            <time datetime={latestStory.data.date.toISOString()}>{formatDate(latestStory.data.date)}</time>
+            · {readLabel(latestStory.data.readTime)}
+          </p>
+          <p class="home-card-desc home-card-desc--clamp">{latestStory.data.excerpt}</p>
+          <div class="home-chips">
+            {latestStory.data.tags.slice(0, 2).map((t) => <Badge variant="chip" text={getTagLabel(t)} />)}
           </div>
-          <a
-            href="/dev-stories/"
-            class="hidden sm:inline-flex items-center gap-1.5 font-mono text-sm uppercase tracking-widest text-[var(--accent)] hover:text-[var(--text-primary)] transition-colors"
-          >
-            All Dev Stories
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
-            </svg>
-          </a>
         </div>
-
-        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {recentStories.map((story) => (
-            <StoryCard
-              title={story.data.title}
-              excerpt={story.data.excerpt}
-              date={story.data.date}
-              readTime={story.data.readTime}
-              slug={story.id}
-              storyType={story.data.storyType}
-              projects={story.data.projects}
-              automated={story.data.automated}
-              workflow={story.data.workflow}
-              tags={story.data.tags}
-              featured={false}
-            />
-          ))}
-        </div>
-
-        <div class="mt-10 sm:hidden">
-          <a
-            href="/dev-stories/"
-            class="inline-flex items-center gap-1.5 font-mono text-sm uppercase tracking-widest text-[var(--accent)] hover:text-[var(--text-primary)] transition-colors"
-          >
-            All Dev Stories
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
-            </svg>
-          </a>
-        </div>
-      </div>
+      </Card>
     </section>
   )}
 
-  <!-- =========================================================
-       FEATURED PROJECTS
-       ========================================================= -->
-  {featuredProjects.length > 0 && (
-    <section class="bg-[var(--bg-subtle)]">
-      <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-20">
-        <div class="flex items-end justify-between mb-10">
-          <div>
-            <p class="font-mono text-xs font-bold uppercase tracking-widest text-[var(--accent)] mb-2">Builds & artifacts</p>
-            <h2 class="font-serif text-4xl font-bold tracking-tight text-[var(--text-primary)]">Featured Projects</h2>
-          </div>
-          <a
-            href="/projects/"
-            class="hidden sm:inline-flex items-center gap-1.5 text-sm font-medium text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors"
-          >
-            All projects
-            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>
-            </svg>
-          </a>
-        </div>
-
-        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {featuredProjects.map((p) => (
-            <ProjectCard
-              title={p.data.title}
-              excerpt={p.data.excerpt}
-              date={p.data.date}
-              type={p.data.type}
-              tags={p.data.tags}
-              slug={p.id}
-              featured={p.data.featured ?? false}
-              visibility={p.data.visibility}
-            />
-          ))}
+  <!-- Studio -->
+  <section class="s2s-span-half home-block home-scope" aria-labelledby="home-studio">
+    <SectionHeading
+      id="home-studio"
+      icon="studio"
+      title="Studio"
+      label="Components"
+      description="Reusable tools for researchers and builders."
+      action={{ label: 'View all studio', href: '/portfolio/ui/' }}
+    />
+    <Card variant="panel" href="/portfolio/ui/" class="home-studio">
+      <span class="home-studio__icon"><Icon name="studio" size={24} /></span>
+      <div class="home-studio__body">
+        <h3 class="home-card-title home-card-title--sm">@miethe/ui</h3>
+        <p class="home-card-desc home-card-desc--clamp">{studio?.description ?? 'The component library behind this site.'}</p>
+        <div class="home-chips">
+          <Badge variant="chip" text="TypeScript" />
+          <Badge variant="chip" text="React" />
+          <Badge variant="count" text={`${uiDocs.length} documented`} />
         </div>
       </div>
-    </section>
-  )}
+      <V2Image kind="sticker" id="signal-noise" class="home-studio__art" />
+    </Card>
+  </section>
+</HubLayout>
 
-</BaseLayout>
+<style>
+  .home-block { min-width: 0; }
+
+  .home-chips { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+  .home-nowrap { white-space: nowrap; }
+
+  .home-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font: 450 var(--type-micro) / 1 var(--font-sans);
+    color: var(--s2s-ink-muted);
+  }
+  .home-status__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 999px;
+    background: currentColor;
+  }
+  .home-status--live .home-status__dot { background: var(--s2s-secondary); box-shadow: 0 0 6px var(--s2s-secondary); }
+  .home-status--pending .home-status__dot { background: transparent; border: 1px solid var(--s2s-accent); }
+
+  .home-card-title {
+    margin: 10px 0 6px;
+    font: var(--type-heading-weight) var(--type-title) / 1.15 var(--font-display);
+    color: var(--s2s-ink);
+    text-wrap: balance;
+  }
+  .home-card-title--sm { font-size: var(--type-card); margin-top: 0; }
+  .home-card-desc {
+    margin: 0 0 12px;
+    font: 400 var(--type-ui) / 1.5 var(--font-sans);
+    color: var(--s2s-ink-muted);
+  }
+  .home-card-desc--clamp {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* ---------- Featured investigation (in preparation) ---------- */
+  .home-scope :global(.home-lab) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+  .home-lab__art {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 180px;
+    border: 1px solid var(--s2s-rule-strong);
+    border-radius: var(--s2s-radius-control);
+    background:
+      radial-gradient(70% 80% at 50% 30%, var(--s2s-accent-soft), transparent 70%),
+      var(--s2s-inset);
+    overflow: hidden;
+  }
+  .home-lab__art :global(img) { width: min(88%, 260px); height: auto; display: block; }
+  .home-lab__art-caption {
+    position: absolute;
+    left: 12px;
+    top: 10px;
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.625rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--s2s-ink-subtle);
+  }
+  .home-lab__title {
+    margin: 12px 0 6px;
+    font: var(--type-heading-weight) var(--type-title) / 1.15 var(--font-display);
+    color: var(--s2s-ink);
+  }
+  .home-lab__desc {
+    margin: 0;
+    max-width: 58ch;
+    font: 400 var(--type-ui) / 1.55 var(--font-sans);
+    color: var(--s2s-ink-soft);
+  }
+  .home-lab__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+    margin: 14px 0 0;
+    padding: 0;
+    list-style: none;
+    font: 400 var(--type-micro) / 1 var(--font-sans);
+    color: var(--s2s-ink-muted);
+  }
+  .home-lab__meta li { display: inline-flex; align-items: center; gap: 6px; }
+  .home-lab__actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 18px; }
+
+  /* ---------- Evidence at a glance ---------- */
+  :global(.home-glance.home-glance) { display: flex; flex-direction: column; }
+  .home-glance__list { flex: 1; }
+  .home-glance__quote {
+    margin: 12px 0 0;
+    text-align: right;
+    font: italic 400 var(--type-ui) / 1.4 var(--font-serif);
+    color: var(--s2s-ink-soft);
+  }
+
+  /* ---------- Featured writing ---------- */
+  .home-scope :global(.home-essay) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    color: inherit;
+    text-decoration: none;
+  }
+  .home-essay__img {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: var(--s2s-radius-control);
+    border: 1px solid var(--s2s-rule);
+    background: var(--s2s-inset);
+  }
+  .home-essay__top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+  .home-essay__date { display: flex; gap: 6px; margin: 0; }
+
+  /* ---------- Selected projects ---------- */
+  .home-projects {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .home-projects > li { display: flex; min-width: 0; }
+  .home-scope :global(.home-project) {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    color: inherit;
+    text-decoration: none;
+  }
+  .home-project__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 999px;
+    border: 1px solid var(--s2s-rule-strong);
+    background: var(--s2s-inset);
+    color: var(--s2s-accent);
+    --icon-accent: var(--s2s-accent-strong);
+  }
+  .home-project__title {
+    margin: 12px 0 4px;
+    font: var(--type-heading-weight) var(--type-card) / 1.2 var(--font-display);
+    color: var(--s2s-ink);
+  }
+  .home-project__desc {
+    flex: 1;
+    margin: 0 0 12px;
+    font: 400 var(--type-micro) / 1.5 var(--font-sans);
+    color: var(--s2s-ink-muted);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .home-project__foot { justify-content: space-between; }
+
+  /* ---------- Notebook ---------- */
+  .home-scope :global(.home-note) {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 16px;
+    color: inherit;
+    text-decoration: none;
+  }
+  .home-scope :global(.home-note__art) { display: block; }
+  .home-scope :global(.home-note__art) :global(img) { display: block; width: 100%; max-width: 220px; height: auto; margin-inline: auto; }
+  .home-note__body .s2s-meta { margin: 0 0 8px; }
+
+  /* ---------- Studio ---------- */
+  .home-scope :global(.home-studio) {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 16px;
+    align-items: start;
+    color: inherit;
+    text-decoration: none;
+  }
+  .home-studio__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: var(--s2s-radius-control);
+    border: 1px solid var(--s2s-rule-strong);
+    background: var(--s2s-inset);
+    color: var(--s2s-accent);
+    --icon-accent: var(--s2s-accent-strong);
+  }
+  .home-scope :global(.home-studio__art) { display: none; }
+
+  @media (min-width: 640px) {
+    .home-scope :global(.home-lab) { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.25fr); }
+    .home-scope :global(.home-essay) { grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.6fr); }
+    .home-essay__img { aspect-ratio: auto; height: 100%; min-height: 150px; max-height: 170px; }
+    .home-projects { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .home-scope :global(.home-note) { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.3fr); align-items: center; }
+    .home-scope :global(.home-studio) { grid-template-columns: auto minmax(0, 1fr) minmax(0, 0.9fr); }
+    .home-scope :global(.home-studio__art) { display: block; align-self: center; }
+    .home-scope :global(.home-studio__art) :global(img) { display: block; width: 100%; height: auto; border-radius: var(--s2s-radius-control); }
+  }
+</style>
