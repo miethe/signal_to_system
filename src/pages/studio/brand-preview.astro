@@ -1,12 +1,14 @@
 ---
 /**
  * Brand + SVG preview (noindex, unlisted). Every hand-authored brand asset,
- * icon, ornament and diagram on all three language backgrounds and at
- * several sizes, for taste review and screenshot capture.
+ * icon, ornament and diagram on the backgrounds the visual pack's site
+ * mockups actually use, at several sizes, for taste review and capture.
  *
- * Standalone page (no BaseLayout) so the shell's current tokens don't bleed
- * in. The language values below are PREVIEW FIXTURES copied from the design
- * token files (02 §2); the token node owns the real ones.
+ * The three backgrounds are the ones the Studio mockup's own "Design
+ * Languages" switcher shows: Observatory (the dark shell every mockup uses),
+ * Folio (the cream notebook leaf from the Notebooks mockup) and Instrument
+ * (the dark green-grid thumbnail). Values are PREVIEW FIXTURES sampled from
+ * the mockup PNGs; the token node owns the real ones.
  */
 import Mark from '../../components/brand/Mark.astro';
 import Lockup from '../../components/brand/Lockup.astro';
@@ -19,23 +21,16 @@ import LayeredDiamond from '../../components/diagrams/LayeredDiamond.astro';
 import SystemArchitectureDiagram from '../../components/diagrams/SystemArchitectureDiagram.astro';
 
 const languages = [
-  { id: 'observatory', name: 'Observatory', note: 'dark editorial default' },
-  { id: 'folio', name: 'Folio', note: 'paper and ink, Notebooks' },
-  { id: 'instrument', name: 'Instrument', note: 'light technical, Studio' },
+  { id: 'observatory', name: 'Observatory', note: 'the site shell in every mockup' },
+  { id: 'folio', name: 'Folio', note: 'the Notebooks paper leaf' },
+  { id: 'instrument', name: 'Instrument', note: 'the Studio switcher thumbnail' },
 ];
-const navIcons = [
-  ['writing', 'Writing'],
-  ['labs', 'Labs'],
-  ['projects', 'Projects'],
-  ['notebooks', 'Notebooks'],
-  ['studio', 'Studio'],
-];
+const nav = ['Writing', 'Labs', 'Projects', 'Notebooks', 'Studio'];
 const titleCase = (s: string) => s.replace(/-/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
-const markSizes = [16, 20, 24, 32, 48, 96];
 const devFlow = [
   { label: 'Workflow runs', detail: 'Agents execute a bounded task', tone: 'secondary' as const },
   { label: 'AAR generated', detail: 'Automated after-action review', tone: 'secondary' as const },
-  { label: 'Human review', detail: 'Nick edits and approves', state: 'current' as const, tone: 'accent' as const },
+  { label: 'Human review', detail: 'Edited and approved', state: 'current' as const, tone: 'accent' as const },
   { label: 'Published', detail: 'Labelled Automated + Reviewed', state: 'next' as const, tone: 'muted' as const },
 ];
 ---
@@ -56,80 +51,85 @@ const devFlow = [
     {languages.map((lang) => (
       <section class="lang" data-language={lang.id} id={lang.id} aria-labelledby={`${lang.id}-h`}>
         <header class="bar">
-          <Lockup size={30} href="#top" />
+          <Lockup layout="header" size={28} href="#top" />
           <nav aria-label="Primary (preview)">
-            {navIcons.map(([icon, label], i) => (
-              <a href="#" class:list={[i === 0 && 'active']}>
-                <Icon name={icon} size={18} />
-                {label}
-              </a>
-            ))}
-            <span class="search"><Icon name="search" size={16} label="Search" /></span>
+            {nav.map((label, i) => <a href="#" class:list={[i === 4 && 'active']}>{label}</a>)}
           </nav>
+          <span class="search"><Icon name="search" size={15} /> Search ideas, experiments, systems…</span>
         </header>
 
-        <p class="kicker">Brand preview / {lang.name} / {lang.note}</p>
-        <h2 id={`${lang.id}-h`}>The orbit and the trail.</h2>
+        <p class="kicker">Brand preview <span aria-hidden="true">→</span> {lang.name} <span aria-hidden="true">·</span> {lang.note}</p>
+        <h2 id={`${lang.id}-h`}>Signal, shaped into a system.</h2>
 
         <div class="grid two">
           <div class="card">
-            <h3>Mark, auto optical size</h3>
-            <div class="row sizes">
-              {markSizes.map((s) => (
-                <figure>
-                  <Mark size={s} />
-                  <figcaption>{s}px{s <= 24 ? ' · small cut' : ''}</figcaption>
-                </figure>
-              ))}
-            </div>
-            <h3>16px: full geometry vs small cut</h3>
-            <div class="row sizes">
-              <figure><Mark size={16} variant="full" /><figcaption>full @16</figcaption></figure>
-              <figure><Mark size={16} variant="small" /><figcaption>small @16</figcaption></figure>
-              <figure><Mark size={24} variant="full" /><figcaption>full @24</figcaption></figure>
-              <figure><Mark size={24} variant="small" /><figcaption>small @24</figcaption></figure>
+            <h3>Primary lockup <small>board 01</small></h3>
+            <div class="row center"><Lockup size={124} /></div>
+            <div class="row center">
+              <Lockup size={72} mono />
+              <Lockup layout="stacked" size={64} />
             </div>
           </div>
           <div class="card">
-            <h3>Lockups</h3>
-            <div class="row lockups">
-              <Lockup size={40} />
-              <Lockup orientation="stacked" size={56} byline="By Nick Miethe" />
-            </div>
-            <h3>Reserve: constellation variant</h3>
+            <h3>Mark sizes <small>≤24px five-bar cut · 25–40px seven-bar cut</small></h3>
             <div class="row sizes">
-              {[24, 32, 48, 96].map((s) => (
+              {[16, 20, 24, 32, 48, 96].map((s) => (
+                <figure><Mark size={s} /><figcaption>{s}px</figcaption></figure>
+              ))}
+            </div>
+            <div class="row sizes">
+              {[16, 24, 32, 48, 96].map((s) => (
+                <figure><Mark size={s} variant="mono" /><figcaption>mono {s}</figcaption></figure>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div class="grid two">
+          <div class="card">
+            <h3>Secondary: monogram <small>board 05 · compact and social · 32px minimum</small></h3>
+            <div class="row sizes">
+              {[32, 48, 64, 112].map((s) => (
+                <figure><Mark size={s} variant="monogram" /><figcaption>{s}px</figcaption></figure>
+              ))}
+              <Lockup layout="monogram" size={64} />
+            </div>
+          </div>
+          <div class="card">
+            <h3>Reserve: constellation <small>board 03 · 24px minimum</small></h3>
+            <div class="row sizes">
+              {[24, 40, 64, 112].map((s) => (
                 <figure><Mark size={s} variant="constellation" /><figcaption>{s}px</figcaption></figure>
               ))}
-              <Lockup size={32} variant="constellation" byline="By Nick Miethe" />
             </div>
           </div>
         </div>
 
         <div class="card">
-          <h3>Favicon set (rendered PNGs, identical in every language)</h3>
+          <h3>Favicon set <small>board favicon idea 01 · identical in every language</small></h3>
           <div class="row sizes favicons">
             <figure><img src="/brand/favicon-16.png" width="16" height="16" alt="" /><figcaption>16</figcaption></figure>
             <figure><img src="/brand/favicon-32.png" width="32" height="32" alt="" /><figcaption>32</figcaption></figure>
             <figure><img src="/brand/favicon.svg" width="32" height="32" alt="" /><figcaption>favicon.svg</figcaption></figure>
             <figure><img src="/brand/apple-touch-icon.png" width="64" height="64" alt="" /><figcaption>180 apple</figcaption></figure>
-            <figure><img src="/brand/icon-192.png" width="64" height="64" alt="" class="rounded" /><figcaption>192</figcaption></figure>
-            <figure><img src="/brand/icon-512.png" width="96" height="96" alt="" class="rounded" /><figcaption>512</figcaption></figure>
-            <figure class="maskable"><img src="/brand/icon-maskable-512.png" width="96" height="96" alt="" /><figcaption>maskable 512 (safe zone)</figcaption></figure>
+            <figure><img src="/brand/icon-192.png" width="64" height="64" alt="" /><figcaption>192</figcaption></figure>
+            <figure><img src="/brand/icon-512.png" width="96" height="96" alt="" /><figcaption>512</figcaption></figure>
+            <figure class="maskable"><img src="/brand/icon-maskable-512.png" width="96" height="96" alt="" /><figcaption>maskable (safe zone)</figcaption></figure>
+            <figure><img src="/brand/monogram-512.png" width="96" height="96" alt="" /><figcaption>social avatar</figcaption></figure>
           </div>
         </div>
 
         <div class="card">
-          <h3>Icons · 24px grid, 1.5 stroke, one accent detail</h3>
+          <h3>Icons <small>after neon_research_icon_grid · 24 grid, 1.5 stroke, mint accent{lang.id !== 'folio' && ', glow'}</small></h3>
           <ul class="icons">
             {iconNames.map((n) => (
-              <li><Icon name={n} size={24} /><span>{titleCase(n)}</span></li>
+              <li><Icon name={n} size={28} glow={lang.id !== 'folio'} /><span>{titleCase(n)}</span></li>
             ))}
           </ul>
           <div class="row sizes">
             {[16, 20, 24, 32, 48].map((s) => (
               <figure class="iconsize">
-                <span>{['labs', 'claims', 'datasets', 'reproduce', 'research-programs'].map((n) => <Icon name={n} size={s} />)}</span>
+                <span>{['labs', 'claims', 'datasets', 'reproduce', 'research-programs'].map((n) => <Icon name={n} size={s} glow={lang.id !== 'folio'} />)}</span>
                 <figcaption>{s}px</figcaption>
               </figure>
             ))}
@@ -137,53 +137,53 @@ const devFlow = [
         </div>
 
         <div class="card">
-          <h3>Section dividers</h3>
-          <SectionDivider variant="sparkle" width="560" />
-          <SectionDivider variant="waveform" width="560" />
-          <SectionDivider variant="moon" width="560" />
+          <h3>Section dividers <small>UI asset sheet</small></h3>
+          <SectionDivider variant="sparkle" width="620" />
+          <SectionDivider variant="waveform" width="620" />
+          <SectionDivider variant="moon" width="620" />
         </div>
 
         <div class="grid two">
           <div class="card">
-            <h3>ProcessLoopDiagram</h3>
-            <ProcessLoopDiagram width="420" />
+            <h3>From ideas to evidence to systems <small>About mockup</small></h3>
+            <ProcessLoopDiagram width="440" />
           </div>
           <div class="card">
-            <h3>DotTimeline · horizontal (About)</h3>
-            <DotTimeline label="Selected timeline" />
-            <h3 class="gap">DotTimeline · vertical, numbered (Dev Stories)</h3>
+            <h3>Selected timeline <small>placeholder defaults</small></h3>
+            <DotTimeline label="Selected timeline (placeholder)" />
+            <h3 class="gap">From execution to a published story <small>Dev Stories</small></h3>
             <DotTimeline orientation="vertical" numbered items={devFlow} label="From execution to a published story" />
           </div>
         </div>
 
         <div class="grid two">
           <div class="card">
-            <h3>LayeredDiamond · labelled (Studio composition)</h3>
+            <h3>How it fits together <small>Studio mockup</small></h3>
             <LayeredDiamond
-              width="460"
+              width="480"
               labels={[
-                { title: 'ResearchHeader', caption: 'Sets the context' },
-                { title: 'ClaimRef', caption: 'Anchors the claim' },
-                { title: 'FigureWithData', caption: 'Adds evidence' },
-                { title: 'NotebookLeaf', caption: 'Captures thinking' },
-                { title: 'ProvenanceTimeline', caption: 'Shows the trail' },
+                { title: 'ResearchHeader', caption: 'Sets the context', icon: 'essays' },
+                { title: 'ClaimRef', caption: 'Anchors the claim', icon: 'claims' },
+                { title: 'FigureWithData', caption: 'Adds evidence', icon: 'figures' },
+                { title: 'NotebookLeaf', caption: 'Captures thinking', icon: 'notebooks' },
+                { title: 'ProvenanceTimeline', caption: 'Shows the trail', icon: 'timeline' },
               ]}
             />
           </div>
           <div class="card">
-            <h3>LayeredDiamond · 3 and 4 layers, bare</h3>
+            <h3>Data stack <small>sticker sheet · 3 and 4 layers</small></h3>
             <div class="row">
-              <LayeredDiamond layers={3} width="180" />
-              <LayeredDiamond layers={4} width="180" />
+              <LayeredDiamond layers={3} width="190" />
+              <LayeredDiamond layers={4} width="190" />
             </div>
-            <h3 class="gap">SystemArchitectureDiagram · orbit</h3>
-            <SystemArchitectureDiagram layout="orbit" width="400" />
+            <h3 class="gap">Orbit map <small>neighbour ring + spokes</small></h3>
+            <SystemArchitectureDiagram layout="orbit" width="420" />
           </div>
         </div>
 
         <div class="card">
-          <h3>SystemArchitectureDiagram · flow (project dossier)</h3>
-          <SystemArchitectureDiagram width="760" />
+          <h3>System architecture <small>Research Foundry dossier mockup</small></h3>
+          <SystemArchitectureDiagram width="780" />
         </div>
       </section>
     ))}
@@ -191,62 +191,68 @@ const devFlow = [
 </html>
 
 <style is:global>
-  :root { color-scheme: light dark; }
-  body { margin: 0; }
+  body { margin: 0; background: #0d1117; }
   [data-language='observatory'] {
-    --canvas: #111517; --surface: #191e21; --ink: #f3f0e9; --muted: #a9b4b7;
-    --accent: #b8a5f2; --secondary: #9cceb9; --rule: #3a4448;
+    --canvas: #0d1117; --surface: #11161b; --rule: #262b34;
+    --ink: #f4ecf8; --muted: #b8bdca; --subtle: #868e9a;
+    --accent: #c6acf7; --violet: #9a68ef; --violet-deep: #7647d0; --secondary: #9eeedc;
+    --mark-top: #5a3fc9; --mark-mid: #c9a8f8; --mark-bottom: #9eeedc; --mark-dot: #8a5ce0;
+    --icon-glow: rgb(154 104 239 / 0.55);
+    --glow: radial-gradient(120% 60% at 50% -10%, rgb(118 71 208 / 0.28), transparent 60%);
   }
   [data-language='folio'] {
-    --canvas: #f6f1e7; --surface: #fffaf1; --ink: #302c29; --muted: #6e645b;
-    --accent: #974b32; --secondary: #456759; --rule: #c9bdad;
+    --canvas: #ece4d9; --surface: #f4ede1; --rule: #d6cabb;
+    --ink: #221f26; --muted: #615d64; --subtle: #817b73;
+    --accent: #643fa6; --violet: #643fa6; --violet-deep: #4a2d86; --secondary: #2f7d5c;
+    --mark-top: #4a2d86; --mark-mid: #7a52c2; --mark-bottom: #2f7d5c; --mark-dot: #643fa6;
+    --glow: none;
   }
   [data-language='instrument'] {
-    --canvas: #f0f4f7; --surface: #ffffff; --ink: #142d42; --muted: #4f6579;
-    --accent: #244fb0; --secondary: #006d70; --rule: #b9c7d2;
+    --canvas: #0f1318; --surface: #12161c; --rule: #2c3b37;
+    --ink: #e6e9ee; --muted: #c6c8d0; --subtle: #868e9a;
+    --accent: #6cc79a; --violet: #9a68ef; --violet-deep: #7647d0; --secondary: #6cc79a;
+    --mark-top: #5a3fc9; --mark-mid: #c9a8f8; --mark-bottom: #9eeedc; --mark-dot: #8a5ce0;
+    --icon-glow: rgb(108 199 154 / 0.45);
+    --glow: linear-gradient(#405a5122 1px, transparent 1px) 0 0 / 32px 32px, linear-gradient(90deg, #405a5122 1px, transparent 1px) 0 0 / 32px 32px;
   }
   .lang {
     --font-display: Georgia, 'Times New Roman', serif;
-    --font-sans: 'Helvetica Neue', Arial, system-ui, sans-serif;
+    --font-sans: 'Avenir Next', 'Helvetica Neue', Arial, system-ui, sans-serif;
     --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
     --icon-accent: var(--secondary);
-    background: var(--canvas);
+    background: var(--glow), var(--canvas);
     color: var(--ink);
     font-family: var(--font-sans);
-    padding: 28px 48px 48px;
+    padding: 22px 48px 44px;
   }
 </style>
 
 <style>
-  .bar {
-    display: flex; align-items: center; justify-content: space-between;
-    padding-bottom: 18px; border-bottom: 1px solid var(--rule); margin-bottom: 28px;
-  }
-  nav { display: flex; align-items: center; gap: 22px; font-size: 14px; }
-  nav a { display: inline-flex; align-items: center; gap: 7px; color: var(--ink); text-decoration: none; }
-  nav a.active { color: var(--accent); }
-  nav a :global(.s2s-icon) { color: var(--muted); }
-  nav a.active :global(.s2s-icon) { color: var(--accent); }
-  .search { display: inline-grid; place-items: center; width: 30px; height: 30px; border: 1px solid var(--rule); border-radius: 6px; color: var(--muted); }
-  .kicker { font: 11px var(--font-mono); letter-spacing: 0.14em; text-transform: uppercase; color: var(--secondary); margin: 0 0 6px; }
-  h2 { font: 400 40px/1.1 var(--font-display); margin: 0 0 24px; }
-  h3 { font: 500 11px var(--font-mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin: 0 0 14px; }
+  .bar { display: flex; align-items: center; gap: 48px; padding-bottom: 16px; border-bottom: 1px solid var(--rule); margin-bottom: 26px; }
+  nav { display: flex; gap: 30px; font-size: 14px; margin-left: auto; }
+  nav a { color: var(--ink); text-decoration: none; padding-bottom: 6px; border-bottom: 2px solid transparent; }
+  nav a.active { border-bottom-color: var(--accent); }
+  .search { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: var(--subtle); border: 1px solid var(--rule); border-radius: 6px; padding: 7px 12px; width: 250px; white-space: nowrap; }
+  .kicker { font-size: 11px; font-weight: 500; letter-spacing: 0.24em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
+  h2 { font: 400 44px/1.1 var(--font-display); margin: 0 0 24px; letter-spacing: -0.01em; }
+  h3 { font: 400 18px var(--font-display); color: var(--ink); margin: 0 0 16px; }
+  h3 small { font: 500 10px var(--font-sans); letter-spacing: 0.18em; text-transform: uppercase; color: var(--subtle); margin-left: 10px; }
   h3.gap { margin-top: 26px; }
   .grid.two { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  .card { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 20px 22px; margin-bottom: 20px; }
-  .row { display: flex; align-items: flex-end; gap: 22px; flex-wrap: wrap; margin-bottom: 18px; }
-  .lockups { align-items: center; gap: 48px; }
+  .card { background: var(--surface); border: 1px solid var(--rule); border-radius: 10px; padding: 20px 24px; margin-bottom: 20px; }
+  .row { display: flex; align-items: flex-end; gap: 26px; flex-wrap: wrap; margin-bottom: 18px; }
+  .row.center { justify-content: center; align-items: center; gap: 56px; margin: 8px 0 24px; }
   figure { margin: 0; display: flex; flex-direction: column; align-items: center; gap: 8px; }
-  figcaption { font: 10px var(--font-mono); color: var(--muted); letter-spacing: 0.04em; }
-  .favicons img.rounded { border-radius: 14px; }
+  figcaption { font-size: 10px; letter-spacing: 0.06em; color: var(--subtle); }
+  .favicons img { border-radius: 0; }
   .maskable { position: relative; }
   .maskable::after {
     content: ''; position: absolute; top: 9.6px; left: 50%; width: 76.8px; height: 76.8px;
     transform: translateX(-50%); border-radius: 50%; border: 1px dashed var(--secondary); pointer-events: none;
   }
-  .icons { list-style: none; margin: 0 0 20px; padding: 0; display: grid; grid-template-columns: repeat(9, 1fr); gap: 18px 8px; }
-  .icons li { display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--accent); }
+  .icons { list-style: none; margin: 0 0 22px; padding: 0; display: grid; grid-template-columns: repeat(9, 1fr); gap: 20px 8px; }
+  .icons li { display: flex; flex-direction: column; align-items: center; gap: 9px; color: var(--accent); }
   .icons span { font-size: 11px; color: var(--muted); text-align: center; }
-  .iconsize span { display: flex; gap: 10px; color: var(--ink); }
-  :global(.s2s-divider) { margin: 10px 0 18px; }
+  .iconsize span { display: flex; gap: 10px; color: var(--accent); }
+  :global(.s2s-divider) { margin: 8px 0 18px; }
 </style>
