@@ -1,0 +1,870 @@
+{
+  "schemaVersion": 1,
+  "generatedFrom": {
+    "commit": "78de390",
+    "buildCommand": "npm run build",
+    "generatedAt": "2026-09-22",
+    "routeCount": 122
+  },
+  "policy": {
+    "defaultAction": "preserve",
+    "redirects": "None are authorized by this baseline. Future redirects require collision, chain, and loop tests.",
+    "fragments": "Fragment identifiers are client-side anchors and are not emitted as separate files."
+  },
+  "routes": [
+    {
+      "path": "/404.html",
+      "output": "404.html",
+      "family": "site",
+      "action": "preserve",
+      "target": "/404.html"
+    },
+    {
+      "path": "/about/",
+      "output": "about/index.html",
+      "family": "site",
+      "action": "preserve",
+      "target": "/about/"
+    },
+    {
+      "path": "/aos/execution/",
+      "output": "aos/execution/index.html",
+      "family": "aos",
+      "action": "preserve",
+      "target": "/aos/execution/"
+    },
+    {
+      "path": "/aos/",
+      "output": "aos/index.html",
+      "family": "aos",
+      "action": "preserve",
+      "target": "/aos/"
+    },
+    {
+      "path": "/aos/intents/",
+      "output": "aos/intents/index.html",
+      "family": "aos",
+      "action": "preserve",
+      "target": "/aos/intents/"
+    },
+    {
+      "path": "/aos/orchestration/",
+      "output": "aos/orchestration/index.html",
+      "family": "aos",
+      "action": "preserve",
+      "target": "/aos/orchestration/"
+    },
+    {
+      "path": "/aos/research/",
+      "output": "aos/research/index.html",
+      "family": "aos",
+      "action": "preserve",
+      "target": "/aos/research/"
+    },
+    {
+      "path": "/dev-stories/aar-the-opm-1-g-gate-loop-mutation-verify-in-the-fix-step-not-the-next-review-ro/",
+      "output": "dev-stories/aar-the-opm-1-g-gate-loop-mutation-verify-in-the-fix-step-not-the-next-review-ro/index.html",
+      "family": "dev-stories",
+      "action": "preserve",
+      "target": "/dev-stories/aar-the-opm-1-g-gate-loop-mutation-verify-in-the-fix-step-not-the-next-review-ro/"
+    },
+    {
+      "path": "/dev-stories/after-action-report-fable-5-one-shot-command-center-build/",
+      "output": "dev-stories/after-action-report-fable-5-one-shot-command-center-build/index.html",
+      "family": "dev-stories",
+      "action": "preserve",
+      "target": "/dev-stories/after-action-report-fable-5-one-shot-command-center-build/"
+    },
+    {
+      "path": "/dev-stories/boxbrain-v2-design-uplift-orchestration-after-action-review/",
+      "output": "dev-stories/boxbrain-v2-design-uplift-orchestration-after-action-review/index.html",
+      "family": "dev-stories",
+      "action": "preserve",
+      "target": "/dev-stories/boxbrain-v2-design-uplift-orchestration-after-action-review/"
+    },
+    {
+      "path": "/dev-stories/dev-stories-b2-enterprise-multi-tenancy/",
+      "output": "dev-stories/dev-stories-b2-enterprise-multi-tenancy/index.html",
+      "family": "dev-stories",
+      "action": "preserve",
+      "target": "/dev-stories/dev-stories-b2-enterprise-multi-tenancy/"
+    },
+    {
+      "path": "/dev-stories/",
+      "output": "dev-stories/index.html",
+      "family": "dev-stories",
+      "action": "preserve",
+      "target": "/dev-stories/"
+    },
+    {
+      "path": "/dev-stories/m6-abstraction-engine-after-action-review-expandable-to-e2e/",
+      "output": "dev-stories/m6-abstraction-engine-after-action-review-expandable-to-e2e/index.html",
+      "family": "dev-stories",
+      "action": "preserve",
+      "target": "/dev-stories/m6-abstraction-engine-after-action-review-expandable-to-e2e/"
+    },
+    {
+      "path": "/dev-stories/orchestrator/Fable 5/",
+      "output": "dev-stories/orchestrator/Fable 5/index.html",
+      "family": "dev-stories",
+      "action": "preserve",
+      "target": "/dev-stories/orchestrator/Fable 5/"
+    },
+    {
+      "path": "/essays/agentic-operations-flow/",
+      "output": "essays/agentic-operations-flow/index.html",
+      "family": "essay-reader",
+      "action": "preserve",
+      "target": "/essays/agentic-operations-flow/"
+    },
+    {
+      "path": "/essays/contract-as-spec-worked-example/",
+      "output": "essays/contract-as-spec-worked-example/index.html",
+      "family": "essay-reader",
+      "action": "preserve",
+      "target": "/essays/contract-as-spec-worked-example/"
+    },
+    {
+      "path": "/essays/governed-agentic-sdlc-01-productivity-paradox/",
+      "output": "essays/governed-agentic-sdlc-01-productivity-paradox/index.html",
+      "family": "essay-reader",
+      "action": "preserve",
+      "target": "/essays/governed-agentic-sdlc-01-productivity-paradox/"
+    },
+    {
+      "path": "/essays/",
+      "output": "essays/index.html",
+      "family": "essay-reader",
+      "action": "preserve",
+      "target": "/essays/"
+    },
+    {
+      "path": "/essays/the-contract-is-the-work/",
+      "output": "essays/the-contract-is-the-work/index.html",
+      "family": "essay-reader",
+      "action": "preserve",
+      "target": "/essays/the-contract-is-the-work/"
+    },
+    {
+      "path": "/essays/the-registry-wave-agentic-artifact-supply-chain/evidence/",
+      "output": "essays/the-registry-wave-agentic-artifact-supply-chain/evidence/index.html",
+      "family": "essay-reader",
+      "action": "preserve",
+      "target": "/essays/the-registry-wave-agentic-artifact-supply-chain/evidence/"
+    },
+    {
+      "path": "/essays/the-registry-wave-agentic-artifact-supply-chain/figure/deployment/",
+      "output": "essays/the-registry-wave-agentic-artifact-supply-chain/figure/deployment/index.html",
+      "family": "essay-reader",
+      "action": "preserve",
+      "target": "/essays/the-registry-wave-agentic-artifact-supply-chain/figure/deployment/"
+    },
+    {
+      "path": "/essays/the-registry-wave-agentic-artifact-supply-chain/figure/detection/",
+      "output": "essays/the-registry-wave-agentic-artifact-supply-chain/figure/detection/index.html",
+      "family": "essay-reader",
+      "action": "preserve",
+      "target": "/essays/the-registry-wave-agentic-artifact-supply-chain/figure/detection/"
+    },
+    {
+      "path": "/essays/the-registry-wave-agentic-artifact-supply-chain/figure/drift/",
+      "output": "essays/the-registry-wave-agentic-artifact-supply-chain/figure/drift/index.html",
+      "family": "essay-reader",
+      "action": "preserve",
+      "target": "/essays/the-registry-wave-agentic-artifact-supply-chain/figure/drift/"
+    },
+    {
+      "path": "/essays/the-registry-wave-agentic-artifact-supply-chain/figure/incident/",
+      "output": "essays/the-registry-wave-agentic-artifact-supply-chain/figure/incident/index.html",
+      "family": "essay-reader",
+      "action": "preserve",
+      "target": "/essays/the-registry-wave-agentic-artifact-supply-chain/figure/incident/"
+    },
+    {
+      "path": "/essays/the-registry-wave-agentic-artifact-supply-chain/figure/outcome/",
+      "output": "essays/the-registry-wave-agentic-artifact-supply-chain/figure/outcome/index.html",
+      "family": "essay-reader",
+      "action": "preserve",
+      "target": "/essays/the-registry-wave-agentic-artifact-supply-chain/figure/outcome/"
+    },
+    {
+      "path": "/essays/the-registry-wave-agentic-artifact-supply-chain/figure/use/",
+      "output": "essays/the-registry-wave-agentic-artifact-supply-chain/figure/use/index.html",
+      "family": "essay-reader",
+      "action": "preserve",
+      "target": "/essays/the-registry-wave-agentic-artifact-supply-chain/figure/use/"
+    },
+    {
+      "path": "/essays/the-registry-wave-agentic-artifact-supply-chain/",
+      "output": "essays/the-registry-wave-agentic-artifact-supply-chain/index.html",
+      "family": "essay-reader",
+      "action": "preserve",
+      "target": "/essays/the-registry-wave-agentic-artifact-supply-chain/"
+    },
+    {
+      "path": "/essays/the-registry-wave-agentic-artifact-supply-chain/thread/deployment/",
+      "output": "essays/the-registry-wave-agentic-artifact-supply-chain/thread/deployment/index.html",
+      "family": "essay-reader",
+      "action": "preserve",
+      "target": "/essays/the-registry-wave-agentic-artifact-supply-chain/thread/deployment/"
+    },
+    {
+      "path": "/essays/the-registry-wave-agentic-artifact-supply-chain/thread/detection/",
+      "output": "essays/the-registry-wave-agentic-artifact-supply-chain/thread/detection/index.html",
+      "family": "essay-reader",
+      "action": "preserve",
+      "target": "/essays/the-registry-wave-agentic-artifact-supply-chain/thread/detection/"
+    },
+    {
+      "path": "/essays/the-registry-wave-agentic-artifact-supply-chain/thread/drift/",
+      "output": "essays/the-registry-wave-agentic-artifact-supply-chain/thread/drift/index.html",
+      "family": "essay-reader",
+      "action": "preserve",
+      "target": "/essays/the-registry-wave-agentic-artifact-supply-chain/thread/drift/"
+    },
+    {
+      "path": "/essays/the-registry-wave-agentic-artifact-supply-chain/thread/incident/",
+      "output": "essays/the-registry-wave-agentic-artifact-supply-chain/thread/incident/index.html",
+      "family": "essay-reader",
+      "action": "preserve",
+      "target": "/essays/the-registry-wave-agentic-artifact-supply-chain/thread/incident/"
+    },
+    {
+      "path": "/essays/the-registry-wave-agentic-artifact-supply-chain/thread/outcome/",
+      "output": "essays/the-registry-wave-agentic-artifact-supply-chain/thread/outcome/index.html",
+      "family": "essay-reader",
+      "action": "preserve",
+      "target": "/essays/the-registry-wave-agentic-artifact-supply-chain/thread/outcome/"
+    },
+    {
+      "path": "/essays/the-registry-wave-agentic-artifact-supply-chain/thread/use/",
+      "output": "essays/the-registry-wave-agentic-artifact-supply-chain/thread/use/index.html",
+      "family": "essay-reader",
+      "action": "preserve",
+      "target": "/essays/the-registry-wave-agentic-artifact-supply-chain/thread/use/"
+    },
+    {
+      "path": "/evidence/ancestry/",
+      "output": "evidence/ancestry/index.html",
+      "family": "essay-evidence",
+      "action": "preserve",
+      "target": "/evidence/ancestry/"
+    },
+    {
+      "path": "/evidence/bom-scope/",
+      "output": "evidence/bom-scope/index.html",
+      "family": "essay-evidence",
+      "action": "preserve",
+      "target": "/evidence/bom-scope/"
+    },
+    {
+      "path": "/evidence/context-records/",
+      "output": "evidence/context-records/index.html",
+      "family": "essay-evidence",
+      "action": "preserve",
+      "target": "/evidence/context-records/"
+    },
+    {
+      "path": "/evidence/drift-check/",
+      "output": "evidence/drift-check/index.html",
+      "family": "essay-evidence",
+      "action": "preserve",
+      "target": "/evidence/drift-check/"
+    },
+    {
+      "path": "/evidence/drift-live-run-2026-09-15/",
+      "output": "evidence/drift-live-run-2026-09-15/index.html",
+      "family": "essay-evidence",
+      "action": "preserve",
+      "target": "/evidence/drift-live-run-2026-09-15/"
+    },
+    {
+      "path": "/evidence/drift-manifest-excerpt/",
+      "output": "evidence/drift-manifest-excerpt/index.html",
+      "family": "essay-evidence",
+      "action": "preserve",
+      "target": "/evidence/drift-manifest-excerpt/"
+    },
+    {
+      "path": "/evidence/instruction-parity/",
+      "output": "evidence/instruction-parity/index.html",
+      "family": "essay-evidence",
+      "action": "preserve",
+      "target": "/evidence/instruction-parity/"
+    },
+    {
+      "path": "/evidence/provisioning/",
+      "output": "evidence/provisioning/index.html",
+      "family": "essay-evidence",
+      "action": "preserve",
+      "target": "/evidence/provisioning/"
+    },
+    {
+      "path": "/evidence/run-record/",
+      "output": "evidence/run-record/index.html",
+      "family": "essay-evidence",
+      "action": "preserve",
+      "target": "/evidence/run-record/"
+    },
+    {
+      "path": "/evidence/stale-guidance/",
+      "output": "evidence/stale-guidance/index.html",
+      "family": "essay-evidence",
+      "action": "preserve",
+      "target": "/evidence/stale-guidance/"
+    },
+    {
+      "path": "/evidence/workflow-sync/",
+      "output": "evidence/workflow-sync/index.html",
+      "family": "essay-evidence",
+      "action": "preserve",
+      "target": "/evidence/workflow-sync/"
+    },
+    {
+      "path": "/glossary/",
+      "output": "glossary/index.html",
+      "family": "site",
+      "action": "preserve",
+      "target": "/glossary/"
+    },
+    {
+      "path": "/",
+      "output": "index.html",
+      "family": "site",
+      "action": "preserve",
+      "target": "/"
+    },
+    {
+      "path": "/other-sites/",
+      "output": "other-sites/index.html",
+      "family": "site",
+      "action": "preserve",
+      "target": "/other-sites/"
+    },
+    {
+      "path": "/portfolio/",
+      "output": "portfolio/index.html",
+      "family": "site",
+      "action": "preserve",
+      "target": "/portfolio/"
+    },
+    {
+      "path": "/portfolio/ui/bulk-action-bar/",
+      "output": "portfolio/ui/bulk-action-bar/index.html",
+      "family": "portfolio-ui",
+      "action": "preserve",
+      "target": "/portfolio/ui/bulk-action-bar/"
+    },
+    {
+      "path": "/portfolio/ui/diff-viewer/",
+      "output": "portfolio/ui/diff-viewer/index.html",
+      "family": "portfolio-ui",
+      "action": "preserve",
+      "target": "/portfolio/ui/diff-viewer/"
+    },
+    {
+      "path": "/portfolio/ui/file-tree/",
+      "output": "portfolio/ui/file-tree/index.html",
+      "family": "portfolio-ui",
+      "action": "preserve",
+      "target": "/portfolio/ui/file-tree/"
+    },
+    {
+      "path": "/portfolio/ui/frontmatter-display/",
+      "output": "portfolio/ui/frontmatter-display/index.html",
+      "family": "portfolio-ui",
+      "action": "preserve",
+      "target": "/portfolio/ui/frontmatter-display/"
+    },
+    {
+      "path": "/portfolio/ui/",
+      "output": "portfolio/ui/index.html",
+      "family": "portfolio-ui",
+      "action": "preserve",
+      "target": "/portfolio/ui/"
+    },
+    {
+      "path": "/portfolio/ui/markdown-editor/",
+      "output": "portfolio/ui/markdown-editor/index.html",
+      "family": "portfolio-ui",
+      "action": "preserve",
+      "target": "/portfolio/ui/markdown-editor/"
+    },
+    {
+      "path": "/portfolio/ui/status-badge/",
+      "output": "portfolio/ui/status-badge/index.html",
+      "family": "portfolio-ui",
+      "action": "preserve",
+      "target": "/portfolio/ui/status-badge/"
+    },
+    {
+      "path": "/portfolio/ui/tabs/",
+      "output": "portfolio/ui/tabs/index.html",
+      "family": "portfolio-ui",
+      "action": "preserve",
+      "target": "/portfolio/ui/tabs/"
+    },
+    {
+      "path": "/projects/",
+      "output": "projects/index.html",
+      "family": "project",
+      "action": "preserve",
+      "target": "/projects/"
+    },
+    {
+      "path": "/rss.xml",
+      "output": "rss.xml",
+      "family": "site",
+      "action": "preserve",
+      "target": "/rss.xml"
+    },
+    {
+      "path": "/search.json",
+      "output": "search.json",
+      "family": "site",
+      "action": "preserve",
+      "target": "/search.json"
+    },
+    {
+      "path": "/series/agentic-systems-engineering/",
+      "output": "series/agentic-systems-engineering/index.html",
+      "family": "series",
+      "action": "preserve",
+      "target": "/series/agentic-systems-engineering/"
+    },
+    {
+      "path": "/series/ai-workflows/",
+      "output": "series/ai-workflows/index.html",
+      "family": "series",
+      "action": "preserve",
+      "target": "/series/ai-workflows/"
+    },
+    {
+      "path": "/series/governed-agentic-sdlc/",
+      "output": "series/governed-agentic-sdlc/index.html",
+      "family": "series",
+      "action": "preserve",
+      "target": "/series/governed-agentic-sdlc/"
+    },
+    {
+      "path": "/series/",
+      "output": "series/index.html",
+      "family": "series",
+      "action": "preserve",
+      "target": "/series/"
+    },
+    {
+      "path": "/sitemap-0.xml",
+      "output": "sitemap-0.xml",
+      "family": "site",
+      "action": "preserve",
+      "target": "/sitemap-0.xml"
+    },
+    {
+      "path": "/sitemap-index.xml",
+      "output": "sitemap-index.xml",
+      "family": "site",
+      "action": "preserve",
+      "target": "/sitemap-index.xml"
+    },
+    {
+      "path": "/start-here/",
+      "output": "start-here/index.html",
+      "family": "site",
+      "action": "preserve",
+      "target": "/start-here/"
+    },
+    {
+      "path": "/systems/agentic-node/",
+      "output": "systems/agentic-node/index.html",
+      "family": "systems",
+      "action": "preserve",
+      "target": "/systems/agentic-node/"
+    },
+    {
+      "path": "/systems/aos/",
+      "output": "systems/aos/index.html",
+      "family": "systems",
+      "action": "preserve",
+      "target": "/systems/aos/"
+    },
+    {
+      "path": "/systems/boxbrain/",
+      "output": "systems/boxbrain/index.html",
+      "family": "systems",
+      "action": "preserve",
+      "target": "/systems/boxbrain/"
+    },
+    {
+      "path": "/systems/",
+      "output": "systems/index.html",
+      "family": "systems",
+      "action": "preserve",
+      "target": "/systems/"
+    },
+    {
+      "path": "/systems/intenttree/",
+      "output": "systems/intenttree/index.html",
+      "family": "systems",
+      "action": "preserve",
+      "target": "/systems/intenttree/"
+    },
+    {
+      "path": "/systems/research-foundry/",
+      "output": "systems/research-foundry/index.html",
+      "family": "systems",
+      "action": "preserve",
+      "target": "/systems/research-foundry/"
+    },
+    {
+      "path": "/systems/skillmeat/",
+      "output": "systems/skillmeat/index.html",
+      "family": "systems",
+      "action": "preserve",
+      "target": "/systems/skillmeat/"
+    },
+    {
+      "path": "/tags/abstraction/",
+      "output": "tags/abstraction/index.html",
+      "family": "tag",
+      "action": "preserve",
+      "target": "/tags/abstraction/"
+    },
+    {
+      "path": "/tags/agent-ready-repos/",
+      "output": "tags/agent-ready-repos/index.html",
+      "family": "tag",
+      "action": "preserve",
+      "target": "/tags/agent-ready-repos/"
+    },
+    {
+      "path": "/tags/architecture-decision-records/",
+      "output": "tags/architecture-decision-records/index.html",
+      "family": "tag",
+      "action": "preserve",
+      "target": "/tags/architecture-decision-records/"
+    },
+    {
+      "path": "/tags/architecture-diagram/",
+      "output": "tags/architecture-diagram/index.html",
+      "family": "tag",
+      "action": "preserve",
+      "target": "/tags/architecture-diagram/"
+    },
+    {
+      "path": "/tags/artifact-first/",
+      "output": "tags/artifact-first/index.html",
+      "family": "tag",
+      "action": "preserve",
+      "target": "/tags/artifact-first/"
+    },
+    {
+      "path": "/tags/context-engineering/",
+      "output": "tags/context-engineering/index.html",
+      "family": "tag",
+      "action": "preserve",
+      "target": "/tags/context-engineering/"
+    },
+    {
+      "path": "/tags/delivery-systems/",
+      "output": "tags/delivery-systems/index.html",
+      "family": "tag",
+      "action": "preserve",
+      "target": "/tags/delivery-systems/"
+    },
+    {
+      "path": "/tags/governance/",
+      "output": "tags/governance/index.html",
+      "family": "tag",
+      "action": "preserve",
+      "target": "/tags/governance/"
+    },
+    {
+      "path": "/tags/human-ai-workflow/",
+      "output": "tags/human-ai-workflow/index.html",
+      "family": "tag",
+      "action": "preserve",
+      "target": "/tags/human-ai-workflow/"
+    },
+    {
+      "path": "/tags/",
+      "output": "tags/index.html",
+      "family": "tag",
+      "action": "preserve",
+      "target": "/tags/"
+    },
+    {
+      "path": "/tags/platform-strategy/",
+      "output": "tags/platform-strategy/index.html",
+      "family": "tag",
+      "action": "preserve",
+      "target": "/tags/platform-strategy/"
+    },
+    {
+      "path": "/topics/agentic-sdlc/",
+      "output": "topics/agentic-sdlc/index.html",
+      "family": "topic",
+      "action": "preserve",
+      "target": "/topics/agentic-sdlc/"
+    },
+    {
+      "path": "/topics/ai-agents/",
+      "output": "topics/ai-agents/index.html",
+      "family": "topic",
+      "action": "preserve",
+      "target": "/topics/ai-agents/"
+    },
+    {
+      "path": "/topics/architecture/",
+      "output": "topics/architecture/index.html",
+      "family": "topic",
+      "action": "preserve",
+      "target": "/topics/architecture/"
+    },
+    {
+      "path": "/topics/cto/",
+      "output": "topics/cto/index.html",
+      "family": "topic",
+      "action": "preserve",
+      "target": "/topics/cto/"
+    },
+    {
+      "path": "/topics/platform-engineering/",
+      "output": "topics/platform-engineering/index.html",
+      "family": "topic",
+      "action": "preserve",
+      "target": "/topics/platform-engineering/"
+    },
+    {
+      "path": "/topics/projects/",
+      "output": "topics/projects/index.html",
+      "family": "topic",
+      "action": "preserve",
+      "target": "/topics/projects/"
+    },
+    {
+      "path": "/topics/technical-leadership/",
+      "output": "topics/technical-leadership/index.html",
+      "family": "topic",
+      "action": "preserve",
+      "target": "/topics/technical-leadership/"
+    },
+    {
+      "path": "/workflow-showcase/",
+      "output": "workflow-showcase/index.html",
+      "family": "site",
+      "action": "preserve",
+      "target": "/workflow-showcase/"
+    },
+    {
+      "path": "/workflow-showcase/stage-1/step-1-1.prd.html",
+      "output": "workflow-showcase/stage-1/step-1-1.prd.html",
+      "family": "site",
+      "action": "preserve",
+      "target": "/workflow-showcase/stage-1/step-1-1.prd.html"
+    },
+    {
+      "path": "/workflow-showcase/stage-1/step-1-1.terminal.html",
+      "output": "workflow-showcase/stage-1/step-1-1.terminal.html",
+      "family": "site",
+      "action": "preserve",
+      "target": "/workflow-showcase/stage-1/step-1-1.terminal.html"
+    },
+    {
+      "path": "/workflow-showcase/stage-1/step-1-2.agents.html",
+      "output": "workflow-showcase/stage-1/step-1-2.agents.html",
+      "family": "site",
+      "action": "preserve",
+      "target": "/workflow-showcase/stage-1/step-1-2.agents.html"
+    },
+    {
+      "path": "/workflow-showcase/stage-1/step-1-2.terminal.html",
+      "output": "workflow-showcase/stage-1/step-1-2.terminal.html",
+      "family": "site",
+      "action": "preserve",
+      "target": "/workflow-showcase/stage-1/step-1-2.terminal.html"
+    },
+    {
+      "path": "/workflow-showcase/stage-1/step-1-3.plan.html",
+      "output": "workflow-showcase/stage-1/step-1-3.plan.html",
+      "family": "site",
+      "action": "preserve",
+      "target": "/workflow-showcase/stage-1/step-1-3.plan.html"
+    },
+    {
+      "path": "/workflow-showcase/stage-1/step-1-3.terminal.html",
+      "output": "workflow-showcase/stage-1/step-1-3.terminal.html",
+      "family": "site",
+      "action": "preserve",
+      "target": "/workflow-showcase/stage-1/step-1-3.terminal.html"
+    },
+    {
+      "path": "/workflow-showcase/stage-1/step-1-4.progress.html",
+      "output": "workflow-showcase/stage-1/step-1-4.progress.html",
+      "family": "site",
+      "action": "preserve",
+      "target": "/workflow-showcase/stage-1/step-1-4.progress.html"
+    },
+    {
+      "path": "/workflow-showcase/stage-1/step-1-4.terminal.html",
+      "output": "workflow-showcase/stage-1/step-1-4.terminal.html",
+      "family": "site",
+      "action": "preserve",
+      "target": "/workflow-showcase/stage-1/step-1-4.terminal.html"
+    },
+    {
+      "path": "/workflow-showcase/stage-1/step-1-5.progress.html",
+      "output": "workflow-showcase/stage-1/step-1-5.progress.html",
+      "family": "site",
+      "action": "preserve",
+      "target": "/workflow-showcase/stage-1/step-1-5.progress.html"
+    },
+    {
+      "path": "/workflow-showcase/stage-1/step-1-5.terminal.html",
+      "output": "workflow-showcase/stage-1/step-1-5.terminal.html",
+      "family": "site",
+      "action": "preserve",
+      "target": "/workflow-showcase/stage-1/step-1-5.terminal.html"
+    },
+    {
+      "path": "/workflow-showcase/stage-1/step-1-6.agents.html",
+      "output": "workflow-showcase/stage-1/step-1-6.agents.html",
+      "family": "site",
+      "action": "preserve",
+      "target": "/workflow-showcase/stage-1/step-1-6.agents.html"
+    },
+    {
+      "path": "/workflow-showcase/stage-1/step-1-6.terminal.html",
+      "output": "workflow-showcase/stage-1/step-1-6.terminal.html",
+      "family": "site",
+      "action": "preserve",
+      "target": "/workflow-showcase/stage-1/step-1-6.terminal.html"
+    },
+    {
+      "path": "/workflow-showcase/stage-1/step-1-7.progress.html",
+      "output": "workflow-showcase/stage-1/step-1-7.progress.html",
+      "family": "site",
+      "action": "preserve",
+      "target": "/workflow-showcase/stage-1/step-1-7.progress.html"
+    },
+    {
+      "path": "/workflow-showcase/stage-1/step-1-7.terminal.html",
+      "output": "workflow-showcase/stage-1/step-1-7.terminal.html",
+      "family": "site",
+      "action": "preserve",
+      "target": "/workflow-showcase/stage-1/step-1-7.terminal.html"
+    },
+    {
+      "path": "/workflow-showcase/stage-2/step-2-1.agents.html",
+      "output": "workflow-showcase/stage-2/step-2-1.agents.html",
+      "family": "site",
+      "action": "preserve",
+      "target": "/workflow-showcase/stage-2/step-2-1.agents.html"
+    },
+    {
+      "path": "/workflow-showcase/stage-2/step-2-1.terminal.html",
+      "output": "workflow-showcase/stage-2/step-2-1.terminal.html",
+      "family": "site",
+      "action": "preserve",
+      "target": "/workflow-showcase/stage-2/step-2-1.terminal.html"
+    },
+    {
+      "path": "/workflow-showcase/stage-2/step-2-2.prd.html",
+      "output": "workflow-showcase/stage-2/step-2-2.prd.html",
+      "family": "site",
+      "action": "preserve",
+      "target": "/workflow-showcase/stage-2/step-2-2.prd.html"
+    },
+    {
+      "path": "/workflow-showcase/stage-2/step-2-2.terminal.html",
+      "output": "workflow-showcase/stage-2/step-2-2.terminal.html",
+      "family": "site",
+      "action": "preserve",
+      "target": "/workflow-showcase/stage-2/step-2-2.terminal.html"
+    },
+    {
+      "path": "/workflow-showcase/stage-2/step-2-3.plan.html",
+      "output": "workflow-showcase/stage-2/step-2-3.plan.html",
+      "family": "site",
+      "action": "preserve",
+      "target": "/workflow-showcase/stage-2/step-2-3.plan.html"
+    },
+    {
+      "path": "/workflow-showcase/stage-2/step-2-3.terminal.html",
+      "output": "workflow-showcase/stage-2/step-2-3.terminal.html",
+      "family": "site",
+      "action": "preserve",
+      "target": "/workflow-showcase/stage-2/step-2-3.terminal.html"
+    },
+    {
+      "path": "/workflow-showcase/stage-2/step-2-4.progress.html",
+      "output": "workflow-showcase/stage-2/step-2-4.progress.html",
+      "family": "site",
+      "action": "preserve",
+      "target": "/workflow-showcase/stage-2/step-2-4.progress.html"
+    },
+    {
+      "path": "/workflow-showcase/stage-2/step-2-4.terminal.html",
+      "output": "workflow-showcase/stage-2/step-2-4.terminal.html",
+      "family": "site",
+      "action": "preserve",
+      "target": "/workflow-showcase/stage-2/step-2-4.terminal.html"
+    },
+    {
+      "path": "/workflow-showcase/stage-2/step-2-5.agents.html",
+      "output": "workflow-showcase/stage-2/step-2-5.agents.html",
+      "family": "site",
+      "action": "preserve",
+      "target": "/workflow-showcase/stage-2/step-2-5.agents.html"
+    },
+    {
+      "path": "/workflow-showcase/stage-2/step-2-5.terminal.html",
+      "output": "workflow-showcase/stage-2/step-2-5.terminal.html",
+      "family": "site",
+      "action": "preserve",
+      "target": "/workflow-showcase/stage-2/step-2-5.terminal.html"
+    },
+    {
+      "path": "/workflow-showcase/stage-2/step-2-6.agents.html",
+      "output": "workflow-showcase/stage-2/step-2-6.agents.html",
+      "family": "site",
+      "action": "preserve",
+      "target": "/workflow-showcase/stage-2/step-2-6.agents.html"
+    },
+    {
+      "path": "/workflow-showcase/stage-2/step-2-6.terminal.html",
+      "output": "workflow-showcase/stage-2/step-2-6.terminal.html",
+      "family": "site",
+      "action": "preserve",
+      "target": "/workflow-showcase/stage-2/step-2-6.terminal.html"
+    },
+    {
+      "path": "/workflow-showcase/stage-2/step-2-7.progress.html",
+      "output": "workflow-showcase/stage-2/step-2-7.progress.html",
+      "family": "site",
+      "action": "preserve",
+      "target": "/workflow-showcase/stage-2/step-2-7.progress.html"
+    },
+    {
+      "path": "/workflow-showcase/stage-2/step-2-7.terminal.html",
+      "output": "workflow-showcase/stage-2/step-2-7.terminal.html",
+      "family": "site",
+      "action": "preserve",
+      "target": "/workflow-showcase/stage-2/step-2-7.terminal.html"
+    },
+    {
+      "path": "/workflow-showcase/stage-2/step-2-8.agents.html",
+      "output": "workflow-showcase/stage-2/step-2-8.agents.html",
+      "family": "site",
+      "action": "preserve",
+      "target": "/workflow-showcase/stage-2/step-2-8.agents.html"
+    },
+    {
+      "path": "/workflow-showcase/stage-2/step-2-8.terminal.html",
+      "output": "workflow-showcase/stage-2/step-2-8.terminal.html",
+      "family": "site",
+      "action": "preserve",
+      "target": "/workflow-showcase/stage-2/step-2-8.terminal.html"
+    }
+  ]
+}
