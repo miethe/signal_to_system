@@ -30,12 +30,12 @@ interface Props {
 
 const {
   items = [
-    { date: '2016', label: 'Started building', detail: 'Side projects', tone: 'secondary' },
-    { date: '2019', label: 'Deep dive', detail: 'AI/ML and systems', tone: 'secondary' },
-    { date: '2021', label: 'Launched Signal to System', tone: 'accent' },
-    { date: '2023', label: 'Expanded into research and writing', tone: 'secondary' },
-    { date: '2024', label: 'New tools, new questions', tone: 'accent' },
-    { date: '2025', label: 'Continuing the journey', state: 'current', tone: 'accent' },
+    // Deliberately placeholder: real dates and milestones must be passed in.
+    { date: 'Date A', label: 'Milestone A', detail: 'Placeholder', tone: 'secondary' },
+    { date: 'Date B', label: 'Milestone B', detail: 'Placeholder', tone: 'accent' },
+    { date: 'Date C', label: 'Milestone C', detail: 'Placeholder', tone: 'accent' },
+    { date: 'Date D', label: 'Milestone D', detail: 'Placeholder', tone: 'secondary' },
+    { date: 'Date E', label: 'Milestone E', detail: 'Placeholder', state: 'current', tone: 'accent' },
   ],
   orientation = 'horizontal',
   numbered = false,
@@ -127,8 +127,7 @@ const {
   .s2s-timeline__text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
   .s2s-timeline--vertical .s2s-timeline__text { padding-top: 2px; }
   .s2s-timeline__date {
-    font: 500 12px var(--font-mono, ui-monospace, monospace);
-    letter-spacing: 0.06em;
+    font: 600 13px var(--font-sans, system-ui, sans-serif);
     color: var(--ink, currentColor);
   }
   .s2s-timeline__label { font-size: 13px; line-height: 1.35; color: var(--ink, currentColor); }

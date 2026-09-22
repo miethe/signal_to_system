@@ -4,8 +4,9 @@
  *
  * layout="flow"  (default) the project-dossier map: inputs -> core (with its
  *                internal pipeline) -> outputs, curved connectors, arrowheads.
- * layout="orbit" the constellation view: a core star on orbit rings with
- *                labelled satellite nodes and edges between them.
+ * layout="orbit" the constellation view: a core star on an orbit ring, satellites
+ *                linked only to their ring neighbours and by spokes to the core
+ *                (no crossing chords).
  *
  * Icons on outputs come from src/assets/icons by name. The <desc> spells
  * the whole graph out as text, so nothing is conveyed only by position.
@@ -29,7 +30,7 @@ interface Props {
   outputs?: Output[];
   /** orbit layout: satellites, clockwise from upper-left. */
   nodes?: OrbitNode[];
-  /** orbit layout: index pairs; defaults to neighbours around the ring. */
+  /** orbit layout: index pairs; defaults to neighbours around the ring. Avoid crossing chords. */
   edges?: [number, number][];
   title?: string;
   width?: number | string;
@@ -167,7 +168,6 @@ const desc =
     <g class="orbits">
       <circle cx={ocx} cy={ocy} r={OR} />
       <ellipse cx={ocx} cy={ocy} rx={OR * 1.45} ry={OR * 0.46} transform={`rotate(-18 ${ocx} ${ocy})`} />
-      <ellipse cx={ocx} cy={ocy} rx={OR * 1.05} ry={OR * 0.52} transform={`rotate(38 ${ocx} ${ocy})`} />
       <path class="meridian" d={`M${ocx} ${ocy - OR - 26}V${ocy + OR + 26}`} />
     </g>
     <g class="edges">
@@ -202,7 +202,7 @@ const desc =
   .orbits { fill: none; stroke: var(--rule, currentColor); stroke-width: 1; }
   .meridian { stroke-dasharray: 2 4; }
   .edges path { stroke: var(--accent, currentColor); stroke-width: 1.25; stroke-opacity: 0.55; fill: none; }
-  .edges .spoke { stroke: var(--secondary, currentColor); stroke-opacity: 0.35; stroke-dasharray: 2 3; }
+  .edges .spoke { stroke: var(--secondary, currentColor); stroke-opacity: 0.4; stroke-width: 1; }
   .star { fill: var(--accent, currentColor); }
   .sat { stroke: var(--canvas, transparent); stroke-width: 3; paint-order: stroke; }
   .tone-accent { fill: var(--accent, currentColor); }

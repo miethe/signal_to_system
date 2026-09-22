@@ -5,8 +5,11 @@
  * Data-driven: any number of steps (3 is the reference), placed clockwise
  * from 12 o'clock, joined by arcs that end in open arrowheads. Emits inline
  * SVG with a <title>/<desc> that reads the cycle as an ordered sentence.
- * Colors: arcs --accent, step dots --secondary, labels --ink, captions --muted.
+ * Matches the About mockup: thin lavender arcs, open arrowheads, tracked-caps
+ * labels, and the brand waveform mark at the center.
+ * Colors: arcs --accent, labels --ink, captions --muted.
  */
+import Mark from '../brand/Mark.astro';
 import { arrowhead, polar, r2, rad, waveformBars, nextId } from './geometry';
 
 interface Step {
@@ -16,7 +19,8 @@ interface Step {
 
 interface Props {
   steps?: Step[];
-  center?: 'waveform' | 'mark' | 'none';
+  /** mark = the brand waveform-diamond (About mockup); waveform = plain bars. */
+  center?: 'mark' | 'waveform' | 'none';
   title?: string;
   /** Rendered width (the SVG keeps its aspect ratio). */
   width?: number | string;
@@ -29,7 +33,7 @@ const {
     { label: 'Evidence', caption: "Find what's real" },
     { label: 'Systems', caption: 'Build for impact' },
   ],
-  center = 'waveform',
+  center = 'mark',
   title = 'From ideas to evidence to systems',
   width = '100%',
   class: className,
@@ -101,15 +105,9 @@ const desc = `A repeating cycle: ${steps.map((s) => s.label + (s.caption ? ` (${
       d={bars.map((h, i) => `M${cx - 30 + i * 5} ${r2(cy - h)}v${r2(h * 2)}`).join('')}
     />
   )}
-  {center === 'mark' && (
-    <g fill="none" stroke-linecap="round" transform={`translate(${cx - 24} ${cy - 24}) scale(1.5)`}>
-      <circle class="glyph" cx="15.6" cy="16" r="9" stroke-width="2" />
-      <path class="dot-stroke" d="M5 22L27 11.75" stroke-width="1.5" />
-    </g>
-  )}
+  {center === 'mark' && <Mark size={64} x={cx - 32} y={cy - 32} decorative />}
   {nodes.map((s) => (
     <>
-      <circle class="dot" cx={s.dx} cy={s.dy} r="3.5" />
       <text class="label" x={s.x} y={s.labelY} text-anchor={s.anchor}>{s.label.toUpperCase()}</text>
       {s.caption && (
         <text class="caption" x={s.x} y={s.labelY + 17} text-anchor={s.anchor}>{s.caption}</text>
@@ -122,12 +120,10 @@ const desc = `A repeating cycle: ${steps.map((s) => s.label + (s.caption ? ` (${
   .s2s-loop { display: block; max-width: 100%; height: auto; overflow: visible; }
   .arcs { stroke: var(--accent, currentColor); }
   .glyph { stroke: var(--accent, currentColor); }
-  .dot { fill: var(--secondary, currentColor); }
-  .dot-stroke { stroke: var(--secondary, currentColor); }
   .label {
     fill: var(--ink, currentColor);
-    font: 500 11px var(--font-mono, ui-monospace, monospace);
-    letter-spacing: 0.16em;
+    font: 600 11px var(--font-sans, system-ui, sans-serif);
+    letter-spacing: 0.2em;
   }
   .caption {
     fill: var(--muted, currentColor);
