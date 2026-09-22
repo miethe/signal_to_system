@@ -1,0 +1,80 @@
+---
+/**
+ * Wordmark lockups from the logo board and the site header. Live text (not
+ * outlines), so it inherits the page's type roles and stays accessible.
+ *
+ * board    board 01: mark, serif "Signal to System", tracked caps byline centered below.
+ * header   the mockup header: mark, wordmark, byline inline to the right.
+ * stacked  mark above wordmark, for square contexts.
+ * monogram board 05 mark with the wordmark, for compact/social contexts.
+ */
+import Mark from './Mark.astro';
+
+interface Props {
+  layout?: 'board' | 'header' | 'stacked' | 'monogram';
+  /** Mark size in px; type scales from it. */
+  size?: number;
+  title?: string;
+  byline?: string | false;
+  mono?: boolean;
+  href?: string;
+  class?: string;
+}
+
+const {
+  layout = 'board',
+  size = 40,
+  title = 'Signal to System',
+  byline = 'By Nick Miethe',
+  mono = false,
+  href,
+  class: className,
+} = Astro.props;
+const Tag = href ? 'a' : 'div';
+const variant = layout === 'monogram' ? 'monogram' : mono ? 'mono' : 'wave';
+---
+
+<Tag href={href} class:list={['s2s-lockup', `s2s-lockup--${layout}`, className]} style={`--lockup-mark:${size}px`}>
+  <Mark size={size} variant={variant} decorative />
+  <span class="s2s-lockup__text">
+    <span class="s2s-lockup__title">{title}</span>
+    {byline && <span class="s2s-lockup__byline">{byline}</span>}
+  </span>
+</Tag>
+
+<style>
+  .s2s-lockup {
+    display: inline-flex;
+    align-items: center;
+    gap: calc(var(--lockup-mark) * 0.28);
+    color: var(--ink, currentColor);
+    text-decoration: none;
+  }
+  .s2s-lockup--stacked { flex-direction: column; text-align: center; gap: calc(var(--lockup-mark) * 0.18); }
+  .s2s-lockup__text { display: flex; flex-direction: column; align-items: center; gap: calc(var(--lockup-mark) * 0.12); }
+  .s2s-lockup--header .s2s-lockup__text { flex-direction: row; align-items: baseline; gap: calc(var(--lockup-mark) * 0.5); }
+  .s2s-lockup--monogram .s2s-lockup__text { align-items: flex-start; }
+  .s2s-lockup__title {
+    font-family: var(--font-display, Georgia, 'Times New Roman', serif);
+    font-size: calc(var(--lockup-mark) * 0.72);
+    line-height: 1;
+    letter-spacing: -0.015em;
+  }
+  .s2s-lockup--board { gap: calc(var(--lockup-mark) * 0.1); }
+  .s2s-lockup--board .s2s-lockup__title { font-size: calc(var(--lockup-mark) * 0.46); }
+  .s2s-lockup--board .s2s-lockup__byline { font-size: max(8px, calc(var(--lockup-mark) * 0.1)); letter-spacing: 0.42em; }
+  .s2s-lockup--header .s2s-lockup__title { font-size: calc(var(--lockup-mark) * 0.66); }
+  .s2s-lockup--stacked .s2s-lockup__title { font-size: calc(var(--lockup-mark) * 0.4); }
+  .s2s-lockup--monogram .s2s-lockup__title { font-size: calc(var(--lockup-mark) * 0.5); }
+  .s2s-lockup__byline {
+    font-family: var(--font-sans, 'Helvetica Neue', Arial, sans-serif);
+    font-size: max(8px, calc(var(--lockup-mark) * 0.2));
+    font-weight: 500;
+    letter-spacing: 0.34em;
+    text-transform: uppercase;
+    color: var(--muted, currentColor);
+  }
+  .s2s-lockup--header .s2s-lockup__byline { font-size: max(8px, calc(var(--lockup-mark) * 0.24)); }
+  .s2s-lockup--stacked .s2s-lockup__byline { font-size: max(8px, calc(var(--lockup-mark) * 0.12)); }
+  .s2s-lockup--monogram .s2s-lockup__byline { font-size: max(8px, calc(var(--lockup-mark) * 0.15)); }
+</style>

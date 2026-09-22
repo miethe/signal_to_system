@@ -1,0 +1,212 @@
+---
+/**
+ * SystemArchitectureDiagram — node/edge system map, data-driven.
+ *
+ * layout="flow"  (default) the project-dossier map: inputs -> core (with its
+ *                internal pipeline) -> outputs, curved connectors, arrowheads.
+ * layout="orbit" the constellation view: a core star on an orbit ring, satellites
+ *                linked only to their ring neighbours and by spokes to the core
+ *                (no crossing chords).
+ *
+ * Icons on outputs come from src/assets/icons by name. The <desc> spells
+ * the whole graph out as text, so nothing is conveyed only by position.
+ */
+import { loadSvg } from '../brand/svg-inline';
+import { arrowhead, polar, r2, rad, sparkle, nextId } from './geometry';
+
+interface Output {
+  label: string;
+  icon?: string;
+}
+interface OrbitNode {
+  label: string;
+  tone?: 'accent' | 'secondary';
+}
+
+interface Props {
+  layout?: 'flow' | 'orbit';
+  core?: { title: string; steps?: string[] };
+  inputs?: string[];
+  outputs?: Output[];
+  /** orbit layout: satellites, clockwise from upper-left. */
+  nodes?: OrbitNode[];
+  /** orbit layout: index pairs; defaults to neighbours around the ring. Avoid crossing chords. */
+  edges?: [number, number][];
+  title?: string;
+  width?: number | string;
+  class?: string;
+}
+
+const {
+  layout = 'flow',
+  core = { title: 'Research Foundry', steps: ['Ingest', 'Organize', 'Synthesize', 'Build'] },
+  inputs = ['Web & PDFs', 'Notebooks', 'APIs', 'Manual input'],
+  outputs = [
+    { label: 'Knowledge base', icon: 'sources' },
+    { label: 'Research outputs', icon: 'evidence' },
+    { label: 'Prototypes / apps', icon: 'projects' },
+    { label: 'Reports & exports', icon: 'essays' },
+  ],
+  nodes = [
+    { label: 'People', tone: 'secondary' },
+    { label: 'Ideas', tone: 'accent' },
+    { label: 'Systems', tone: 'secondary' },
+    { label: 'Impact', tone: 'accent' },
+    { label: 'Evidence', tone: 'secondary' },
+  ],
+  edges,
+  title = layout === 'flow' ? `${core.title}: system architecture` : `${core.title}: how the parts connect`,
+  width = '100%',
+  class: className,
+} = Astro.props;
+
+const titleId = nextId('arch-title');
+const descId = nextId('arch-desc');
+
+// ---------- flow ----------
+const rowH = 44;
+const rows = Math.max(inputs.length, outputs.length, 3);
+const FW = 720;
+const FH = rows * rowH + 16;
+const fcy = FH / 2;
+const rowY = (i: number, n: number) => r2(fcy + (i - (n - 1) / 2) * rowH);
+const coreX = 196;
+const coreW = 272;
+const coreH = 84;
+const inRows = inputs.map((label, i) => {
+  const y = rowY(i, inputs.length);
+  const ty = r2(fcy + (y - fcy) * 0.22);
+  return { label, y, d: `M124 ${y}C160 ${y} 160 ${ty} ${coreX} ${ty}` };
+});
+const outX = 566;
+const outRows = outputs.map((o, i) => {
+  const y = rowY(i, outputs.length);
+  const sy = r2(fcy + (y - fcy) * 0.22);
+  const ex = outX - 6;
+  return {
+    ...o,
+    y,
+    d: `M${coreX + coreW} ${sy}C${coreX + coreW + 40} ${sy} ${ex - 40} ${y} ${ex} ${y}`,
+    head: arrowhead(ex, y, 1, 0, 6, 3.5),
+    icon: o.icon ? loadSvg('icons', o.icon).inner : null,
+  };
+});
+
+// ---------- orbit ----------
+const OW = 460;
+const OH = 360;
+const ocx = 230;
+const ocy = 180;
+const OR = 112;
+const sats = nodes.map((node, i) => {
+  const a = -150 + (i * 360) / nodes.length;
+  const [x, y] = polar(ocx, ocy, OR, a);
+  const cos = Math.cos(rad(a));
+  const [lx, ly] = polar(ocx, ocy, OR + 22, a);
+  return {
+    ...node,
+    x,
+    y,
+    lx: Math.abs(cos) < 0.25 ? x : lx,
+    ly: r2(ly + 4),
+    anchor: Math.abs(cos) < 0.25 ? 'middle' : cos > 0 ? 'start' : 'end',
+  };
+});
+const edgePairs = edges ?? nodes.map((_, i) => [i, (i + 1) % nodes.length] as [number, number]);
+
+const desc =
+  layout === 'flow'
+    ? `Inputs (${inputs.join(', ')}) feed ${core.title}${core.steps ? `, which runs ${core.steps.join(', then ')}` : ''}, producing ${outputs.map((o) => o.label).join(', ')}.`
+    : `${core.title} at the center, orbited by ${nodes.map((n) => n.label).join(', ')}. Links: ${edgePairs.map(([a, b]) => `${nodes[a].label} to ${nodes[b].label}`).join('; ')}.`;
+---
+
+{layout === 'flow' ? (
+  <svg viewBox={`0 0 ${FW} ${FH}`} width={width} role="img" aria-labelledby={`${titleId} ${descId}`} class:list={['s2s-arch', className]}>
+    <title id={titleId}>{title}</title>
+    <desc id={descId}>{desc}</desc>
+    <g class="wire">
+      {inRows.map((r) => <path d={r.d} />)}
+      {outRows.map((r) => (
+        <>
+          <path d={r.d} />
+          <path d={r.head} />
+        </>
+      ))}
+    </g>
+    {inRows.map((r) => (
+      <g class="pill">
+        <rect x="8" y={r.y - 14} width="116" height="28" rx="6" />
+        <text x="20" y={r.y + 4}>{r.label}</text>
+      </g>
+    ))}
+    <g class="core">
+      <rect x={coreX} y={fcy - coreH / 2} width={coreW} height={coreH} rx="10" />
+      <text class="core-title" x={coreX + coreW / 2} y={core.steps ? fcy - 6 : fcy + 5} text-anchor="middle">{core.title}</text>
+      {core.steps && (
+        <text class="core-steps" x={coreX + coreW / 2} y={fcy + 20} text-anchor="middle">
+          {core.steps.map((s, i) => (
+            <>
+              {i > 0 && <tspan class="sep">{'  →  '}</tspan>}
+              <tspan>{s}</tspan>
+            </>
+          ))}
+        </text>
+      )}
+    </g>
+    {outRows.map((r) => (
+      <g class="pill pill--out">
+        <rect x={outX} y={r.y - 15} width="146" height="30" rx="6" />
+        {r.icon && <svg x={outX + 9} y={r.y - 8} width="16" height="16" viewBox="0 0 24 24" class="ico" set:html={r.icon} />}
+        <text x={outX + (r.icon ? 32 : 12)} y={r.y + 4}>{r.label}</text>
+      </g>
+    ))}
+  </svg>
+) : (
+  <svg viewBox={`0 0 ${OW} ${OH}`} width={width} role="img" aria-labelledby={`${titleId} ${descId}`} class:list={['s2s-arch', 's2s-arch--orbit', className]}>
+    <title id={titleId}>{title}</title>
+    <desc id={descId}>{desc}</desc>
+    <g class="orbits">
+      <circle cx={ocx} cy={ocy} r={OR} />
+      <ellipse cx={ocx} cy={ocy} rx={OR * 1.45} ry={OR * 0.46} transform={`rotate(-18 ${ocx} ${ocy})`} />
+      <path class="meridian" d={`M${ocx} ${ocy - OR - 26}V${ocy + OR + 26}`} />
+    </g>
+    <g class="edges">
+      {edgePairs.map(([a, b]) => <path d={`M${sats[a].x} ${sats[a].y}L${sats[b].x} ${sats[b].y}`} />)}
+      {sats.map((s) => <path class="spoke" d={`M${ocx} ${ocy}L${s.x} ${s.y}`} />)}
+    </g>
+    <path class="star" d={sparkle(ocx, ocy, 13, 0.2)} />
+    {sats.map((s) => (
+      <>
+        <circle class={`sat tone-${s.tone ?? 'accent'}`} cx={s.x} cy={s.y} r="5" />
+        <text class="sat-label" x={s.lx} y={s.ly} text-anchor={s.anchor}>{s.label.toUpperCase()}</text>
+      </>
+    ))}
+    <text class="core-caption" x={ocx} y={ocy + 34} text-anchor="middle">{core.title}</text>
+  </svg>
+)}
+
+<style>
+  .s2s-arch { display: block; max-width: 100%; height: auto; overflow: visible; font-family: var(--font-sans, system-ui, sans-serif); }
+  .wire path { fill: none; stroke: var(--accent, currentColor); stroke-width: 1.25; stroke-linecap: round; stroke-linejoin: round; stroke-opacity: 0.75; }
+  .pill rect { fill: var(--surface, transparent); stroke: var(--rule, currentColor); stroke-width: 1; }
+  .pill text { fill: var(--ink, currentColor); font-size: 12px; }
+  .pill--out rect { stroke: var(--accent, currentColor); stroke-opacity: 0.55; }
+  .ico { fill: none; stroke: var(--accent, currentColor); stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; --icon-accent: var(--secondary, currentColor); }
+  .ico :global(.accent) { stroke: var(--icon-accent); }
+  .ico :global(.accent-fill) { fill: var(--icon-accent); }
+  .core rect { fill: var(--surface, transparent); stroke: var(--accent, currentColor); stroke-width: 1.5; }
+  .core-title { fill: var(--ink, currentColor); font-family: var(--font-display, var(--font-serif, Georgia, serif)); font-size: 18px; }
+  .core-steps { fill: var(--muted, currentColor); font-size: 11.5px; }
+  .core-steps .sep { fill: var(--secondary, currentColor); }
+
+  .orbits { fill: none; stroke: var(--rule, currentColor); stroke-width: 1; }
+  .meridian { stroke-dasharray: 2 4; }
+  .edges path { stroke: var(--accent, currentColor); stroke-width: 1.25; stroke-opacity: 0.55; fill: none; }
+  .edges .spoke { stroke: var(--secondary, currentColor); stroke-opacity: 0.4; stroke-width: 1; }
+  .star { fill: var(--accent, currentColor); }
+  .sat { stroke: var(--canvas, transparent); stroke-width: 3; paint-order: stroke; }
+  .tone-accent { fill: var(--accent, currentColor); }
+  .tone-secondary { fill: var(--secondary, currentColor); }
+  .sat-label { fill: var(--ink, currentColor); font: 500 11px var(--font-mono, ui-monospace, monospace); letter-spacing: 0.16em; }
+  .core-caption { fill: var(--muted, currentColor); font: 12px var(--font-sans, system-ui, sans-serif); }
+</style>

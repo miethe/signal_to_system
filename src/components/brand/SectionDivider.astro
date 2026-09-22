@@ -1,0 +1,31 @@
+---
+/**
+ * Section-divider ornament (sparkle | waveform | moon), inlined from
+ * src/assets/ornaments. Always decorative: it separates, it does not say.
+ * Line color follows `--rule`, flanking phases `--muted`, the center ornament `--accent`.
+ */
+import { loadSvg } from './svg-inline';
+
+interface Props {
+  variant?: 'sparkle' | 'waveform' | 'moon';
+  /** Rendered width; height follows the 10:1 artboard. */
+  width?: number | string;
+  class?: string;
+}
+
+const { variant = 'sparkle', width = '100%', class: className } = Astro.props;
+const { attrs, inner } = loadSvg('ornaments', `divider-${variant}`);
+---
+
+<div class:list={['s2s-divider', className]} role="presentation">
+  <svg {...attrs} aria-hidden="true" focusable="false" width={width} preserveAspectRatio="xMidYMid meet" set:html={inner} />
+</div>
+
+<style is:global>
+  .s2s-divider { display: flex; justify-content: center; color: var(--rule, currentColor); }
+  .s2s-divider svg { display: block; max-width: 100%; height: auto; }
+  .s2s-divider .accent,
+  .s2s-divider .accent-fill { color: var(--accent, currentColor); }
+  .s2s-divider .accent { stroke: currentColor; }
+  .s2s-divider .phase { color: var(--muted, currentColor); }
+</style>

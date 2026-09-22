@@ -1,0 +1,132 @@
+---
+/**
+ * ProcessLoopDiagram — the About-page "ideas -> evidence -> systems" cycle.
+ *
+ * Data-driven: any number of steps (3 is the reference), placed clockwise
+ * from 12 o'clock, joined by arcs that end in open arrowheads. Emits inline
+ * SVG with a <title>/<desc> that reads the cycle as an ordered sentence.
+ * Matches the About mockup: thin lavender arcs, open arrowheads, tracked-caps
+ * labels, and the brand waveform mark at the center.
+ * Colors: arcs --accent, labels --ink, captions --muted.
+ */
+import Mark from '../brand/Mark.astro';
+import { arrowhead, polar, r2, rad, waveformBars, nextId } from './geometry';
+
+interface Step {
+  label: string;
+  caption?: string;
+}
+
+interface Props {
+  steps?: Step[];
+  /** mark = the brand waveform-diamond (About mockup); waveform = plain bars. */
+  center?: 'mark' | 'waveform' | 'none';
+  title?: string;
+  /** Rendered width (the SVG keeps its aspect ratio). */
+  width?: number | string;
+  class?: string;
+}
+
+const {
+  steps = [
+    { label: 'Ideas', caption: 'Ask better questions' },
+    { label: 'Evidence', caption: "Find what's real" },
+    { label: 'Systems', caption: 'Build for impact' },
+  ],
+  center = 'mark',
+  title = 'From ideas to evidence to systems',
+  width = '100%',
+  class: className,
+} = Astro.props;
+
+const W = 440;
+const H = 340;
+const cx = 220;
+const cy = 172;
+const R = 94;
+const gap = 18; // degrees of clear space either side of each step
+const n = steps.length;
+const step = 360 / n;
+const angleOf = (i: number) => -90 + i * step;
+
+const arcs = steps.map((_, i) => {
+  const a0 = angleOf(i) + gap;
+  const a1 = angleOf(i + 1) - gap;
+  const [x0, y0] = polar(cx, cy, R, a0);
+  const [x1, y1] = polar(cx, cy, R, a1);
+  const large = a1 - a0 > 180 ? 1 : 0;
+  // Clockwise tangent at the arc end.
+  const head = arrowhead(x1, y1, -Math.sin(rad(a1)), Math.cos(rad(a1)));
+  return { d: `M${x0} ${y0}A${R} ${R} 0 ${large} 1 ${x1} ${y1}`, head };
+});
+
+const nodes = steps.map((s, i) => {
+  const a = angleOf(i);
+  const [dx, dy] = polar(cx, cy, R, a);
+  const cos = Math.cos(rad(a));
+  const sin = Math.sin(rad(a));
+  const top = sin < -0.7;
+  const bottom = sin > 0.7;
+  const [lx, ly] = polar(cx, cy, R + 18, a);
+  const anchor = Math.abs(cos) < 0.3 ? 'middle' : cos > 0 ? 'start' : 'end';
+  const labelY = top ? cy - R - 38 : bottom ? cy + R + 30 : r2(ly + 6);
+  return { ...s, dx, dy, x: Math.abs(cos) < 0.3 ? cx : lx, labelY, anchor };
+});
+
+const bars = waveformBars(13, 20);
+const titleId = nextId('loop-title');
+const descId = nextId('loop-desc');
+const desc = `A repeating cycle: ${steps.map((s) => s.label + (s.caption ? ` (${s.caption})` : '')).join(', then ')}, then back to ${steps[0].label}.`;
+---
+
+<svg
+  viewBox={`0 0 ${W} ${H}`}
+  width={width}
+  role="img"
+  aria-labelledby={`${titleId} ${descId}`}
+  class:list={['s2s-loop', className]}
+>
+  <title id={titleId}>{title}</title>
+  <desc id={descId}>{desc}</desc>
+  <g class="arcs" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    {arcs.map((a) => (
+      <>
+        <path d={a.d} />
+        <path d={a.head} />
+      </>
+    ))}
+  </g>
+  {center === 'waveform' && (
+    <path
+      class="glyph"
+      fill="none"
+      stroke-width="2"
+      stroke-linecap="round"
+      d={bars.map((h, i) => `M${cx - 30 + i * 5} ${r2(cy - h)}v${r2(h * 2)}`).join('')}
+    />
+  )}
+  {center === 'mark' && <Mark size={64} x={cx - 32} y={cy - 32} decorative />}
+  {nodes.map((s) => (
+    <>
+      <text class="label" x={s.x} y={s.labelY} text-anchor={s.anchor}>{s.label.toUpperCase()}</text>
+      {s.caption && (
+        <text class="caption" x={s.x} y={s.labelY + 17} text-anchor={s.anchor}>{s.caption}</text>
+      )}
+    </>
+  ))}
+</svg>
+
+<style>
+  .s2s-loop { display: block; max-width: 100%; height: auto; overflow: visible; }
+  .arcs { stroke: var(--accent, currentColor); }
+  .glyph { stroke: var(--accent, currentColor); }
+  .label {
+    fill: var(--ink, currentColor);
+    font: 600 11px var(--font-sans, system-ui, sans-serif);
+    letter-spacing: 0.2em;
+  }
+  .caption {
+    fill: var(--muted, currentColor);
+    font: 13px var(--font-sans, system-ui, sans-serif);
+  }
+</style>

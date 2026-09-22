@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="s2s-monogram-title">
+  <title id="s2s-monogram-title">S/S, Signal to System</title>
+  <!-- Secondary mark (logo board 05): signal S over system S, split by a diagonal, with a
+       four-point sparkle. Display cut (above 48px): a narrow, high-contrast S (1.1 hairlines, vertical hairline
+       serifs) drawn once in a 28 x 52 box and placed twice. monogram-small.svg covers 48px and below. -->
+  <defs>
+    <path id="s2s-s" d="M26.6 14.5L26.6 2.4C24.2 .9 20 0 14.5 0C7 0 1.4 4.8 1.4 12.6C1.4 20 6 24.6 12.4 27.6C19.8 30.6 22.4 32.6 22.4 38.2C22.4 44.4 18.6 50.9 13.4 50.9C8 50.9 3.6 46.4 2.4 38.2L1.2 38.2L1.2 49.6C4.4 51.2 8.6 52 13.6 52C21.8 52 27.2 46.6 27.2 38.6C27.2 31 22.6 27.4 15.4 24.4C9.4 21.8 6.6 19.4 6.6 13C6.6 6.2 10.2 1.1 14.6 1.1C19.8 1.1 24 5.8 25.6 14.5Z"/>
+  </defs>
+  <path d="M8 62L58 6" fill="none" stroke-width="1" stroke-linecap="round" style="stroke: var(--muted, currentColor)"/>
+  <use href="#s2s-s" transform="translate(7 2) scale(.66)" style="fill: var(--mark-signal, var(--accent, currentColor))"/>
+  <use href="#s2s-s" transform="translate(38 27.5) scale(.66)" style="fill: var(--mark-system, var(--secondary, currentColor))"/>
+  <path d="M51 3.5Q51.6 8.4 56.5 9Q51.6 9.6 51 14.5Q50.4 9.6 45.5 9Q50.4 8.4 51 3.5Z" style="fill: var(--mark-signal, var(--accent, currentColor))"/>
+</svg>

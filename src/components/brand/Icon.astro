@@ -1,0 +1,41 @@
+---
+/**
+ * Inlines a hand-authored icon from src/assets/icons by name.
+ *
+ * Decorative by default (aria-hidden). Pass `label` when the icon carries
+ * meaning on its own (e.g. an icon-only button); it becomes role="img" with
+ * an accessible name. Color: currentColor for the line, `--icon-accent`
+ * (falls back to currentColor) for the one highlighted detail.
+ */
+import { loadSvg } from './svg-inline';
+
+interface Props {
+  name: string;
+  size?: number | string;
+  label?: string;
+  /** Neon treatment from the icon grid: a soft --icon-glow halo (dark surfaces only). */
+  glow?: boolean;
+  class?: string;
+}
+
+const { name, size = 24, label, glow = false, class: className } = Astro.props;
+const { attrs, inner } = loadSvg('icons', name);
+const a11y = label ? { role: 'img', 'aria-label': label } : { 'aria-hidden': 'true', focusable: 'false' };
+const body = label ? `<title>${label}</title>${inner}` : inner;
+---
+
+<svg
+  {...attrs}
+  {...a11y}
+  width={size}
+  height={size}
+  class:list={['s2s-icon', `s2s-icon--${name}`, glow && 's2s-icon--glow', className]}
+  set:html={body}
+/>
+
+<style is:global>
+  .s2s-icon { flex-shrink: 0; vertical-align: middle; }
+  .s2s-icon .accent { stroke: var(--icon-accent, currentColor); }
+  .s2s-icon .accent-fill { fill: var(--icon-accent, currentColor); }
+  .s2s-icon--glow { filter: drop-shadow(0 0 3px var(--icon-glow, transparent)); }
+</style>

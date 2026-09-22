@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+  <title>Topics</title>
+  <circle cx="5.5" cy="6" r="2"/>
+  <circle cx="5.5" cy="12" r="2"/>
+  <circle cx="5.5" cy="18" r="2"/>
+  <path d="M9.5 6H20M9.5 12H20"/>
+  <path class="accent" d="M9.5 18H16"/>
+</svg>
