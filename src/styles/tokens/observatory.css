@@ -1,0 +1,171 @@
+/* ============================================================
+   OBSERVATORY — the S2S v2 site language (semantic role layer)
+
+   Every mockup in docs/design/s2s-v2-visual/01-site-mockups renders this
+   language in its dark form, so dark is the default: <html class="dark"> is
+   emitted by BaseLayout and kept unless the visitor chose light.
+
+   Contract: components and layouts consume ROLES (--s2s-*), never raw
+   palette values. The dark values are pixel-sampled from the mockup PNGs;
+   the light values are derived from them (no mockup shows light). Sample
+   sources, coordinates and the sampled-vs-chosen deltas are recorded in
+   docs/design/tokens.md. `npm run check:palette` blocks new raw palette
+   literals anywhere in src/ outside src/styles/tokens/.
+
+   Folio and Instrument (./folio.css, ./instrument.css) are Studio-scoped
+   skins applied with [data-skin], not global themes.
+   ============================================================ */
+
+/* ---------- Light (derived) ---------- */
+:root,
+.light {
+  color-scheme: light;
+
+  /* Fields and elevations */
+  --s2s-backdrop: #e6e3ea;          /* page field outside the site frame */
+  --s2s-backdrop-glow: rgb(120 94 214 / 0.18);
+  --s2s-backdrop-haze: rgb(120 94 214 / 0.08);
+  --s2s-backdrop-shade: rgb(60 52 90 / 0.08);
+  --s2s-shadow-frame: 0 30px 80px -40px rgb(40 30 70 / 0.35);
+  --s2s-canvas: #f7f6f3;            /* the site frame's field */
+  --s2s-canvas-raised: #fbfaf8;     /* header + footer bars */
+  --s2s-surface: #ffffff;           /* cards, panels */
+  --s2s-surface-hover: #faf8fd;
+  --s2s-inset: #f0eef3;             /* search field, inputs, toggle track */
+  --s2s-chip: #ebe8f0;              /* pills, chips, tags */
+  --s2s-scrim: rgb(24 20 34 / 0.55);
+
+  /* Rules */
+  --s2s-rule: #e4e1e8;              /* hairlines between regions, card edges */
+  --s2s-rule-strong: #d4d0db;       /* control borders */
+  --s2s-rule-emphasis: #a9a4b3;     /* secondary-button outline */
+  --s2s-frame-rule: #d8d4de;        /* the site frame edge */
+
+  /* Ink */
+  --s2s-ink: #17151d;
+  --s2s-ink-soft: #2b2833;          /* nav, card titles */
+  --s2s-ink-muted: #4b4856;         /* body copy, deks */
+  --s2s-ink-subtle: #6a6774;        /* eyebrows, meta, bylines (AA on canvas) */
+  --s2s-ink-faint: #9a97a3;         /* disabled, decorative only */
+
+  /* Accent (violet) */
+  --s2s-accent: #5b3fc4;            /* links, active marks, focus */
+  --s2s-accent-hover: #4a2fb0;
+  --s2s-accent-strong: #d3bbfc;     /* primary button fill (same lavender as dark) */
+  --s2s-accent-strong-hover: #c7abfa;
+  --s2s-on-accent: #1d1530;         /* text on --s2s-accent-strong */
+  --s2s-accent-soft: rgb(91 63 196 / 0.09);
+  --s2s-accent-label: #6d55d6;      /* small-caps section labels ("LABS") */
+
+  /* Secondary (sage) */
+  --s2s-secondary: #2f7d5c;
+  --s2s-secondary-soft: rgb(47 125 92 / 0.1);
+
+  /* Status */
+  --s2s-status-ok: #2f7d5c;
+  --s2s-status-warn: #9a6a00;
+  --s2s-status-danger: #b3261e;
+  --s2s-status-info: #3d5fc4;
+
+  /* Controls */
+  --s2s-focus: #5b3fc4;
+  --s2s-toggle-knob: #5b3fc4;
+
+  /* Brand mark roles (feed src/components/brand/Mark.astro) */
+  --s2s-mark-top: #4a2d86;
+  --s2s-mark-mid: #7a52c2;
+  --s2s-mark-bottom: #2f7d5c;
+  --s2s-mark-dot: #643fa6;
+  --s2s-mark-glow: transparent;
+
+  /* Depth */
+  --s2s-shadow-card: 0 1px 2px rgb(23 21 29 / 0.04), 0 8px 24px -16px rgb(23 21 29 / 0.18);
+  --s2s-shadow-pop: 0 18px 48px -18px rgb(23 21 29 / 0.35);
+}
+
+/* ---------- Dark (default; sampled from the mockups) ---------- */
+.dark {
+  color-scheme: dark;
+
+  --s2s-backdrop: #11121b;
+  --s2s-backdrop-glow: rgb(128 114 204 / 0.62);
+  --s2s-backdrop-haze: rgb(78 72 128 / 0.5);
+  --s2s-backdrop-shade: rgb(44 46 66 / 0.55);
+  --s2s-shadow-frame: 0 40px 90px -30px rgb(0 0 0 / 0.75);
+  --s2s-canvas: #0d1015;
+  --s2s-canvas-raised: #101318;
+  --s2s-surface: #151a1f;
+  --s2s-surface-hover: #191e24;
+  --s2s-inset: #181b21;
+  --s2s-chip: #26282e;
+  --s2s-scrim: rgb(4 5 10 / 0.72);
+
+  --s2s-rule: #20232b;
+  --s2s-rule-strong: #2b2e36;
+  --s2s-rule-emphasis: #4a4d52;
+  --s2s-frame-rule: #2d303d;
+
+  --s2s-ink: #f4f3f6;
+  --s2s-ink-soft: #d9d9df;
+  --s2s-ink-muted: #b3b6bd;
+  --s2s-ink-subtle: #7b7f87;
+  --s2s-ink-faint: #555961;
+
+  --s2s-accent: #bba0f4;
+  --s2s-accent-hover: #d3bbfc;
+  --s2s-accent-strong: #d3bbfc;
+  --s2s-accent-strong-hover: #dfcbfd;
+  --s2s-on-accent: #1d1530;
+  --s2s-accent-soft: rgb(187 160 244 / 0.12);
+  --s2s-accent-label: #9b87f5;
+
+  --s2s-secondary: #8fdea4;
+  --s2s-secondary-soft: rgb(143 222 164 / 0.12);
+
+  --s2s-status-ok: #8fdea4;
+  --s2s-status-warn: #e9c46a;
+  --s2s-status-danger: #f28b82;
+  --s2s-status-info: #9bb8f5;
+
+  --s2s-focus: #c9b1fb;
+  --s2s-toggle-knob: #ebdcd3;
+
+  --s2s-mark-top: #5a3fc9;
+  --s2s-mark-mid: #c9a8f8;
+  --s2s-mark-bottom: #9eeedc;
+  --s2s-mark-dot: #8a5ce0;
+  --s2s-mark-glow: rgb(154 104 239 / 0.55);
+
+  --s2s-shadow-card: 0 1px 0 rgb(255 255 255 / 0.02) inset, 0 18px 40px -28px rgb(0 0 0 / 0.8);
+  --s2s-shadow-pop: 0 24px 60px -20px rgb(0 0 0 / 0.85);
+}
+
+/* ---------- Scale (theme-independent) ---------- */
+:root {
+  /* Space: 4..64 */
+  --s2s-space-1: 4px;
+  --s2s-space-2: 8px;
+  --s2s-space-3: 12px;
+  --s2s-space-4: 16px;
+  --s2s-space-5: 24px;
+  --s2s-space-6: 32px;
+  --s2s-space-7: 48px;
+  --s2s-space-8: 64px;
+
+  /* Radii (mockup: controls 6px, cards 10px, frame 16px, pills full) */
+  --s2s-radius-control: 6px;
+  --s2s-radius-card: 10px;
+  --s2s-radius-frame: 16px;
+  --s2s-radius-pill: 999px;
+
+  /* Layout */
+  --s2s-frame-max: 1240px;          /* mockup frame: x 103..1345 at 1448 */
+  --s2s-frame-gutter: 40px;         /* content inset inside the frame */
+  --s2s-header-h: 62px;
+  --s2s-measure: 720px;             /* reading width */
+  --s2s-rail: 280px;                /* sidebar/facet rail */
+
+  /* Motion */
+  --s2s-ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --s2s-dur: 160ms;
+}

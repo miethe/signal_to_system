@@ -1,0 +1,25 @@
+/* ============================================================
+   FOLIO — STUB (Studio-scoped skin, not a global theme)
+
+   The Notebooks mockup realizes Folio as cream NotebookLeaf cards inside the
+   dark Observatory shell. This file only reserves the role overrides so a
+   [data-skin="folio"] subtree can be exercised; values are provisional
+   samples from the brand-preview fixture and are owned by the M3 Notebook
+   design pass. Nothing in the shell applies this skin.
+   ============================================================ */
+[data-skin='folio'] {
+  color-scheme: light;
+  --s2s-canvas: #ece4d9;
+  --s2s-surface: #f4ede1;
+  --s2s-inset: #efe7da;
+  --s2s-chip: #e4dacb;
+  --s2s-rule: #d6cabb;
+  --s2s-rule-strong: #c9bba9;
+  --s2s-ink: #221f26;
+  --s2s-ink-soft: #2e2a31;
+  --s2s-ink-muted: #615d64;
+  --s2s-ink-subtle: #7a746c;
+  --s2s-accent: #643fa6;
+  --s2s-accent-label: #643fa6;
+  --s2s-secondary: #2f7d5c;
+}
