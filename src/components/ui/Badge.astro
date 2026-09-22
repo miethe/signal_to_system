@@ -6,6 +6,14 @@
  *   variant  — controls colour palette
  *   text     — label text
  *   href     — if provided, renders as an <a> tag
+ *   dot      — leading status dot (v2 `live` variant shows one by default)
+ *
+ * v2 (Observatory) variants, from the mockups:
+ *   chip   — tag chip ("Environment", "Open Source"): chip fill, rule edge
+ *   live   — status with a sage dot ("● Active")
+ *   count  — mono count pill ("24")
+ *   label  — accent small caps ("LABS", "FEATURED ESSAY")
+ * The v1 variants are unchanged.
  */
 
 interface Props {
@@ -16,9 +24,14 @@ interface Props {
     | "type"
     | "project"
     | "aos"
-    | "workflow";
+    | "workflow"
+    | "chip"
+    | "live"
+    | "count"
+    | "label";
   text: string;
   href?: string;
+  dot?: boolean;
   class?: string;
 }
 
@@ -26,6 +39,7 @@ const {
   variant = "default",
   text,
   href,
+  dot,
   class: className = "",
 } = Astro.props;
 
@@ -47,17 +61,77 @@ const variants: Record<string, string> = {
     "bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300",
   workflow:
     "font-mono bg-[var(--bg-muted)] text-[var(--text-tertiary)] ring-1 ring-inset ring-[var(--border-subtle)]",
+  chip:
+    "s2s-badge--chip",
+  live:
+    "s2s-badge--live",
+  count:
+    "s2s-badge--count",
+  label:
+    "s2s-badge--label",
 };
 
-const cls = [base, variants[variant] ?? variants.default, className].join(" ");
+const v2 = ["chip", "live", "count", "label"].includes(variant);
+const showDot = dot ?? variant === "live";
+
+const cls = [v2 ? "s2s-badge" : base, variants[variant] ?? variants.default, className].join(" ");
 ---
 
 {
   href ? (
     <a href={href} class={cls + " hover:opacity-80"}>
+      {showDot && <span class="s2s-badge__dot" aria-hidden="true" />}
       {text}
     </a>
   ) : (
-    <span class={cls}>{text}</span>
+    <span class={cls}>
+      {showDot && <span class="s2s-badge__dot" aria-hidden="true" />}
+      {text}
+    </span>
   )
 }
+
+<style is:global>
+  .s2s-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+    text-decoration: none;
+  }
+  .s2s-badge--chip {
+    padding: 3px 9px;
+    border: 1px solid var(--s2s-rule-strong);
+    border-radius: var(--s2s-radius-pill);
+    background: var(--s2s-chip);
+    font: 450 0.65625rem / 1.25 var(--font-sans);
+    color: var(--s2s-ink-soft);
+  }
+  a.s2s-badge--chip:hover { border-color: var(--s2s-rule-emphasis); color: var(--s2s-ink); }
+  .s2s-badge--live {
+    font: 450 var(--type-micro) / 1.2 var(--font-sans);
+    color: var(--s2s-ink-muted);
+  }
+  .s2s-badge--count {
+    min-width: 24px;
+    justify-content: center;
+    padding: 2px 7px;
+    border-radius: 5px;
+    background: var(--s2s-chip);
+    font: 500 0.625rem / 1.3 var(--font-mono);
+    color: var(--s2s-ink-soft);
+  }
+  .s2s-badge--label {
+    font: 600 0.625rem / 1.2 var(--font-sans);
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--s2s-accent-label);
+  }
+  .s2s-badge__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--s2s-status-ok);
+    box-shadow: 0 0 0 3px var(--s2s-secondary-soft);
+  }
+</style>

@@ -1,0 +1,86 @@
+---
+/**
+ * PageHero — the hero band every section mockup opens with: a tracked
+ * eyebrow trail, a large light serif H1 (an optional accent word), a muted
+ * lede, CTA buttons, and an optional right-hand aside (the pull quote /
+ * "OBSERVE · INVESTIGATE · BUILD" rail). The mockups' photographic sky is
+ * an asset-pipeline deliverable; until then the band carries a CSS glow.
+ *
+ * Slots: actions (Buttons), aside (anything; hidden below 1024px).
+ */
+interface Props {
+  heading: string;
+  /** A trailing word/phrase of `heading` to set in accent (Writing mockup: "systems."). */
+  accent?: string;
+  eyebrow?: string[];
+  lede?: string;
+  compact?: boolean;
+  class?: string;
+}
+const { heading, accent, eyebrow, lede, compact = false, class: className } = Astro.props;
+const split = accent && heading.endsWith(accent) ? [heading.slice(0, -accent.length), accent] : [heading, ''];
+---
+
+<section class:list={['s2s-hero', compact && 's2s-hero--compact', className]}>
+  <div class="s2s-hero__main">
+    {eyebrow && (
+      <p class="s2s-eyebrow s2s-hero__eyebrow">
+        {eyebrow.map((e, i) => (
+          <>
+            {i > 0 && <span aria-hidden="true" class="s2s-hero__arrow">→</span>}
+            <span>{e}</span>
+          </>
+        ))}
+      </p>
+    )}
+    <h1 class="s2s-display s2s-hero__title">
+      {split[0]}{split[1] && <span class="s2s-hero__accent">{split[1]}</span>}
+    </h1>
+    {lede && <p class="s2s-hero__lede">{lede}</p>}
+    {Astro.slots.has('actions') && <div class="s2s-hero__actions"><slot name="actions" /></div>}
+  </div>
+  {Astro.slots.has('aside') && <div class="s2s-hero__aside"><slot name="aside" /></div>}
+</section>
+
+<style>
+  .s2s-hero {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+    padding: 36px 20px 40px;
+    border-bottom: 1px solid var(--s2s-rule);
+    background:
+      radial-gradient(60% 90% at 78% 0%, var(--s2s-accent-soft), transparent 70%),
+      linear-gradient(180deg, transparent 60%, var(--s2s-canvas));
+    overflow: hidden;
+  }
+  .s2s-hero--compact { padding-bottom: 28px; }
+  .s2s-hero__eyebrow { display: flex; flex-wrap: wrap; gap: 0 14px; margin: 0 0 14px; }
+  .s2s-hero__arrow { letter-spacing: 0; }
+  .s2s-hero__title {
+    max-width: 19ch;
+    margin: 0;
+    font-size: var(--type-hero);
+    text-wrap: balance;
+  }
+  .s2s-hero__accent { color: var(--s2s-accent); }
+  .s2s-hero__lede {
+    max-width: 60ch;
+    margin: 16px 0 0;
+    font: 400 var(--type-body) / 1.55 var(--font-sans);
+    color: var(--s2s-ink-muted);
+  }
+  .s2s-hero__actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 24px; }
+  .s2s-hero__aside { display: none; }
+
+  @media (min-width: 1024px) {
+    .s2s-hero {
+      grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+      padding: 28px var(--s2s-frame-gutter) 30px;
+      min-height: 288px;
+    }
+    .s2s-hero--compact { min-height: 0; }
+    .s2s-hero__aside { display: block; align-self: stretch; }
+  }
+</style>

@@ -1,0 +1,84 @@
+---
+/**
+ * FacetRail — a rail panel of facets with counts (the Writing mockup's
+ * "Popular topics"): a heading row with an optional icon and "View all"
+ * action, then a list of links, each with a sage check glyph and a count
+ * chip. The current facet is marked aria-current and lit in accent.
+ */
+import Card from './Card.astro';
+import Icon from '../brand/Icon.astro';
+
+interface Item { label: string; href: string; count?: number | string; current?: boolean }
+interface Props {
+  heading: string;
+  items: Item[];
+  icon?: string;
+  action?: { label: string; href: string };
+  class?: string;
+}
+const { heading, items, icon, action, class: className } = Astro.props;
+const hid = `facet-${heading.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+---
+
+<Card as="aside" class:list={['s2s-facets', className]} aria-labelledby={hid}>
+  <div class="s2s-facets__head">
+    {icon && <span class="s2s-facets__icon"><Icon name={icon} size={20} /></span>}
+    <h3 id={hid} class="s2s-facets__title">{heading}</h3>
+    {action && <a class="s2s-facets__action s2s-focus" href={action.href}>{action.label} <span aria-hidden="true">→</span></a>}
+  </div>
+  <ul class="s2s-facets__list">
+    {items.map((it) => (
+      <li>
+        <a href={it.href} class="s2s-facet s2s-focus" aria-current={it.current ? 'true' : undefined}>
+          <svg class="s2s-facet__check" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false">
+            <path d="M8 1.5 13.6 4v4.3c0 3-2.4 5.3-5.6 6.2-3.2-.9-5.6-3.2-5.6-6.2V4Z" fill="currentColor" opacity=".22" />
+            <path d="m5.4 8.2 1.8 1.8 3.5-3.7" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          <span class="s2s-facet__label">{it.label}</span>
+          {it.count !== undefined && <span class="s2s-facet__count">{it.count}</span>}
+        </a>
+      </li>
+    ))}
+  </ul>
+</Card>
+
+<style>
+  .s2s-facets__head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .s2s-facets__icon { display: inline-flex; color: var(--s2s-accent); --icon-accent: var(--s2s-accent-strong); }
+  .s2s-facets__title {
+    flex: 1;
+    margin: 0;
+    font: var(--type-heading-weight) 1.0625rem / 1.2 var(--font-display);
+    color: var(--s2s-ink);
+  }
+  .s2s-facets__action {
+    font: 450 0.65625rem / 1 var(--font-sans);
+    color: var(--s2s-ink-soft);
+    text-decoration: none;
+  }
+  .s2s-facets__action:hover { color: var(--s2s-accent); }
+  .s2s-facets__list { margin: 0; padding: 0; list-style: none; }
+  .s2s-facet {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    padding: 5px 4px;
+    border-radius: 6px;
+    font: 400 var(--type-micro) / 1.3 var(--font-sans);
+    color: var(--s2s-ink-soft);
+    text-decoration: none;
+  }
+  .s2s-facet:hover { background: var(--s2s-inset); color: var(--s2s-ink); }
+  .s2s-facet[aria-current='true'] { color: var(--s2s-accent); background: var(--s2s-accent-soft); }
+  .s2s-facet__check { flex-shrink: 0; color: var(--s2s-secondary); }
+  .s2s-facet__label { flex: 1; min-width: 0; }
+  .s2s-facet__count {
+    min-width: 26px;
+    padding: 2px 7px;
+    border-radius: 5px;
+    background: var(--s2s-chip);
+    font: 500 0.625rem / 1.3 var(--font-mono);
+    color: var(--s2s-ink-soft);
+    text-align: center;
+  }
+</style>

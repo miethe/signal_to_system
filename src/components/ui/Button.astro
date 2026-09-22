@@ -6,10 +6,15 @@
  *   variant  — visual style
  *   size     — sm | md | lg
  *   href     — optional link target
+ *
+ * v2 (Observatory) variants, from the mockups' hero and card CTAs:
+ *   signal   — lavender fill, dark ink ("Explore Labs →", "View Investigation →")
+ *   outline  — transparent with an emphasis rule ("Read Essays", "See Evidence")
+ * The v1 variants are unchanged.
  */
 
 interface Props {
-  variant?: "primary" | "secondary" | "ghost";
+  variant?: "primary" | "secondary" | "ghost" | "signal" | "outline";
   size?: "sm" | "md" | "lg";
   href?: string;
   type?: "button" | "submit" | "reset";
@@ -36,6 +41,8 @@ const variants: Record<string, string> = {
     "bg-[var(--bg-surface)] text-[var(--text-primary)] hover:bg-[var(--bg-subtle)] border border-[var(--border-subtle)] !text-[var(--text-primary)]",
   ghost:
     "bg-transparent text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)] !text-[var(--text-secondary)]",
+  signal: "s2s-btn s2s-btn--signal",
+  outline: "s2s-btn s2s-btn--outline",
 };
 
 const sizes: Record<string, string> = {
@@ -44,7 +51,11 @@ const sizes: Record<string, string> = {
   lg: "text-base px-6 py-3",
 };
 
-const cls = [base, variants[variant] ?? variants.primary, sizes[size] ?? sizes.md, className].join(" ");
+const v2 = variant === "signal" || variant === "outline";
+const cls = (v2
+  ? [variants[variant], `s2s-btn--${size}`, "s2s-focus", className]
+  : [base, variants[variant] ?? variants.primary, sizes[size] ?? sizes.md, className]
+).join(" ");
 ---
 
 {
@@ -58,3 +69,41 @@ const cls = [base, variants[variant] ?? variants.primary, sizes[size] ?? sizes.m
     </button>
   )
 }
+
+<style is:global>
+  .s2s-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    border-radius: 4px;
+    font: 500 var(--type-ui) / 1 var(--font-sans);
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color var(--s2s-dur) ease, border-color var(--s2s-dur) ease, color var(--s2s-dur) ease;
+  }
+  .s2s-btn--sm { height: 28px; padding: 0 14px; font-size: var(--type-micro); }
+  .s2s-btn--md { height: 32px; padding: 0 22px; }
+  .s2s-btn--lg { height: 34px; padding: 0 30px; }
+  .s2s-btn--signal {
+    border: 1px solid var(--s2s-accent-strong);
+    background: var(--s2s-accent-strong);
+    color: var(--s2s-on-accent);
+  }
+  .s2s-btn--signal:hover {
+    background: var(--s2s-accent-strong-hover);
+    border-color: var(--s2s-accent-strong-hover);
+    color: var(--s2s-on-accent);
+  }
+  .s2s-btn--outline {
+    border: 1px solid var(--s2s-rule-emphasis);
+    background: transparent;
+    color: var(--s2s-ink-soft);
+  }
+  .s2s-btn--outline:hover {
+    border-color: var(--s2s-ink-subtle);
+    background: var(--s2s-inset);
+    color: var(--s2s-ink);
+  }
+</style>

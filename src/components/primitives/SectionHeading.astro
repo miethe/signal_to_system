@@ -1,0 +1,79 @@
+---
+/**
+ * SectionHeading — the mockups' section/card header: an optional line icon,
+ * a serif title, an accent small-caps label beneath it, a muted one-line
+ * description, and a "View all →" action at the right.
+ *
+ *   ◎ Featured Investigation                          View all labs →
+ *     LABS
+ *     Deep dives with evidence, not hot takes.
+ */
+import Icon from '../brand/Icon.astro';
+
+interface Props {
+  title: string;
+  label?: string;
+  description?: string;
+  icon?: string;
+  action?: { label: string; href: string };
+  level?: 2 | 3 | 4;
+  id?: string;
+  class?: string;
+}
+const { title, label, description, icon, action, level = 2, id, class: className } = Astro.props;
+const H = `h${level}` as 'h2' | 'h3' | 'h4';
+---
+
+<header class:list={['s2s-sh', className]}>
+  {icon && <span class="s2s-sh__icon"><Icon name={icon} size={24} /></span>}
+  <div class="s2s-sh__text">
+    <H class="s2s-sh__title" id={id}>{title}</H>
+    {label && <p class="s2s-label s2s-sh__label">{label}</p>}
+    {description && <p class="s2s-sh__desc">{description}</p>}
+  </div>
+  {action && (
+    <a class="s2s-sh__action s2s-focus" href={action.href}>
+      {action.label}<span aria-hidden="true">→</span>
+    </a>
+  )}
+</header>
+
+<style>
+  .s2s-sh {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .s2s-sh__icon {
+    display: inline-flex;
+    margin-top: 1px;
+    color: var(--s2s-accent);
+    --icon-accent: var(--s2s-accent-strong);
+  }
+  .s2s-sh__text { min-width: 0; flex: 1; }
+  .s2s-sh__title {
+    margin: 0;
+    font: var(--type-heading-weight) var(--type-section) / 1.15 var(--font-display);
+    letter-spacing: -0.005em;
+    color: var(--s2s-ink);
+  }
+  .s2s-sh__label { margin: 3px 0 0; }
+  .s2s-sh__desc {
+    margin: 3px 0 0;
+    font: 400 var(--type-meta) / 1.45 var(--font-sans);
+    color: var(--s2s-ink-muted);
+  }
+  .s2s-sh__action {
+    flex-shrink: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+    font: 450 var(--type-micro) / 1 var(--font-sans);
+    color: var(--s2s-ink-soft);
+    text-decoration: none;
+    border-radius: 2px;
+  }
+  .s2s-sh__action:hover { color: var(--s2s-accent); }
+</style>
