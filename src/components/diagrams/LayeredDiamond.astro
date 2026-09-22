@@ -1,0 +1,100 @@
+---
+/**
+ * LayeredDiamond — the "data stack" motif: isometric planes on a shared
+ * axis, capped with sparkles. Parameterized layer count; optional labels
+ * with dashed leaders (the Studio "How it fits together" composition).
+ *
+ * Top plane --accent, bottom plane --secondary, intermediate planes blend
+ * by opacity. Planes fill with --surface so upper planes occlude lower ones.
+ */
+import { r2, sparkle, nextId } from './geometry';
+
+interface Layer {
+  title: string;
+  caption?: string;
+}
+
+interface Props {
+  /** Layer count when no labels are given. */
+  layers?: number;
+  labels?: Layer[];
+  sparkles?: boolean;
+  title?: string;
+  width?: number | string;
+  class?: string;
+}
+
+const { layers = 4, labels, sparkles = true, title = 'Layered data stack', width = '100%', class: className } = Astro.props;
+const count = labels?.length ?? layers;
+
+const PW = 150; // plane width
+const PH = 75; // plane height (2:1 isometric)
+const gapY = labels ? 42 : 28;
+const top = sparkles ? 40 : 12;
+const cx = 12 + PW / 2 + 8;
+const W = labels ? 460 : cx * 2;
+const H = top + PH + gapY * (count - 1) + (sparkles ? 40 : 12);
+
+const planes = Array.from({ length: count }, (_, i) => {
+  const cy = top + PH / 2 + i * gapY;
+  const d = `M${cx} ${r2(cy - PH / 2)}L${cx + PW / 2} ${r2(cy)}L${cx} ${r2(cy + PH / 2)}L${cx - PW / 2} ${r2(cy)}Z`;
+  const tone = i === count - 1 && count > 1 ? 'secondary' : 'accent';
+  const strength = count > 1 ? r2(1 - (i / (count - 1)) * 0.35) : 1;
+  return { cy, d, tone, strength, label: labels?.[i] };
+}).reverse(); // draw bottom first so the top plane sits in front
+
+const inset = (cy: number) => {
+  const w = PW * 0.32;
+  const h = PH * 0.32;
+  return `M${cx} ${r2(cy - h)}L${r2(cx + w)} ${r2(cy)}L${cx} ${r2(cy + h)}L${r2(cx - w)} ${r2(cy)}Z`;
+};
+const firstCy = top + PH / 2;
+const lastCy = top + PH / 2 + (count - 1) * gapY;
+const titleId = nextId('stack-title');
+---
+
+<svg
+  viewBox={`0 0 ${W} ${H}`}
+  width={width}
+  role="img"
+  aria-labelledby={titleId}
+  class:list={['s2s-stack', className]}
+>
+  <title id={titleId}>{labels ? `${title}: ${labels.map((l) => l.title).join(', ')}` : title}</title>
+  <path class="axis" d={`M${cx} ${sparkles ? 14 : top}V${r2(lastCy + PH / 2 + (sparkles ? 14 : 0))}`} />
+  {planes.map((p) => (
+    <g class={`plane tone-${p.tone}`} style={`--strength:${p.strength}`}>
+      <path d={p.d} />
+      {p.cy === firstCy && <path class="inset" d={inset(p.cy)} />}
+      {p.label && (
+        <>
+          <path class="leader" d={`M${cx + PW / 2 + 8} ${r2(p.cy)}H${cx + PW / 2 + 52}`} />
+          <text class="t" x={cx + PW / 2 + 62} y={r2(p.cy - 1)}>{p.label.title}</text>
+          {p.label.caption && <text class="c" x={cx + PW / 2 + 62} y={r2(p.cy + 15)}>{p.label.caption}</text>}
+        </>
+      )}
+    </g>
+  ))}
+  {sparkles && (
+    <>
+      <path class="spark" d={sparkle(cx, 14, 10)} />
+      <path class="spark spark--low" d={sparkle(cx, r2(lastCy + PH / 2 + 22), 8)} />
+    </>
+  )}
+</svg>
+
+<style>
+  .s2s-stack { display: block; max-width: 100%; height: auto; overflow: visible; }
+  .axis { stroke: var(--rule, currentColor); stroke-width: 1; stroke-dasharray: 2 4; fill: none; }
+  .plane path { stroke-width: 1.5; stroke-linejoin: round; }
+  .plane > path:first-child { fill: var(--surface, transparent); }
+  .tone-accent { --p: var(--accent, currentColor); }
+  .tone-secondary { --p: var(--secondary, currentColor); }
+  .plane > path { stroke: var(--p); stroke-opacity: var(--strength); }
+  .inset { fill: none; stroke-dasharray: 3 3; stroke-opacity: 0.6 !important; }
+  .leader { fill: none; stroke: var(--rule, currentColor) !important; stroke-width: 1 !important; stroke-dasharray: 2 3; }
+  .t { fill: var(--ink, currentColor); font: 14px var(--font-sans, system-ui, sans-serif); }
+  .c { fill: var(--muted, currentColor); font: 12px var(--font-sans, system-ui, sans-serif); }
+  .spark { fill: var(--accent, currentColor); }
+  .spark--low { fill: var(--secondary, currentColor); }
+</style>
