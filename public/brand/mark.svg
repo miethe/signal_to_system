@@ -1,10 +1,28 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-labelledby="s2s-mark-title">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="s2s-mark-title">
   <title id="s2s-mark-title">Signal to System</title>
-  <style>
-    .ring { stroke: var(--accent, currentColor); }
-    .trail { stroke: var(--secondary, currentColor); }
-  </style>
-  <!-- Orbit: the system. Trail: a signal crossing it and leaving on both sides. -->
-  <circle class="ring" cx="15.6" cy="16" r="9" fill="none" stroke-width="2"/>
-  <path class="trail" d="M5 22L27 11.75" fill="none" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Primary mark (logo board 01): seven signal bars whose heights trace a rhombus,
+       node dots at the left and right points. Bar pitch 6, width 2.8, half-heights
+       6.5 / 13 / 19.5 / 26: a linear taper that reaches zero exactly at the dots.
+       Gradient stops read the mark-top, mark-mid, mark-bottom and mark-dot custom properties. -->
+  <defs>
+    <linearGradient id="s2s-wave" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" style="stop-color: var(--mark-top, #5a3fc9)"/>
+      <stop offset=".5" style="stop-color: var(--mark-mid, #c9a8f8)"/>
+      <stop offset=".86" style="stop-color: var(--mark-mid, #c9a8f8)"/>
+      <stop offset="1" style="stop-color: var(--mark-bottom, #9eeedc)"/>
+    </linearGradient>
+  </defs>
+  <g fill="url(#s2s-wave)">
+    <rect x="12.6" y="25.5" width="2.8" height="13" rx="1.4"/>
+    <rect x="18.6" y="19" width="2.8" height="26" rx="1.4"/>
+    <rect x="24.6" y="12.5" width="2.8" height="39" rx="1.4"/>
+    <rect x="30.6" y="6" width="2.8" height="52" rx="1.4"/>
+    <rect x="36.6" y="12.5" width="2.8" height="39" rx="1.4"/>
+    <rect x="42.6" y="19" width="2.8" height="26" rx="1.4"/>
+    <rect x="48.6" y="25.5" width="2.8" height="13" rx="1.4"/>
+  </g>
+  <g style="fill: var(--mark-dot, #8a5ce0)">
+    <circle cx="8" cy="32" r="1.9"/>
+    <circle cx="56" cy="32" r="1.9"/>
+  </g>
 </svg>

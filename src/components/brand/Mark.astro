@@ -1,64 +1,133 @@
 ---
 /**
- * The Signal to System orbit/trail mark, inline.
+ * The Signal to System marks, inline (source of truth: the visual pack's logo
+ * exploration board).
  *
- * Ring = var(--accent), trail = var(--secondary): each language recolors the
- * mark with no new asset (02 §3). At 24px and below the optical "small" cut
- * is used automatically, because the full mark's 2px ring / 1.5px trail
- * rasterize to sub-pixel hairlines at favicon sizes.
+ * wave          primary (board 01): seven signal bars on a rhombus taper with
+ *               node dots at the points; per-bar violet-to-mint gradient.
+ * mono          the board's monochrome row: slimmer bars, one ink (currentColor).
+ * small         favicon cut (board favicon idea 01): five pixel-aligned bars, no
+ *               dots. Chosen automatically for wave/mono at 24px and below.
+ * medium        seven 2px bars on a 32 grid, no dots; chosen automatically at
+ *               25-40px, where the full mark's 2.8/64 bars fall below a pixel.
+ * monogram      secondary (board 05): S/S split by a diagonal, with a sparkle.
+ * constellation reserve alternate (board 03).
  *
- * `variant="constellation"` is the reserve network mark (not for <= 20px).
+ * Color roles: --mark-top / --mark-mid / --mark-bottom / --mark-dot (wave),
+ * falling back to --violet-deep / --accent / --secondary / --violet.
  */
+import { nextId } from '../diagrams/geometry';
+
+type Variant = 'wave' | 'mono' | 'small' | 'medium' | 'monogram' | 'constellation';
+
 interface Props {
   size?: number;
-  variant?: 'auto' | 'full' | 'small' | 'constellation';
+  variant?: Variant;
   /** Accessible name. Set `decorative` when a visible wordmark sits next to it. */
   label?: string;
   decorative?: boolean;
+  /** Position when nested inside another SVG. */
+  x?: number;
+  y?: number;
   class?: string;
 }
 
-const { size = 32, variant = 'auto', label = 'Signal to System', decorative = false, class: className } = Astro.props;
-const cut = variant === 'auto' ? (size <= 24 ? 'small' : 'full') : variant;
+const { size = 32, variant = 'wave', label = 'Signal to System', decorative = false, x, y, class: className } = Astro.props;
+const scalable = variant === 'wave' || variant === 'mono';
+const cut: Variant = scalable && size <= 24 ? 'small' : scalable && size <= 40 ? 'medium' : variant;
 const a11y = decorative ? { 'aria-hidden': 'true', focusable: 'false' } : { role: 'img', 'aria-label': label };
+const gid = nextId('s2s-wave');
+const fill = variant === 'mono' ? 'currentColor' : `url(#${gid})`;
+
+// Board 01 geometry on a 64 grid: pitch 6, half-heights 6.5 / 13 / 19.5 / 26.
+const halves = [6.5, 13, 19.5, 26, 19.5, 13, 6.5];
+const bw = variant === 'mono' ? 2.2 : 2.8;
+const bars = halves.map((h, i) => ({ x: 14 + i * 6 - bw / 2, y: 32 - h, h: h * 2 }));
+// Favicon cut on a 16 grid: 2px bars, 1px gaps, heights 4 / 8 / 12.
+const small = [4, 8, 12, 8, 4].map((h, i) => ({ x: 1 + i * 3, y: 8 - h / 2, h }));
+// 32 grid: 2px bars on a 4px pitch, heights 6 / 12 / 18 / 24.
+const medium = [6, 12, 18, 24, 18, 12, 6].map((h, i) => ({ x: 3 + i * 4, y: 16 - h / 2, h }));
+const S =
+  'M33.4 14.2L33.4 2.2C30 .8 25 0 18.5 0C9 0 1.8 5.5 1.8 13.5C1.8 21 7 24.5 15 27.8C24 31.5 27.8 34 27.8 39.5C27.8 45.5 23.5 49.4 17 49.4C10 49.4 5.5 45 4 37.5L2.2 37.5L2.2 50C6 51.5 11.5 52 17.5 52C27.5 52 34.4 46 34.4 38.5C34.4 30.5 28.8 27.2 20.5 23.8C12.5 20.6 8.6 18.5 8.6 13C8.6 7 12.5 2.6 18.5 2.6C25 2.6 30 7 31.6 14.2Z';
 ---
 
-{cut === 'small' && (
-  <svg viewBox="0 0 16 16" width={size} height={size} class:list={['s2s-mark', className]} {...a11y}>
-    {!decorative && <title>{label}</title>}
-    <circle class="ring" cx="8" cy="8" r="4.75" stroke-width="1.5" />
-    <path class="trail" d="M1.5 11.5L14.5 5.4" stroke-width="1.35" />
-  </svg>
-)}
-{cut === 'full' && (
-  <svg viewBox="0 0 32 32" width={size} height={size} class:list={['s2s-mark', className]} {...a11y}>
-    {!decorative && <title>{label}</title>}
-    <circle class="ring" cx="15.6" cy="16" r="9" stroke-width="2" />
-    <path class="trail" d="M5 22L27 11.75" stroke-width="1.5" />
-  </svg>
-)}
-{cut === 'constellation' && (
-  <svg viewBox="0 0 32 32" width={size} height={size} class:list={['s2s-mark', 's2s-mark--constellation', className]} {...a11y}>
-    {!decorative && <title>{label}</title>}
-    <path class="edge" d="M17.88 8.78L9.43 19.82M20 9.5v6.3M10.82 21.82l6.12-1.88M22.26 21.26l2.62 2.62" stroke-width="1.5" />
-    <g class="ring" stroke-width="1.5">
-      <circle cx="20" cy="6" r="2.5" />
-      <circle cx="7" cy="23" r="3" />
-      <circle cx="20" cy="19" r="2.2" />
-      <circle cx="27" cy="26" r="2" />
-    </g>
-    <g class="core">
-      <circle cx="20" cy="6" r="1" />
-      <circle cx="7" cy="23" r="1.2" />
-      <circle cx="27" cy="26" r=".8" />
-    </g>
-  </svg>
-)}
+<svg
+  viewBox={cut === 'small' ? '0 0 16 16' : cut === 'constellation' || cut === 'medium' ? '0 0 32 32' : '0 0 64 64'}
+  width={size}
+  height={size}
+  x={x}
+  y={y}
+  class:list={['s2s-mark', `s2s-mark--${cut}`, className]}
+  {...a11y}
+>
+  {!decorative && <title>{label}</title>}
+  {variant !== 'mono' && (cut === 'wave' || cut === 'small' || cut === 'medium') && (
+    <defs>
+      <linearGradient id={gid} x1="0" y1="0" x2="0" y2="1">
+        <stop class="st-top" offset="0" />
+        <stop class="st-mid" offset=".5" />
+        <stop class="st-mid" offset=".86" />
+        <stop class="st-bottom" offset="1" />
+      </linearGradient>
+    </defs>
+  )}
+  {cut === 'wave' || cut === 'mono' ? (
+    <>
+      <g fill={fill}>
+        {bars.map((b) => <rect x={b.x} y={b.y} width={bw} height={b.h} rx={bw / 2} />)}
+      </g>
+      <g class={variant === 'mono' ? 'ink' : 'dot'}>
+        <circle cx="8" cy="32" r={variant === 'mono' ? 1.6 : 1.9} />
+        <circle cx="56" cy="32" r={variant === 'mono' ? 1.6 : 1.9} />
+      </g>
+    </>
+  ) : cut === 'small' || cut === 'medium' ? (
+    <g fill={fill}>{(cut === 'small' ? small : medium).map((b) => <rect x={b.x} y={b.y} width="2" height={b.h} rx="1" />)}</g>
+  ) : cut === 'monogram' ? (
+    <>
+      <path class="rule" d="M8 62L58 6" stroke-width="1" />
+      <path class="s-signal" transform="translate(4 2) scale(.66)" d={S} />
+      <path class="s-system" transform="translate(36 27.5) scale(.66)" d={S} />
+      <path class="s-signal" d="M51 3.5Q51.6 8.4 56.5 9Q51.6 9.6 51 14.5Q50.4 9.6 45.5 9Q50.4 8.4 51 3.5Z" />
+    </>
+  ) : (
+    <>
+      <path class="edge" d="M17.88 8.78L9.43 19.82M20 9.5v6.3M10.82 21.82l6.12-1.88M22.26 21.26l2.62 2.62" stroke-width=".9" />
+      <g class="ring-system" stroke-width="1.5">
+        <circle cx="20" cy="6" r="2.5" />
+        <circle cx="20" cy="19" r="2.2" />
+        <circle cx="27" cy="26" r="2" />
+      </g>
+      <circle class="ring-signal" cx="7" cy="23" r="3" stroke-width="1.5" />
+      <circle class="s-signal" cx="7" cy="23" r="1.3" />
+      <g class="s-system">
+        <circle cx="20" cy="6" r=".9" />
+        <circle cx="20" cy="19" r=".8" />
+        <circle cx="27" cy="26" r=".7" />
+      </g>
+    </>
+  )}
+</svg>
 
 <style is:global>
-  .s2s-mark { flex-shrink: 0; fill: none; stroke-linecap: round; }
-  .s2s-mark .ring { stroke: var(--mark-ring, var(--accent, currentColor)); }
-  .s2s-mark .trail { stroke: var(--mark-trail, var(--secondary, currentColor)); }
-  .s2s-mark .edge { stroke: var(--muted, currentColor); }
-  .s2s-mark .core { fill: var(--mark-trail, var(--secondary, currentColor)); stroke: none; }
+  .s2s-mark {
+    --_top: var(--mark-top, var(--violet-deep, currentColor));
+    --_mid: var(--mark-mid, var(--accent, currentColor));
+    --_bottom: var(--mark-bottom, var(--secondary, currentColor));
+    --_dot: var(--mark-dot, var(--violet, currentColor));
+    flex-shrink: 0;
+    fill: none;
+    stroke-linecap: round;
+  }
+  .s2s-mark .st-top { stop-color: var(--_top); }
+  .s2s-mark .st-mid { stop-color: var(--_mid); }
+  .s2s-mark .st-bottom { stop-color: var(--_bottom); }
+  .s2s-mark .dot { fill: var(--_dot); }
+  .s2s-mark .ink { fill: currentColor; }
+  .s2s-mark .rule { stroke: var(--muted, currentColor); }
+  .s2s-mark .edge { stroke: var(--subtle, var(--muted, currentColor)); }
+  .s2s-mark .s-signal { fill: var(--_mid); }
+  .s2s-mark .s-system { fill: var(--_bottom); }
+  .s2s-mark .ring-signal { stroke: var(--_mid); }
+  .s2s-mark .ring-system { stroke: var(--_bottom); }
 </style>
