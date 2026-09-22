@@ -142,19 +142,19 @@ export default function SearchBox() {
   }
 
   if (!isOpen) {
+    // The v2 header's search field (mockup: 235x30 inset field with a lens
+    // and placeholder). It is a trigger for the dialog, not a live input, so
+    // it stays a button; below 1024px it collapses to the lens alone.
     return (
       <button
         type="button"
         onClick={open}
         aria-label="Search (Cmd+K)"
         title="Search (Cmd+K)"
-        className="flex h-9 items-center gap-2 rounded-md px-2.5 text-[var(--text-secondary)] transition-colors hover:bg-[var(--bg-muted)] hover:text-[var(--text-primary)] focus-ring sm:px-3"
+        className="s2s-search s2s-focus"
       >
-        <Search className="h-4 w-4 shrink-0" aria-hidden="true" />
-        <span className="hidden text-sm sm:block">Search</span>
-        <kbd className="hidden rounded border border-[var(--border)] bg-[var(--bg-muted)] px-1.5 py-0.5 text-xs text-[var(--text-disabled)] sm:block">
-          ⌘K
-        </kbd>
+        <Search className="s2s-search__lens" aria-hidden="true" />
+        <span className="s2s-search__placeholder">Search ideas, experiments, systems…</span>
       </button>
     );
   }
@@ -163,7 +163,7 @@ export default function SearchBox() {
     /* Backdrop */
     <div
       className="fixed inset-0 z-[100] flex items-start justify-center px-4 pt-[15vh]"
-      style={{ background: 'rgba(2, 6, 23, 0.75)', backdropFilter: 'blur(4px)' }}
+      style={{ background: 'var(--s2s-scrim)', backdropFilter: 'blur(4px)' }}
       role="presentation"
     >
       {/* Dialog */}
@@ -172,7 +172,7 @@ export default function SearchBox() {
         role="dialog"
         aria-modal="true"
         aria-label="Search"
-        className="w-full max-w-xl overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--bg-base)] shadow-2xl"
+        className="w-full max-w-xl overflow-hidden rounded-[var(--s2s-radius-card)] border border-[var(--s2s-rule-strong)] bg-[var(--s2s-surface)] shadow-[var(--s2s-shadow-pop)]"
         onKeyDown={onKeyDownInDialog}
       >
         {/* Input row */}
@@ -214,7 +214,7 @@ export default function SearchBox() {
           )}
 
           {error && !loading && (
-            <div className="px-4 py-10 text-center text-sm text-red-400">{error}</div>
+            <div className="px-4 py-10 text-center text-sm text-[var(--s2s-status-danger)]">{error}</div>
           )}
 
           {!loading && !error && query.trim() && results.length === 0 && (

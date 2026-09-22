@@ -1,0 +1,105 @@
+---
+/**
+ * The mockups' header theme control: a pill with a small sun at one end and
+ * a round knob at the other. Dark (Observatory, the default) parks the cream
+ * knob right; light parks a violet knob left and shows a moon.
+ *
+ * Position and glyph are pure CSS keyed on <html class="dark|light">, which
+ * BaseLayout's boot script sets before first paint, so there is no flash
+ * and no hydration. The click handler goes through themeStore so any island
+ * subscribed to $theme stays in sync.
+ */
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+---
+
+<button
+  type="button"
+  role="switch"
+  aria-checked="true"
+  aria-label="Dark mode"
+  title="Toggle dark mode"
+  class:list={['s2s-theme-switch s2s-focus', className]}
+  data-theme-switch
+>
+  <svg class="s2s-theme-switch__sun" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true" focusable="false">
+    <circle cx="8" cy="8" r="2.4" fill="currentColor" />
+    <path
+      d="M8 1.2v2.2M8 12.6v2.2M1.2 8h2.2M12.6 8h2.2M3.2 3.2l1.5 1.5M11.3 11.3l1.5 1.5M3.2 12.8l1.5-1.5M11.3 4.7l1.5-1.5"
+      stroke="currentColor"
+      stroke-width="1.2"
+      stroke-linecap="round"
+    />
+  </svg>
+  <svg class="s2s-theme-switch__moon" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true" focusable="false">
+    <path d="M13.2 10.1A5.6 5.6 0 0 1 5.9 2.8a5.6 5.6 0 1 0 7.3 7.3Z" fill="currentColor" />
+  </svg>
+  <span class="s2s-theme-switch__knob" aria-hidden="true"></span>
+</button>
+
+<script>
+  import { toggleTheme } from '../../store/themeStore';
+
+  function sync() {
+    const dark = document.documentElement.classList.contains('dark');
+    document.querySelectorAll<HTMLButtonElement>('[data-theme-switch]').forEach((b) => {
+      b.setAttribute('aria-checked', String(dark));
+    });
+  }
+
+  document.querySelectorAll<HTMLButtonElement>('[data-theme-switch]').forEach((b) => {
+    b.addEventListener('click', () => {
+      toggleTheme();
+      sync();
+    });
+  });
+  sync();
+</script>
+
+<style>
+  .s2s-theme-switch {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    width: 54px;
+    height: 30px;
+    flex-shrink: 0;
+    padding: 0 9px;
+    border: 1px solid var(--s2s-rule-strong);
+    border-radius: var(--s2s-radius-pill);
+    background: var(--s2s-canvas);
+    color: var(--s2s-ink-subtle);
+    cursor: pointer;
+    transition: border-color var(--s2s-dur) ease, background-color var(--s2s-dur) ease;
+  }
+  .s2s-theme-switch:hover {
+    border-color: var(--s2s-rule-emphasis);
+    color: var(--s2s-ink-soft);
+  }
+  .s2s-theme-switch svg {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  .s2s-theme-switch__sun { left: 10px; }
+  .s2s-theme-switch__moon { right: 10px; display: none; }
+  .s2s-theme-switch__knob {
+    position: absolute;
+    top: 50%;
+    right: 4px;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--s2s-toggle-knob);
+    transform: translateY(-50%);
+    transition: right 220ms var(--s2s-ease), background-color var(--s2s-dur) ease;
+  }
+  :global(.light) .s2s-theme-switch__sun { display: none; }
+  :global(.light) .s2s-theme-switch__moon { display: block; }
+  :global(.light) .s2s-theme-switch__knob { right: calc(100% - 24px); }
+  @media (prefers-reduced-motion: reduce) {
+    .s2s-theme-switch__knob { transition: none; }
+  }
+</style>

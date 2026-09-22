@@ -1,0 +1,154 @@
+---
+/**
+ * v2 site footer — the single bar every mockup closes on: a small lockup at
+ * left, the tagline centered, utility links, a short rule and a two-line
+ * tracked motto at right. The disclaimer and copyright (kept from v1; the
+ * mockups omit them) sit in a fine-print row underneath.
+ */
+import Lockup from '../brand/Lockup.astro';
+import { site } from '../../data/site';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="s2s-footer">
+  <div class="s2s-footer__bar">
+    <Lockup layout="header" size={17} href="/" class="s2s-footer__brand s2s-focus" />
+    <p class="s2s-footer__tagline">{site.footer.tagline}</p>
+    <div class="s2s-footer__end">
+      <nav aria-label="Footer">
+        <ul>
+          {site.footer.bar.map((l) => (
+            <li>
+              <a
+                href={l.href}
+                class="s2s-focus"
+                {...('external' in l && l.external ? { rel: 'noopener noreferrer', target: '_blank' } : {})}
+              >
+                {l.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      <span class="s2s-footer__rule" aria-hidden="true"></span>
+      <p class="s2s-footer__motto">
+        {site.footer.motto[0]}<br />{site.footer.motto[1]}
+      </p>
+    </div>
+  </div>
+  <div class="s2s-footer__fine">
+    <p>{site.defaultDisclaimer}</p>
+    <p>&copy; {year} {site.author.name}</p>
+  </div>
+</footer>
+
+<style>
+  .s2s-footer {
+    --mark-top: var(--s2s-mark-top);
+    --mark-mid: var(--s2s-mark-mid);
+    --mark-bottom: var(--s2s-mark-bottom);
+    --mark-dot: var(--s2s-mark-dot);
+    --ink: var(--s2s-ink);
+    --muted: var(--s2s-ink-subtle);
+    margin-top: 64px;
+    padding: 0 16px;
+    background: var(--s2s-canvas-raised);
+    border-top: 1px solid var(--s2s-rule);
+  }
+
+  .s2s-footer__bar {
+    display: grid;
+    grid-template-columns: 1fr;
+    justify-items: start;
+    gap: 14px;
+    padding: 20px 0 16px;
+  }
+
+  :global(.s2s-footer__brand) {
+    border-radius: 4px;
+    white-space: nowrap;
+  }
+  :global(.s2s-footer__brand .s2s-lockup__title) { color: var(--s2s-ink-soft); }
+  :global(.s2s-footer__brand .s2s-lockup__byline) { color: var(--s2s-ink-subtle); }
+
+  .s2s-footer__tagline {
+    margin: 0;
+    font: 400 var(--type-micro) / 1.4 var(--font-sans);
+    letter-spacing: 0.01em;
+    color: var(--s2s-ink-muted);
+  }
+
+  .s2s-footer__end {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 14px 28px;
+  }
+  .s2s-footer__end ul {
+    display: flex;
+    gap: 22px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .s2s-footer__end a {
+    font: 400 var(--type-micro) / 1 var(--font-sans);
+    color: var(--s2s-ink-soft);
+    text-decoration: none;
+    border-radius: 2px;
+  }
+  .s2s-footer__end a:hover { color: var(--s2s-ink); }
+
+  .s2s-footer__rule {
+    display: none;
+    width: 30px;
+    height: 1px;
+    background: var(--s2s-rule-emphasis);
+  }
+
+  .s2s-footer__motto {
+    margin: 0;
+    font: 500 0.5rem / 1.5 var(--font-sans);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--s2s-ink-subtle);
+  }
+
+  .s2s-footer__fine {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 4px 24px;
+    padding: 10px 0 14px;
+    border-top: 1px solid var(--s2s-rule);
+  }
+  .s2s-footer__fine p {
+    margin: 0;
+    max-width: 90ch;
+    font: 400 0.625rem / 1.5 var(--font-sans);
+    color: var(--s2s-ink-faint);
+  }
+
+  @media (min-width: 1024px) {
+    .s2s-footer {
+      padding: 0 32px;
+    }
+    .s2s-footer__bar {
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 24px;
+      padding: 13px 0 12px;
+    }
+    .s2s-footer__tagline { justify-self: center; }
+    .s2s-footer__end { justify-self: end; flex-wrap: nowrap; }
+    .s2s-footer__rule { display: block; }
+  }
+
+  @media (min-width: 1280px) {
+    :global(.s2s-frame:not(.s2s-frame--reader)) > .s2s-footer {
+      border-radius: 0 0 var(--s2s-radius-frame) var(--s2s-radius-frame);
+    }
+  }
+</style>
