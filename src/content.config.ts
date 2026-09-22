@@ -138,6 +138,7 @@ const series = defineCollection({
 
     // Optional metadata
     heroImage: z.string().optional(),
+    ogImage: z.string().optional(),
     featured: z.boolean().optional(),
     topic: z.string().optional(),
 
@@ -198,6 +199,7 @@ const stories = defineCollection({
     seriesOrder: z.number().optional(),
     featured: z.boolean().optional(),
     heroImage: z.string().optional(),
+    ogImage: z.string().optional(),
 
     // SEO
     seoTitle: z.string().optional(),

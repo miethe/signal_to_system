@@ -82,7 +82,7 @@ export const site = {
     ],
   },
 
-  defaultOgImage: "/brand/og-default.png",
+  defaultOgImage: "/og/default.png",
 
   defaultDisclaimer:
     "The views expressed here are my own and do not represent any employer, client, or affiliated organization. Content is for informational purposes and reflects my personal opinions and experiences.",

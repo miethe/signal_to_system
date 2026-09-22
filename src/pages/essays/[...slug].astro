@@ -28,7 +28,7 @@ const relatedItems = await getRelatedArticles(post);
     readTime: post.data.readTime ? parseInt(post.data.readTime) : undefined,
     category: post.data.category,
     tags: post.data.tags,
-    ogImage: post.data.ogImage ?? post.data.heroImage,
+    ogImage: post.data.ogImage ?? `/og/essays/${post.id}.png`,
     heroImage: post.data.heroImage,
     heroAlt: post.data.heroAlt,
     whyItMatters: post.data.whyItMatters,
