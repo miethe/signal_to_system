@@ -8,7 +8,7 @@ AVIF + WebP under `public/images/v2/`. The site build never reads the 2 MB sourc
 - **Regenerate:** `npm run assets:build -- --source <visual pack>`. The default source is
   `docs/design/s2s-v2-visual`, which lands with the plan branch.
 - **Use:** `<V2Image kind="hero|sticker|backdrop" id="…" />` (`src/components/media/V2Image.astro`).
-  It writes a `<picture>` with intrinsic sizes read from `public/images/v2/manifest.json`.
+  It writes a `<picture>` with intrinsic sizes read from `src/data/v2-images.json`.
 
 | Output | Where it shows |
 |---|---|

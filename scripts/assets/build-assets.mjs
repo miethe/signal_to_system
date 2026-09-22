@@ -9,7 +9,8 @@
  *   hero/<id>-<w>.{avif,webp}      photographic hero bands, baked copy patched out
  *   backdrop/<id>.{avif,webp}      softened page backdrop behind the frame
  *   stickers/<id>.{avif,webp}      transparent keeper stickers, alpha-trimmed
- *   manifest.json                  what was written, with pixel sizes (read by src/lib/images.ts)
+ *   src/data/v2-images.json        what was written, with pixel sizes (read by V2Image; kept out
+ *                                  of public/ so it never ships as a route)
  *
  * Patching: each patch keeps the target's own low-pass tone and borrows the
  * high-pass star texture of a clean `from` block, through a feathered mask,
@@ -122,7 +123,7 @@ for (const s of manifest.stickers.items) {
   written.stickers[s.id] = await emit(pipeline, join(outDir, 'stickers', s.id));
 }
 
-await writeFile(join(outDir, 'manifest.json'), `${JSON.stringify(written, null, 2)}\n`);
+await writeFile(join(root, 'src/data/v2-images.json'), `${JSON.stringify(written, null, 2)}\n`);
 const total = Object.values(written).flatMap((g) => Object.values(g)).flat()
   .reduce((n, i) => n + i.avifBytes + i.webpBytes, 0);
 console.log(`Wrote ${manifest.outDir} (${(total / 1024).toFixed(0)} KiB total).`);
