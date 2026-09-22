@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 24" fill="none" stroke-linecap="round">
+  <title>Section divider: sparkle</title>
+  <defs>
+    <linearGradient id="fade-l" x1="0" x2="1">
+      <stop offset="0" stop-color="currentColor" stop-opacity="0"/>
+      <stop offset="1" stop-color="currentColor"/>
+    </linearGradient>
+    <linearGradient id="fade-r" x1="0" x2="1">
+      <stop offset="0" stop-color="currentColor"/>
+      <stop offset="1" stop-color="currentColor" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="11.5" width="106" height="1" fill="url(#fade-l)"/>
+  <rect x="134" y="11.5" width="106" height="1" fill="url(#fade-r)"/>
+  <circle cx="100" cy="12" r="1" fill="currentColor"/>
+  <circle cx="140" cy="12" r="1" fill="currentColor"/>
+  <path class="accent-fill" fill="currentColor" d="M120 3Q121.62 10.38 129 12Q121.62 13.62 120 21Q118.38 13.62 111 12Q118.38 10.38 120 3Z"/>
+</svg>

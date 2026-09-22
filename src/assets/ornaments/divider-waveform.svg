@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 24" fill="none" stroke-linecap="round">
+  <title>Section divider: waveform</title>
+  <defs>
+    <linearGradient id="fade-l" x1="0" x2="1">
+      <stop offset="0" stop-color="currentColor" stop-opacity="0"/>
+      <stop offset="1" stop-color="currentColor"/>
+    </linearGradient>
+    <linearGradient id="fade-r" x1="0" x2="1">
+      <stop offset="0" stop-color="currentColor"/>
+      <stop offset="1" stop-color="currentColor" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect x="0" y="11.5" width="90" height="1" fill="url(#fade-l)"/>
+  <rect x="150" y="11.5" width="90" height="1" fill="url(#fade-r)"/>
+  <path class="accent" stroke="currentColor" stroke-width="1.5" d="M96 10.3v3.4M100 9.8v4.4M104 8.7v6.6M108 8.2v7.6M112 4.7v14.6M116 4.7v14.6M120 3.2v17.6M124 3.1v17.8M128 7v10M132 6.9v10.2M136 9v6M140 9.8v4.4M144 10.2v3.6"/>
+</svg>
