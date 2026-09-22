@@ -71,7 +71,7 @@ const devFlow = [
             </div>
           </div>
           <div class="card">
-            <h3>Mark sizes <small>≤24px five-bar cut · 25–40px seven-bar cut</small></h3>
+            <h3>Mark sizes <small>≤24px five bars · 25–40px seven bars · ≥48px glow</small></h3>
             <div class="row sizes">
               {[16, 20, 24, 32, 48, 96].map((s) => (
                 <figure><Mark size={s} /><figcaption>{s}px</figcaption></figure>
@@ -87,9 +87,9 @@ const devFlow = [
 
         <div class="grid two">
           <div class="card">
-            <h3>Secondary: monogram <small>board 05 · compact and social · 32px minimum</small></h3>
+            <h3>Secondary: monogram <small>board 05 · ≤48px sturdy cut, above that the hairline cut</small></h3>
             <div class="row sizes">
-              {[32, 48, 64, 112].map((s) => (
+              {[32, 48, 64, 112, 160].map((s) => (
                 <figure><Mark size={s} variant="monogram" /><figcaption>{s}px</figcaption></figure>
               ))}
               <Lockup layout="monogram" size={64} />
@@ -205,6 +205,7 @@ const devFlow = [
     --ink: #221f26; --muted: #615d64; --subtle: #817b73;
     --accent: #643fa6; --violet: #643fa6; --violet-deep: #4a2d86; --secondary: #2f7d5c;
     --mark-top: #4a2d86; --mark-mid: #7a52c2; --mark-bottom: #2f7d5c; --mark-dot: #643fa6;
+    --mark-glow: rgb(100 63 166 / 0.16); --mark-sheen: rgb(255 255 255 / 0.22);
     --glow: none;
   }
   [data-language='instrument'] {

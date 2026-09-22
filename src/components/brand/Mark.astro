@@ -11,6 +11,12 @@
  * medium        seven 2px bars on a 32 grid, no dots; chosen automatically at
  *               25-40px, where the full mark's 2.8/64 bars fall below a pixel.
  * monogram      secondary (board 05): S/S split by a diagonal, with a sparkle.
+ *               Above 48px a narrow high-contrast S with hairline serifs; at
+ *               48px and below a sturdier S whose thin strokes survive raster.
+ *
+ * Display sizes (wave, 48px and up) get the board's soft glow (--mark-glow,
+ * a CSS drop-shadow; set it to transparent on light surfaces) and a thin
+ * bevel sheen on each bar. Small cuts and mono stay flat and crisp.
  * constellation reserve alternate (board 03).
  *
  * Color roles: --mark-top / --mark-mid / --mark-bottom / --mark-dot (wave),
@@ -37,6 +43,8 @@ const scalable = variant === 'wave' || variant === 'mono';
 const cut: Variant = scalable && size <= 24 ? 'small' : scalable && size <= 40 ? 'medium' : variant;
 const a11y = decorative ? { 'aria-hidden': 'true', focusable: 'false' } : { role: 'img', 'aria-label': label };
 const gid = nextId('s2s-wave');
+const glow = cut === 'wave' && variant === 'wave' && size >= 48;
+const monoDisplay = cut === 'monogram' && size > 48;
 const fill = variant === 'mono' ? 'currentColor' : `url(#${gid})`;
 
 // Board 01 geometry on a 64 grid: pitch 6, half-heights 6.5 / 13 / 19.5 / 26.
@@ -47,8 +55,12 @@ const bars = halves.map((h, i) => ({ x: 14 + i * 6 - bw / 2, y: 32 - h, h: h * 2
 const small = [4, 8, 12, 8, 4].map((h, i) => ({ x: 1 + i * 3, y: 8 - h / 2, h }));
 // 32 grid: 2px bars on a 4px pitch, heights 6 / 12 / 18 / 24.
 const medium = [6, 12, 18, 24, 18, 12, 6].map((h, i) => ({ x: 3 + i * 4, y: 16 - h / 2, h }));
-const S =
+const S_SMALL =
   'M33.4 14.2L33.4 2.2C30 .8 25 0 18.5 0C9 0 1.8 5.5 1.8 13.5C1.8 21 7 24.5 15 27.8C24 31.5 27.8 34 27.8 39.5C27.8 45.5 23.5 49.4 17 49.4C10 49.4 5.5 45 4 37.5L2.2 37.5L2.2 50C6 51.5 11.5 52 17.5 52C27.5 52 34.4 46 34.4 38.5C34.4 30.5 28.8 27.2 20.5 23.8C12.5 20.6 8.6 18.5 8.6 13C8.6 7 12.5 2.6 18.5 2.6C25 2.6 30 7 31.6 14.2Z';
+const S_DISPLAY =
+  'M26.6 14.5L26.6 2.4C24.2 .9 20 0 14.5 0C7 0 1.4 4.8 1.4 12.6C1.4 20 6 24.6 12.4 27.6C19.8 30.6 22.4 32.6 22.4 38.2C22.4 44.4 18.6 50.9 13.4 50.9C8 50.9 3.6 46.4 2.4 38.2L1.2 38.2L1.2 49.6C4.4 51.2 8.6 52 13.6 52C21.8 52 27.2 46.6 27.2 38.6C27.2 31 22.6 27.4 15.4 24.4C9.4 21.8 6.6 19.4 6.6 13C6.6 6.2 10.2 1.1 14.6 1.1C19.8 1.1 24 5.8 25.6 14.5Z';
+const S = monoDisplay ? S_DISPLAY : S_SMALL;
+const sPos = monoDisplay ? ['translate(7 2) scale(.66)', 'translate(38 27.5) scale(.66)'] : ['translate(4 2) scale(.66)', 'translate(36 27.5) scale(.66)'];
 ---
 
 <svg
@@ -73,9 +85,10 @@ const S =
   )}
   {cut === 'wave' || cut === 'mono' ? (
     <>
-      <g fill={fill}>
+      <g fill={fill} class:list={[glow && 'glow']} style={glow ? `--_blur:${(size * 0.022).toFixed(2)}px` : undefined}>
         {bars.map((b) => <rect x={b.x} y={b.y} width={bw} height={b.h} rx={bw / 2} />)}
       </g>
+      {glow && <g class="sheen">{bars.map((b) => <rect x={b.x + 0.5} y={b.y + 1.5} width="0.7" height={b.h - 3} />)}</g>}
       <g class={variant === 'mono' ? 'ink' : 'dot'}>
         <circle cx="8" cy="32" r={variant === 'mono' ? 1.6 : 1.9} />
         <circle cx="56" cy="32" r={variant === 'mono' ? 1.6 : 1.9} />
@@ -86,8 +99,8 @@ const S =
   ) : cut === 'monogram' ? (
     <>
       <path class="rule" d="M8 62L58 6" stroke-width="1" />
-      <path class="s-signal" transform="translate(4 2) scale(.66)" d={S} />
-      <path class="s-system" transform="translate(36 27.5) scale(.66)" d={S} />
+      <path class="s-signal" transform={sPos[0]} d={S} />
+      <path class="s-system" transform={sPos[1]} d={S} />
       <path class="s-signal" d="M51 3.5Q51.6 8.4 56.5 9Q51.6 9.6 51 14.5Q50.4 9.6 45.5 9Q50.4 8.4 51 3.5Z" />
     </>
   ) : (
@@ -123,6 +136,8 @@ const S =
   .s2s-mark .st-mid { stop-color: var(--_mid); }
   .s2s-mark .st-bottom { stop-color: var(--_bottom); }
   .s2s-mark .dot { fill: var(--_dot); }
+  .s2s-mark .glow { filter: drop-shadow(0 0 var(--_blur) var(--mark-glow, rgb(154 104 239 / 0.55))); }
+  .s2s-mark .sheen { fill: var(--mark-sheen, rgb(255 255 255 / 0.28)); }
   .s2s-mark .ink { fill: currentColor; }
   .s2s-mark .rule { stroke: var(--muted, currentColor); }
   .s2s-mark .edge { stroke: var(--subtle, var(--muted, currentColor)); }
