@@ -4,19 +4,19 @@
       {
         "width": 640,
         "height": 360,
-        "avifBytes": 12460,
+        "avifBytes": 14260,
         "webpBytes": 13152
       },
       {
         "width": 1024,
         "height": 576,
-        "avifBytes": 31120,
+        "avifBytes": 34658,
         "webpBytes": 31828
       },
       {
         "width": 1672,
         "height": 941,
-        "avifBytes": 68942,
+        "avifBytes": 81145,
         "webpBytes": 75632
       }
     ],
@@ -24,13 +24,13 @@
       {
         "width": 640,
         "height": 480,
-        "avifBytes": 12464,
+        "avifBytes": 16466,
         "webpBytes": 13866
       },
       {
         "width": 920,
         "height": 690,
-        "avifBytes": 23035,
+        "avifBytes": 30351,
         "webpBytes": 27244
       }
     ]
@@ -39,7 +39,7 @@
     "observatory-backdrop": {
       "width": 1920,
       "height": 1081,
-      "avifBytes": 18345,
+      "avifBytes": 25564,
       "webpBytes": 32336
     }
   },
@@ -47,25 +47,25 @@
     "observatory": {
       "width": 516,
       "height": 344,
-      "avifBytes": 24794,
+      "avifBytes": 23282,
       "webpBytes": 50454
     },
     "mountain-arc": {
       "width": 515,
       "height": 353,
-      "avifBytes": 29744,
+      "avifBytes": 26283,
       "webpBytes": 50226
     },
     "notebook": {
       "width": 395,
       "height": 320,
-      "avifBytes": 24457,
+      "avifBytes": 20158,
       "webpBytes": 36082
     },
     "signal-noise": {
       "width": 462,
       "height": 261,
-      "avifBytes": 16185,
+      "avifBytes": 16578,
       "webpBytes": 26404
     }
   }
