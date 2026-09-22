@@ -84,6 +84,12 @@ def main() -> int:
                         page.goto(base + path, wait_until="load", timeout=45000)
                         page.wait_for_timeout(800)
                         page.evaluate("document.fonts.ready.then(() => true)")
+                        if args.full:
+                            # Walk the page so lazy images below the fold load.
+                            page.evaluate("""async () => { const h = document.documentElement.scrollHeight;
+                              for (let y = 0; y < h; y += 600) { window.scrollTo(0, y); await new Promise(r => setTimeout(r, 60)); }
+                              window.scrollTo(0, 0); }""")
+                            page.wait_for_timeout(500)
                         page.wait_for_timeout(400)
                         fn = out / f"{args.prefix}{name}-{theme}-{w}.png"
                         page.screenshot(path=str(fn), full_page=args.full)

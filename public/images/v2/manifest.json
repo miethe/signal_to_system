@@ -1,0 +1,72 @@
+{
+  "hero": {
+    "observatory": [
+      {
+        "width": 640,
+        "height": 360,
+        "avifBytes": 12460,
+        "webpBytes": 13152
+      },
+      {
+        "width": 1024,
+        "height": 576,
+        "avifBytes": 31120,
+        "webpBytes": 31828
+      },
+      {
+        "width": 1672,
+        "height": 941,
+        "avifBytes": 68942,
+        "webpBytes": 75632
+      }
+    ],
+    "notebook-vista": [
+      {
+        "width": 640,
+        "height": 480,
+        "avifBytes": 12464,
+        "webpBytes": 13866
+      },
+      {
+        "width": 920,
+        "height": 690,
+        "avifBytes": 23035,
+        "webpBytes": 27244
+      }
+    ]
+  },
+  "backdrop": {
+    "observatory-backdrop": {
+      "width": 1920,
+      "height": 1081,
+      "avifBytes": 18345,
+      "webpBytes": 32336
+    }
+  },
+  "stickers": {
+    "observatory": {
+      "width": 516,
+      "height": 344,
+      "avifBytes": 24794,
+      "webpBytes": 50454
+    },
+    "mountain-arc": {
+      "width": 515,
+      "height": 353,
+      "avifBytes": 29744,
+      "webpBytes": 50226
+    },
+    "notebook": {
+      "width": 395,
+      "height": 320,
+      "avifBytes": 24457,
+      "webpBytes": 36082
+    },
+    "signal-noise": {
+      "width": 462,
+      "height": 261,
+      "avifBytes": 16185,
+      "webpBytes": 26404
+    }
+  }
+}

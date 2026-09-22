@@ -1,0 +1,260 @@
+{
+  "$comment": "S2S v2 raster asset pipeline (node_01M35CKMKN8BX2XXAAKS2DQWZJ). Sources are the committed visual pack (docs/design/s2s-v2-visual, plan/s2s-v2-adoption). Every box is x,y,w,h in source pixels. Run: node scripts/assets/build-assets.mjs [--source <dir>]. Outputs are committed under public/images/v2 so the site build never needs the 2MB sources.",
+  "outDir": "public/images/v2",
+  "formats": {
+    "avif": {
+      "quality": 60,
+      "effort": 6
+    },
+    "webp": {
+      "quality": 80,
+      "effort": 6
+    }
+  },
+  "heroes": [
+    {
+      "id": "observatory",
+      "source": "03-hero-backgrounds/milky_way_observatory_over_misty_peaks.png",
+      "use": "Homepage + About hero band (PageHero variant=photo); the dome sits right, text reads on the dark left third.",
+      "patches": [
+        {
+          "why": "baked IDEAS/EVIDENCE/SYSTEMS label",
+          "box": [
+            1228,
+            92,
+            124,
+            88
+          ],
+          "from": [
+            520,
+            40
+          ],
+          "feather": 14
+        },
+        {
+          "why": "baked constellation (upper)",
+          "box": [
+            1352,
+            44,
+            320,
+            206
+          ],
+          "from": [
+            360,
+            20
+          ],
+          "feather": 18
+        },
+        {
+          "why": "baked constellation (lower) + OBSERVE rail head",
+          "box": [
+            1440,
+            236,
+            232,
+            100
+          ],
+          "from": [
+            300,
+            230
+          ],
+          "feather": 16
+        },
+        {
+          "why": "baked OBSERVE..REPEAT rail tail",
+          "box": [
+            1512,
+            330,
+            160,
+            68
+          ],
+          "from": [
+            420,
+            330
+          ],
+          "feather": 12
+        },
+        {
+          "why": "baked A QUIETER BRIGHTER TOMORROW caption",
+          "box": [
+            76,
+            484,
+            132,
+            84
+          ],
+          "from": [
+            76,
+            380
+          ],
+          "feather": 16
+        }
+      ],
+      "widths": [
+        640,
+        1024,
+        1672
+      ]
+    },
+    {
+      "id": "notebook-vista",
+      "source": "03-hero-backgrounds/starry_observatory_notebook_landscape.png",
+      "use": "Quiet-state art (404, empty, withdrawn). Cropped to the text-free valley; the baked handwriting, leaf sketch and notebook props are outside the crop.",
+      "crop": [
+        150,
+        60,
+        920,
+        690
+      ],
+      "widths": [
+        640,
+        920
+      ]
+    }
+  ],
+  "backdrops": [
+    {
+      "id": "observatory-backdrop",
+      "source": "03-hero-backgrounds/milky_way_observatory_over_misty_peaks.png",
+      "use": "Page backdrop behind the 1240px frame at >=1280px (dark theme). Softened so it reads as atmosphere, never as content.",
+      "usePatchedHero": "observatory",
+      "blur": 3,
+      "width": 1920
+    }
+  ],
+  "stickers": {
+    "source": "02-visual-assets-transparent/cosmic_research_ui_sticker_sheet.png",
+    "maxWidth": 560,
+    "items": [
+      {
+        "id": "observatory",
+        "box": [
+          20,
+          20,
+          540,
+          390
+        ],
+        "use": "About bio accent / 404 art",
+        "clip": [
+          [
+            20,
+            20
+          ],
+          [
+            488,
+            20
+          ],
+          [
+            488,
+            300
+          ],
+          [
+            506,
+            332
+          ],
+          [
+            536,
+            368
+          ],
+          [
+            536,
+            410
+          ],
+          [
+            20,
+            410
+          ]
+        ]
+      },
+      {
+        "id": "mountain-arc",
+        "box": [
+          496,
+          40,
+          548,
+          360
+        ],
+        "use": "Section-divider art, Labs coming state",
+        "clip": [
+          [
+            500,
+            40
+          ],
+          [
+            1016,
+            40
+          ],
+          [
+            1016,
+            400
+          ],
+          [
+            566,
+            400
+          ],
+          [
+            522,
+            346
+          ],
+          [
+            500,
+            306
+          ]
+        ]
+      },
+      {
+        "id": "notebook",
+        "box": [
+          1026,
+          84,
+          398,
+          330
+        ],
+        "use": "Notebook teaser accent"
+      },
+      {
+        "id": "signal-noise",
+        "box": [
+          40,
+          764,
+          470,
+          270
+        ],
+        "use": "Studio teaser / search empty state"
+      }
+    ],
+    "$comment": "clip = optional polygon in sheet pixels; neighbouring stickers' soft halos overlap their boxes, so the polygon cuts the shared corner."
+  },
+  "dropped": [
+    {
+      "asset": "cosmic sticker sheet: compass",
+      "reason": "Analysis \u00a74: unused decorative; no page asks for it."
+    },
+    {
+      "asset": "cosmic sticker sheet: Urban Heat data map, Urban Heat project folder",
+      "reason": "Fake data. Rebuild as a real chart / fact panel when a real investigation ships; never ship the raster."
+    },
+    {
+      "asset": "cosmic sticker sheet: Field Notes 001 filmstrip",
+      "reason": "Raster chrome with baked copy; recreate as a thumbnail frame component if Notebooks needs it (M3b)."
+    },
+    {
+      "asset": "cosmic sticker sheet: layered diamond, orbit sphere",
+      "reason": "Already SVG components (src/components/diagrams/LayeredDiamond, SystemArchitectureDiagram)."
+    },
+    {
+      "asset": "hero backgrounds: every baked label, rail, constellation and handwriting caption",
+      "reason": "Rebuilt as live HTML (a11y, reflow, theming); patched or cropped out above."
+    },
+    {
+      "asset": "logo board alternates (observatory, constellation, compass lockups)",
+      "reason": "Brand #148 signed off the waveform-diamond lockup + monogram only."
+    },
+    {
+      "asset": "ui asset sheet (pills, dividers, loop, timeline, tabs)",
+      "reason": "Recreated as code / SVG in M1a and #148; the raster is reference only."
+    },
+    {
+      "asset": "neon icon grid",
+      "reason": "Recreated as SVG in src/assets/icons (#148)."
+    }
+  ]
+}

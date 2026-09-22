@@ -1,0 +1,58 @@
+---
+/**
+ * V2Image — a <picture> for the pipeline outputs in public/images/v2
+ * (scripts/assets/build-assets.mjs). AVIF first, WebP fallback; the
+ * intrinsic size comes from the pipeline's manifest.json so layout never
+ * shifts. Decorative by default (alt="").
+ *
+ *   <V2Image kind="hero" id="observatory" sizes="100vw" />
+ *   <V2Image kind="sticker" id="notebook" />
+ */
+import manifest from '../../../public/images/v2/manifest.json';
+
+type Kind = 'hero' | 'sticker' | 'backdrop';
+interface Props {
+  kind: Kind;
+  id: string;
+  alt?: string;
+  sizes?: string;
+  loading?: 'lazy' | 'eager';
+  fetchpriority?: 'high' | 'low' | 'auto';
+  class?: string;
+  imgClass?: string;
+}
+
+const { kind, id, alt = '', sizes, loading = 'lazy', fetchpriority, class: className, imgClass } = Astro.props;
+const base = '/images/v2';
+
+interface Out { width: number; height: number }
+let variants: { path: string; width: number; height: number }[];
+if (kind === 'hero') {
+  const list = (manifest.hero as Record<string, Out[]>)[id];
+  if (!list) throw new Error(`V2Image: unknown hero "${id}"`);
+  variants = list.map((v) => ({ path: `${base}/hero/${id}-${v.width}`, ...v }));
+} else {
+  const group = kind === 'sticker' ? manifest.stickers : manifest.backdrop;
+  const v = (group as Record<string, Out>)[id];
+  if (!v) throw new Error(`V2Image: unknown ${kind} "${id}"`);
+  variants = [{ path: `${base}/${kind === 'sticker' ? 'stickers' : 'backdrop'}/${id}`, ...v }];
+}
+const largest = variants[variants.length - 1];
+const srcset = (ext: string) =>
+  variants.length > 1 ? variants.map((v) => `${v.path}.${ext} ${v.width}w`).join(', ') : `${largest.path}.${ext}`;
+---
+
+<picture class={className}>
+  <source type="image/avif" srcset={srcset('avif')} sizes={variants.length > 1 ? sizes : undefined} />
+  <source type="image/webp" srcset={srcset('webp')} sizes={variants.length > 1 ? sizes : undefined} />
+  <img
+    src={`${largest.path}.webp`}
+    width={largest.width}
+    height={largest.height}
+    alt={alt}
+    loading={loading}
+    decoding="async"
+    fetchpriority={fetchpriority}
+    class={imgClass}
+  />
+</picture>

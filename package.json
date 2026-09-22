@@ -20,7 +20,8 @@
     "demo:doctor": "node demo/tools/demo-foundry.mjs doctor",
     "demo:capture": "playwright test demo/demos/**/*.spec.ts",
     "demo:review": "node demo/tools/demo-foundry.mjs review",
-    "review:capture": "python3 scripts/capture-review.py"
+    "review:capture": "python3 scripts/capture-review.py",
+    "assets:build": "node scripts/assets/build-assets.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^5.0.2",

@@ -3,8 +3,9 @@
 
    Mockup anatomy (every page in 01-site-mockups, 1448px wide): the site
    sits in a framed 1240px panel (1px rule, 16px radius) floating on a
-   darker atmospheric backdrop lit violet from the top edge. Below 1280px
-   the frame goes full-bleed and the backdrop disappears.
+   darker atmospheric backdrop lit violet from the top edge, over the
+   observatory photograph (dark theme). Below 1280px the frame goes
+   full-bleed and the backdrop disappears.
 
    Roles only: this file must stay free of raw palette literals.
    ============================================================ */
@@ -45,10 +46,13 @@ body {
   body {
     /* Anchored to the top of the page (not fixed): a violet bloom over the
        frame's top edge, as in every mockup, fading into the backdrop. */
+    /* The observatory photo (dark only; `none` in light) sits under a veil
+       and fades into the plain backdrop below its own height (16:9). */
     background:
       radial-gradient(760px 240px at 58% -60px, var(--s2s-backdrop-glow), transparent 75%),
       radial-gradient(1400px 320px at 50% -80px, var(--s2s-backdrop-haze), transparent 80%),
-      linear-gradient(180deg, var(--s2s-backdrop-shade), transparent 900px),
+      linear-gradient(180deg, var(--s2s-backdrop-veil) 55%, var(--s2s-backdrop) 100%) top center / 100% 56.25vw no-repeat,
+      var(--s2s-backdrop-photo) top center / 100% auto no-repeat,
       var(--s2s-backdrop);
     padding: 16px 0 24px;
   }
