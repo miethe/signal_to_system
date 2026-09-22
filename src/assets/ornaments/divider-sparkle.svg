@@ -10,9 +10,7 @@
       <stop offset="1" stop-color="currentColor" stop-opacity="0"/>
     </linearGradient>
   </defs>
-  <rect x="0" y="11.5" width="106" height="1" fill="url(#fade-l)"/>
-  <rect x="134" y="11.5" width="106" height="1" fill="url(#fade-r)"/>
-  <circle cx="100" cy="12" r="1" fill="currentColor"/>
-  <circle cx="140" cy="12" r="1" fill="currentColor"/>
-  <path class="accent-fill" fill="currentColor" d="M120 3Q121.62 10.38 129 12Q121.62 13.62 120 21Q118.38 13.62 111 12Q118.38 10.38 120 3Z"/>
+  <rect x="0" y="11.5" width="104" height="1" fill="url(#fade-l)"/>
+  <rect x="136" y="11.5" width="104" height="1" fill="url(#fade-r)"/>
+    <path class="accent-fill" fill="currentColor" d="M120 1Q121.1 10.9 133 12Q121.1 13.1 120 23Q118.9 13.1 107 12Q118.9 10.9 120 1Z"/>
 </svg>
