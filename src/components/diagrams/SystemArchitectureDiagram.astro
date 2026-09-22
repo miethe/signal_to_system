@@ -58,7 +58,7 @@ const {
   title = layout === 'flow' ? `${core.title}: system architecture` : `${core.title}: how the parts connect`,
   width = '100%',
   class: className,
-} = Astro.props;
+}: Props = Astro.props;
 
 const titleId = nextId('arch-title');
 const descId = nextId('arch-desc');
