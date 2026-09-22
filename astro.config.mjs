@@ -14,7 +14,9 @@ export default defineConfig({
     mdx(),
     // /workflow-showcase/ is restored but unlisted pending editorial review —
     // keep it out of the sitemap alongside its noindex and absent nav entry.
-    sitemap({ filter: (page) => !page.includes('/workflow-showcase') }),
+    sitemap({
+      filter: (page) => !page.includes('/workflow-showcase') && !page.includes('/studio/brand-preview'),
+    }),
   ],
   vite: {
     plugins: [tailwindcss()],
