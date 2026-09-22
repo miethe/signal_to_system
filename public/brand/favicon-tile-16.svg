@@ -1,15 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
   <title>Signal to System</title>
-  <!-- Favicon (logo board favicon idea 01), 16px cut: five pixel-aligned 2px bars on a
-       rounded tile. Resolved colors (favicons cannot read page tokens); the tile rim brightens
-       in a dark browser theme so the tile does not sink into dark tab chrome. -->
-  <style>
-    .tile { fill: #080914; }
-    .rim { stroke: #c9a8f8; stroke-opacity: .22; }
-    @media (prefers-color-scheme: dark) {
-      .rim { stroke-opacity: .45; }
-    }
-  </style>
+  <!-- PNG source, 16px: five pixel-aligned bars, no node dots (they fall below one pixel). -->
   <defs>
     <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#8f6cf0"/>
@@ -17,8 +8,8 @@
       <stop offset="1" stop-color="#9eeedc"/>
     </linearGradient>
   </defs>
-  <rect class="tile" width="16" height="16" rx="3.5"/>
-  <rect class="rim" x=".25" y=".25" width="15.5" height="15.5" rx="3.25" fill="none" stroke-width=".5"/>
+  <rect width="16" height="16" rx="3.5" fill="#080914"/>
+  <rect x="0.25" y="0.25" width="15.5" height="15.5" rx="3.25" fill="none" stroke="#c9a8f8" stroke-opacity=".22" stroke-width="0.5"/>
   <g fill="url(#g)">
     <rect x="1" y="6" width="2" height="4" rx="1"/>
     <rect x="4" y="4" width="2" height="8" rx="1"/>

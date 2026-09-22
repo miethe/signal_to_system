@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
   <title>Signal to System</title>
-  <!-- PNG source, 192/512 (manifest 'any'): full mark on a rounded tile, as on the board. -->
+  <!-- PNG source, 180 apple-touch-icon: full-bleed tile (iOS applies its own mask). -->
   <defs>
     <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#5a3fc9"/>
@@ -9,8 +9,7 @@
       <stop offset="1" stop-color="#9eeedc"/>
     </linearGradient>
   </defs>
-  <rect width="64" height="64" rx="14" fill="#080914"/>
-  <rect x="0.5" y="0.5" width="63" height="63" rx="13.5" fill="none" stroke="#c9a8f8" stroke-opacity=".22" stroke-width="1"/>
+  <rect width="64" height="64" fill="#080914"/>
   <g transform="translate(32 32) scale(.78) translate(-32 -32)">
     <g fill="url(#g)">
       <rect x="12.6" y="25.5" width="2.8" height="13" rx="1.4"/>

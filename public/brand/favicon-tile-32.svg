@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <title>Signal to System</title>
+  <!-- PNG source, 32px: seven pixel-aligned 2px bars on a 4px pitch, rhombus taper 6/12/18/24. -->
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#8f6cf0"/>
+      <stop offset=".6" stop-color="#d0b1f7"/>
+      <stop offset="1" stop-color="#9eeedc"/>
+    </linearGradient>
+  </defs>
+  <rect width="32" height="32" rx="7" fill="#080914"/>
+  <rect x="0.375" y="0.375" width="31.25" height="31.25" rx="6.625" fill="none" stroke="#c9a8f8" stroke-opacity=".22" stroke-width="0.75"/>
+  <g fill="url(#g)">
+    <rect x="3" y="13" width="2" height="6" rx="1"/>
+    <rect x="7" y="10" width="2" height="12" rx="1"/>
+    <rect x="11" y="7" width="2" height="18" rx="1"/>
+    <rect x="15" y="4" width="2" height="24" rx="1"/>
+    <rect x="19" y="7" width="2" height="18" rx="1"/>
+    <rect x="23" y="10" width="2" height="12" rx="1"/>
+    <rect x="27" y="13" width="2" height="6" rx="1"/>
+  </g>
+</svg>
