@@ -5,6 +5,7 @@
 @import "./tokens/instrument.css";
 @import "./tokens/bridge.css";
 @import "./reader-legacy.css";
+@import "./shell.css";
 @import "@fontsource-variable/material-symbols-outlined/wght.css";
 
 /* Bind Tailwind's `dark:` variant to the site's own `.dark` class instead of
