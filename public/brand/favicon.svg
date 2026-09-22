@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16">
+  <title>Signal to System</title>
+  <style>
+    /* Resolved colors: favicons cannot read page tokens. Light = Instrument pair, dark = Observatory pair (02 §2). */
+    .ring { stroke: #244FB0; }
+    .trail { stroke: #006D70; }
+    @media (prefers-color-scheme: dark) {
+      .ring { stroke: #B8A5F2; }
+      .trail { stroke: #9CCEB9; }
+    }
+  </style>
+  <circle class="ring" cx="8" cy="8" r="4.75" fill="none" stroke-width="1.5"/>
+  <path class="trail" d="M1.5 11.5L14.5 5.4" fill="none" stroke-width="1.35" stroke-linecap="round"/>
+</svg>
