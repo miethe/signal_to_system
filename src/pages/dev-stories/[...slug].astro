@@ -1,10 +1,11 @@
 ---
 import { getCollection, render } from 'astro:content';
 import StoryLayout from '../../layouts/StoryLayout.astro';
+import { isPublishable } from '../../lib/publication.mjs';
 import { getStoriesBySeries, getRelatedArticles } from '../../lib/content';
 
 export async function getStaticPaths() {
-  const stories = await getCollection('stories');
+  const stories = await getCollection('stories', isPublishable);
   return stories.map((story) => ({
     params: { slug: story.id },
     props: { story },
