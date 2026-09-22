@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-labelledby="s2s-mark-title">
+  <title id="s2s-mark-title">Signal to System</title>
+  <style>
+    .ring { stroke: var(--accent, currentColor); }
+    .trail { stroke: var(--secondary, currentColor); }
+  </style>
+  <!-- Orbit: the system. Trail: a signal crossing it and leaving on both sides. -->
+  <circle class="ring" cx="15.6" cy="16" r="9" fill="none" stroke-width="2"/>
+  <path class="trail" d="M5 22L27 11.75" fill="none" stroke-width="1.5" stroke-linecap="round"/>
+</svg>

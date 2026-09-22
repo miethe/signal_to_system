@@ -1,0 +1,71 @@
+---
+/**
+ * Wordmark lockup: mark + "Signal to System" (serif display) + tracked-caps
+ * mono byline. Live text, not outlines: it inherits the page's type roles and
+ * stays selectable, translatable and accessible.
+ *
+ * horizontal: header / footer. stacked: square contexts (avatar, app tile, OG).
+ */
+import Mark from './Mark.astro';
+
+interface Props {
+  orientation?: 'horizontal' | 'stacked';
+  /** Mark size in px; type scales from it. */
+  size?: number;
+  title?: string;
+  byline?: string | false;
+  variant?: 'full' | 'constellation';
+  href?: string;
+  class?: string;
+}
+
+const {
+  orientation = 'horizontal',
+  size = 32,
+  title = 'Signal to System',
+  byline = 'Nick Miethe / Independent inquiry',
+  variant = 'full',
+  href,
+  class: className,
+} = Astro.props;
+const Tag = href ? 'a' : 'div';
+---
+
+<Tag
+  href={href}
+  class:list={['s2s-lockup', `s2s-lockup--${orientation}`, className]}
+  style={`--lockup-mark:${size}px`}
+>
+  <Mark size={size} variant={variant} decorative />
+  <span class="s2s-lockup__text">
+    <span class="s2s-lockup__title">{title}</span>
+    {byline && <span class="s2s-lockup__byline">{byline}</span>}
+  </span>
+</Tag>
+
+<style>
+  .s2s-lockup {
+    display: inline-flex;
+    align-items: center;
+    gap: calc(var(--lockup-mark) * 0.4);
+    color: var(--ink, currentColor);
+    text-decoration: none;
+  }
+  .s2s-lockup--stacked { flex-direction: column; text-align: center; gap: calc(var(--lockup-mark) * 0.3); }
+  .s2s-lockup__text { display: flex; flex-direction: column; gap: calc(var(--lockup-mark) * 0.14); }
+  .s2s-lockup__title {
+    font-family: var(--font-display, var(--font-serif, Georgia, 'Times New Roman', serif));
+    font-size: calc(var(--lockup-mark) * 0.62);
+    line-height: 1;
+    letter-spacing: -0.01em;
+  }
+  .s2s-lockup--stacked .s2s-lockup__title { font-size: calc(var(--lockup-mark) * 0.42); }
+  .s2s-lockup__byline {
+    font-family: var(--font-mono, ui-monospace, 'SF Mono', Menlo, monospace);
+    font-size: max(9px, calc(var(--lockup-mark) * 0.27));
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--muted, currentColor);
+  }
+  .s2s-lockup--stacked .s2s-lockup__byline { font-size: max(8px, calc(var(--lockup-mark) * 0.18)); }
+</style>
