@@ -6,12 +6,23 @@
  * column beside it. The Folio skin tokens are stubs (./styles/tokens/folio.css)
  * until the M3 Notebook design pass.
  *
+ * The leaf+margin wrap carries `data-studio-scope` (node_01M35CKMTWWPWA3DJNSGR930A6):
+ * LanguageSwitch.astro (rendered by the page in `after`, alongside the
+ * studio Tabs) can re-skin it to Folio/Instrument/Observatory. The leaf's
+ * own `data-skin="folio"` is a literal attribute on that element, so it
+ * keeps its forced Folio look regardless of what the scope is set to —
+ * only the margin column (and anything else outside the leaf) responds to
+ * the switch.
+ *
  * Slot contract
  *   default   required  the leaf's content (prose, figures)
  *   margin    optional  marginalia: dates, links, amendments (right of the leaf)
- *   after     optional  below the leaf, back in the Observatory shell
+ *   after     optional  below the leaf, back in the Observatory shell —
+ *                       outside data-studio-scope, so the studio Tabs and
+ *                       LanguageSwitch placed here are unaffected by it
  */
 import BaseLayout from '../BaseLayout.astro';
+import StudioScopeRestore from '../../components/studio/StudioScopeRestore.astro';
 
 interface Props {
   title: string;
@@ -24,25 +35,30 @@ const { title, description, heading, kicker, noindex } = Astro.props;
 ---
 
 <BaseLayout title={title} description={description} noindex={noindex}>
-  <div class="s2s-folio">
-    <div class="s2s-folio__leaf" data-skin="folio">
-      <header class="s2s-folio__head">
-        {kicker && <p class="s2s-eyebrow">{kicker}</p>}
-        <h1 class="s2s-display s2s-folio__title">{heading}</h1>
-      </header>
-      <div class="s2s-folio__body"><slot /></div>
+  <div class="s2s-folio-wrap">
+    <div class="s2s-folio" data-studio-scope>
+      <div class="s2s-folio__leaf" data-skin="folio">
+        <header class="s2s-folio__head">
+          {kicker && <p class="s2s-eyebrow">{kicker}</p>}
+          <h1 class="s2s-display s2s-folio__title">{heading}</h1>
+        </header>
+        <div class="s2s-folio__body"><slot /></div>
+      </div>
+      {Astro.slots.has('margin') && <aside class="s2s-folio__margin" aria-label="Margin notes"><slot name="margin" /></aside>}
     </div>
-    {Astro.slots.has('margin') && <aside class="s2s-folio__margin" aria-label="Margin notes"><slot name="margin" /></aside>}
+    <StudioScopeRestore />
     {Astro.slots.has('after') && <div class="s2s-folio__after"><slot name="after" /></div>}
   </div>
 </BaseLayout>
 
 <style>
+  .s2s-folio-wrap {
+    padding: 24px 12px 0;
+  }
   .s2s-folio {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: 20px;
-    padding: 24px 12px 0;
   }
   .s2s-folio__leaf {
     padding: 28px 22px 32px;
@@ -65,15 +81,20 @@ const { title, description, heading, kicker, noindex } = Astro.props;
     font: 400 var(--type-micro) / 1.6 var(--font-mono);
     color: var(--s2s-ink-subtle);
   }
+  .s2s-folio__after {
+    margin-top: 20px;
+  }
   @media (min-width: 1024px) {
+    .s2s-folio-wrap {
+      padding: 40px var(--s2s-frame-gutter) 0;
+    }
     .s2s-folio {
       grid-template-columns: minmax(0, 760px) 220px;
       justify-content: center;
       gap: 32px;
-      padding: 40px var(--s2s-frame-gutter) 0;
     }
     .s2s-folio__leaf { padding: 44px 56px 52px 72px; }
     .s2s-folio__margin { padding-top: 56px; }
-    .s2s-folio__after { grid-column: 1 / -1; }
+    .s2s-folio__after { margin-top: 24px; }
   }
 </style>

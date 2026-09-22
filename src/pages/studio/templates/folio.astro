@@ -2,6 +2,7 @@
 /** /studio/templates/folio/ (noindex) — exercises the Folio page template. */
 import FolioLayout from '../../../layouts/templates/FolioLayout.astro';
 import Tabs from '../../../components/primitives/Tabs.astro';
+import LanguageSwitch from '../../../components/studio/LanguageSwitch.astro';
 import { templateTabs } from '../../../lib/studio-preview';
 ---
 
@@ -31,8 +32,9 @@ import { templateTabs } from '../../../lib/studio-preview';
     <p>Measure · 62ch on a 28px rule</p>
   </Fragment>
 
-  <div slot="after" class="after">
+  <div slot="after" class="after s2s-studio-toolbar">
     <Tabs label="Templates" items={templateTabs('/studio/templates/folio/')} />
+    <LanguageSwitch />
   </div>
 </FolioLayout>
 

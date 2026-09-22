@@ -6,15 +6,24 @@
  *
  * Slot contract
  *   hero-actions  optional  CTA Buttons under the lede
- *   toolbar       optional  a FilterToolbar (or Tabs) above the index
+ *   subnav        optional  a row between the hero and the grid, outside
+ *                           `data-studio-scope` (the studio Tabs +
+ *                           LanguageSwitch row)
+ *   toolbar       optional  a FilterToolbar above the index
  *   default       required  the index: cards/rows, any layout
  *   rail          required  280px right rail: FacetRail and rail Cards, stacked
  *   after         optional  full-width band under both columns
  *
  * Below 1024px the rail drops under the index.
+ *
+ * Studio preview (node_01M35CKMTWWPWA3DJNSGR930A6): pass `scope` on
+ * /studio/ pages so the grid carries `data-studio-scope` and
+ * LanguageSwitch.astro can re-skin it. Off by default, so a production
+ * route never inherits a stored preview language.
  */
 import BaseLayout from '../BaseLayout.astro';
 import PageHero from '../../components/primitives/PageHero.astro';
+import StudioScopeRestore from '../../components/studio/StudioScopeRestore.astro';
 
 interface Props {
   title: string;
@@ -26,15 +35,17 @@ interface Props {
   noindex?: boolean;
   /** Accessible name for the rail landmark. */
   railLabel?: string;
+  scope?: boolean;
 }
-const { title, description, heading, accent, eyebrow, lede, noindex, railLabel = 'Related' } = Astro.props;
+const { title, description, heading, accent, eyebrow, lede, noindex, railLabel = 'Related', scope = false } = Astro.props;
 ---
 
 <BaseLayout title={title} description={description} noindex={noindex}>
   <PageHero heading={heading} accent={accent} eyebrow={eyebrow} lede={lede} compact>
     {Astro.slots.has('hero-actions') && <Fragment slot="actions"><slot name="hero-actions" /></Fragment>}
   </PageHero>
-  <div class="s2s-ir">
+  {Astro.slots.has('subnav') && <div class="s2s-ir__subnav"><slot name="subnav" /></div>}
+  <div class="s2s-ir" data-studio-scope={scope ? true : undefined}>
     <div class="s2s-ir__main">
       {Astro.slots.has('toolbar') && <div class="s2s-ir__toolbar"><slot name="toolbar" /></div>}
       <slot />
@@ -44,9 +55,11 @@ const { title, description, heading, accent, eyebrow, lede, noindex, railLabel =
     </aside>
     {Astro.slots.has('after') && <div class="s2s-ir__after"><slot name="after" /></div>}
   </div>
+  {scope && <StudioScopeRestore />}
 </BaseLayout>
 
 <style>
+  .s2s-ir__subnav { padding: 16px 16px 0; }
   .s2s-ir {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
@@ -56,6 +69,7 @@ const { title, description, heading, accent, eyebrow, lede, noindex, railLabel =
   .s2s-ir__toolbar { margin-bottom: 16px; }
   .s2s-ir__rail { display: flex; flex-direction: column; gap: 14px; }
   @media (min-width: 1024px) {
+    .s2s-ir__subnav { padding: 16px 22px 0 28px; }
     .s2s-ir {
       grid-template-columns: minmax(0, 1fr) var(--s2s-rail);
       gap: 24px 22px;

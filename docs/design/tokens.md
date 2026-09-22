@@ -50,3 +50,41 @@ same lavender `--s2s-accent-strong` button fill.
 (`--background`, `--muted`, …) are unchanged so `@miethe/ui` renders exactly as before. The essay
 reader (`PostLayout`, `StoryLayout`) is pinned to its pre-v2 values by `src/styles/reader-legacy.css`
 until M2.
+
+## Language preview (Studio-only, node_01M35CKMTWWPWA3DJNSGR930A6)
+
+Observatory is the only language the site ships in. Folio (`folio.css`) and Instrument
+(`instrument.css`) are role-token stubs that exist to preview the other two design languages
+named in the S2S v2 spec, scoped with `[data-skin='folio'|'instrument']`; nothing in the shell
+applies either outside a scope that opts in.
+
+- **Where it's live:** every `/studio/*` preview page —
+  `src/pages/studio/primitives.astro` and `src/pages/studio/templates/{index,index-rail,
+  detail-rail,folio}.astro` — carries a `LanguageSwitch` segmented control
+  (`src/components/studio/LanguageSwitch.astro`) next to the page's studio Tabs. It is separate
+  from the header's sun/moon `ThemeSwitch` (light/dark; global, unaffected by this control) and
+  never touches `<html>`/`<body>` or the header/footer.
+- **Scope contract:** the control sets `data-skin` on the nearest element carrying
+  `data-studio-scope` — the previewed content only, never the page hero or the studio Tabs row.
+  `HubLayout`, `IndexRailLayout` and `DetailRailLayout` render that attribute on their own grid
+  container (`.s2s-hub` / `.s2s-ir` / `.s2s-dr`; Hub gates it behind an explicit `scope` prop
+  since production pages like Home also use `HubLayout`). `FolioLayout` puts it on the
+  leaf+margin wrap; the leaf itself keeps a hard-coded `data-skin="folio"`, so switching the
+  control there re-skins only the margin/after content — the leaf stays forced to Folio, per the
+  M3 Notebook direction.
+- **Scope containers re-paint their own canvas + ink** (`[data-studio-scope]` in `shell.css`),
+  the same pattern `body`/`.s2s-frame` use at the page level — otherwise Folio/Instrument's ink
+  color would sit on the ambient (unscoped) shell background wherever a heading isn't inside a
+  card, and read as low-contrast.
+- **Persistence:** `localStorage['s2s-studio-language']`. A classic inline script
+  (`src/components/studio/StudioScopeRestore.astro`, placed immediately after the scope element)
+  applies the stored choice before the deferred `LanguageSwitch` module script runs, so a reload
+  on Folio/Instrument doesn't flash Observatory first.
+- **Folio/Instrument values:** both stubs now set every role a preview touches (canvas, surface,
+  ink, accent, rule) so switching is visibly different from Observatory, not just a stub with no
+  effect. Folio is a warm paper light language (cream canvas, near-black ink, violet accent, the
+  site's existing serif stays display-forward). Instrument is a cool technical dark language
+  (blue-black canvas, cyan-teal accent) and additionally overrides `--font-display: var(--font-mono)`
+  inside the scope, so headings read as JetBrains Mono instead of the site's Newsreader serif.
+  Both remain provisional stubs owned by later design passes (M3 Notebook for Folio); this pass
+  only made them legible and clearly distinct for preview purposes.

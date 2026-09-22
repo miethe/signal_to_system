@@ -1,0 +1,193 @@
+---
+/**
+ * Studio-only design-language preview control (node_01M35CKMTWWPWA3DJNSGR930A6).
+ *
+ * A three-way segmented control that previews Observatory (the site,
+ * default), Folio and Instrument by setting `data-skin` on the nearest
+ * `[data-studio-scope]` element — never on <html>/<body>, never on the
+ * header or footer. The header's sun/moon ThemeSwitch (light/dark) is a
+ * separate, global control and is untouched by this one.
+ *
+ * Usage: render it beside the page's studio Tabs (outside the
+ * `[data-studio-scope]` subtree), anywhere after the scope element exists
+ * in the document — its own script runs after parsing (deferred module)
+ * and finds the scope via `closest('[data-studio-scope]')`, falling back
+ * to the page's single `document.querySelector('[data-studio-scope]')`
+ * when the control is not itself nested inside the scope (the normal case
+ * here: the control sits in a subnav row above the previewed content).
+ *
+ * Persistence: localStorage `s2s-studio-language`. See
+ * StudioScopeRestore.astro for the pre-paint restore half of this.
+ */
+interface Props {
+  class?: string;
+}
+const { class: className } = Astro.props;
+
+const LANGS = [
+  { id: 'observatory', label: 'Observatory' },
+  { id: 'folio', label: 'Folio' },
+  { id: 'instrument', label: 'Instrument' },
+] as const;
+---
+
+<div class:list={['s2s-lang-switch', className]} data-lang-switch>
+  <div class="s2s-lang-switch__control">
+    <span class="s2s-label s2s-lang-switch__tag" aria-hidden="true">Language</span>
+    <div class="s2s-lang-switch__track" role="radiogroup" aria-label="Preview design language">
+      {LANGS.map((lang) => (
+        <button
+          type="button"
+          role="radio"
+          aria-checked={lang.id === 'observatory' ? 'true' : 'false'}
+          tabindex={lang.id === 'observatory' ? 0 : -1}
+          data-lang={lang.id}
+          class="s2s-lang-switch__seg s2s-focus"
+        >
+          <span class="s2s-lang-switch__dot" data-skin={lang.id} aria-hidden="true"></span>
+          <span class="s2s-lang-switch__seg-label">{lang.label}</span>
+        </button>
+      ))}
+    </div>
+  </div>
+  <p class="s2s-lang-switch__caption">Preview only. The site ships in Observatory.</p>
+</div>
+
+<script>
+  const STORAGE_KEY = 's2s-studio-language';
+
+  function scopeFor(control: HTMLElement): HTMLElement | null {
+    return (
+      control.closest<HTMLElement>('[data-studio-scope]') ??
+      document.querySelector<HTMLElement>('[data-studio-scope]')
+    );
+  }
+
+  function applySkin(scope: HTMLElement, lang: string) {
+    if (lang === 'observatory') scope.removeAttribute('data-skin');
+    else scope.setAttribute('data-skin', lang);
+  }
+
+  function persist(lang: string) {
+    try {
+      window.localStorage.setItem(STORAGE_KEY, lang);
+    } catch {
+      /* private mode / blocked storage: preview still works this load */
+    }
+  }
+
+  function init(root: HTMLElement) {
+    const track = root.querySelector<HTMLElement>('.s2s-lang-switch__track');
+    if (!track) return;
+    const radios = Array.from(track.querySelectorAll<HTMLButtonElement>('[role="radio"]'));
+    if (!radios.length) return;
+    const scope = scopeFor(root);
+
+    function select(lang: string, { focus = false }: { focus?: boolean } = {}) {
+      radios.forEach((r) => {
+        const checked = r.dataset.lang === lang;
+        r.setAttribute('aria-checked', String(checked));
+        r.tabIndex = checked ? 0 : -1;
+        if (checked && focus) r.focus();
+      });
+      if (scope) applySkin(scope, lang);
+      persist(lang);
+    }
+
+    // Sync to whatever is already on the scope (StudioScopeRestore has
+    // already run, since it is a classic inline script and this module
+    // script is deferred until after the document is parsed).
+    const current = scope?.getAttribute('data-skin') || 'observatory';
+    radios.forEach((r) => {
+      const checked = r.dataset.lang === current;
+      r.setAttribute('aria-checked', String(checked));
+      r.tabIndex = checked ? 0 : -1;
+    });
+
+    radios.forEach((radio, i) => {
+      radio.addEventListener('click', () => select(radio.dataset.lang!));
+      radio.addEventListener('keydown', (e) => {
+        const key = e.key;
+        let next = -1;
+        if (key === 'ArrowRight' || key === 'ArrowDown') next = (i + 1) % radios.length;
+        else if (key === 'ArrowLeft' || key === 'ArrowUp') next = (i - 1 + radios.length) % radios.length;
+        else if (key === 'Home') next = 0;
+        else if (key === 'End') next = radios.length - 1;
+        else return;
+        e.preventDefault();
+        select(radios[next].dataset.lang!, { focus: true });
+      });
+    });
+  }
+
+  document.querySelectorAll<HTMLElement>('[data-lang-switch]').forEach(init);
+</script>
+
+<style>
+  .s2s-lang-switch {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+  }
+  .s2s-lang-switch__control {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .s2s-lang-switch__tag {
+    display: none;
+  }
+  .s2s-lang-switch__track {
+    display: inline-flex;
+    align-items: center;
+    height: 32px;
+    padding: 3px;
+    gap: 2px;
+    border: 1px solid var(--s2s-rule-strong);
+    border-radius: var(--s2s-radius-pill);
+    background: var(--s2s-inset);
+  }
+  .s2s-lang-switch__seg {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    height: 100%;
+    padding: 0 12px;
+    border: 0;
+    border-radius: var(--s2s-radius-pill);
+    background: transparent;
+    color: var(--s2s-ink-muted);
+    font: 450 var(--type-ui) / 1 var(--font-sans);
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color var(--s2s-dur) ease, color var(--s2s-dur) ease, box-shadow var(--s2s-dur) ease;
+  }
+  .s2s-lang-switch__seg:hover {
+    color: var(--s2s-ink-soft);
+  }
+  .s2s-lang-switch__seg[aria-checked='true'] {
+    background: var(--s2s-chip);
+    color: var(--s2s-ink);
+    box-shadow: inset 0 0 0 1px var(--s2s-rule-emphasis);
+  }
+  .s2s-lang-switch__dot {
+    width: 8px;
+    height: 8px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background: var(--s2s-accent);
+  }
+  .s2s-lang-switch__caption {
+    margin: 0;
+    max-width: 34ch;
+    text-align: right;
+    font: 400 var(--type-micro) / 1.4 var(--font-sans);
+    color: var(--s2s-ink-muted);
+  }
+  @media (min-width: 640px) {
+    .s2s-lang-switch__tag {
+      display: inline;
+    }
+  }
+</style>

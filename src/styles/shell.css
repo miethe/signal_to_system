@@ -51,7 +51,7 @@ body {
     background:
       radial-gradient(760px 240px at 58% -60px, var(--s2s-backdrop-glow), transparent 75%),
       radial-gradient(1400px 320px at 50% -80px, var(--s2s-backdrop-haze), transparent 80%),
-      linear-gradient(180deg, var(--s2s-backdrop-veil) 55%, var(--s2s-backdrop) 100%) top center / 100% 56.25vw no-repeat,
+      linear-gradient(180deg, var(--s2s-backdrop-veil) 55%, var(--s2s-backdrop) 97%) top center / 100% 57vw no-repeat,
       var(--s2s-backdrop-photo) top center / 100% auto no-repeat,
       var(--s2s-backdrop);
     padding: 16px 0 24px;
@@ -128,6 +128,33 @@ body {
 .s2s-focus:focus-visible {
   outline: 2px solid var(--s2s-focus);
   outline-offset: 2px;
+}
+
+/* ---------- Studio subnav row (Tabs + LanguageSwitch) ----------
+   Used on every /studio/* preview page: the studio Tabs on the left,
+   LanguageSwitch.astro right-aligned on the same row at >=640px; below
+   that the control wraps to its own line, still stacked above the
+   previewed (data-studio-scope) content. */
+.s2s-studio-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px 20px;
+}
+.s2s-studio-toolbar > * { min-width: 0; max-width: 100%; }
+
+/* ---------- Studio-scoped skin container (LanguageSwitch.astro) ----------
+   Re-establishes canvas + ink at the scope root, the same pattern `body`
+   and `.s2s-frame` use at the page level, so Folio/Instrument's ink color
+   always sits on that skin's own canvas rather than bleeding onto the
+   ambient (unscoped) shell background. For Observatory this repaints the
+   same value already there (`.s2s-frame`'s own background), so it is a
+   no-op until a preview language actually changes it. */
+[data-studio-scope] {
+  background-color: var(--s2s-canvas);
+  color: var(--s2s-ink);
+  transition: background-color var(--s2s-dur) ease, color var(--s2s-dur) ease;
 }
 
 /* ---------- Header search trigger (SearchBox.tsx, closed state) ---------- */
