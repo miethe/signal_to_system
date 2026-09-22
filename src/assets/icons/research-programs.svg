@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+  <title>Research Programs</title>
+  <circle cx="12" cy="12" r="8"/>
+  <path class="accent-fill" fill="currentColor" stroke="none" d="M12 9Q12.78 11.22 15 12Q12.78 12.78 12 15Q11.22 12.78 9 12Q11.22 11.22 12 9Z"/>
+  <circle fill="currentColor" stroke="none" cx="17.66" cy="6.34" r="1.75"/>
+  <circle class="accent-fill" fill="currentColor" stroke="none" cx="6.34" cy="17.66" r="1.75"/>
+</svg>
