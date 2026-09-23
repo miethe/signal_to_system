@@ -8,7 +8,7 @@
   },
   "policy": {
     "defaultAction": "preserve",
-    "redirects": "None are authorized by this baseline. Future redirects require collision, chain, and loop tests.",
+    "redirects": "None are authorized by this baseline. A route with action \"redirect\" must declare target as an existing canonical path; collision, chain, loop, and dangling-target tests are required.",
     "fragments": "Fragment identifiers are client-side anchors and are not emitted as separate files."
   },
   "routes": [
@@ -109,6 +109,22 @@
       "family": "dev-stories",
       "action": "preserve",
       "target": "/dev-stories/orchestrator/Fable 5/"
+    },
+    {
+      "path": "/feeds/dev-story.xml",
+      "output": "feeds/dev-story.xml",
+      "family": "feeds",
+      "action": "add",
+      "target": "/feeds/dev-story.xml",
+      "milestone": "M2"
+    },
+    {
+      "path": "/feeds/essay.xml",
+      "output": "feeds/essay.xml",
+      "family": "feeds",
+      "action": "add",
+      "target": "/feeds/essay.xml",
+      "milestone": "M2"
     },
     {
       "path": "/essays/agentic-operations-flow/",
@@ -921,6 +937,30 @@
       "family": "site",
       "action": "preserve",
       "target": "/workflow-showcase/stage-2/step-2-8.terminal.html"
+    },
+    {
+      "path": "/series/i-let-claude-build-my-app/",
+      "output": "series/i-let-claude-build-my-app/index.html",
+      "family": "series",
+      "action": "add",
+      "target": "/series/i-let-claude-build-my-app/",
+      "milestone": "M2"
+    },
+    {
+      "path": "/writing/",
+      "output": "writing/index.html",
+      "family": "writing",
+      "action": "add",
+      "target": "/writing/",
+      "milestone": "M2"
+    },
+    {
+      "path": "/feeds/companion.xml",
+      "output": "feeds/companion.xml",
+      "family": "feeds",
+      "action": "add",
+      "target": "/feeds/companion.xml",
+      "milestone": "M2"
     }
   ]
 }

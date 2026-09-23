@@ -16,8 +16,9 @@ interface Props {
   /** Emit robots noindex/nofollow. For pages that build but aren't published yet. */
   noindex?: boolean;
   /**
-   * Pin the page body to the pre-v2 reader look (src/styles/reader-legacy.css).
-   * Set by PostLayout/StoryLayout until M2 re-tokens the reader.
+   * Mark <main> as a reader page (ReaderShell). Since M2 the reader sits in
+   * the site frame like every other page; the flag only adds `.s2s-main--reader`
+   * as a styling hook.
    */
   reader?: boolean;
 }
@@ -110,20 +111,21 @@ const resolvedDescription = description.slice(0, 160);
         if (perfMode === 'lite') html.classList.add('perf-lite');
       })();
     </script>
+    <!-- Page-specific head tags (e.g. a format feed's rel=alternate link). -->
+    <slot name="head" />
   </head>
 
-  <body class:list={[reader && 's2s-body--reader']}>
+  <body>
     <a href="#main-content" class="skip-link">Skip to content</a>
 
-    <!-- The framed panel from the mockups. Reader pages run flush (no frame)
-         so the essay keeps its pre-v2 measure and page field until M2. -->
-    <div class:list={['s2s-frame', reader && 's2s-frame--reader']}>
+    <!-- The framed panel from the mockups (every page, the reader included). -->
+    <div class="s2s-frame">
       <!-- Navigation slot: a page may pass its own header; default is the v2 shell header. -->
       <slot name="nav">
         <SiteHeader />
       </slot>
 
-      <main id="main-content" tabindex="-1" class:list={['s2s-main', reader && 'reader-legacy', className]}>
+      <main id="main-content" tabindex="-1" class:list={['s2s-main', reader && 's2s-main--reader', className]}>
         <slot />
       </main>
 

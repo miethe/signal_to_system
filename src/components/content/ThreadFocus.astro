@@ -15,7 +15,7 @@
  * leg every action below is a real link, so the standalone route and the
  * eventual overlay share one navigable, no-JS-safe destination for each.
  */
-import '../../styles/registry-wave-v2.css';
+import '../../styles/reader/shell.css';
 import Figure from './Figure.astro';
 import RunningExampleCard from './RunningExampleCard.astro';
 import ThreadOverview from './ThreadOverview.astro';
@@ -45,7 +45,7 @@ const kindLabel: Record<string, string> = {
 
 {
   beat && (
-    <div class:list={['thread-focus', thread.slug === 'the-registry-wave-agentic-artifact-supply-chain' && 'registry-wave-focus']} data-focus-kind="thread" data-focus-key={beat.id}>
+    <div class:list={['thread-focus', 'reader-focus']} data-focus-kind="thread" data-focus-key={beat.id}>
       <div class="thread-focus__grid">
         <div class="thread-focus__main">
           <div class="thread-focus__actions">
@@ -324,11 +324,11 @@ const kindLabel: Record<string, string> = {
   :global(.dark) .thread-focus__grid { gap: 24px; }
   @media (min-width: 960px) { :global(.dark) .thread-focus__grid { grid-template-columns: minmax(0, 720px) 287px; } }
   :global(.dark) .thread-focus__actions { gap: 10px; margin-bottom: 18px; padding-bottom: 10px; }
-  :global(.dark) .thread-focus__action:first-child { display: inline-flex; align-items: center; min-height: 31px; padding: 0 13px; border: 1px solid #294b69; border-radius: 6px; background: #0b2946; }
-  :global(.dark) .thread-focus__title { margin: 8px 0 12px; color: #f5f1ea; font-size: 32px; line-height: 1.08; }
-  :global(.dark) .thread-focus__recap { color: #bbc7d8; font-size: 16px; line-height: 1.58; }
-  :global(.dark) .thread-focus__boundary { padding: 9px 16px; border-color: #efbc68; border-width: 0 0 0 3px; border-radius: 0; background: linear-gradient(90deg, rgb(240 185 93 / 9%), transparent); }
-  :global(.dark) .thread-focus__boundary-label { color: #efbc68; }
-  :global(.dark) .thread-focus__rail > * { border-color: #294b6d; border-radius: 8px; background: linear-gradient(145deg, rgb(10 29 51 / 94%), rgb(6 21 39 / 90%)); box-shadow: 0 12px 32px rgb(0 0 0 / 18%); }
+  :global(.dark) .thread-focus__action:first-child { display: inline-flex; align-items: center; min-height: 31px; padding: 0 13px; border: 1px solid var(--reader-edge); border-radius: 6px; background: var(--s2s-canvas-raised); }
+  :global(.dark) .thread-focus__title { margin: 8px 0 12px; color: var(--s2s-ink); font-size: 32px; line-height: 1.08; }
+  :global(.dark) .thread-focus__recap { color: var(--s2s-ink-muted); font-size: 16px; line-height: 1.58; }
+  :global(.dark) .thread-focus__boundary { padding: 9px 16px; border-color: var(--reader-caveat); border-width: 0 0 0 3px; border-radius: 0; background: linear-gradient(90deg, color-mix(in srgb, var(--reader-caveat) 9%, transparent), transparent); }
+  :global(.dark) .thread-focus__boundary-label { color: var(--reader-caveat); }
+  :global(.dark) .thread-focus__rail > * { border-color: var(--reader-edge); border-radius: 8px; background: var(--reader-panel); box-shadow: var(--reader-shadow); }
   @media (max-width: 640px) { :global(.dark) .thread-focus__title { font-size: 26px; } :global(.dark) .thread-focus__recap { font-size: 15px; line-height: 1.45; } }
 </style>

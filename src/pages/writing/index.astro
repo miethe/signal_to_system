@@ -1,0 +1,287 @@
+---
+/**
+ * /writing — the Writing hub (M2, ia-hub node_01M35CKN6AXH9A0PAZXY7GKXFE).
+ * Visual authority: docs/design/s2s-v2-visual/01-site-mockups/
+ * writing_that_turns_observations_into_systems.png.
+ *
+ * Additive: /essays/ and /dev-stories/ keep their URLs (spec 02). Every
+ * number and item comes from the PublicationSummary read model
+ * (src/lib/writing.ts), the series collection and reading-paths.json.
+ * Where the mockup shows data the site does not have (view and like
+ * counts, a newsletter), the page omits it or offers the real equivalent
+ * (RSS) instead.
+ *
+ * Built from the shared Writing/Labs family (src/components/family/).
+ * Filtering is progressive enhancement: without JS every panel shows.
+ */
+import { getCollection } from 'astro:content';
+import HubLayout from '../../layouts/templates/HubLayout.astro';
+import Button from '../../components/ui/Button.astro';
+import Icon from '../../components/brand/Icon.astro';
+import FilterToolbar from '../../components/primitives/FilterToolbar.astro';
+import FacetRail from '../../components/primitives/FacetRail.astro';
+import StateNotice from '../../components/primitives/StateNotice.astro';
+import CollectionPanel from '../../components/family/CollectionPanel.astro';
+import FeatureCard from '../../components/family/FeatureCard.astro';
+import EntryRow from '../../components/family/EntryRow.astro';
+import PathList from '../../components/family/PathList.astro';
+import SubscribeBand from '../../components/family/SubscribeBand.astro';
+import { getPublications, byFormat, FORMAT_LABEL, SUBTYPE_LABEL, type PublicationSummary } from '../../lib/writing';
+import { getTagLabel } from '../../lib/tags';
+import { formatDate, formatDateISO } from '../../lib/utils';
+import pathsData from '../../data/reading-paths.json';
+
+const pubs = await getPublications();
+const groups = byFormat(pubs);
+const allSeries = await getCollection('series');
+
+// Panels in mockup order. Guides and Companions share one panel.
+const panels = [
+  {
+    key: 'essay', title: 'Essays', icon: 'essays', items: groups.essay,
+    description: 'Long-form, developed arguments: big questions, deep dives, synthetic thinking.',
+    action: { label: 'View all essays', href: '/essays/' }, featuredLabel: 'Featured essay',
+  },
+  {
+    key: 'field-note', title: 'Field Notes', icon: 'field-notes', items: groups['field-note'],
+    description: 'Shorter, bounded observations and practical findings, more finished than a notebook.',
+    featuredLabel: 'Featured field note',
+  },
+  {
+    key: 'dev-story', title: 'Dev Stories', icon: 'dev-stories', items: groups['dev-story'],
+    description: 'What happened while building: builder notes and automated after-action reviews.',
+    action: { label: 'View all dev stories', href: '/dev-stories/' }, featuredLabel: 'Featured dev story',
+  },
+  {
+    key: 'guide companion', title: 'Guides / Companions', icon: 'guides', items: [...groups.guide, ...groups.companion],
+    description: 'Step-by-step guides and companion pieces that support another publication.',
+    featuredLabel: 'Featured companion',
+  },
+];
+
+/** Featured first (frontmatter `featured`), else the newest. */
+const pick = (items: PublicationSummary[]) => items.find((i) => i.featured) ?? items[0];
+
+const meta = (p: PublicationSummary) => [
+  { label: formatDate(p.publishedAt), datetime: formatDateISO(p.publishedAt), icon: 'timeline' },
+  ...(p.readMinutes ? [{ label: `${p.readMinutes} min read` }] : []),
+];
+const kindOf = (p: PublicationSummary) => (p.subtype ? SUBTYPE_LABEL[p.subtype] : FORMAT_LABEL[p.format]);
+
+// Filters: format, topic (tags), series, sort.
+const tagCounts = new Map<string, number>();
+for (const p of pubs) for (const t of p.tags) tagCounts.set(t, (tagCounts.get(t) ?? 0) + 1);
+const topTags = [...tagCounts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+const seriesWithParts = allSeries
+  .map((s) => ({ s, n: pubs.filter((p) => p.series?.id === s.id).length }))
+  .filter((x) => x.n > 0);
+
+const filters = [
+  {
+    id: 'format', label: 'Format', icon: 'writing',
+    options: [{ value: '', label: 'All formats' }, ...panels.filter((p) => p.items.length).map((p) => ({ value: p.key, label: p.title }))],
+  },
+  {
+    id: 'topic', label: 'Topic', icon: 'topics',
+    options: [{ value: '', label: 'All topics' }, ...topTags.map(([t]) => ({ value: t, label: getTagLabel(t) }))],
+  },
+  {
+    id: 'series', label: 'Series', icon: 'reading-paths',
+    options: [{ value: '', label: 'All series' }, ...seriesWithParts.map(({ s }) => ({ value: s.id, label: s.data.title }))],
+  },
+  {
+    id: 'sort', label: 'Sort', icon: 'timeline',
+    options: [{ value: 'new', label: 'Newest first' }, { value: 'old', label: 'Oldest first' }],
+  },
+];
+
+// Rail: the core reading path's first published steps, topics, series.
+const arc = pathsData.paths[0];
+const startSteps = arc.steps
+  .filter((s): s is typeof s & { slug: string } => s.state === 'published' && typeof s.slug === 'string')
+  .slice(0, 3);
+const bySlug = new Map(pubs.map((p) => [p.id, p]));
+const readingPaths = [
+  { title: arc.umbrellaTerm, href: `/series/${arc.pageSlug}/`, sub: `${arc.steps.length} parts · the core reading path`, icon: 'reading-paths' },
+  ...seriesWithParts.map(({ s, n }) => ({ title: s.data.title, href: `/series/${s.id}/`, sub: `${n} ${n === 1 ? 'part' : 'parts'} · series`, icon: 'essays' })),
+];
+const topicItems = topTags.slice(0, 8).map(([t, n]) => ({ label: getTagLabel(t), href: `/tags/${t}/`, count: n }));
+
+const attrs = (p: PublicationSummary) => ({
+  'data-entry': '',
+  'data-date': p.publishedAt.toISOString(),
+  'data-tags': p.tags.join(' '),
+  'data-series': p.series?.id ?? '',
+});
+---
+
+<HubLayout
+  title="Writing"
+  description="Essays, field notes, Dev Stories and companion pieces: the polished publication layer of Signal to System."
+  heading="Writing that turns observations into systems."
+  accent="systems."
+  eyebrow={['Ideas', 'Evidence', 'Systems']}
+  lede="Writing is the polished publication layer of Signal to System, where research, experiments and real-world experience become clear arguments, practical insights and lasting references."
+  hero={{
+    photo: 'observatory',
+    quote: { text: 'Ideas compound\nwhen they’re written\nwith care.' },
+    rail: ['Observe', 'Investigate', 'Build', 'Share', 'Repeat'],
+    railFoot: ['A quieter', 'brighter', 'tomorrow'],
+  }}
+>
+  <Fragment slot="hero-actions">
+    <Button href="#writing-latest" variant="signal" size="lg">Browse latest writing <span aria-hidden="true">→</span></Button>
+    <Button href="/start-here/" variant="outline" size="lg"><Icon name="reading-paths" size={16} /> Start here</Button>
+  </Fragment>
+
+  <div class="writing-main s2s-span-major" id="writing-latest">
+    <FilterToolbar
+      label="Filter writing"
+      filters={filters}
+      count={`${pubs.length} ${pubs.length === 1 ? 'piece' : 'pieces'}`}
+      class="writing-filters"
+    />
+
+    <p class="writing-empty" data-writing-empty hidden>
+      Nothing matches these filters. <button type="button" class="writing-reset s2s-focus" data-writing-reset>Clear filters</button>
+    </p>
+
+    <div class="writing-panels">
+      {panels.map((panel) => {
+        const featured = pick(panel.items);
+        const rest = panel.items.filter((i) => i !== featured);
+        return (
+          <CollectionPanel
+            title={panel.title}
+            icon={panel.icon}
+            count={panel.items.length}
+            description={panel.description}
+            action={panel.items.length ? panel.action : undefined}
+            data-panel={panel.key}
+          >
+            {featured ? (
+              <>
+                <div {...attrs(featured)}>
+                  <FeatureCard
+                    href={featured.canonicalPath}
+                    title={featured.title}
+                    eyebrow={featured.format === 'companion' ? 'Featured companion' : panel.featuredLabel}
+                    dek={featured.summary}
+                    image={featured.heroImage && !featured.heroImage.endsWith('.svg') ? featured.heroImage : undefined}
+                    glyph={panel.icon}
+                    meta={meta(featured)}
+                    chips={featured.tags.slice(0, 2).map((t) => ({ label: getTagLabel(t) }))}
+                  />
+                </div>
+                {rest.length > 0 && (
+                  <ul class="writing-rows">
+                    {rest.map((p) => <EntryRow href={p.canonicalPath} title={p.title} kind={kindOf(p)} meta={meta(p)} {...attrs(p)} />)}
+                  </ul>
+                )}
+              </>
+            ) : (
+              <StateNotice
+                kind="in-preparation"
+                compact
+                art={false}
+                title={`No ${panel.title.toLowerCase()} yet.`}
+                body="This format is part of the Writing model; the first pieces are in preparation."
+              />
+            )}
+          </CollectionPanel>
+        );
+      })}
+    </div>
+
+    <SubscribeBand id="writing-follow" />
+  </div>
+
+  <div class="writing-rail s2s-span-minor">
+    <PathList
+      heading="Start here"
+      icon="reading-paths"
+      intro="New to the writing? The core reading path begins with these."
+      numbered
+      items={startSteps.map((s) => ({ title: bySlug.get(s.slug)?.title ?? s.title, href: bySlug.get(s.slug)?.canonicalPath ?? `/essays/${s.slug}/`, sub: s.whatItAnswers }))}
+      action={{ label: 'Full guide', href: '/start-here/' }}
+    />
+    <FacetRail heading="Popular topics" icon="topics" items={topicItems} action={{ label: 'View all topics', href: '/tags/' }} />
+    <PathList heading="Reading paths" icon="reading-paths" items={readingPaths} action={{ label: 'View all series', href: '/series/' }} />
+  </div>
+</HubLayout>
+
+<script>
+  // Progressive enhancement: filter and sort entries by data attributes.
+  const root = document.querySelector<HTMLElement>('.writing-main');
+  if (root) {
+    const selects = [...root.querySelectorAll<HTMLSelectElement>('select[data-filter]')];
+    const panels = [...root.querySelectorAll<HTMLElement>('[data-panel]')];
+    const empty = root.querySelector<HTMLElement>('[data-writing-empty]');
+    const value = (id: string) => selects.find((s) => s.dataset.filter === id)?.value ?? '';
+
+    const apply = () => {
+      const format = value('format');
+      const topic = value('topic');
+      const series = value('series');
+      const oldest = value('sort') === 'old';
+      let visible = 0;
+      for (const panel of panels) {
+        const inFormat = !format || panel.dataset.panel === format;
+        let shown = 0;
+        const entries = [...panel.querySelectorAll<HTMLElement>('[data-entry]')];
+        for (const e of entries) {
+          const ok = inFormat
+            && (!topic || (e.dataset.tags ?? '').split(' ').includes(topic))
+            && (!series || e.dataset.series === series);
+          e.hidden = !ok;
+          if (ok) shown++;
+        }
+        const list = panel.querySelector('.writing-rows');
+        if (list) {
+          const rows = [...list.children] as HTMLElement[];
+          rows.sort((a, b) => ((a.dataset.date ?? '') < (b.dataset.date ?? '') ? 1 : -1) * (oldest ? -1 : 1));
+          rows.forEach((r) => list.appendChild(r));
+        }
+        const filtering = Boolean(format || topic || series);
+        panel.hidden = filtering ? shown === 0 : false;
+        if (!panel.hidden) visible++;
+      }
+      if (empty) empty.hidden = visible > 0;
+    };
+
+    selects.forEach((s) => s.addEventListener('change', apply));
+    root.querySelector('[data-writing-reset]')?.addEventListener('click', () => {
+      selects.forEach((s) => { s.selectedIndex = 0; });
+      apply();
+    });
+  }
+</script>
+
+<style>
+  .writing-main, .writing-rail { min-width: 0; }
+  .writing-main { display: flex; flex-direction: column; gap: 18px; }
+  .writing-rail { display: flex; flex-direction: column; gap: 16px; }
+
+  .writing-panels { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  @media (min-width: 1100px) {
+    .writing-panels { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  }
+  .writing-panels :global([data-panel][hidden]) { display: none; }
+  .writing-panels :global([data-entry][hidden]) { display: none; }
+
+  .writing-rows { margin: 10px 0 0; padding: 0; }
+  .writing-main :global(.writing-filters .s2s-filter) { flex: 1 1 150px; min-width: 0; }
+  .writing-main :global(.writing-filters .s2s-filters__count) { flex: 0 0 auto; margin-left: auto; }
+
+  .writing-empty { margin: 0; font: 400 var(--type-body-s) / 1.5 var(--font-sans); color: var(--s2s-ink-muted); }
+  .writing-reset {
+    margin-left: 8px;
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    color: var(--s2s-accent);
+    cursor: pointer;
+  }
+
+</style>

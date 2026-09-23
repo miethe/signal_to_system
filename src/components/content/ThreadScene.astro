@@ -215,12 +215,12 @@ const kindUsesCyan = beat?.kind === 'conceptual' || beat?.kind === 'mechanism';
     text-decoration: underline;
   }
 
-  :global(.dark) .thread-scene { border-color: #29496d; border-radius: 8px; background: linear-gradient(180deg, #0a1b31 0%, #07162a 100%); box-shadow: 0 8px 22px rgb(0 0 0 / 14%); }
+  :global(.dark) .thread-scene { border-color: var(--reader-edge); border-radius: 8px; background: var(--reader-panel); box-shadow: var(--reader-shadow); }
   :global(.dark) .thread-scene__corner { display: none; }
-  :global(.dark) .thread-scene__body { border-left-color: #8a63ff; }
-  :global(.dark) .thread-scene__eyebrow { color: #aebbd0; }
-  :global(.dark) .thread-scene__kind { color: #bbaaff; }
-  :global(.dark) .thread-scene__recap { color: #b8c2d3; }
+  :global(.dark) .thread-scene__body { border-left-color: var(--accent); }
+  :global(.dark) .thread-scene__eyebrow { color: var(--text-secondary); }
+  :global(.dark) .thread-scene__kind { color: var(--accent); }
+  :global(.dark) .thread-scene__recap { color: var(--text-secondary); }
 
   .thread-scene__explore:focus-visible {
     outline: 2px solid var(--accent);

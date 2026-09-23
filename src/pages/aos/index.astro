@@ -1,174 +1,74 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import EssayCard from '../../components/cards/EssayCard.astro';
-import StoryCard from '../../components/cards/StoryCard.astro';
-import { getContentByAosArea, getAllAosAreas } from '../../lib/content';
+/**
+ * /aos — the Agentic OS index on the v2 shell (M2 ia-facets). Every aos:true
+ * publication, grouped by AOS area (aosAreas), plus a General panel for aos
+ * writing tagged with no registered area so nothing is dropped. Area panels
+ * reuse the Writing/Labs family (CollectionPanel + PublicationList).
+ */
+import HubLayout from '../../layouts/templates/HubLayout.astro';
+import CollectionPanel from '../../components/family/CollectionPanel.astro';
+import PublicationList from '../../components/family/PublicationList.astro';
+import FacetRail from '../../components/primitives/FacetRail.astro';
+import StateNotice from '../../components/primitives/StateNotice.astro';
 import { AOS_AREAS_REGISTRY } from '../../data/taxonomy';
+import { getPublications } from '../../lib/writing';
 
-// ---------------------------------------------------------------------------
-// All aos:true content, grouped by AOS area.
-// ---------------------------------------------------------------------------
-
-const { posts, stories } = await getContentByAosArea();
-const areaFacets = await getAllAosAreas();
-const countsBySlug = new Map(areaFacets.map((a) => [a.slug, a.count]));
-
-const groups = AOS_AREAS_REGISTRY.filter((area) => countsBySlug.has(area.slug)).map(
-  (area) => ({
-    slug: area.slug,
-    label: area.label,
-    description: area.description,
-    posts: posts.filter((p) => (p.data.aosAreas ?? []).includes(area.slug)),
-    stories: stories.filter((s) => (s.data.aosAreas ?? []).includes(area.slug)),
-  }),
-);
-
-// aos:true content that isn't tagged with any registered area still belongs
-// on this page — collect it under a General bucket so nothing is dropped.
-const generalPosts = posts.filter(
-  (p) => !(p.data.aosAreas ?? []).some((slug) => countsBySlug.has(slug)),
-);
-const generalStories = stories.filter(
-  (s) => !(s.data.aosAreas ?? []).some((slug) => countsBySlug.has(slug)),
-);
-
-const totalCount = posts.length + stories.length;
+const aosPubs = (await getPublications()).filter((p) => p.aos);
+const registered = new Set(AOS_AREAS_REGISTRY.map((a) => a.slug));
+const areas = AOS_AREAS_REGISTRY
+  .map((area) => ({ ...area, items: aosPubs.filter((p) => p.aosAreas.includes(area.slug)) }))
+  .filter((area) => area.items.length > 0);
+const general = aosPubs.filter((p) => !p.aosAreas.some((slug) => registered.has(slug)));
+const essays = aosPubs.filter((p) => p.collection === 'posts').length;
+const stories = aosPubs.length - essays;
 ---
 
-<BaseLayout
+<HubLayout
   title="The Agentic OS"
   description="Writing about building the Agentic OS — orchestration, memory, research, knowledge, artifacts, execution, and the infrastructure underneath it."
+  heading="The Agentic OS"
+  eyebrow={['Labs', 'Agentic OS']}
+  lede="Writing about building the Agentic OS: the personal umbrella of orchestration, memory, research, knowledge, and execution subsystems, and the infrastructure that keeps it running."
 >
-  <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-    <!-- Page header -->
-    <header class="mb-12 border-b border-zinc-200 dark:border-zinc-800 pb-10">
-      <div class="mb-3">
-        <span class="inline-block rounded-md bg-violet-100 dark:bg-violet-900/40 px-2.5 py-1 text-xs font-medium text-violet-700 dark:text-violet-300">
-          Agentic OS
-        </span>
-      </div>
-      <h1 class="text-4xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 sm:text-5xl mb-4">
-        The Agentic OS
-      </h1>
-      <p class="text-xl text-zinc-600 dark:text-zinc-400 max-w-2xl leading-relaxed mb-4">
-        Writing about building the Agentic OS: the personal umbrella of orchestration, memory, research, knowledge, and execution subsystems, and the infrastructure that keeps it running.
-      </p>
-      <p class="text-zinc-500 dark:text-zinc-400">
-        {totalCount} {totalCount === 1 ? 'item' : 'items'} — {posts.length} {posts.length === 1 ? 'essay' : 'essays'}, {stories.length} {stories.length === 1 ? 'dev story' : 'dev stories'}
-      </p>
-    </header>
-
-    <!-- Area nav -->
-    {groups.length > 0 && (
-      <nav class="mb-12 flex flex-wrap gap-2" aria-label="AOS areas">
-        {groups.map((group) => (
-          <a
-            href={`/aos/${group.slug}/`}
-            class="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 bg-zinc-50 px-2.5 py-1 text-sm font-medium text-zinc-700 hover:border-violet-300 hover:bg-violet-50 hover:text-violet-700 dark:border-zinc-700 dark:bg-zinc-800/60 dark:text-zinc-300 dark:hover:border-violet-700 dark:hover:bg-violet-900/30 dark:hover:text-violet-300 transition-colors"
-          >
-            {group.label}
-            <sup class="text-[10px] text-zinc-400 dark:text-zinc-500">
-              {group.posts.length + group.stories.length}
-            </sup>
-          </a>
-        ))}
-      </nav>
+  <div class="aos-main s2s-span-major">
+    <p class="aos-count">
+      {[
+        `${aosPubs.length} ${aosPubs.length === 1 ? 'piece' : 'pieces'}`,
+        essays > 0 && `${essays} ${essays === 1 ? 'essay' : 'essays'}`,
+        stories > 0 && `${stories} ${stories === 1 ? 'Dev Story' : 'Dev Stories'}`,
+      ].filter(Boolean).join(' · ')}
+    </p>
+    {aosPubs.length === 0 && (
+      <StateNotice kind="empty" title="No Agentic OS writing yet." body="Published writing about the Agentic OS will appear here." />
     )}
-
-    {totalCount === 0 ? (
-      <div class="rounded-xl border border-dashed border-zinc-300 dark:border-zinc-700 p-16 text-center">
-        <p class="text-zinc-500 dark:text-zinc-400">No Agentic OS content found yet.</p>
-      </div>
-    ) : (
-      <div class="space-y-16">
-        {groups.map((group) => (
-          (group.posts.length > 0 || group.stories.length > 0) && (
-            <section id={group.slug}>
-              <div class="mb-6">
-                <h2 class="text-2xl font-semibold text-zinc-900 dark:text-zinc-50">
-                  <a href={`/aos/${group.slug}/`} class="hover:text-violet-600 dark:hover:text-violet-400 transition-colors">
-                    {group.label}
-                  </a>
-                </h2>
-                {group.description && (
-                  <p class="mt-1 text-sm text-zinc-500 dark:text-zinc-400 max-w-2xl">
-                    {group.description}
-                  </p>
-                )}
-              </div>
-              <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                {group.posts.map((post) => (
-                  <EssayCard
-                    title={post.data.title}
-                    excerpt={post.data.excerpt}
-                    date={post.data.date}
-                    readTime={post.data.readTime}
-                    category={post.data.category}
-                    tags={post.data.tags}
-                    slug={post.id}
-                    contentType={post.data.contentType}
-                    featured={false}
-                  />
-                ))}
-                {group.stories.map((story) => (
-                  <StoryCard
-                    title={story.data.title}
-                    excerpt={story.data.excerpt}
-                    date={story.data.date}
-                    readTime={story.data.readTime}
-                    slug={story.id}
-                    storyType={story.data.storyType}
-                    projects={story.data.projects}
-                    automated={story.data.automated}
-                    workflow={story.data.workflow}
-                    tags={story.data.tags}
-                    featured={false}
-                  />
-                ))}
-              </div>
-            </section>
-          )
-        ))}
-
-        <!-- General bucket — aos:true content without a registered area -->
-        {(generalPosts.length > 0 || generalStories.length > 0) && (
-          <section>
-            <h2 class="text-sm font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 mb-6">
-              General — {generalPosts.length + generalStories.length}
-            </h2>
-            <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {generalPosts.map((post) => (
-                <EssayCard
-                  title={post.data.title}
-                  excerpt={post.data.excerpt}
-                  date={post.data.date}
-                  readTime={post.data.readTime}
-                  category={post.data.category}
-                  tags={post.data.tags}
-                  slug={post.id}
-                  contentType={post.data.contentType}
-                  featured={false}
-                />
-              ))}
-              {generalStories.map((story) => (
-                <StoryCard
-                  title={story.data.title}
-                  excerpt={story.data.excerpt}
-                  date={story.data.date}
-                  readTime={story.data.readTime}
-                  slug={story.id}
-                  storyType={story.data.storyType}
-                  projects={story.data.projects}
-                  automated={story.data.automated}
-                  workflow={story.data.workflow}
-                  tags={story.data.tags}
-                  featured={false}
-                />
-              ))}
-            </div>
-          </section>
-        )}
-      </div>
+    {areas.map((area) => (
+      <CollectionPanel
+        id={`area-${area.slug}`}
+        title={area.label}
+        icon="research-programs"
+        count={area.items.length}
+        description={area.description}
+        action={{ label: 'View area', href: `/aos/${area.slug}/` }}
+      >
+        <PublicationList items={area.items} />
+      </CollectionPanel>
+    ))}
+    {general.length > 0 && (
+      <CollectionPanel id="area-general" title="General" icon="research-programs" count={general.length} description="Agentic OS writing not tied to a single area.">
+        <PublicationList items={general} />
+      </CollectionPanel>
     )}
   </div>
-</BaseLayout>
+
+  <div class="aos-rail s2s-span-minor">
+    {areas.length > 0 && (
+      <FacetRail heading="Areas" icon="research-programs" items={areas.map((a) => ({ label: a.label, href: `/aos/${a.slug}/`, count: a.items.length }))} />
+    )}
+    <FacetRail heading="Explore" icon="projects" items={[{ label: 'All systems', href: '/systems/' }, { label: 'All writing', href: '/writing/' }]} />
+  </div>
+</HubLayout>
+
+<style>
+  .aos-main, .aos-rail { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+  .aos-count { margin: 0; font: 400 var(--type-meta) / 1.4 var(--font-sans); color: var(--s2s-ink-subtle); }
+</style>

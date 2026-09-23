@@ -91,7 +91,7 @@ Posts are rendered through `.prose-custom` (defined in `src/styles/global.css`).
 - **Use real markdown tables for comparative data.** If you catch yourself writing three consecutive `**Bold label:**` blocks each followed by a bullet list, collapse them into a `| col | col |` table — `.prose-custom` has proper `thead`/`tbody` styling, and tables survive mobile widths better than stacked bold-lists.
 - **Heading spacing is automatic.** `h2` gets a top margin and a subtle bottom border; `h3` gets a smaller top margin. Don't add blank `<br />` tags or extra horizontal rules to force separation.
 - **Paragraph spacing is automatic.** One blank line between paragraphs is correct. Don't wrap prose in `<div>` tags — that strips the prose styles.
-- **Callouts** use the `<Callout type="info|why-it-matters|leader-takeaway|warning|success|danger" title="...">` component (imported from `../../components/content/Callout`). Prefer callouts over blockquotes for "key insight" framing; reserve blockquotes for actual quoted material or single-line thesis statements.
+- **Callouts** use the `<Callout type="info|warning|why-it-matters|leader-takeaway|story" title="...">` component (imported from `../../components/content/Callout.astro`). Prefer callouts over blockquotes for "key insight" framing; reserve blockquotes for actual quoted material or single-line thesis statements.
 - **Inline definitions** use the `<Term id="...">**word**</Term>` component (imported from `../../components/content/Term.astro`) for first mentions of coined terminology, e.g. `<Term id="contract-as-spec">**contract-as-spec**</Term>`. The `id` must exist in `src/data/glossary.ts` (term, definition, and optionally the slug of the post that coined it) — `Term` renders a `<dfn>` with a hover/focus tooltip, not a plain `<dfn>` tag.
 - **Footnotes** use the standard `[^key]` / `[^key]: ...` syntax — rendered at the bottom of the post automatically.
 - **Reading-path locator**: `<WhereThisSits slug="this-posts-slug" />` (imported from `../../components/content/WhereThisSits.astro`) renders a prior → this → next box for posts that belong to a cross-series guided reading path (defined in `src/data/reading-paths.json`, distinct from the `series` collection — a reading path can span several parallel series). Place it near the end of the post, before any footnotes/sources section. Throws a build error if the post's slug isn't listed in any path's `steps`.
@@ -104,3 +104,5 @@ For drafting workflow, voice guidance, and research integration, see `docs/CLAUD
 When writing content, use the `/voice-writer` skill to match Nick's voice. Use `/blog-drafter` for the full workflow from spec to publication-ready MDX.
 
 Post planning template available at `docs/templates/post-planning.md`.
+
+Before publishing, complete the [pre-publish review checklist](../../docs/authoring/review-checklist.md).

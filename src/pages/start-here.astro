@@ -1,4 +1,5 @@
 ---
+import { inSeries } from '../lib/series.mjs';
 import { getCollection } from 'astro:content';
 import PageLayout from '../layouts/PageLayout.astro';
 import EssayCard from '../components/cards/EssayCard.astro';
@@ -22,10 +23,8 @@ const activeSeries = allSeries.filter((s) => s.data.status === 'active').slice(0
 
 // Post counts for series
 const seriesPostCounts = new Map<string, number>();
-for (const post of published) {
-  if (post.data.series) {
-    seriesPostCounts.set(post.data.series, (seriesPostCounts.get(post.data.series) ?? 0) + 1);
-  }
+for (const s of allSeries) {
+  seriesPostCounts.set(s.id, published.filter((post) => inSeries(post, s.id)).length);
 }
 
 // Reading path: curated starter set keyed by reader type

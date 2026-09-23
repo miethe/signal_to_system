@@ -15,7 +15,7 @@
  * baseline should only shrink: when a file drops below its count, run
  * `node scripts/check-palette-literals.mjs --update-baseline`.
  *
- * Exempt: the token sources, the frozen reader pin, and the signed-off
+ * Exempt: the token sources, the signed-off
  * brand/diagram SVG geometry.
  */
 import { readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
@@ -27,7 +27,6 @@ const BASELINE = join(ROOT, 'scripts', 'palette-literal-baseline.json');
 const EXTENSIONS = /\.(astro|ts|tsx|js|jsx|mjs|css|mdx|md|json)$/;
 const EXEMPT = [
   'src/styles/tokens/',
-  'src/styles/reader-legacy.css',
   'src/components/brand/',
   'src/components/diagrams/',
 ];

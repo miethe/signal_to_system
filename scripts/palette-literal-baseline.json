@@ -1,26 +1,12 @@
 {
   "version": 1,
-  "generated": "2026-09-22",
+  "generated": "2026-09-23",
   "note": "Grandfathered raw palette literals per file (pre-v2 debt). This list must only shrink; new colors belong in src/styles/tokens/ as --s2s-* roles.",
   "files": {
-    "src/components/cards/EssayCard.astro": 1,
-    "src/components/cards/StoryCard.astro": 1,
-    "src/components/content/AuthorProfile.astro": 4,
-    "src/components/content/EvidenceFocus.astro": 14,
-    "src/components/content/ExecutiveSignal.astro": 9,
-    "src/components/content/FigureViewer.astro": 17,
-    "src/components/content/PullQuote.astro": 5,
-    "src/components/content/ReadingCompanion.astro": 13,
-    "src/components/content/SectionMarker.astro": 5,
-    "src/components/content/ThreadFocus.astro": 11,
-    "src/components/content/ThreadScene.astro": 8,
-    "src/components/content/WhereThisSits.astro": 8,
     "src/components/interactive/InteractiveNetwork.tsx": 6,
     "src/content/stories/agentic-os-field-note.mdx": 1,
     "src/pages/studio/brand-preview.astro": 50,
-    "src/styles/agentic-operations-flow.css": 55,
-    "src/styles/global.css": 116,
-    "src/styles/registry-wave-v2.css": 53,
+    "src/styles/global.css": 31,
     "src/styles/workflow-showcase.css": 45
   }
 }

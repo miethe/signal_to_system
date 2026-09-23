@@ -1,0 +1,48 @@
+---
+/**
+ * MetaLine — one row of small icon + value facts: "Apr 12, 2026 · 12 min
+ * read", or a record's counts ("12 Claims · 38 Sources · 14 Figures").
+ *
+ * Shared family (Writing + Labs): Writing uses it for dates/read time on
+ * cards; Labs reuses it for investigation counts on featured and grid
+ * cards (labs-storyboard: labs_investigations, investigation cards). Only
+ * pass facts that exist; the component never pads.
+ */
+import Icon from '../brand/Icon.astro';
+
+interface Item { label: string; value?: string | number; icon?: string; datetime?: string }
+interface Props { items: Item[]; size?: 'sm' | 'md'; class?: string }
+const { items, size = 'sm', class: className } = Astro.props;
+const shown = items.filter((i) => i.label || i.value !== undefined);
+---
+
+{shown.length > 0 && (
+  <ul class:list={['s2s-meta-line', `s2s-meta-line--${size}`, className]}>
+    {shown.map((i) => (
+      <li class="s2s-meta-line__item">
+        {i.icon && <Icon name={i.icon} size={size === 'md' ? 18 : 14} class="s2s-meta-line__icon" />}
+        {i.value !== undefined && <span class="s2s-meta-line__value">{i.value}</span>}
+        {i.datetime ? <time datetime={i.datetime}>{i.label}</time> : <span>{i.label}</span>}
+      </li>
+    ))}
+  </ul>
+)}
+
+<style>
+  .s2s-meta-line {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font: 400 var(--type-meta) / 1.4 var(--font-sans);
+    color: var(--s2s-ink-subtle);
+  }
+  .s2s-meta-line__item { display: inline-flex; align-items: center; gap: 6px; }
+  .s2s-meta-line__item :global(.s2s-meta-line__icon) { color: var(--s2s-ink-faint); }
+  .s2s-meta-line__value { font-family: var(--font-mono); color: var(--s2s-ink-soft); }
+  .s2s-meta-line--md { gap: 8px 22px; font-size: var(--type-body-s); }
+  .s2s-meta-line--md .s2s-meta-line__value { font-size: var(--type-body); color: var(--s2s-ink); }
+</style>

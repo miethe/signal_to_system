@@ -12,7 +12,7 @@
  * `fs.statSync`. A missing asset at build time leaves both fields `null`
  * — a labeled pending slot, not a substitute value.
  */
-import '../../styles/registry-wave-v2.css';
+import '../../styles/reader/shell.css';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
@@ -59,7 +59,7 @@ const filename = beat?.image.src.split('/').pop() ?? '';
 
 {
   beat && (
-    <div class:list={['figure-viewer', thread.slug === 'the-registry-wave-agentic-artifact-supply-chain' && 'registry-wave-focus']} data-focus-kind="figure" data-focus-key={beat.id}>
+    <div class:list={['figure-viewer', 'reader-focus']} data-focus-kind="figure" data-focus-key={beat.id}>
       <div class="figure-viewer__actions">
         <a class="figure-viewer__action" href={`/essays/${thread.slug}/`}>
           &larr; Back to essay
@@ -115,14 +115,14 @@ const filename = beat?.image.src.split('/').pop() ?? '';
     gap: 0.75rem 1.25rem;
     margin-bottom: 1.5rem;
     padding-bottom: 1rem;
-    border-bottom: 1px solid var(--border-subtle);
+    border-bottom: 1px solid var(--s2s-rule);
   }
 
   .figure-viewer__action {
     font-family: var(--font-mono);
     font-size: 0.75rem;
     font-weight: 600;
-    color: var(--accent);
+    color: var(--s2s-accent);
     text-decoration: none;
     background: none;
     border: 0;
@@ -140,18 +140,18 @@ const filename = beat?.image.src.split('/').pop() ?? '';
     font-weight: 700;
     letter-spacing: 0.14em;
     text-transform: uppercase;
-    color: var(--text-tertiary);
+    color: var(--s2s-ink-subtle);
   }
 
   .figure-viewer__action--close {
-    color: var(--text-tertiary);
+    color: var(--s2s-ink-subtle);
   }
 
   .figure-viewer__figure {
     margin: 0 0 1.5rem;
     padding: 1.25rem;
-    background: #f6f8fb;
-    border: 1px solid var(--border-subtle);
+    background: var(--reader-plate-bg);
+    border: 1px solid var(--reader-plate-edge);
     border-radius: var(--radius-lg);
   }
 
@@ -169,16 +169,16 @@ const filename = beat?.image.src.split('/').pop() ?? '';
     margin: 0 0 0.35rem;
     font-size: 0.875rem;
     line-height: 1.5;
-    color: #334155;
+    color: var(--s2s-ink-muted);
   }
-  .figure-viewer__eyebrow { margin: 0 0 .35rem; color: var(--cyan-text); font-size: .6875rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
-  .figure-viewer__title { margin: 0 0 1.25rem; color: var(--text-primary); font-size: clamp(1.25rem, 2.5vw, 2rem); line-height: 1.25; }
+  .figure-viewer__eyebrow { margin: 0 0 .35rem; color: var(--s2s-secondary); font-size: .6875rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+  .figure-viewer__title { margin: 0 0 1.25rem; color: var(--s2s-ink); font-size: clamp(1.25rem, 2.5vw, 2rem); line-height: 1.25; }
 
   .figure-viewer__long-description {
     margin: 0;
     font-size: 0.8125rem;
     line-height: 1.55;
-    color: #64748b;
+    color: var(--s2s-ink-subtle);
   }
 
   .figure-viewer__metadata {
@@ -186,9 +186,9 @@ const filename = beat?.image.src.split('/').pop() ?? '';
     gap: 0.75rem 1.5rem;
     margin: 0;
     padding: 1rem 1.125rem;
-    border: 1px solid var(--border-subtle);
+    border: 1px solid var(--s2s-rule);
     border-radius: var(--radius-lg);
-    background: var(--bg-subtle);
+    background: var(--s2s-canvas-raised);
   }
 
   @media (min-width: 560px) {
@@ -203,24 +203,25 @@ const filename = beat?.image.src.split('/').pop() ?? '';
     font-weight: 600;
     letter-spacing: 0.04em;
     text-transform: uppercase;
-    color: var(--text-tertiary);
+    color: var(--s2s-ink-subtle);
   }
 
   .figure-viewer__metadata dd {
     margin: 0;
     font-size: 0.8125rem;
-    color: var(--text-primary);
+    color: var(--s2s-ink);
     word-break: break-word;
   }
 
-  :global(.dark) .figure-viewer { padding: 18px 24px; border: 1px solid rgb(104 82 255 / 72%); border-radius: 14px; background: linear-gradient(145deg, #091d38 0%, #06172e 58%, #08203d 100%); box-shadow: 0 24px 80px rgb(0 0 0 / 62%), 0 0 28px rgb(76 63 220 / 16%); }
+  /* Dark keeps its own card treatment (padding/radius tighten, a signal-edge
+     border and panel fill) — the base rules above are already theme-aware,
+     so only the genuinely dark-only structure remains here. */
+  :global(.dark) .figure-viewer { padding: 18px 24px; border: 1px solid var(--reader-signal-edge); border-radius: 14px; background: var(--reader-panel); box-shadow: var(--reader-lift), 0 0 28px color-mix(in srgb, var(--s2s-accent) 16%, transparent); }
   :global(.dark) .figure-viewer__actions { gap: 8px 14px; margin-bottom: 14px; padding-bottom: 10px; }
-  :global(.dark) .figure-viewer__eyebrow { margin-bottom: 4px; color: #8fcce8; font-size: 10px; }
-  :global(.dark) .figure-viewer__title { margin-bottom: 14px; color: #f2f0ea; font-size: 24px; line-height: 1.12; }
-  :global(.dark) .figure-viewer__figure { padding: 12px; border-color: #315071; background: #071a31; border-radius: 10px; overflow: hidden; }
+  :global(.dark) .figure-viewer__eyebrow { margin-bottom: 4px; font-size: 10px; }
+  :global(.dark) .figure-viewer__title { margin-bottom: 14px; font-size: 24px; line-height: 1.12; }
+  :global(.dark) .figure-viewer__figure { padding: 12px; border-radius: 10px; overflow: hidden; }
   :global(.dark) .figure-viewer__figure img { max-height: min(52vh, 520px); margin-bottom: 10px; border-radius: 6px; }
-  :global(.dark) .figure-viewer__caption { color: #d1d9e5; }
-  :global(.dark) .figure-viewer__long-description { color: #aebbd0; }
-  :global(.dark) .figure-viewer__metadata { padding: 12px 14px; border-color: #29496d; background: rgb(5 20 38 / 56%); }
+  :global(.dark) .figure-viewer__metadata { padding: 12px 14px; }
   @media (max-width: 640px) { :global(.dark) .figure-viewer { padding: 14px; border-radius: 10px; } :global(.dark) .figure-viewer__title { font-size: 20px; } :global(.dark) .figure-viewer__figure { padding: 8px; } }
 </style>

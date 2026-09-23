@@ -13,7 +13,8 @@
  *   live   — status with a sage dot ("● Active")
  *   count  — mono count pill ("24")
  *   label  — accent small caps ("LABS", "FEATURED ESSAY")
- * The v1 variants are unchanged.
+ * The v1 variants keep their names and read role tokens since M2
+ * (status = ok, type = secondary/sage, project = accent, aos = accent label).
  */
 
 interface Props {
@@ -52,13 +53,13 @@ const variants: Record<string, string> = {
   category:
     "bg-[var(--accent-subtle)] text-[var(--accent-text)]",
   status:
-    "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-400",
+    "bg-[color-mix(in_srgb,var(--s2s-status-ok)_14%,transparent)] text-[var(--s2s-status-ok)]",
   type:
-    "bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-400",
+    "bg-[var(--s2s-secondary-soft)] text-[var(--s2s-secondary)]",
   project:
-    "bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-300",
+    "bg-[var(--s2s-accent-soft)] text-[var(--s2s-accent)]",
   aos:
-    "bg-violet-100 text-violet-700 dark:bg-violet-900/40 dark:text-violet-300",
+    "bg-[var(--s2s-accent-soft)] text-[var(--s2s-accent-label)]",
   workflow:
     "font-mono bg-[var(--bg-muted)] text-[var(--text-tertiary)] ring-1 ring-inset ring-[var(--border-subtle)]",
   chip:
