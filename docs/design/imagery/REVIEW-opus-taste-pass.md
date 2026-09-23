@@ -113,7 +113,7 @@ left sitting beside the new family.
    **Resolved 2026-09-23:** Neither is selected. Retain the `accent-1` role; its dark-mode value is **decided by design-language package**. Copper remains only the current paper-light reference.
 3. **Are the corner stacks brand furniture or per-essay?**
    **Resolved 2026-09-23:** Per-essay. Each storyboard lists its exact subject-tied corner-word set verbatim; Registry Wave's set is not reused.
-4. **Can the deck provenance go?** **OPEN.** The AOF essay's source note says it is built from your deck.
-   The plan cuts two deck slides and redraws the rest. Is losing the "original deck frame" OK?
+4. **Can the deck provenance go?** **Resolved 2026-09-23 — keep the cut (Nick).** The AOF essay's source note says it is built from your deck.
+   The plan cuts two deck slides and redraws the rest; losing the "original deck frame" is OK.
 5. **Should social cards be built or bespoke?**
    **Resolved 2026-09-23:** Build art-only plates. The site OG renderer composites titles live; a later `render.ts` change must resolve per-post art with fallback. Do not generate baked-text cards.

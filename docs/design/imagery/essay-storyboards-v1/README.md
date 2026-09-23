@@ -11,6 +11,10 @@ Revised by the Opus taste pass (2026-09-23); `../REVIEW-opus-taste-pass.md` expl
 2. The storyboard for the essay you are working on.
 3. `manifest.yaml` for ids, targets, priorities, and the two dependencies.
 
+## Inputs to attach
+
+Use the curated external designer asset pack at `/Users/miethe/dev/homelab/development/_s2s-imagery-asset-pack/` (or distribute `/Users/miethe/dev/homelab/development/_s2s-imagery-asset-pack.zip`) before generating. Its tracked guide is [`../asset-pack/INDEX.md`](../asset-pack/INDEX.md); it identifies visual authority versus behavior-only reference, and the latter may inform product behavior but must not be imitated as image style.
+
 ## Style references to attach (by template)
 
 All under `public/assets/posts/the-registry-wave-agentic-artifact-supply-chain/`:

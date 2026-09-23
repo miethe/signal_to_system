@@ -39,3 +39,6 @@ demo/demos/*/output/
 demo/output/
 test-results/
 playwright-report/
+# Generated asset pack remains external; ignore all except index.
+docs/design/imagery/asset-pack/*
+!docs/design/imagery/asset-pack/INDEX.md
