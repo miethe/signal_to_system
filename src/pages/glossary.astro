@@ -13,13 +13,13 @@ const entries = Object.entries(GLOSSARY).map(([id, entry]) => {
 ---
 <HubLayout title="Glossary" description="Definitions for terms used across Signal to System essays." heading="Glossary" eyebrow={['Reference']} lede={`${entries.length} terms defined across Signal to System essays.`}>
   <CollectionPanel class="s2s-span-major" title="Terms" icon="guides" count={entries.length} description="Definitions and their first published context.">
-    {entries.length ? <dl class="glossary-list">{entries.map((entry) => <div id={entry.id}><dt>{entry.term}</dt><dd>{entry.definition}</dd>{entry.href && <a href={entry.href}>Read in “{entry.postTitle}” <span aria-hidden="true">→</span></a>}</div>)}</dl> : <StateNotice title="No terms yet" body="Defined terms will appear here as they are published." />}
+    {entries.length ? <dl class="glossary-list">{entries.map((entry) => <div id={entry.id}><dt>{entry.term}</dt><dd>{entry.definition}</dd>{entry.href && <a href={entry.href}>Read in “{entry.postTitle}” <span aria-hidden="true">→</span></a>}</div>)}</dl> : <StateNotice kind="empty" compact title="No terms yet" body="Defined terms will appear here as they are published." />}
   </CollectionPanel>
 </HubLayout>
 <style>
 .glossary-list { display: grid; gap: 12px; margin: 0; }
 .glossary-list > div { padding: 16px; border-top: 1px solid var(--s2s-rule); }
-.glossary-list dt { color: var(--s2s-ink); font: 500 var(--type-title-s) / 1.2 var(--font-serif); }
+.glossary-list dt { color: var(--s2s-ink); font: 400 1.1875rem / 1.25 var(--font-display); }
 .glossary-list dd { margin: 8px 0; color: var(--s2s-ink-muted); font: 400 var(--type-body-s) / 1.55 var(--font-sans); }
 .glossary-list a { color: var(--s2s-accent); font: 450 var(--type-meta) / 1.3 var(--font-sans); text-decoration: none; }
 .glossary-list a:hover { color: var(--s2s-accent-hover); }

@@ -111,6 +111,8 @@ const resolvedDescription = description.slice(0, 160);
         if (perfMode === 'lite') html.classList.add('perf-lite');
       })();
     </script>
+    <!-- Page-specific head tags (e.g. a format feed's rel=alternate link). -->
+    <slot name="head" />
   </head>
 
   <body>

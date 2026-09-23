@@ -23,4 +23,4 @@ export async function getStaticPaths() {
 const { label, description, items } = Astro.props;
 ---
 
-<FacetPage title={label} description={description} eyebrow={['Systems']} items={items} panelTitle="Related writing" panelDescription={`Published essays and Dev Stories about ${label}.`} back={{ href: '/systems/', label: 'All systems' }} />
+<FacetPage icon="projects" title={label} description={description} eyebrow={['Systems']} items={items} panelTitle="Related writing" panelDescription={`Published essays and Dev Stories about ${label}.`} back={{ href: '/systems/', label: 'All systems' }} />

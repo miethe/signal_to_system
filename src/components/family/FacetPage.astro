@@ -1,13 +1,18 @@
 ---
+/**
+ * FacetPage — one facet (a system, an AOS area, an orchestrator): HubLayout
+ * hero, one CollectionPanel of its publications (PublicationList), and a
+ * back link in the rail. Labs reuse: a research-program or domain page.
+ */
 import HubLayout from '../../layouts/templates/HubLayout.astro';
 import CollectionPanel from './CollectionPanel.astro';
 import PublicationList from './PublicationList.astro';
 import type { PublicationSummary } from '../../lib/writing';
-interface Props { title: string; description: string; eyebrow?: string[]; items: PublicationSummary[]; panelTitle?: string; panelDescription?: string; back?: { href: string; label: string }; }
-const { title, description, eyebrow = ['Writing'], items, panelTitle = 'Published writing', panelDescription, back } = Astro.props;
+interface Props { title: string; description: string; eyebrow?: string[]; items: PublicationSummary[]; panelTitle?: string; panelDescription?: string; icon?: string; back?: { href: string; label: string }; }
+const { title, description, eyebrow = ['Writing'], items, panelTitle = 'Published writing', panelDescription, icon = 'essays', back } = Astro.props;
 ---
 <HubLayout title={title} description={description} heading={title} eyebrow={eyebrow} lede={description}>
-  <CollectionPanel class="s2s-span-major" title={panelTitle} icon="essays" count={items.length} description={panelDescription}>
+  <CollectionPanel class="s2s-span-major" title={panelTitle} icon={icon} count={items.length} description={panelDescription}>
     <PublicationList items={items} />
   </CollectionPanel>
   {back && <aside class="s2s-span-minor s2s-facet-back"><a href={back.href}>{back.label} <span aria-hidden="true">→</span></a></aside>}

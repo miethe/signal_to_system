@@ -48,6 +48,8 @@ export interface PublicationSummary {
   tags: string[];
   projects: string[];
   aos: boolean;
+  /** Agentic OS areas (`aosAreas`), only meaningful when `aos` is true. */
+  aosAreas: string[];
   series?: { id: string; title: string; order?: number };
   featured: boolean;
   heroImage?: string;
@@ -103,6 +105,7 @@ export function toSummary(
     tags: d.tags ?? [],
     projects: d.projects ?? [],
     aos: Boolean(d.aos),
+    aosAreas: d.aosAreas ?? [],
     series: seriesEntry
       ? { id: seriesEntry.id, title: seriesEntry.data.title, order: d.seriesOrder }
       : undefined,

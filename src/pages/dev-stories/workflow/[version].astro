@@ -9,4 +9,4 @@ export async function getStaticPaths() {
 }
 const { version, items } = Astro.props;
 ---
-<FacetPage title={`Workflow ${version}`} description={`Dev Stories built with workflow ${version} of the agentic execution loop.`} eyebrow={['Dev Stories', 'Workflow']} items={items} panelTitle="Dev Stories" back={{ href: '/dev-stories/', label: 'All Dev Stories' }} />
+<FacetPage icon="methods" title={`Workflow ${version}`} description={`Dev Stories built with workflow ${version} of the agentic execution loop.`} eyebrow={['Dev Stories', 'Workflow']} items={items} panelTitle="Dev Stories" back={{ href: '/dev-stories/', label: 'All Dev Stories' }} />

@@ -3,6 +3,7 @@ import HubLayout from '../../layouts/templates/HubLayout.astro';
 import CollectionPanel from '../../components/family/CollectionPanel.astro';
 import FacetRail from '../../components/primitives/FacetRail.astro';
 import StateNotice from '../../components/primitives/StateNotice.astro';
+import Pill from '../../components/family/Pill.astro';
 import { PROJECTS_REGISTRY } from '../../data/taxonomy';
 import { getAllProjects } from '../../lib/content';
 
@@ -40,8 +41,62 @@ const allProjects = [...registeredProjects, ...unregisteredProjects];
 const totalCount = allProjects.length;
 ---
 
-<HubLayout title="Systems" description="Browse writing by the projects and systems it relates to on Signal to System." heading="Systems" eyebrow={['Explore']} lede="The projects and systems this writing relates to. Each links to the essays and Dev Stories that touch it.">
-  <CollectionPanel class="s2s-span-major" title="Systems" icon="projects" count={totalCount} description="Browse the systems behind the work.">
-    {allProjects.length ? <FacetRail heading="Systems" icon="projects" items={allProjects.map((project) => ({ label: project.label, href: `/systems/${project.slug}/`, count: project.count }))} /> : <StateNotice title="No systems found" body="Systems will appear here when published writing references them." />}
+<HubLayout
+  title="Systems"
+  description="Browse writing by the projects and systems it relates to on Signal to System."
+  heading="Systems"
+  eyebrow={['Labs', 'Systems']}
+  lede="The projects and systems this writing relates to. Each links to the essays and Dev Stories that touch it."
+>
+  <CollectionPanel class="s2s-span-major" title="All systems" icon="projects" count={totalCount} countNoun={['system', 'systems']}>
+    {allProjects.length === 0 ? (
+      <StateNotice kind="empty" compact title="No systems yet." body="Systems appear here when published writing references them." />
+    ) : (
+      <ul class="sys-grid">
+        {allProjects.map(({ slug, label, description, aos, count }) => (
+          <li>
+            <a class="sys-card s2s-focus" href={`/systems/${slug}/`}>
+              <span class="sys-card__head">
+                <span class="sys-card__title">{label}</span>
+                {aos && <Pill label="AOS" tone="accent" />}
+                <span class="sys-card__count">{count} {count === 1 ? 'piece' : 'pieces'}</span>
+              </span>
+              {description && <span class="sys-card__desc">{description}</span>}
+            </a>
+          </li>
+        ))}
+      </ul>
+    )}
   </CollectionPanel>
+  <div class="s2s-span-minor">
+    <FacetRail heading="Explore" icon="research-programs" items={[{ label: 'The Agentic OS', href: '/aos/' }, { label: 'All writing', href: '/writing/' }]} />
+  </div>
 </HubLayout>
+
+<style>
+  .sys-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .sys-card {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    height: 100%;
+    padding: 14px 16px;
+    border: 1px solid var(--s2s-rule);
+    border-radius: var(--s2s-radius-card);
+    background: var(--s2s-canvas-raised);
+    text-decoration: none;
+    transition: border-color var(--s2s-dur) ease;
+  }
+  .sys-card:hover { border-color: var(--s2s-accent); text-decoration: none; }
+  .sys-card__head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+  .sys-card__title { font: 400 1.0625rem / 1.25 var(--font-display); color: var(--s2s-ink); }
+  .sys-card__count { margin-left: auto; font: 400 var(--type-micro) / 1.3 var(--font-sans); color: var(--s2s-ink-subtle); }
+  .sys-card__desc { font: 400 var(--type-meta) / 1.5 var(--font-sans); color: var(--s2s-ink-muted); }
+</style>

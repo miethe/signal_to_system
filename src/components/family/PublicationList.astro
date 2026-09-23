@@ -1,4 +1,8 @@
 ---
+/**
+ * PublicationList — a lead FeatureCard (with Dev Story type/provenance pills)
+ * over EntryRows, from PublicationSummary items; StateNotice when empty.
+ */
 import FeatureCard from './FeatureCard.astro';
 import EntryRow from './EntryRow.astro';
 import StateNotice from '../primitives/StateNotice.astro';
@@ -25,9 +29,9 @@ const pills = (item: PublicationSummary) => item.format === 'dev-story'
 const lead = featured ? items[0] : undefined;
 const rest = featured ? items.slice(1) : items;
 ---
-{items.length === 0 ? <StateNotice title="Nothing published yet" body={empty} /> : (
+{items.length === 0 ? <StateNotice kind="empty" compact title="Nothing published yet" body={empty} /> : (
   <div class="s2s-publication-list">
-    {lead && <FeatureCard href={lead.canonicalPath} title={lead.title} dek={lead.summary} glyph={lead.format === 'dev-story' ? 'dev-stories' : 'essays'} eyebrow={kind(lead)} pills={pills(lead)} meta={itemMeta(lead)} chips={lead.tags.slice(0, 3).map((tag) => ({ label: tag, href: `/tags/${tag}/` }))} />}
+    {lead && <FeatureCard href={lead.canonicalPath} title={lead.title} dek={lead.summary} glyph={lead.format === 'dev-story' ? 'dev-stories' : 'essays'} eyebrow={pills(lead) ? undefined : kind(lead)} pills={pills(lead)} meta={itemMeta(lead)} chips={lead.tags.slice(0, 3).map((tag) => ({ label: tag, href: `/tags/${tag}/` }))} />}
     {rest.length > 0 && <ul class="s2s-publication-list__rows">{rest.map((item) => <EntryRow href={item.canonicalPath} title={item.title} kind={kind(item)} meta={itemMeta(item)} />)}</ul>}
   </div>
 )}

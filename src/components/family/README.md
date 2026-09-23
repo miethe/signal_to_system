@@ -13,6 +13,8 @@ like a richer research-native sibling of Writing").
 | `PathList` | Start here, Reading paths, Dev Stories orchestrators | Start in Labs, Research programs, Explore the research |
 | `Pill` | Dev Stories type + provenance ("AAR", "Human + agent", "Automated", "Reviewed" only when recorded) | evidence / claim status, report state |
 | `SubscribeBand` | "Follow new writing" (RSS today; a newsletter signup drops into its `action` slot) | "Follow new research" |
+| `PublicationList` | lead card + rows for a facet (system, AOS area, orchestrator, essays) | a program's or domain's investigations |
+| `FacetPage` | /systems/<x>/, /aos/<area>/, orchestrator and workflow pages | a research-program or domain page |
 | `RailCard` | "About Dev Stories", "From execution to a published story" | "About Labs", a report's Method / Status notes |
 
 `CollectionPanel` also takes a `badge` pill and an `aside` slot (the Dev

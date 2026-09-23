@@ -953,6 +953,14 @@
       "action": "add",
       "target": "/writing/",
       "milestone": "M2"
+    },
+    {
+      "path": "/feeds/companion.xml",
+      "output": "feeds/companion.xml",
+      "family": "feeds",
+      "action": "add",
+      "target": "/feeds/companion.xml",
+      "milestone": "M2"
     }
   ]
 }

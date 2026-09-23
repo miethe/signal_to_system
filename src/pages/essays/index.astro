@@ -13,7 +13,7 @@ const groups = Object.entries(formats).filter(([, items]) => items.length > 0) a
   <Fragment slot="head"><link rel="alternate" type="application/rss+xml" href="/feeds/essay.xml" title="Signal to System essays" /></Fragment>
   <Fragment slot="subnav"><Tabs label="Writing sections" items={[{ label: 'All writing', href: '/writing/', icon: 'writing' }, { label: 'Essays', href: '/essays/', icon: 'essays', current: true }, { label: 'Dev Stories', href: '/dev-stories/', icon: 'dev-stories' }]} /></Fragment>
   <div class="s2s-span-major essays-list">
-    {groups.map(([format, items]) => <CollectionPanel title={FORMAT_PLURAL[format]} icon="essays" count={items.length}><PublicationList items={items} /></CollectionPanel>)}
+    {groups.map(([format, items]) => <CollectionPanel title={FORMAT_PLURAL[format]} icon={format === 'field-note' ? 'field-notes' : format === 'guide' ? 'guides' : 'essays'} count={items.length}><PublicationList items={items} /></CollectionPanel>)}
   </div>
 </HubLayout>
 <style>.essays-list { display: grid; gap: 18px; min-width: 0; }</style>

@@ -1,16 +1,74 @@
 ---
+/**
+ * /aos — the Agentic OS index on the v2 shell (M2 ia-facets). Every aos:true
+ * publication, grouped by AOS area (aosAreas), plus a General panel for aos
+ * writing tagged with no registered area so nothing is dropped. Area panels
+ * reuse the Writing/Labs family (CollectionPanel + PublicationList).
+ */
 import HubLayout from '../../layouts/templates/HubLayout.astro';
 import CollectionPanel from '../../components/family/CollectionPanel.astro';
+import PublicationList from '../../components/family/PublicationList.astro';
 import FacetRail from '../../components/primitives/FacetRail.astro';
 import StateNotice from '../../components/primitives/StateNotice.astro';
 import { AOS_AREAS_REGISTRY } from '../../data/taxonomy';
-import { getAllAosAreas } from '../../lib/content';
-const facets = await getAllAosAreas();
-const counts = new Map(facets.map((facet) => [facet.slug, facet.count]));
-const areas = AOS_AREAS_REGISTRY.filter((area) => counts.has(area.slug)).map((area) => ({ ...area, count: counts.get(area.slug)! }));
+import { getPublications } from '../../lib/writing';
+
+const aosPubs = (await getPublications()).filter((p) => p.aos);
+const registered = new Set(AOS_AREAS_REGISTRY.map((a) => a.slug));
+const areas = AOS_AREAS_REGISTRY
+  .map((area) => ({ ...area, items: aosPubs.filter((p) => p.aosAreas.includes(area.slug)) }))
+  .filter((area) => area.items.length > 0);
+const general = aosPubs.filter((p) => !p.aosAreas.some((slug) => registered.has(slug)));
+const essays = aosPubs.filter((p) => p.collection === 'posts').length;
+const stories = aosPubs.length - essays;
 ---
-<HubLayout title="The Agentic OS" description="Writing about building the Agentic OS — orchestration, memory, research, knowledge, artifacts, execution, and the infrastructure underneath it." heading="The Agentic OS" eyebrow={['Systems']} lede="Writing about the personal umbrella of orchestration, memory, research, knowledge, and execution subsystems — and the infrastructure that keeps it running.">
-  <CollectionPanel class="s2s-span-major" title="Areas" icon="projects" count={areas.length} description="Browse the Agentic OS by area.">
-    {areas.length ? <FacetRail heading="Areas" icon="aos" items={areas.map((area) => ({ label: area.label, href: `/aos/${area.slug}/`, count: area.count }))} /> : <StateNotice title="No Agentic OS content found" body="Published writing about the Agentic OS will appear here." />}
-  </CollectionPanel>
+
+<HubLayout
+  title="The Agentic OS"
+  description="Writing about building the Agentic OS — orchestration, memory, research, knowledge, artifacts, execution, and the infrastructure underneath it."
+  heading="The Agentic OS"
+  eyebrow={['Labs', 'Agentic OS']}
+  lede="Writing about building the Agentic OS: the personal umbrella of orchestration, memory, research, knowledge, and execution subsystems, and the infrastructure that keeps it running."
+>
+  <div class="aos-main s2s-span-major">
+    <p class="aos-count">
+      {[
+        `${aosPubs.length} ${aosPubs.length === 1 ? 'piece' : 'pieces'}`,
+        essays > 0 && `${essays} ${essays === 1 ? 'essay' : 'essays'}`,
+        stories > 0 && `${stories} ${stories === 1 ? 'Dev Story' : 'Dev Stories'}`,
+      ].filter(Boolean).join(' · ')}
+    </p>
+    {aosPubs.length === 0 && (
+      <StateNotice kind="empty" title="No Agentic OS writing yet." body="Published writing about the Agentic OS will appear here." />
+    )}
+    {areas.map((area) => (
+      <CollectionPanel
+        id={`area-${area.slug}`}
+        title={area.label}
+        icon="research-programs"
+        count={area.items.length}
+        description={area.description}
+        action={{ label: 'View area', href: `/aos/${area.slug}/` }}
+      >
+        <PublicationList items={area.items} />
+      </CollectionPanel>
+    ))}
+    {general.length > 0 && (
+      <CollectionPanel id="area-general" title="General" icon="research-programs" count={general.length} description="Agentic OS writing not tied to a single area.">
+        <PublicationList items={general} />
+      </CollectionPanel>
+    )}
+  </div>
+
+  <div class="aos-rail s2s-span-minor">
+    {areas.length > 0 && (
+      <FacetRail heading="Areas" icon="research-programs" items={areas.map((a) => ({ label: a.label, href: `/aos/${a.slug}/`, count: a.items.length }))} />
+    )}
+    <FacetRail heading="Explore" icon="projects" items={[{ label: 'All systems', href: '/systems/' }, { label: 'All writing', href: '/writing/' }]} />
+  </div>
 </HubLayout>
+
+<style>
+  .aos-main, .aos-rail { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+  .aos-count { margin: 0; font: 400 var(--type-meta) / 1.4 var(--font-sans); color: var(--s2s-ink-subtle); }
+</style>

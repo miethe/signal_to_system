@@ -11,12 +11,13 @@ test('aggregate RSS retains its established item field set', { skip: !existsSync
 });
 test('search index retains established fields for each item type', { skip: !existsSync(path.join(dist, 'search.json')) }, () => {
   const index = JSON.parse(readFileSync(path.join(dist, 'search.json'), 'utf8'));
-  const expected = { post: ['category', 'contentType', 'date', 'excerpt', 'featured', 'readTime', 'tags', 'title', 'type', 'url'], project: ['category', 'contentType', 'date', 'excerpt', 'featured', 'readTime', 'tags', 'title', 'type', 'url'], story: ['category', 'contentType', 'date', 'excerpt', 'featured', 'readTime', 'tags', 'title', 'type', 'url'] };
+  const expected = { post: ['category', 'contentType', 'date', 'excerpt', 'featured', 'readTime', 'tags', 'title', 'type', 'url'], project: ['category', 'contentType', 'date', 'excerpt', 'featured', 'readTime', 'tags', 'title', 'type', 'url'], story: ['category', 'date', 'excerpt', 'featured', 'readTime', 'tags', 'title', 'type', 'url'] };
+  // Serialized shape as published at 28c2e57: stories set contentType to undefined, so JSON omits it.
   for (const item of index) assert.deepEqual(Object.keys(item).sort(), expected[item.type]);
 });
 test('format feeds are RSS and only link to built routes', { skip: !existsSync(path.join(dist, 'feeds')) }, () => {
   for (const file of readdirSync(path.join(dist, 'feeds')).filter((name) => name.endsWith('.xml'))) {
     const xml = readFileSync(path.join(dist, 'feeds', file), 'utf8'); assert.match(xml, /<rss version="2.0"/);
-    for (const link of [...xml.matchAll(/<link>([^<]+)<\/link>/g)].map((match) => new URL(match[1]).pathname).filter((value) => value !== '/')) assert.ok(existsSync(path.join(dist, value, 'index.html')), `${file}: ${value} is not a built route`);
+    for (const link of [...xml.matchAll(/<link>([^<]+)<\/link>/g)].map((match) => new URL(match[1]).pathname).filter((p) => p !== '/')) assert.ok(existsSync(path.join(dist, link, 'index.html')), `${file}: ${link} is not a built route`);
   }
 });

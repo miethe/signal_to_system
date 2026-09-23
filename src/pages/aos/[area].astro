@@ -14,7 +14,7 @@ export async function getStaticPaths() {
       props: {
         label,
         description: definition?.description ?? `Writing about ${label} in the Agentic OS on Signal to System.`,
-        items: publications.filter((publication) => publication.aos),
+        items: publications.filter((publication) => publication.aos && publication.aosAreas.includes(facet.slug)),
       },
     };
   });
@@ -22,4 +22,4 @@ export async function getStaticPaths() {
 const { label, description, items } = Astro.props;
 ---
 
-<FacetPage title={label} description={description} eyebrow={['Agentic OS']} items={items} panelTitle="Related writing" back={{ href: '/aos/', label: 'The Agentic OS' }} />
+<FacetPage icon="research-programs" title={label} description={description} eyebrow={['Agentic OS']} items={items} panelTitle="Related writing" back={{ href: '/aos/', label: 'The Agentic OS' }} />

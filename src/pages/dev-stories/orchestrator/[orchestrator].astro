@@ -11,4 +11,4 @@ export async function getStaticPaths() {
 }
 const { orchestrator, items } = Astro.props;
 ---
-<FacetPage title={orchestrator} description={`Dev Stories driven by the ${orchestrator} orchestrator.`} eyebrow={['Dev Stories', 'Orchestrator']} items={items} panelTitle="Dev Stories" back={{ href: '/dev-stories/', label: 'All Dev Stories' }} />
+<FacetPage icon="methods" title={orchestrator} description={`Dev Stories driven by the ${orchestrator} orchestrator.`} eyebrow={['Dev Stories', 'Orchestrator']} items={items} panelTitle="Dev Stories" back={{ href: '/dev-stories/', label: 'All Dev Stories' }} />
