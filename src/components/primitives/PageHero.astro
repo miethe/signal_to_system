@@ -1,31 +1,56 @@
 ---
 /**
  * PageHero — the hero band every section mockup opens with: a tracked
- * eyebrow trail, a large light serif H1 (an optional accent word), a muted
- * lede, CTA buttons, and an optional right-hand aside (the pull quote /
- * "OBSERVE · INVESTIGATE · BUILD" rail). The mockups' photographic sky is
- * an asset-pipeline deliverable; until then the band carries a CSS glow.
+ * eyebrow trail, a large light serif H1 (an optional accent word or second
+ * line), a muted lede, CTA buttons, and an optional right-hand aside.
  *
- * Slots: actions (Buttons), aside (anything; hidden below 1024px).
+ * Two looks:
+ *  - default: a quiet CSS glow (section indexes, Studio, previews).
+ *  - photo="<hero id>": the Home/About band — a pipeline photograph
+ *    (public/images/v2/hero, baked copy removed) under a legibility veil,
+ *    with the live pull quote and the tracked "OBSERVE · INVESTIGATE ..."
+ *    rail rebuilt as HTML. The photo band is a night scene in both themes,
+ *    so it scopes the dark roles locally (class "dark").
+ *
+ * Slots: actions (Buttons), aside (custom right column; hidden < 1024px).
  */
+import V2Image from '../media/V2Image.astro';
+
 interface Props {
   heading: string;
   /** A trailing word/phrase of `heading` to set in accent (Writing mockup: "systems."). */
   accent?: string;
+  /** A second, lighter display line under the heading (About: "Building systems from signals."). */
+  subheading?: string;
   eyebrow?: string[];
   lede?: string;
   compact?: boolean;
+  /** Pipeline hero id (src/data/v2-images.json), e.g. "observatory". */
+  photo?: string;
+  quote?: { text: string; by?: string };
+  /** Tracked caps rail at the right edge; `railFoot` is the lower group. */
+  rail?: string[];
+  railFoot?: string[];
   class?: string;
 }
-const { heading, accent, eyebrow, lede, compact = false, class: className } = Astro.props;
+const {
+  heading, accent, subheading, eyebrow, lede, compact = false,
+  photo, quote, rail, railFoot, class: className,
+} = Astro.props;
 const split = accent && heading.endsWith(accent) ? [heading.slice(0, -accent.length), accent] : [heading, ''];
+const hasBuiltInAside = Boolean(quote || rail?.length || railFoot?.length);
 ---
 
-<section class:list={['s2s-hero', compact && 's2s-hero--compact', className]}>
+<section class:list={['s2s-hero', compact && 's2s-hero--compact', photo && 's2s-hero--photo dark', className]}>
+  {photo && (
+    <div class="s2s-hero__photo" aria-hidden="true">
+      <V2Image kind="hero" id={photo} sizes="(min-width: 1280px) 1240px, 100vw" loading="eager" fetchpriority="high" imgClass="s2s-hero__img" />
+    </div>
+  )}
   <div class="s2s-hero__main">
     {eyebrow && (
       <p class="s2s-eyebrow s2s-hero__eyebrow">
-        {eyebrow.map((e, i) => (
+        {eyebrow.map((e: string, i: number) => (
           <>
             {i > 0 && <span aria-hidden="true" class="s2s-hero__arrow">→</span>}
             <span>{e}</span>
@@ -35,11 +60,28 @@ const split = accent && heading.endsWith(accent) ? [heading.slice(0, -accent.len
     )}
     <h1 class="s2s-display s2s-hero__title">
       {split[0]}{split[1] && <span class="s2s-hero__accent">{split[1]}</span>}
+      {subheading && <span class="s2s-hero__sub">{subheading}</span>}
     </h1>
     {lede && <p class="s2s-hero__lede">{lede}</p>}
     {Astro.slots.has('actions') && <div class="s2s-hero__actions"><slot name="actions" /></div>}
   </div>
-  {Astro.slots.has('aside') && <div class="s2s-hero__aside"><slot name="aside" /></div>}
+  {hasBuiltInAside && (
+    <div class="s2s-hero__aside s2s-hero__aside--built">
+      {quote && (
+        <figure class="s2s-hero__quote">
+          <blockquote><p>“{quote.text}”</p></blockquote>
+          {quote.by && <figcaption class="s2s-label">— {quote.by}</figcaption>}
+        </figure>
+      )}
+      {(rail?.length || railFoot?.length) && (
+        <div class="s2s-hero__rail" aria-hidden="true">
+          {rail?.length ? <ul>{rail.map((r: string) => <li>{r}</li>)}</ul> : <span />}
+          {railFoot?.length ? <ul class="s2s-hero__rail-foot">{railFoot.map((r: string) => <li>{r}</li>)}</ul> : null}
+        </div>
+      )}
+    </div>
+  )}
+  {!hasBuiltInAside && Astro.slots.has('aside') && <div class="s2s-hero__aside"><slot name="aside" /></div>}
 </section>
 
 <style>
@@ -54,8 +96,10 @@ const split = accent && heading.endsWith(accent) ? [heading.slice(0, -accent.len
       radial-gradient(60% 90% at 78% 0%, var(--s2s-accent-soft), transparent 70%),
       linear-gradient(180deg, transparent 60%, var(--s2s-canvas));
     overflow: hidden;
+    isolation: isolate;
   }
   .s2s-hero--compact { padding-bottom: 28px; }
+  .s2s-hero__main { position: relative; }
   .s2s-hero__eyebrow { display: flex; flex-wrap: wrap; gap: 0 14px; margin: 0 0 14px; }
   .s2s-hero__arrow { letter-spacing: 0; }
   .s2s-hero__title {
@@ -65,6 +109,12 @@ const split = accent && heading.endsWith(accent) ? [heading.slice(0, -accent.len
     text-wrap: balance;
   }
   .s2s-hero__accent { color: var(--s2s-accent); }
+  .s2s-hero__sub {
+    display: block;
+    margin-top: 2px;
+    font-size: 0.86em;
+    color: var(--s2s-ink-soft);
+  }
   .s2s-hero__lede {
     max-width: 60ch;
     margin: 16px 0 0;
@@ -74,6 +124,73 @@ const split = accent && heading.endsWith(accent) ? [heading.slice(0, -accent.len
   .s2s-hero__actions { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 24px; }
   .s2s-hero__aside { display: none; }
 
+  /* ---------- Photo band ---------- */
+  .s2s-hero--photo {
+    background: var(--s2s-canvas);
+    color: var(--s2s-ink);
+    padding-top: 30px;
+    padding-bottom: 260px; /* phone: the scene sits under the copy */
+  }
+  /* Phone/tablet: the scene is a band under the copy, dome in view. */
+  .s2s-hero__photo {
+    position: absolute;
+    inset: auto 0 0;
+    height: 380px;
+    z-index: -1;
+  }
+  .s2s-hero__photo :global(picture),
+  .s2s-hero__photo :global(img) {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .s2s-hero__photo :global(.s2s-hero__img) {
+    object-fit: cover;
+    object-position: 82% 62%;
+  }
+  /* Legibility veil: the copy side darkens toward the canvas, and the band
+     settles into the page at its lower edge. */
+  .s2s-hero__photo::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      linear-gradient(180deg, var(--s2s-canvas) 0%, var(--s2s-hero-veil) 34%, transparent 60%),
+      linear-gradient(0deg, var(--s2s-canvas) 0, transparent 14%);
+  }
+  .s2s-hero--photo .s2s-hero__lede { color: var(--s2s-ink-soft); }
+
+  .s2s-hero__quote { margin: 0; }
+  .s2s-hero__quote blockquote { margin: 0; }
+  .s2s-hero__quote p {
+    margin: 0;
+    max-width: 17ch;
+    font: italic 380 1.0625rem / 1.3 var(--font-serif);
+    color: var(--s2s-ink-soft);
+    text-indent: -0.45em;
+    white-space: pre-line;
+  }
+  .s2s-hero__quote figcaption { margin-top: 14px; color: var(--s2s-ink-muted); }
+
+  .s2s-hero__rail {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 24px;
+  }
+  .s2s-hero__rail ul {
+    margin: 0;
+    padding: 2px 0 2px 14px;
+    list-style: none;
+    border-left: 1px solid var(--s2s-rule-emphasis);
+    font: 500 var(--type-micro) / 1 var(--font-sans);
+    letter-spacing: var(--type-tracking-caps);
+    text-transform: uppercase;
+    color: var(--s2s-ink-soft);
+  }
+  .s2s-hero__rail li + li { margin-top: 10px; }
+  .s2s-hero__rail-foot { color: var(--s2s-ink-muted); }
+
   @media (min-width: 1024px) {
     .s2s-hero {
       grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
@@ -82,5 +199,24 @@ const split = accent && heading.endsWith(accent) ? [heading.slice(0, -accent.len
     }
     .s2s-hero--compact { min-height: 0; }
     .s2s-hero__aside { display: block; align-self: stretch; }
+
+    .s2s-hero--photo {
+      grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr);
+      min-height: 290px;
+      padding-bottom: 30px;
+    }
+    .s2s-hero--photo .s2s-hero__photo { inset: 0; height: auto; }
+    .s2s-hero--photo .s2s-hero__photo :global(.s2s-hero__img) { object-position: 0% 43%; }
+    .s2s-hero--photo .s2s-hero__photo::after {
+      background:
+        linear-gradient(90deg, var(--s2s-hero-veil-strong) 0%, var(--s2s-hero-veil) 34%, transparent 58%),
+        linear-gradient(0deg, var(--s2s-hero-veil) 0, transparent 22%);
+    }
+    .s2s-hero__aside--built {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 24px;
+    }
+    .s2s-hero__quote { padding-top: 38px; }
   }
 </style>

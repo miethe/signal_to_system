@@ -13,6 +13,8 @@ export const templateTabs = (current: string) =>
     { label: 'Index + rail', sub: 'Filterable listing', icon: 'topics', href: '/studio/templates/index-rail/' },
     { label: 'Detail + rail', sub: 'One record', icon: 'artifacts', href: '/studio/templates/detail-rail/' },
     { label: 'Folio page', sub: 'Notebook leaf', icon: 'notebooks', href: '/studio/templates/folio/' },
+    { label: 'Article', sub: 'Essay proposal', icon: 'essays', href: '/studio/templates/article/' },
+    { label: 'States', sub: 'Non-content states', icon: 'sparkle', href: '/studio/states/' },
   ].map((t) => ({ ...t, current: t.href === current }));
 
 export async function previewData() {

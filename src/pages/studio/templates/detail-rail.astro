@@ -7,6 +7,7 @@ import StatTile from '../../../components/primitives/StatTile.astro';
 import Tabs from '../../../components/primitives/Tabs.astro';
 import Badge from '../../../components/ui/Badge.astro';
 import Button from '../../../components/ui/Button.astro';
+import LanguageSwitch from '../../../components/studio/LanguageSwitch.astro';
 import { previewData, templateTabs } from '../../../lib/studio-preview';
 
 const data = await previewData();
@@ -14,6 +15,7 @@ const [record, ...others] = data.posts;
 ---
 
 <DetailRailLayout
+  scope
   title="Templates: Detail + rail"
   description="Section template preview (Detail + rail)."
   eyebrow={['Studio', 'Templates', 'Detail + rail']}
@@ -26,7 +28,13 @@ const [record, ...others] = data.posts;
     {record?.tags.map((t) => <Badge variant="chip" text={t} />)}
   </Fragment>
 
-  <Tabs label="Templates" items={templateTabs('/studio/templates/detail-rail/')} />
+  <Fragment slot="subnav">
+    <div class="s2s-studio-toolbar">
+      <Tabs label="Templates" items={templateTabs('/studio/templates/detail-rail/')} />
+      <LanguageSwitch />
+    </div>
+  </Fragment>
+
   <h2 class="h">What this template is for</h2>
   <p>
     One record per page: a project dossier, a Lab investigation, a release. The hero names the record and carries its

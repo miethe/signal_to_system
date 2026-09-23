@@ -16,6 +16,8 @@ import FacetRail from '../../components/primitives/FacetRail.astro';
 import Tabs from '../../components/primitives/Tabs.astro';
 import Badge from '../../components/ui/Badge.astro';
 import Button from '../../components/ui/Button.astro';
+import LanguageSwitch from '../../components/studio/LanguageSwitch.astro';
+import StudioScopeRestore from '../../components/studio/StudioScopeRestore.astro';
 import { previewData } from '../../lib/studio-preview';
 
 const data = await previewData();
@@ -36,9 +38,9 @@ const post = data.posts[0];
     </Fragment>
   </PageHero>
 
-  <div class="page">
-    <section aria-labelledby="tabs-h">
-      <h2 id="tabs-h" class="k">Tabs <span>new · navigation tabs (Studio mockup)</span></h2>
+  <section aria-labelledby="tabs-h" class="tabs-section">
+    <h2 id="tabs-h" class="k">Tabs <span>new · navigation tabs (Studio mockup)</span></h2>
+    <div class="s2s-studio-toolbar">
       <Tabs
         label="Studio sections"
         aside="Reusable. Composable. Open by design."
@@ -49,8 +51,11 @@ const post = data.posts[0];
           { label: 'Library', sub: '@miethe/ui', icon: 'artifacts', href: '/portfolio/ui/' },
         ]}
       />
-    </section>
+      <LanguageSwitch />
+    </div>
+  </section>
 
+  <div class="page" data-studio-scope>
     <section aria-labelledby="filters-h">
       <h2 id="filters-h" class="k">Filter toolbar <span>new · native selects</span></h2>
       <FilterToolbar
@@ -143,16 +148,18 @@ const post = data.posts[0];
       </div>
     </section>
   </div>
+  <StudioScopeRestore />
 </BaseLayout>
 
 <style>
+  .tabs-section { padding: 24px 16px 0; }
   .page { display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; padding: 24px 16px 0; }
   .page > * { min-width: 0; }
   .k { display: flex; flex-wrap: wrap; align-items: baseline; gap: 10px; margin: 0 0 12px; font: 400 1.125rem / 1.2 var(--font-display); color: var(--s2s-ink); }
   .k span { font: 500 0.625rem / 1 var(--font-sans); letter-spacing: 0.18em; text-transform: uppercase; color: var(--s2s-ink-subtle); }
   .grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px 22px; }
   .grid > * { min-width: 0; }
-  .row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+  .row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 12px; }
   .wrap { flex-wrap: wrap; }
   .push { margin-left: auto; }
   .title { margin: 0 0 6px; font: 400 var(--type-title) / 1.15 var(--font-display); color: var(--s2s-ink); }
@@ -161,6 +168,7 @@ const post = data.posts[0];
   .tt { margin: 6px 0 0; font: 400 var(--type-meta) / 1.4 var(--font-sans); color: var(--s2s-ink-muted); }
   .folio { padding: 20px; border-radius: 8px; background: var(--s2s-canvas); }
   @media (min-width: 1024px) {
+    .tabs-section { padding: 24px 32px 0; }
     .page { padding: 24px 32px 0; }
     .grid { grid-template-columns: repeat(12, minmax(0, 1fr)); }
     .wide { grid-column: span 7; }

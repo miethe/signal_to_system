@@ -7,7 +7,7 @@
  * SVG with a <title>/<desc> that reads the cycle as an ordered sentence.
  * Matches the About mockup: thin lavender arcs, open arrowheads, tracked-caps
  * labels, and the brand waveform mark at the center.
- * Colors: arcs --accent, labels --ink, captions --muted.
+ * Colors: arcs --s2s-accent, labels --s2s-ink, captions --s2s-ink-muted.
  */
 import Mark from '../brand/Mark.astro';
 import { arrowhead, polar, r2, rad, waveformBars, nextId } from './geometry';
@@ -118,15 +118,15 @@ const desc = `A repeating cycle: ${steps.map((s) => s.label + (s.caption ? ` (${
 
 <style>
   .s2s-loop { display: block; max-width: 100%; height: auto; overflow: visible; }
-  .arcs { stroke: var(--accent, currentColor); }
-  .glyph { stroke: var(--accent, currentColor); }
+  .arcs { stroke: var(--s2s-accent, currentColor); }
+  .glyph { stroke: var(--s2s-accent, currentColor); }
   .label {
-    fill: var(--ink, currentColor);
+    fill: var(--s2s-ink, currentColor);
     font: 600 11px var(--font-sans, system-ui, sans-serif);
     letter-spacing: 0.2em;
   }
   .caption {
-    fill: var(--muted, currentColor);
+    fill: var(--s2s-ink-muted, currentColor);
     font: 13px var(--font-sans, system-ui, sans-serif);
   }
 </style>

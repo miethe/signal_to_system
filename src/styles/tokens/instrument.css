@@ -2,21 +2,41 @@
    INSTRUMENT — STUB (Studio-scoped skin, not a global theme)
 
    Seen once, as the Studio mockup's "Design Languages" thumbnail: a dark
-   green-grid technical surface. Values are provisional (no full-page mockup
-   exists to sample); a dedicated design pass owns them. Nothing in the shell
-   applies this skin.
+   technical surface. Values are provisional (no full-page mockup exists to
+   sample); a dedicated design pass owns them. Nothing in the shell applies
+   this skin outside the Studio preview scope ([data-studio-scope],
+   src/components/studio/LanguageSwitch.astro).
+
+   Cool technical dark: a blue-black field, cyan-teal accent, and a
+   mono-forward `--font-display` override (JetBrains Mono in place of the
+   site's Newsreader serif) so headings inside the scope read as an
+   instrument panel rather than an editorial page.
    ============================================================ */
 [data-skin='instrument'] {
   color-scheme: dark;
-  --s2s-canvas: #0f1318;
-  --s2s-surface: #12161c;
-  --s2s-rule: #2c3b37;
-  --s2s-rule-strong: #34463f;
-  --s2s-ink: #e6e9ee;
-  --s2s-ink-muted: #c6c8d0;
-  --s2s-ink-subtle: #868e9a;
-  --s2s-accent: #6cc79a;
-  --s2s-accent-label: #6cc79a;
-  --s2s-secondary: #6cc79a;
-  --s2s-grid: rgb(64 90 81 / 0.13);
+  --s2s-canvas: #0a0e17;
+  --s2s-surface: #10151f;
+  --s2s-surface-hover: #141a26;
+  --s2s-inset: #0d1119;
+  --s2s-chip: #182234;
+  --s2s-rule: #1c2534;
+  --s2s-rule-strong: #283349;
+  --s2s-rule-emphasis: #3a4863;
+  --s2s-ink: #e8edf6;
+  --s2s-ink-soft: #cbd4e2;
+  --s2s-ink-muted: #93a1b8;
+  --s2s-ink-subtle: #69768d;
+  --s2s-accent: #43d8dd;
+  --s2s-accent-hover: #6ee3e7;
+  --s2s-accent-label: #43d8dd;
+  --s2s-accent-soft: rgb(67 216 221 / 0.12);
+  --s2s-secondary: #43d8dd;
+  --s2s-secondary-soft: rgb(67 216 221 / 0.12);
+  --s2s-on-accent: #04181a;
+  --s2s-grid: rgb(67 216 221 / 0.08);
+
+  /* Mono-forward: headings and display text in the scope read as JetBrains
+     Mono instead of the site's Newsreader serif. --font-serif is left
+     alone so any prose that explicitly asks for the serif still gets it. */
+  --font-display: var(--font-mono);
 }

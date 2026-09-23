@@ -37,7 +37,7 @@ const { items, label, aside, class: className } = Astro.props;
 </nav>
 
 <style>
-  .s2s-tabs { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; }
+  .s2s-tabs { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; min-width: 0; max-width: 100%; }
   .s2s-tabs ul { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
   .s2s-tab {
     display: flex;
@@ -70,7 +70,8 @@ const { items, label, aside, class: className } = Astro.props;
     color: var(--s2s-ink-muted);
   }
   @media (max-width: 639px) {
-    .s2s-tabs ul { flex-wrap: nowrap; overflow-x: auto; width: 100%; padding-bottom: 4px; }
+    .s2s-tabs { width: 100%; }
+    .s2s-tabs ul { flex-wrap: nowrap; overflow-x: auto; width: 100%; min-width: 0; padding-bottom: 4px; }
     .s2s-tab { min-width: max-content; }
   }
 </style>

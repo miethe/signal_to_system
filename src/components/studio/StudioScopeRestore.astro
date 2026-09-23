@@ -1,0 +1,26 @@
+---
+/**
+ * Studio-only: restores the previewed design-language choice (localStorage
+ * `s2s-studio-language`, set by LanguageSwitch.astro) onto its immediately
+ * preceding sibling before first paint, so a reload of a Folio/Instrument
+ * preview doesn't flash Observatory first.
+ *
+ * Render this directly after the element carrying `data-studio-scope`
+ * (same parent, next sibling) — it walks `previousElementSibling`, which
+ * already exists at this point because classic inline scripts run
+ * synchronously during HTML parsing, in document order.
+ */
+---
+
+<script is:inline>
+  (function () {
+    var el = document.currentScript && document.currentScript.previousElementSibling;
+    if (!el || !el.hasAttribute('data-studio-scope')) return;
+    try {
+      var v = window.localStorage.getItem('s2s-studio-language');
+      if (v && v !== 'observatory') el.setAttribute('data-skin', v);
+    } catch (e) {
+      /* private mode / blocked storage: falls back to Observatory */
+    }
+  })();
+</script>

@@ -42,7 +42,7 @@ if (story.data.series) {
     updatedDate: story.data.updatedDate,
     readTime: story.data.readTime ? parseInt(story.data.readTime) : undefined,
     tags: story.data.tags,
-    ogImage: story.data.heroImage,
+    ogImage: story.data.ogImage ?? `/og/dev-stories/${story.id}.png`,
     heroImage: story.data.heroImage,
     whyItMatters: story.data.whyItMatters,
     leaderTakeaway: story.data.leaderTakeaway,

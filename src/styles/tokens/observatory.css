@@ -26,6 +26,8 @@
   --s2s-backdrop-glow: rgb(120 94 214 / 0.18);
   --s2s-backdrop-haze: rgb(120 94 214 / 0.08);
   --s2s-backdrop-shade: rgb(60 52 90 / 0.08);
+  --s2s-backdrop-photo: none;       /* light keeps a clean field; the night photo is dark-only */
+  --s2s-backdrop-veil: transparent;
   --s2s-shadow-frame: 0 30px 80px -40px rgb(40 30 70 / 0.35);
   --s2s-canvas: #f7f6f3;            /* the site frame's field */
   --s2s-canvas-raised: #fbfaf8;     /* header + footer bars */
@@ -91,6 +93,12 @@
   --s2s-backdrop-glow: rgb(128 114 204 / 0.62);
   --s2s-backdrop-haze: rgb(78 72 128 / 0.5);
   --s2s-backdrop-shade: rgb(44 46 66 / 0.55);
+  /* Page backdrop photo behind the frame (asset pipeline, softened). */
+  --s2s-backdrop-photo: image-set(url('/images/v2/backdrop/observatory-backdrop.avif') type('image/avif'), url('/images/v2/backdrop/observatory-backdrop.webp') type('image/webp'));
+  --s2s-backdrop-veil: rgb(13 14 22 / 0.58);
+  /* Photo hero legibility veil (PageHero photo=...). */
+  --s2s-hero-veil-strong: rgb(12 14 19 / 0.82);
+  --s2s-hero-veil: rgb(12 14 19 / 0.5);
   --s2s-shadow-frame: 0 40px 90px -30px rgb(0 0 0 / 0.75);
   --s2s-canvas: #0d1015;
   --s2s-canvas-raised: #101318;

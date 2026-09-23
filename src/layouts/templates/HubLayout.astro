@@ -7,38 +7,62 @@
  * Slot contract
  *   hero-actions  optional  CTA Buttons under the lede
  *   hero-aside    optional  right side of the hero (quote, MethodRail)
+ *   subnav        optional  a row between the hero and the grid, outside
+ *                           `data-studio-scope` even when `scope` is set
+ *                           (the studio Tabs + LanguageSwitch row)
  *   default       required  sections; each direct child is a grid item.
  *                           Add class `s2s-span-wide` (7/12), `s2s-span-narrow`
- *                           (5/12), `s2s-span-half` or `s2s-span-full` (default).
+ *                           (5/12), `s2s-span-half`, `s2s-span-major` (8/12),
+ *                           `s2s-span-minor` (4/12) or `s2s-span-full` (default).
  *   after         optional  full-width closing band (newsletter, CTA)
  */
 import BaseLayout from '../BaseLayout.astro';
 import PageHero from '../../components/primitives/PageHero.astro';
+import StudioScopeRestore from '../../components/studio/StudioScopeRestore.astro';
 
 interface Props {
-  title: string;
+  /** Omit on the homepage: the document title is then just the site name. */
+  title?: string;
   description?: string;
   heading: string;
   accent?: string;
   eyebrow?: string[];
   lede?: string;
   noindex?: boolean;
+  /** Photo hero pass-through (PageHero): Home and About use the observatory band. */
+  hero?: {
+    photo?: string;
+    subheading?: string;
+    quote?: { text: string; by?: string };
+    rail?: string[];
+    railFoot?: string[];
+  };
+  ogImage?: string;
+  /**
+   * Studio preview only (node_01M35CKMTWWPWA3DJNSGR930A6): marks the grid
+   * `data-studio-scope` so LanguageSwitch.astro can re-skin it. Never set
+   * on production pages (Home stays unscoped).
+   */
+  scope?: boolean;
 }
-const { title, description, heading, accent, eyebrow, lede, noindex } = Astro.props;
+const { title, description, heading, accent, eyebrow, lede, noindex, hero = {}, ogImage, scope } = Astro.props;
 ---
 
-<BaseLayout title={title} description={description} noindex={noindex}>
-  <PageHero heading={heading} accent={accent} eyebrow={eyebrow} lede={lede}>
+<BaseLayout title={title} description={description} noindex={noindex} ogImage={ogImage}>
+  <PageHero heading={heading} accent={accent} eyebrow={eyebrow} lede={lede} {...hero}>
     {Astro.slots.has('hero-actions') && <Fragment slot="actions"><slot name="hero-actions" /></Fragment>}
     {Astro.slots.has('hero-aside') && <Fragment slot="aside"><slot name="hero-aside" /></Fragment>}
   </PageHero>
-  <div class="s2s-hub">
+  {Astro.slots.has('subnav') && <div class="s2s-hub__subnav"><slot name="subnav" /></div>}
+  <div class="s2s-hub" data-studio-scope={scope ? true : undefined}>
     <slot />
   </div>
+  {scope && <StudioScopeRestore />}
   {Astro.slots.has('after') && <div class="s2s-hub__after"><slot name="after" /></div>}
 </BaseLayout>
 
 <style>
+  .s2s-hub__subnav { padding: 16px 16px 0; }
   .s2s-hub {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
@@ -47,6 +71,7 @@ const { title, description, heading, accent, eyebrow, lede, noindex } = Astro.pr
   }
   .s2s-hub__after { padding: 20px 16px 0; }
   @media (min-width: 1024px) {
+    .s2s-hub__subnav { padding: 16px 32px 0; }
     .s2s-hub {
       grid-template-columns: repeat(12, minmax(0, 1fr));
       gap: 24px 22px;
@@ -56,6 +81,8 @@ const { title, description, heading, accent, eyebrow, lede, noindex } = Astro.pr
     .s2s-hub > :global(.s2s-span-wide) { grid-column: span 7; }
     .s2s-hub > :global(.s2s-span-narrow) { grid-column: span 5; }
     .s2s-hub > :global(.s2s-span-half) { grid-column: span 6; }
+    .s2s-hub > :global(.s2s-span-major) { grid-column: span 8; }
+    .s2s-hub > :global(.s2s-span-minor) { grid-column: span 4; }
     .s2s-hub__after { padding: 24px 32px 0; }
   }
 </style>

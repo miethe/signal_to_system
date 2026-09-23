@@ -489,6 +489,20 @@
       "target": "/studio/primitives/"
     },
     {
+      "path": "/studio/states/",
+      "output": "studio/states/index.html",
+      "family": "studio-preview",
+      "action": "preserve",
+      "target": "/studio/states/"
+    },
+    {
+      "path": "/studio/templates/article/",
+      "output": "studio/templates/article/index.html",
+      "family": "studio-preview",
+      "action": "preserve",
+      "target": "/studio/templates/article/"
+    },
+    {
       "path": "/studio/templates/detail-rail/",
       "output": "studio/templates/detail-rail/index.html",
       "family": "studio-preview",

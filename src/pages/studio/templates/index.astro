@@ -11,6 +11,7 @@ import Tabs from '../../../components/primitives/Tabs.astro';
 import MethodRail from '../../../components/primitives/MethodRail.astro';
 import Badge from '../../../components/ui/Badge.astro';
 import Button from '../../../components/ui/Button.astro';
+import LanguageSwitch from '../../../components/studio/LanguageSwitch.astro';
 import { previewData, templateTabs } from '../../../lib/studio-preview';
 
 const data = await previewData();
@@ -26,6 +27,7 @@ const more = data.posts.slice(1, 4);
   accent="rigorous site."
   lede="Four layouts carry every v2 section: Hub, Index + rail, Detail + rail and the Folio page. This page is the Hub, filled with the v2 primitives and the site's real collections."
   noindex
+  scope
 >
   <Fragment slot="hero-actions">
     <Button variant="signal" size="lg" href="/studio/primitives/">Browse primitives <span aria-hidden="true">→</span></Button>
@@ -33,7 +35,12 @@ const more = data.posts.slice(1, 4);
   </Fragment>
   <MethodRail slot="hero-aside" motto={['Small pieces', 'Bigger truths']} />
 
-  <Tabs label="Templates" items={templateTabs('/studio/templates/')} aside="One slot contract per template." />
+  <Fragment slot="subnav">
+    <div class="s2s-studio-toolbar">
+      <Tabs label="Templates" items={templateTabs('/studio/templates/')} aside="One slot contract per template." />
+      <LanguageSwitch />
+    </div>
+  </Fragment>
 
   <Card variant="panel" class="s2s-span-wide">
     <SectionHeading

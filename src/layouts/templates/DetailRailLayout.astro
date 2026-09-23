@@ -6,12 +6,21 @@
  *
  * Slot contract
  *   meta      optional  chips/badges under the lede (status, tags)
+ *   subnav    optional  a row between the hero and the body/rail grid,
+ *                       outside `data-studio-scope` (studio Tabs +
+ *                       LanguageSwitch row)
  *   default   required  body; constrained to --s2s-measure (720px)
  *   rail      required  sticky right rail: StatTiles in a Card, links, TOC
  *   related   optional  full-width band after body + rail
+ *
+ * Studio preview (node_01M35CKMTWWPWA3DJNSGR930A6): pass `scope` on
+ * /studio/ pages so the grid carries `data-studio-scope` and
+ * LanguageSwitch.astro can re-skin it. Off by default, so a production
+ * route never inherits a stored preview language.
  */
 import BaseLayout from '../BaseLayout.astro';
 import PageHero from '../../components/primitives/PageHero.astro';
+import StudioScopeRestore from '../../components/studio/StudioScopeRestore.astro';
 
 interface Props {
   title: string;
@@ -21,15 +30,17 @@ interface Props {
   lede?: string;
   noindex?: boolean;
   railLabel?: string;
+  scope?: boolean;
 }
-const { title, description, heading, eyebrow, lede, noindex, railLabel = 'At a glance' } = Astro.props;
+const { title, description, heading, eyebrow, lede, noindex, railLabel = 'At a glance', scope = false } = Astro.props;
 ---
 
 <BaseLayout title={title} description={description} noindex={noindex}>
   <PageHero heading={heading} eyebrow={eyebrow} lede={lede} compact>
     {Astro.slots.has('meta') && <Fragment slot="actions"><slot name="meta" /></Fragment>}
   </PageHero>
-  <div class="s2s-dr">
+  {Astro.slots.has('subnav') && <div class="s2s-dr__subnav"><slot name="subnav" /></div>}
+  <div class="s2s-dr" data-studio-scope={scope ? true : undefined}>
     <article class="s2s-dr__body">
       <slot />
     </article>
@@ -38,9 +49,11 @@ const { title, description, heading, eyebrow, lede, noindex, railLabel = 'At a g
     </aside>
     {Astro.slots.has('related') && <div class="s2s-dr__related"><slot name="related" /></div>}
   </div>
+  {scope && <StudioScopeRestore />}
 </BaseLayout>
 
 <style>
+  .s2s-dr__subnav { padding: 20px 16px 0; }
   .s2s-dr {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
@@ -54,6 +67,7 @@ const { title, description, heading, eyebrow, lede, noindex, railLabel = 'At a g
   }
   .s2s-dr__rail { display: flex; flex-direction: column; gap: 14px; }
   @media (min-width: 1024px) {
+    .s2s-dr__subnav { padding: 24px var(--s2s-frame-gutter) 0; }
     .s2s-dr {
       grid-template-columns: minmax(0, 1fr) var(--s2s-rail);
       gap: 32px 48px;

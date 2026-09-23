@@ -1,0 +1,125 @@
+---
+/**
+ * /studio/states/ (noindex) — every StateNotice kind at realistic copy, in
+ * both the default (full) and compact renderings, so a reviewer can check
+ * every non-content state in one place.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/primitives/PageHero.astro';
+import StateNotice from '../../components/primitives/StateNotice.astro';
+import Tabs from '../../components/primitives/Tabs.astro';
+import Button from '../../components/ui/Button.astro';
+import { templateTabs } from '../../lib/studio-preview';
+import LanguageSwitch from '../../components/studio/LanguageSwitch.astro';
+import StudioScopeRestore from '../../components/studio/StudioScopeRestore.astro';
+
+const kinds = [
+  {
+    kind: 'empty' as const,
+    title: 'Nothing here yet.',
+    body: 'This collection is waiting on its first entry. Check back once one is published.',
+  },
+  {
+    kind: 'no-results' as const,
+    title: 'No matches for “agentic orchestration”.',
+    body: 'Try a broader word, or clear a filter to widen the results.',
+  },
+  {
+    kind: 'error' as const,
+    title: 'This page couldn’t load.',
+    body: 'Something broke on our end. Reload the page, or try again in a moment.',
+  },
+  {
+    kind: 'withdrawn' as const,
+    title: 'This piece has been withdrawn.',
+    body: 'The author retracted this piece after publication. The record is kept for transparency; the original claims should not be relied on.',
+    meta: '2026-04-02',
+  },
+  {
+    kind: 'in-preparation' as const,
+    title: 'The first investigation is on the bench.',
+    body: 'Labs will publish investigations with their datasets, methods and findings attached, so every claim can be traced back to its evidence.',
+  },
+  {
+    kind: 'not-found' as const,
+    title: 'This page isn’t in the notebook.',
+    body: 'The link may be old, or the page may have moved when the site was reorganised.',
+  },
+];
+---
+
+<BaseLayout title="States" description="Non-content state preview." noindex>
+  <PageHero
+    eyebrow={['Studio', 'States']}
+    heading="One panel for every empty screen."
+    accent="empty screen."
+    lede="StateNotice covers empty collections, filtered-to-nothing search, broken fetches, withdrawn pieces, Labs work in preparation, and pages that don't exist — one primitive, six kinds."
+    compact
+  />
+
+  <div class="page page--toolbar">
+    <div class="s2s-studio-toolbar">
+      <Tabs label="Templates" items={templateTabs('/studio/states/')} />
+      <LanguageSwitch />
+    </div>
+  </div>
+
+  <div class="page page--scope" data-studio-scope>
+
+    {kinds.map((k) => (
+      <section class="row" aria-labelledby={`h-${k.kind}`}>
+        <h2 id={`h-${k.kind}`} class="k">
+          {k.kind} <span>full</span>
+        </h2>
+        <StateNotice kind={k.kind} title={k.title} body={k.body} meta={k.meta}>
+          <Fragment slot="actions">
+            <Button variant="signal" size="sm">Primary action</Button>
+            <Button variant="outline" size="sm">Secondary</Button>
+          </Fragment>
+        </StateNotice>
+
+        <h2 class="k k--compact">
+          {k.kind} <span>compact</span>
+        </h2>
+        <StateNotice kind={k.kind} title={k.title} body={k.body} meta={k.meta} compact art={false}>
+          <Fragment slot="actions">
+            <Button variant="outline" size="sm">Action</Button>
+          </Fragment>
+        </StateNotice>
+      </section>
+    ))}
+  </div>
+  <StudioScopeRestore />
+</BaseLayout>
+
+<style>
+  .page {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+    padding: 24px 20px 60px;
+  }
+  .page--toolbar { padding-bottom: 0; }
+  .row { display: flex; flex-direction: column; gap: 12px; }
+  .k {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin: 16px 0 0;
+    font: 500 var(--type-ui) / 1.2 var(--font-sans);
+    text-transform: capitalize;
+    color: var(--s2s-ink);
+  }
+  .k:first-child { margin-top: 0; }
+  .k span {
+    font: 400 var(--type-micro) / 1 var(--font-sans);
+    text-transform: none;
+    color: var(--s2s-ink-subtle);
+  }
+  .k--compact { margin-top: 20px; }
+
+  @media (min-width: 1024px) {
+    .page { padding: 28px var(--s2s-frame-gutter) 72px; }
+    .page--toolbar { padding-bottom: 0; }
+  }
+</style>

@@ -1,0 +1,177 @@
+---
+/**
+ * /studio/templates/article/ (noindex) — a v2 design proposal for the essay
+ * page, rendered with real content from the newest published post. The live
+ * reader (PostLayout/StoryLayout, `.reader-legacy`) keeps its pre-v2 look
+ * until M2; this page is a proposal only, never wired into the real route.
+ */
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import DetailRailLayout from '../../../layouts/templates/DetailRailLayout.astro';
+import Card from '../../../components/primitives/Card.astro';
+import SectionHeading from '../../../components/primitives/SectionHeading.astro';
+import StatTile from '../../../components/primitives/StatTile.astro';
+import StateNotice from '../../../components/primitives/StateNotice.astro';
+import Tabs from '../../../components/primitives/Tabs.astro';
+import Badge from '../../../components/ui/Badge.astro';
+import { getPublishedPosts, hrefFor } from '../../../lib/content';
+import { getTagLabel } from '../../../lib/tags';
+import { templateTabs } from '../../../lib/studio-preview';
+import LanguageSwitch from '../../../components/studio/LanguageSwitch.astro';
+import { formatDate } from '../../../lib/utils';
+
+const posts = await getPublishedPosts();
+// Prefer the featured essay: it carries the editorial fields (whyItMatters,
+// leaderTakeaway) this proposal lays out. Fall back to the newest post.
+const post = posts.find((p) => p.data.featured && p.data.whyItMatters) ?? posts[0];
+const seriesEntries = await getCollection('series');
+const seriesEntry = post?.data.series ? seriesEntries.find((s) => s.id === post.data.series) : undefined;
+const seriesParts = seriesEntry
+  ? posts
+      .filter((p) => p.data.series === seriesEntry.id)
+      .sort((a, b) => (a.data.seriesOrder ?? 999) - (b.data.seriesOrder ?? 999))
+  : [];
+---
+
+{!post ? (
+  <BaseLayout title="Templates: Article" description="Essay page design proposal." noindex>
+    <div class="empty-wrap">
+      <StateNotice kind="empty" title="No published essay yet" body="This proposal needs at least one published post to render against." />
+    </div>
+  </BaseLayout>
+) : (
+    <DetailRailLayout
+      title="Templates: Article"
+      description="Essay page design proposal (Detail + rail)."
+      eyebrow={[post.data.category, seriesEntry?.data.title].filter(Boolean) as string[]}
+      heading={post.data.title}
+      lede={post.data.excerpt}
+      noindex
+      scope
+      railLabel="In this essay"
+    >
+      <Fragment slot="meta">
+        <Badge variant="live" text="Published" />
+        {post.data.tags.slice(0, 4).map((t) => <Badge variant="chip" text={getTagLabel(t)} />)}
+      </Fragment>
+
+      <Fragment slot="subnav">
+        <div class="s2s-studio-toolbar">
+          <Tabs label="Templates" items={templateTabs('/studio/templates/article/')} />
+          <LanguageSwitch />
+        </div>
+      </Fragment>
+
+      <article class="article">
+        {post.data.whyItMatters && (
+          <p class="lead">{post.data.whyItMatters}</p>
+        )}
+        <p class="note">
+          The live essay body renders here at this measure. This proposal shows the editorial fields; the full
+          reader re-token lands in M2. <a href={hrefFor(post)}>Read the live essay →</a>
+        </p>
+        {post.data.leaderTakeaway && (
+          <>
+            <h2 class="h">The takeaway</h2>
+            <p>{post.data.leaderTakeaway}</p>
+          </>
+        )}
+
+        <StateNotice
+          kind="withdrawn"
+          compact
+          title="State preview: withdrawn"
+          body="Shown here only as a design reference for how a retracted piece would read inline — this essay has not been withdrawn."
+          class="state-preview"
+        />
+      </article>
+
+      <details class="mobile-rail">
+        <summary>About this essay</summary>
+        <div class="mobile-rail__body">
+          <StatTile icon="timeline" value={formatDate(post.data.date)} label="Published" />
+          <StatTile icon="topics" value={post.data.readTime} label="Read time" />
+          <StatTile icon="artifacts" value={post.data.tags.length} label="Tags" />
+        </div>
+      </details>
+
+      <Fragment slot="rail">
+        <Card variant="panel" class="rail-card">
+          <SectionHeading icon="evidence" title="In this essay" level={2} />
+          <StatTile icon="timeline" value={formatDate(post.data.date)} label="Published" />
+          <StatTile icon="topics" value={post.data.readTime} label="Read time" />
+          <StatTile icon="artifacts" value={post.data.tags.length} label="Tags" note="On this record" href="/tags/" />
+        </Card>
+
+        {seriesEntry && (
+          <Card variant="panel" class="rail-card">
+            <SectionHeading icon="reading-paths" title="Series" label={seriesEntry.data.title} level={2} action={{ label: 'View series', href: `/series/${seriesEntry.id}/` }} />
+            <ol class="series-list">
+              {seriesParts.map((p) => (
+                <li aria-current={p.id === post.id ? 'true' : undefined}>
+                  <a href={hrefFor(p)}>{p.data.title}</a>
+                </li>
+              ))}
+            </ol>
+          </Card>
+        )}
+      </Fragment>
+    </DetailRailLayout>
+  )
+}
+
+<style>
+  .note { font: 400 var(--type-ui) / 1.55 var(--font-sans); color: var(--s2s-ink-muted); }
+  .empty-wrap { max-width: 640px; margin: 60px auto; padding: 0 20px; }
+
+  .article {
+    max-width: 720px;
+    font: 400 1.125rem / 1.7 var(--font-serif);
+    color: var(--s2s-ink-soft);
+  }
+  .article .lead {
+    font: 400 1.25rem / 1.6 var(--font-serif);
+    color: var(--s2s-ink);
+  }
+  .article .h {
+    margin: 32px 0 10px;
+    font: var(--type-heading-weight) var(--type-title) / 1.2 var(--font-display);
+    color: var(--s2s-ink);
+  }
+  .article :global(.state-preview) { margin-top: 32px; }
+
+  .mobile-rail {
+    margin-top: 24px;
+    border: 1px solid var(--s2s-rule);
+    border-radius: var(--s2s-radius-card);
+    background: var(--s2s-surface);
+  }
+  .mobile-rail summary {
+    padding: 14px 18px;
+    font: 500 var(--type-ui) / 1 var(--font-sans);
+    color: var(--s2s-ink);
+    cursor: pointer;
+  }
+  .mobile-rail__body { padding: 0 18px 14px; }
+
+  .rail-card + .rail-card { margin-top: 14px; }
+  .series-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .series-list li { font: 400 var(--type-ui) / 1.4 var(--font-sans); }
+  .series-list a { color: var(--s2s-ink-soft); text-decoration: none; }
+  .series-list a:hover { color: var(--s2s-accent); }
+  .series-list li[aria-current='true'] a { color: var(--s2s-accent); font-weight: 500; }
+
+  @media (min-width: 1024px) {
+    .mobile-rail { display: none; }
+  }
+  @media (max-width: 1023px) {
+    :global(.s2s-dr__rail) { display: none; }
+  }
+</style>

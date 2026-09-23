@@ -22,7 +22,8 @@
     "demo:doctor": "node demo/tools/demo-foundry.mjs doctor",
     "demo:capture": "playwright test demo/demos/**/*.spec.ts",
     "demo:review": "node demo/tools/demo-foundry.mjs review",
-    "review:capture": "python3 scripts/capture-review.py"
+    "review:capture": "python3 scripts/capture-review.py",
+    "assets:build": "node scripts/assets/build-assets.mjs"
   },
   "dependencies": {
     "@astrojs/mdx": "^5.0.2",
@@ -35,8 +36,12 @@
     "@fontsource-variable/newsreader": "^5.3.0",
     "@fontsource-variable/noto-serif": "^5.3.0",
     "@fontsource-variable/space-grotesk": "^5.3.0",
+    "@fontsource/inter": "^5.3.0",
+    "@fontsource/jetbrains-mono": "^5.3.0",
+    "@fontsource/newsreader": "^5.3.0",
     "@miethe/ui": "^0.2.0",
     "@nanostores/react": "^1.1.0",
+    "@resvg/resvg-js": "^2.6.2",
     "@tailwindcss/vite": "^4.1.18",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
@@ -45,6 +50,8 @@
     "nanostores": "^1.2.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
+    "satori": "^0.33.5",
+    "sharp": "^0.35.4",
     "tailwindcss": "^4.1.18"
   },
   "devDependencies": {

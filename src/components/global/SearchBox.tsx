@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Search, X, FileText, ArrowRight } from 'lucide-react';
+import { Search, X, FileText, ArrowRight, Compass, Tag } from 'lucide-react';
 
 interface SearchResult {
   title: string;
@@ -7,6 +7,7 @@ interface SearchResult {
   category?: string;
   url: string;
   tags?: string[];
+  type?: 'post' | 'project' | 'story';
 }
 
 interface SearchIndex {
@@ -127,6 +128,11 @@ export default function SearchBox() {
     setActiveIndex(-1);
   }, [query, index]);
 
+  // The newest published essay, drawn from the fetched index (already
+  // sorted newest-first) — never invented. Skipped if the index is empty
+  // or hasn't loaded yet.
+  const newestEssay = index?.find((item) => item.type === 'post');
+
   // Arrow key navigation
   function onKeyDownInDialog(e: React.KeyboardEvent) {
     if (e.key === 'ArrowDown') {
@@ -218,9 +224,25 @@ export default function SearchBox() {
           )}
 
           {!loading && !error && query.trim() && results.length === 0 && (
-            <div className="px-4 py-10 text-center text-sm text-[var(--text-tertiary)]">
-              No results for{' '}
-              <span className="font-medium text-[var(--text-primary)]">"{query}"</span>
+            <div
+              role="status"
+              className="flex flex-col items-center gap-3 px-6 py-10 text-center"
+            >
+              <span className="inline-flex h-10 w-10 items-center justify-center rounded-[var(--s2s-radius-control)] border border-[var(--s2s-rule-strong)] bg-[var(--s2s-inset)] text-[var(--s2s-ink-soft)]">
+                <Search className="h-4 w-4" aria-hidden="true" />
+              </span>
+              <p className="text-sm font-medium text-[var(--s2s-ink)]">
+                No matches for &ldquo;{query}&rdquo;
+              </p>
+              <p className="max-w-[32ch] text-sm text-[var(--s2s-ink-muted)]">
+                Try a broader word, or browse by topic.
+              </p>
+              <a
+                href="/tags/"
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--s2s-accent)] hover:underline"
+              >
+                Browse by topic <ArrowRight className="h-3.5 w-3.5" aria-hidden="true" />
+              </a>
             </div>
           )}
 
@@ -278,8 +300,44 @@ export default function SearchBox() {
           )}
 
           {!loading && !error && !query.trim() && (
-            <div className="px-4 py-8 text-center text-sm text-[var(--text-disabled)]">
-              Type to search across all content
+            <div className="px-5 py-6">
+              <p className="mb-4 text-center text-sm text-[var(--s2s-ink-muted)]">
+                Search essays, build notes and topics
+              </p>
+              <ul className="flex flex-col gap-1">
+                <li>
+                  <a
+                    href="/start-here/"
+                    onClick={close}
+                    className="flex items-center gap-3 rounded-[var(--s2s-radius-control)] px-3 py-2.5 text-sm text-[var(--s2s-ink-soft)] transition-colors hover:bg-[var(--s2s-inset)] hover:text-[var(--s2s-ink)]"
+                  >
+                    <Compass className="h-4 w-4 shrink-0 text-[var(--s2s-ink-subtle)]" aria-hidden="true" />
+                    Start here
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="/series/"
+                    onClick={close}
+                    className="flex items-center gap-3 rounded-[var(--s2s-radius-control)] px-3 py-2.5 text-sm text-[var(--s2s-ink-soft)] transition-colors hover:bg-[var(--s2s-inset)] hover:text-[var(--s2s-ink)]"
+                  >
+                    <Tag className="h-4 w-4 shrink-0 text-[var(--s2s-ink-subtle)]" aria-hidden="true" />
+                    Series
+                  </a>
+                </li>
+                {newestEssay && (
+                  <li>
+                    <a
+                      href={newestEssay.url}
+                      onClick={close}
+                      className="flex items-center gap-3 rounded-[var(--s2s-radius-control)] px-3 py-2.5 text-sm text-[var(--s2s-ink-soft)] transition-colors hover:bg-[var(--s2s-inset)] hover:text-[var(--s2s-ink)]"
+                    >
+                      <FileText className="h-4 w-4 shrink-0 text-[var(--s2s-ink-subtle)]" aria-hidden="true" />
+                      <span className="truncate">{newestEssay.title}</span>
+                    </a>
+                  </li>
+                )}
+              </ul>
             </div>
           )}
         </div>
