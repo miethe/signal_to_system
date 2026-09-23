@@ -1,0 +1,41 @@
+---
+/**
+ * RailCard — a rail module with free content: the PathList heading row
+ * (icon, serif title, optional "View all →") over a default slot.
+ *
+ * Writing: "About Dev Stories" and "From execution to a published story"
+ * on /dev-stories. Labs reuse (labs-storyboard): "About Labs", a report's
+ * "Method" and "Status" rail notes, any explanatory card in the right rail.
+ */
+import Card from '../primitives/Card.astro';
+import Icon from '../brand/Icon.astro';
+
+interface Props {
+  heading: string;
+  icon?: string;
+  action?: { label: string; href: string };
+  id?: string;
+  class?: string;
+}
+const { heading, icon, action, id, class: className } = Astro.props;
+const hid = id ?? `rail-${heading.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+---
+
+<Card as="aside" class:list={['s2s-railcard', className]} aria-labelledby={hid}>
+  <div class="s2s-railcard__head">
+    {icon && <span class="s2s-railcard__icon"><Icon name={icon} size={22} /></span>}
+    <h3 id={hid} class="s2s-railcard__title">{heading}</h3>
+    {action && <a class="s2s-railcard__action s2s-focus" href={action.href}>{action.label} <span aria-hidden="true">→</span></a>}
+  </div>
+  <div class="s2s-railcard__body"><slot /></div>
+</Card>
+
+<style>
+  .s2s-railcard__head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .s2s-railcard__icon { color: var(--s2s-secondary); }
+  .s2s-railcard__title { flex: 1; margin: 0; font: 400 1.25rem / 1.2 var(--font-display); color: var(--s2s-ink); }
+  .s2s-railcard__action { font: 450 var(--type-meta) / 1 var(--font-sans); color: var(--s2s-accent); text-decoration: none; white-space: nowrap; }
+  .s2s-railcard__body { font: 400 var(--type-body-s) / 1.55 var(--font-sans); color: var(--s2s-ink-muted); }
+  .s2s-railcard__body :global(p) { margin: 0 0 10px; }
+  .s2s-railcard__body > :global(:last-child) { margin-bottom: 0; }
+</style>

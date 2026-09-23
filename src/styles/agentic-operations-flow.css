@@ -10,8 +10,8 @@
   border: 1px solid color-mix(in srgb, var(--border) 82%, transparent);
   border-radius: 8px;
   background:
-    linear-gradient(120deg, rgba(20, 184, 166, 0.08), transparent 34%),
-    linear-gradient(300deg, rgba(245, 158, 11, 0.08), transparent 28%),
+    linear-gradient(120deg, color-mix(in srgb, var(--s2s-secondary) 8%, transparent), transparent 34%),
+    linear-gradient(300deg, color-mix(in srgb, var(--s2s-status-warn) 8%, transparent), transparent 28%),
     var(--bg-surface);
   box-shadow: var(--shadow-lg);
 }
@@ -29,16 +29,12 @@
   align-items: center;
   gap: 0.625rem;
   align-self: start;
-  color: #0f766e;
+  color: var(--s2s-secondary);
   font-family: var(--font-mono);
   font-size: 0.8125rem;
   font-weight: 700;
   letter-spacing: 0;
   text-transform: uppercase;
-}
-
-.dark .aof-kicker {
-  color: #5eead4;
 }
 
 .aof-network-mark {
@@ -116,13 +112,9 @@
 }
 
 .aof-tab--active {
-  color: #0f766e;
-  background: color-mix(in srgb, #14b8a6 12%, var(--bg-surface));
-  border-color: color-mix(in srgb, #14b8a6 42%, transparent);
-}
-
-.dark .aof-tab--active {
-  color: #99f6e4;
+  color: var(--s2s-secondary);
+  background: color-mix(in srgb, var(--s2s-secondary) 12%, var(--bg-surface));
+  border-color: color-mix(in srgb, var(--s2s-secondary) 42%, transparent);
 }
 
 .aof-workbench {
@@ -139,7 +131,7 @@
 .aof-summary {
   border-right: 1px solid var(--border-subtle);
   background:
-    linear-gradient(180deg, color-mix(in srgb, #0f766e 8%, transparent), transparent 42%),
+    linear-gradient(180deg, color-mix(in srgb, var(--s2s-secondary) 8%, transparent), transparent 42%),
     color-mix(in srgb, var(--bg-subtle) 58%, transparent);
 }
 
@@ -150,14 +142,10 @@
   align-items: center;
   justify-content: center;
   margin-bottom: 1rem;
-  border: 1px solid color-mix(in srgb, #0f766e 36%, transparent);
+  border: 1px solid color-mix(in srgb, var(--s2s-secondary) 36%, transparent);
   border-radius: 8px;
-  color: #0f766e;
-  background: color-mix(in srgb, #14b8a6 10%, var(--bg-surface));
-}
-
-.dark .aof-summary__icon {
-  color: #5eead4;
+  color: var(--s2s-secondary);
+  background: color-mix(in srgb, var(--s2s-secondary) 10%, var(--bg-surface));
 }
 
 .aof-summary__label {
@@ -194,7 +182,7 @@
 .aof-inspector {
   border-left: 1px solid var(--border-subtle);
   background:
-    linear-gradient(180deg, color-mix(in srgb, #f59e0b 8%, transparent), transparent 50%),
+    linear-gradient(180deg, color-mix(in srgb, var(--s2s-status-warn) 8%, transparent), transparent 50%),
     var(--bg-surface);
 }
 
@@ -203,11 +191,7 @@
   align-items: center;
   gap: 0.55rem;
   margin-bottom: 0.75rem;
-  color: #0f766e;
-}
-
-.dark .aof-inspector__heading {
-  color: #5eead4;
+  color: var(--s2s-secondary);
 }
 
 .aof-inspector h3 {
@@ -256,7 +240,7 @@
   border: 1px solid var(--border-subtle);
   border-radius: 8px;
   background:
-    radial-gradient(circle at center, color-mix(in srgb, #14b8a6 10%, transparent), transparent 44%),
+    radial-gradient(circle at center, color-mix(in srgb, var(--s2s-secondary) 10%, transparent), transparent 44%),
     color-mix(in srgb, var(--bg-surface) 85%, transparent);
 }
 
@@ -265,14 +249,14 @@
   content: "";
   position: absolute;
   inset: 17%;
-  border: 1px dashed color-mix(in srgb, #0f766e 34%, transparent);
+  border: 1px dashed color-mix(in srgb, var(--s2s-secondary) 34%, transparent);
   border-radius: 50%;
   pointer-events: none;
 }
 
 .aof-loop-map::after {
   inset: 29%;
-  border-color: color-mix(in srgb, #f59e0b 34%, transparent);
+  border-color: color-mix(in srgb, var(--s2s-status-warn) 34%, transparent);
 }
 
 .aof-loop-map__center {
@@ -283,7 +267,7 @@
   height: 118px;
   place-items: center;
   transform: translate(-50%, -50%);
-  border: 1px solid color-mix(in srgb, #0f766e 44%, transparent);
+  border: 1px solid color-mix(in srgb, var(--s2s-secondary) 44%, transparent);
   border-radius: 50%;
   background: var(--bg-surface);
   box-shadow: var(--shadow-md);
@@ -323,15 +307,15 @@
 
 .aof-node:hover,
 .aof-node--active {
-  border-color: color-mix(in srgb, #0f766e 55%, transparent);
+  border-color: color-mix(in srgb, var(--s2s-secondary) 55%, transparent);
   color: var(--text-primary);
-  background: color-mix(in srgb, #14b8a6 12%, var(--bg-surface));
+  background: color-mix(in srgb, var(--s2s-secondary) 12%, var(--bg-surface));
   box-shadow: var(--shadow-md);
 }
 
 .aof-node__icon {
   display: inline-flex;
-  color: #0f766e;
+  color: var(--s2s-secondary);
 }
 
 .aof-node--1 { top: 6%; left: 8%; }
@@ -369,8 +353,8 @@
 .aof-route-card--active,
 .aof-gate-card:hover,
 .aof-gate-card--active {
-  border-color: color-mix(in srgb, #0f766e 55%, transparent);
-  background: color-mix(in srgb, #14b8a6 11%, var(--bg-surface));
+  border-color: color-mix(in srgb, var(--s2s-secondary) 55%, transparent);
+  background: color-mix(in srgb, var(--s2s-secondary) 11%, var(--bg-surface));
   color: var(--text-primary);
   box-shadow: var(--shadow-md);
 }
@@ -397,13 +381,9 @@
   width: fit-content;
   border-radius: 999px;
   padding: 0.24rem 0.5rem;
-  background: color-mix(in srgb, #f59e0b 14%, var(--bg-subtle));
-  color: color-mix(in srgb, #92400e 80%, var(--text-primary));
+  background: color-mix(in srgb, var(--s2s-status-warn) 14%, var(--bg-subtle));
+  color: color-mix(in srgb, var(--s2s-status-warn) 80%, var(--text-primary));
   font-weight: 800;
-}
-
-.dark .aof-route-card__artifact {
-  color: #fcd34d;
 }
 
 .aof-artifact-stack {
@@ -435,9 +415,9 @@
   width: 36px;
   height: 36px;
   place-items: center;
-  border: 1px solid color-mix(in srgb, #0f766e 35%, transparent);
+  border: 1px solid color-mix(in srgb, var(--s2s-secondary) 35%, transparent);
   border-radius: 8px;
-  color: #0f766e;
+  color: var(--s2s-secondary);
   font-family: var(--font-mono);
   font-size: 0.75rem;
   font-weight: 800;
@@ -450,8 +430,8 @@
 
 .aof-artifact-card:hover,
 .aof-artifact-card--active {
-  border-color: color-mix(in srgb, #0f766e 55%, transparent);
-  background: color-mix(in srgb, #14b8a6 11%, var(--bg-surface));
+  border-color: color-mix(in srgb, var(--s2s-secondary) 55%, transparent);
+  background: color-mix(in srgb, var(--s2s-secondary) 11%, var(--bg-surface));
 }
 
 .aof-autonomy {
@@ -500,8 +480,8 @@
 
 .aof-segment:hover,
 .aof-segment--active {
-  border-color: color-mix(in srgb, #0f766e 55%, transparent);
-  background: color-mix(in srgb, #14b8a6 13%, var(--bg-surface));
+  border-color: color-mix(in srgb, var(--s2s-secondary) 55%, transparent);
+  background: color-mix(in srgb, var(--s2s-secondary) 13%, var(--bg-surface));
   color: var(--text-primary);
 }
 
@@ -510,17 +490,17 @@
   gap: 0.35rem;
   min-height: 136px;
   align-content: center;
-  border: 1px solid color-mix(in srgb, #0f766e 42%, transparent);
+  border: 1px solid color-mix(in srgb, var(--s2s-secondary) 42%, transparent);
   border-radius: 8px;
   padding: 1.25rem;
   background:
-    linear-gradient(135deg, color-mix(in srgb, #14b8a6 12%, transparent), transparent),
+    linear-gradient(135deg, color-mix(in srgb, var(--s2s-secondary) 12%, transparent), transparent),
     var(--bg-surface);
   text-align: center;
 }
 
 .aof-tier-output span {
-  color: #0f766e;
+  color: var(--s2s-secondary);
   font-family: var(--font-mono);
   font-size: 0.8rem;
   font-weight: 800;
@@ -533,9 +513,9 @@
 }
 
 .aof-tier-output--3 {
-  border-color: color-mix(in srgb, #f59e0b 60%, transparent);
+  border-color: color-mix(in srgb, var(--s2s-status-warn) 60%, transparent);
   background:
-    linear-gradient(135deg, color-mix(in srgb, #f59e0b 16%, transparent), transparent),
+    linear-gradient(135deg, color-mix(in srgb, var(--s2s-status-warn) 16%, transparent), transparent),
     var(--bg-surface);
 }
 
@@ -585,8 +565,8 @@
   height: 32px;
   place-items: center;
   border-radius: 50%;
-  background: color-mix(in srgb, #0f766e 11%, var(--bg-subtle));
-  color: #0f766e;
+  background: color-mix(in srgb, var(--s2s-secondary) 11%, var(--bg-subtle));
+  color: var(--s2s-secondary);
   font-family: var(--font-mono);
   font-size: 0.78rem;
   font-weight: 800;
@@ -599,8 +579,8 @@
 
 .aof-execution-step:hover,
 .aof-execution-step--active {
-  border-color: color-mix(in srgb, #0f766e 55%, transparent);
-  background: color-mix(in srgb, #14b8a6 11%, var(--bg-surface));
+  border-color: color-mix(in srgb, var(--s2s-secondary) 55%, transparent);
+  background: color-mix(in srgb, var(--s2s-secondary) 11%, var(--bg-surface));
 }
 
 .aof-gate-card {
@@ -612,25 +592,21 @@
   width: 36px;
   height: 36px;
   place-items: center;
-  border: 1px solid color-mix(in srgb, #0f766e 35%, transparent);
+  border: 1px solid color-mix(in srgb, var(--s2s-secondary) 35%, transparent);
   border-radius: 8px;
-  color: #0f766e;
-  background: color-mix(in srgb, #14b8a6 10%, transparent);
+  color: var(--s2s-secondary);
+  background: color-mix(in srgb, var(--s2s-secondary) 10%, transparent);
 }
 
 .aof-gate-card--stop .aof-gate-card__icon {
-  border-color: color-mix(in srgb, #f59e0b 52%, transparent);
-  color: #b45309;
-  background: color-mix(in srgb, #f59e0b 14%, transparent);
+  border-color: color-mix(in srgb, var(--s2s-status-warn) 52%, transparent);
+  color: var(--s2s-status-warn);
+  background: color-mix(in srgb, var(--s2s-status-warn) 14%, transparent);
 }
 
 .aof-gate-card--stop.aof-gate-card--active {
-  border-color: color-mix(in srgb, #f59e0b 58%, transparent);
-  background: color-mix(in srgb, #f59e0b 14%, var(--bg-surface));
-}
-
-.dark .aof-gate-card--stop .aof-gate-card__icon {
-  color: #fcd34d;
+  border-color: color-mix(in srgb, var(--s2s-status-warn) 58%, transparent);
+  background: color-mix(in srgb, var(--s2s-status-warn) 14%, var(--bg-surface));
 }
 
 .aof-evidence-stack {
@@ -662,7 +638,7 @@
 }
 
 .aof-evidence-layer svg {
-  color: #0f766e;
+  color: var(--s2s-secondary);
 }
 
 .aof-evidence-layer strong {
@@ -672,8 +648,8 @@
 
 .aof-evidence-layer:hover,
 .aof-evidence-layer--active {
-  border-color: color-mix(in srgb, #0f766e 55%, transparent);
-  background: color-mix(in srgb, #14b8a6 11%, var(--bg-surface));
+  border-color: color-mix(in srgb, var(--s2s-secondary) 55%, transparent);
+  background: color-mix(in srgb, var(--s2s-secondary) 11%, var(--bg-surface));
 }
 
 .aof-mini-list {

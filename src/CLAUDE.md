@@ -21,7 +21,7 @@ src/
   lib/            # Helpers: content.ts, seo.ts, tags.ts, search.ts, reading-paths.ts
   pages/          # Astro routes, incl. dev-stories/, systems/, aos/
   store/          # Nanostores: themeStore.ts, performanceStore.ts
-  styles/         # global.css (Tailwind v4), shell.css, tokens/ (roles, type, bridge), reader-legacy.css
+  styles/         # global.css (Tailwind v4), shell.css, tokens/ (roles, type, bridge, reader), reader/ (prose.css, shell.css)
 ```
 
 ## Dev Stories

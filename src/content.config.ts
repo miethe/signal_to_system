@@ -14,6 +14,10 @@ const posts = defineCollection({
     date: z.coerce.date(),
     readTime: z.string(),
     contentType: z.enum(["essay", "field-note", "companion"]),
+    // Writing format (spec 03). Optional: absent means `contentType`, so
+    // every existing post keeps its classification and URL. Set it only to
+    // name a format contentType cannot express (e.g. "guide").
+    format: z.enum(["essay", "field-note", "guide", "companion"]).optional(),
     category: z.enum([
       "AI Agents",
       "Agentic SDLC",
@@ -171,6 +175,11 @@ const stories = defineCollection({
 
     // Provenance — drives the automated-disclaimer banner (false = curated/editorial)
     automated: z.boolean().default(true),
+    // True only when a person has reviewed an automated story before
+    // publication. Drives the "Reviewed" provenance pill; never inferred.
+    reviewed: z.boolean().optional(),
+    // When that review happened (optional; only meaningful with reviewed: true).
+    reviewedAt: z.coerce.date().optional(),
     sourceAar: z.string().optional(),
 
     // Cross-collection discovery (shared vocab with posts)

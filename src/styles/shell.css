@@ -29,19 +29,6 @@ body {
   flex: 1 0 auto;
 }
 
-/* Reader pages (PostLayout, StoryLayout) run flush: no frame, and the frame
-   is transparent so an essay's own page field (e.g. Registry Wave's) shows
-   through exactly as before. Header and footer content keep the frame's
-   1240px measure. */
-.s2s-frame--reader {
-  background: transparent;
-}
-
-.s2s-frame--reader :is(.s2s-header__bar, .s2s-footer__bar, .s2s-footer__fine) {
-  max-width: var(--s2s-frame-max);
-  margin-inline: auto;
-}
-
 @media (min-width: 1280px) {
   body {
     /* Anchored to the top of the page (not fixed): a violet bloom over the
@@ -57,12 +44,7 @@ body {
     padding: 16px 0 24px;
   }
 
-  body.s2s-body--reader {
-    padding: 0;
-    background: var(--s2s-canvas);
-  }
-
-  .s2s-frame:not(.s2s-frame--reader) {
+  .s2s-frame {
     max-width: var(--s2s-frame-max);
     min-height: calc(100dvh - 40px);
     margin-inline: auto;

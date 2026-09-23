@@ -22,19 +22,19 @@ const { rows } = Astro.props;
 
 const chipConfig: Record<StatusRow['status'], { cls: string; glyph: string }> = {
   IMPLEMENTED: {
-    cls: 'border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/30 dark:text-emerald-300',
+    cls: 'border-[color-mix(in_srgb,var(--s2s-status-ok)_45%,transparent)] bg-[color-mix(in_srgb,var(--s2s-status-ok)_16%,transparent)] text-[var(--s2s-status-ok)]',
     glyph: '✓',
   },
   PARTIAL: {
-    cls: 'border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-800 dark:bg-amber-950/30 dark:text-amber-300',
+    cls: 'border-[color-mix(in_srgb,var(--s2s-status-warn)_45%,transparent)] bg-[color-mix(in_srgb,var(--s2s-status-warn)_16%,transparent)] text-[var(--s2s-status-warn)]',
     glyph: '◐',
   },
   PROPOSED: {
-    cls: 'border-violet-200 bg-violet-50 text-violet-800 dark:border-violet-800 dark:bg-violet-950/30 dark:text-violet-300',
+    cls: 'border-[color-mix(in_srgb,var(--s2s-accent)_45%,transparent)] bg-[var(--s2s-accent-soft)] text-[var(--s2s-accent)]',
     glyph: '◇',
   },
   'TO TEST': {
-    cls: 'border-sky-200 bg-sky-50 text-sky-800 dark:border-sky-800 dark:bg-sky-950/30 dark:text-sky-300',
+    cls: 'border-[color-mix(in_srgb,var(--s2s-secondary)_45%,transparent)] bg-[var(--s2s-secondary-soft)] text-[var(--s2s-secondary)]',
     glyph: '?',
   },
 };

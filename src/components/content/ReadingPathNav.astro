@@ -37,122 +37,117 @@ const hasProgress = currentIndex !== undefined && total !== undefined;
 const progressPct = hasProgress ? Math.round((currentIndex / total) * 100) : 0;
 ---
 
-<nav
-  class="mt-12 border-t border-[var(--border-subtle)] pt-10"
-  aria-label="Series navigation"
->
-  <!-- Series context -->
+<nav class="rpn" aria-label="Series navigation">
   {
     (seriesTitle || hasProgress) && (
-      <div class="mb-6 flex flex-col gap-2">
+      <div class="rpn__context">
         {seriesTitle && (
-          <p class="text-xs font-medium uppercase tracking-wider text-[var(--text-tertiary)]">
-            Part of:{" "}
-            <span class="text-[var(--text-primary)]">{seriesTitle}</span>
+          <p class="rpn__series">
+            Part of <span class="rpn__series-name">{seriesTitle}</span>
           </p>
         )}
         {hasProgress && (
-          <div class="flex items-center gap-3">
+          <div class="rpn__progress">
             <div
-              class="h-1.5 flex-1 overflow-hidden rounded-full bg-[var(--bg-muted)]"
+              class="rpn__track"
               role="progressbar"
               aria-valuenow={currentIndex}
               aria-valuemin={1}
               aria-valuemax={total}
-              aria-label={`Post ${currentIndex} of ${total}`}
+              aria-label={`Part ${currentIndex} of ${total}`}
             >
-              <div
-                class="h-full rounded-full bg-violet-500 transition-all"
-                style={`width: ${progressPct}%`}
-              />
+              <div class="rpn__fill" style={`width: ${progressPct}%`} />
             </div>
-            <span class="shrink-0 text-xs text-[var(--text-tertiary)]">
-              {currentIndex} / {total}
-            </span>
+            <span class="rpn__count">{currentIndex} / {total}</span>
           </div>
         )}
       </div>
     )
   }
 
-  <!-- Prev / Next links -->
-  <div class="grid gap-4 sm:grid-cols-2">
-    <!-- Previous -->
-    <div>
-      {
-        prev ? (
-          <a
-            href={prev.href ?? `/essays/${prev.slug}/`}
-            class="group flex flex-col gap-1 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-5 transition-all hover:border-violet-400/50 hover:shadow-sm dark:hover:border-violet-700"
-          >
-            <span class="flex items-center gap-1 text-xs font-medium text-[var(--text-tertiary)] group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="13"
-                height="13"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-              >
-                <path d="m15 18-6-6 6-6" />
-              </svg>
-              Previous
-            </span>
-            <span class="font-medium leading-snug text-[var(--text-primary)] group-hover:text-violet-700 dark:group-hover:text-violet-300 transition-colors">
-              {prev.title}
-            </span>
-          </a>
-        ) : (
-          <div class="rounded-xl border border-dashed border-[var(--border-subtle)] p-5">
-            <span class="text-sm text-[var(--text-disabled)]">
-              Beginning of series
-            </span>
-          </div>
-        )
-      }
-    </div>
-
-    <!-- Next -->
-    <div>
-      {
-        next ? (
-          <a
-            href={next.href ?? `/essays/${next.slug}/`}
-            class="group flex flex-col items-end gap-1 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-5 text-right transition-all hover:border-violet-400/50 hover:shadow-sm dark:hover:border-violet-700"
-          >
-            <span class="flex items-center gap-1 text-xs font-medium text-[var(--text-tertiary)] group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
-              Next
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="13"
-                height="13"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                aria-hidden="true"
-              >
-                <path d="m9 18 6-6-6-6" />
-              </svg>
-            </span>
-            <span class="font-medium leading-snug text-[var(--text-primary)] group-hover:text-violet-700 dark:group-hover:text-violet-300 transition-colors">
-              {next.title}
-            </span>
-          </a>
-        ) : (
-          <div class="flex h-full items-start justify-end rounded-xl border border-dashed border-[var(--border-subtle)] p-5">
-            <span class="text-sm text-[var(--text-disabled)]">
-              End of series
-            </span>
-          </div>
-        )
-      }
-    </div>
+  <div class="rpn__links">
+    {
+      prev ? (
+        <a class="rpn__link" href={prev.href ?? `/essays/${prev.slug}/`}>
+          <span class="rpn__dir">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m15 18-6-6 6-6" /></svg>
+            Previous
+          </span>
+          <span class="rpn__title">{prev.title}</span>
+        </a>
+      ) : (
+        <div class="rpn__edge">Beginning of series</div>
+      )
+    }
+    {
+      next ? (
+        <a class="rpn__link rpn__link--next" href={next.href ?? `/essays/${next.slug}/`}>
+          <span class="rpn__dir">
+            Next
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg>
+          </span>
+          <span class="rpn__title">{next.title}</span>
+        </a>
+      ) : (
+        <div class="rpn__edge rpn__edge--next">End of series</div>
+      )
+    }
   </div>
 </nav>
+
+<style>
+  .rpn { margin-top: 48px; padding-top: 40px; border-top: 1px solid var(--s2s-rule); }
+  .rpn__context { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+  .rpn__series {
+    margin: 0;
+    font: 500 var(--type-micro) / 1.4 var(--font-sans);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--s2s-ink-subtle);
+  }
+  .rpn__series-name { color: var(--s2s-ink); letter-spacing: 0.04em; text-transform: none; font-size: var(--type-ui); }
+  .rpn__progress { display: flex; align-items: center; gap: 12px; }
+  .rpn__track { flex: 1; height: 4px; overflow: hidden; border-radius: 999px; background: var(--s2s-chip); }
+  .rpn__fill { height: 100%; border-radius: 999px; background: var(--s2s-accent); }
+  .rpn__count { flex-shrink: 0; font: 400 var(--type-meta) / 1 var(--font-mono); color: var(--s2s-ink-subtle); }
+
+  .rpn__links { display: grid; gap: 14px; }
+  @media (min-width: 640px) { .rpn__links { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+  .rpn__link {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 18px 20px;
+    border: 1px solid var(--s2s-rule);
+    border-radius: var(--s2s-radius-card);
+    background: var(--s2s-surface);
+    text-decoration: none;
+    transition: border-color var(--s2s-dur) ease, background-color var(--s2s-dur) ease;
+  }
+  .rpn__link:hover { border-color: var(--s2s-accent); background: var(--s2s-surface-hover); text-decoration: none; }
+  .rpn__link:focus-visible { outline: 2px solid var(--s2s-focus); outline-offset: 2px; }
+  .rpn__link--next { align-items: flex-end; text-align: right; }
+  .rpn__dir {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font: 500 var(--type-micro) / 1.4 var(--font-sans);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--s2s-ink-subtle);
+  }
+  .rpn__link:hover .rpn__dir { color: var(--s2s-accent); }
+  .rpn__title { font: 400 var(--type-card) / 1.35 var(--font-display); color: var(--s2s-ink); }
+
+  .rpn__edge {
+    display: flex;
+    align-items: center;
+    padding: 18px 20px;
+    border: 1px dashed var(--s2s-rule);
+    border-radius: var(--s2s-radius-card);
+    font: 400 var(--type-body-s) / 1.4 var(--font-sans);
+    color: var(--s2s-ink-faint);
+  }
+  .rpn__edge--next { justify-content: flex-end; }
+</style>

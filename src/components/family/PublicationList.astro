@@ -1,0 +1,41 @@
+---
+/**
+ * PublicationList — a lead FeatureCard (with Dev Story type/provenance pills)
+ * over EntryRows, from PublicationSummary items; StateNotice when empty.
+ */
+import FeatureCard from './FeatureCard.astro';
+import EntryRow from './EntryRow.astro';
+import StateNotice from '../primitives/StateNotice.astro';
+import type { PublicationSummary } from '../../lib/writing';
+import { FORMAT_LABEL, SUBTYPE_LABEL } from '../../lib/writing';
+import { formatDate, formatDateISO } from '../../lib/utils';
+
+interface Props { items: PublicationSummary[]; empty?: string; featured?: boolean; }
+const { items, empty = 'No published writing is available here yet.', featured = true } = Astro.props;
+const itemMeta = (item: PublicationSummary) => [
+  { label: formatDate(item.publishedAt), datetime: formatDateISO(item.publishedAt), icon: 'timeline' },
+  ...(item.readMinutes ? [{ label: `${item.readMinutes} min read` }] : []),
+];
+const kind = (item: PublicationSummary) => item.format === 'dev-story' && item.subtype
+  ? SUBTYPE_LABEL[item.subtype]
+  : FORMAT_LABEL[item.format];
+const pills = (item: PublicationSummary) => item.format === 'dev-story'
+  ? [
+      { label: item.subtype ? SUBTYPE_LABEL[item.subtype] : 'Dev Story' },
+      { label: item.provenance === 'authored' ? 'Human + agent' : 'Automated', tone: item.provenance === 'authored' ? 'secondary' as const : 'accent' as const },
+      ...(item.provenance === 'automated-reviewed' ? [{ label: 'Reviewed', tone: 'ok' as const }] : []),
+    ]
+  : undefined;
+const lead = featured ? items[0] : undefined;
+const rest = featured ? items.slice(1) : items;
+---
+{items.length === 0 ? <StateNotice kind="empty" compact title="Nothing published yet" body={empty} /> : (
+  <div class="s2s-publication-list">
+    {lead && <FeatureCard href={lead.canonicalPath} title={lead.title} dek={lead.summary} glyph={lead.format === 'dev-story' ? 'dev-stories' : 'essays'} eyebrow={pills(lead) ? undefined : kind(lead)} pills={pills(lead)} meta={itemMeta(lead)} chips={lead.tags.slice(0, 3).map((tag) => ({ label: tag, href: `/tags/${tag}/` }))} />}
+    {rest.length > 0 && <ul class="s2s-publication-list__rows">{rest.map((item) => <EntryRow href={item.canonicalPath} title={item.title} kind={kind(item)} meta={itemMeta(item)} />)}</ul>}
+  </div>
+)}
+<style>
+.s2s-publication-list { display: grid; gap: 12px; min-width: 0; }
+.s2s-publication-list__rows { margin: 0; padding: 0; }
+</style>

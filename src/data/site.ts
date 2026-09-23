@@ -1,3 +1,11 @@
+/**
+ * Notebooks nav toggle (Nick, 2026-09-23): the Notebooks item is hidden from
+ * the header, the mobile menu and every other `site.nav` consumer until the
+ * /notebooks/ section exists (M3b). To bring it back, build /notebooks/ and
+ * set this to true; the item then points at /notebooks/.
+ */
+const SHOW_NOTEBOOKS_NAV = false;
+
 export const site = {
   title: "Signal to System",
   subtitle: "Architecture, Agents, and Execution for the Technical Executive",
@@ -31,16 +39,17 @@ export const site = {
    * five). Sections that do not exist yet point at the nearest existing route
    * so the nav never 404s; `match` lists the path prefixes that light the
    * item up. Swap `href` when the real section ships:
-   *   Writing   -> /writing/   (M2)   interim /essays/
+   *   Writing   -> /writing/   (M2, shipped; owns /essays and /dev-stories)
    *   Labs      -> /labs/      (M3b)  interim /aos/ (the AOS research program)
-   *   Notebooks -> /notebooks/ (M3b)  interim /dev-stories/ (build notes)
+   *   Notebooks -> /notebooks/ (M3b)  HIDDEN until the section is real
+   *             (Nick, 2026-09-23): see SHOW_NOTEBOOKS_NAV above.
    *   Studio    -> /studio/    (M1b+) interim /portfolio/ui/ (component library)
    */
   nav: [
-    { label: "Writing", href: "/essays/", match: ["/essays", "/series", "/tags", "/topics", "/start-here", "/glossary"] },
+    { label: "Writing", href: "/writing/", match: ["/writing", "/essays", "/dev-stories", "/series", "/tags", "/topics", "/start-here", "/glossary"] },
     { label: "Labs", href: "/aos/", match: ["/aos", "/systems", "/evidence", "/workflow-showcase"] },
     { label: "Projects", href: "/projects/", match: ["/projects", "/portfolio/"], exclude: ["/portfolio/ui"] },
-    { label: "Notebooks", href: "/dev-stories/", match: ["/dev-stories"] },
+    ...(SHOW_NOTEBOOKS_NAV ? [{ label: "Notebooks", href: "/notebooks/", match: ["/notebooks"] }] : []),
     { label: "Studio", href: "/portfolio/ui/", match: ["/portfolio/ui", "/studio"] },
   ],
 

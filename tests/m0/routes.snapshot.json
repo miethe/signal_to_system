@@ -45,6 +45,9 @@
     "/evidence/run-record/",
     "/evidence/stale-guidance/",
     "/evidence/workflow-sync/",
+    "/feeds/companion.xml",
+    "/feeds/dev-story.xml",
+    "/feeds/essay.xml",
     "/glossary/",
     "/other-sites/",
     "/portfolio/",
@@ -63,6 +66,7 @@
     "/series/agentic-systems-engineering/",
     "/series/ai-workflows/",
     "/series/governed-agentic-sdlc/",
+    "/series/i-let-claude-build-my-app/",
     "/sitemap-0.xml",
     "/sitemap-index.xml",
     "/start-here/",
@@ -129,6 +133,7 @@
     "/workflow-showcase/stage-2/step-2-7.progress.html",
     "/workflow-showcase/stage-2/step-2-7.terminal.html",
     "/workflow-showcase/stage-2/step-2-8.agents.html",
-    "/workflow-showcase/stage-2/step-2-8.terminal.html"
+    "/workflow-showcase/stage-2/step-2-8.terminal.html",
+    "/writing/"
   ]
 }

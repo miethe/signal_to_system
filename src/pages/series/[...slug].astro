@@ -1,7 +1,9 @@
 ---
 import { getCollection } from 'astro:content';
 import SeriesLayout from '../../layouts/SeriesLayout.astro';
-import { getPostsBySeries, getStoriesBySeries, hrefFor } from '../../lib/content';
+import { getPostsBySeries, getStoriesBySeries, hrefFor, type Article } from '../../lib/content';
+import { seriesMembers } from '../../lib/series.mjs';
+import { SUBTYPE_LABEL } from '../../lib/writing';
 
 export async function getStaticPaths() {
   const allSeries = await getCollection('series');
@@ -14,9 +16,8 @@ export async function getStaticPaths() {
         getStoriesBySeries(seriesEntry.id),
       ]);
 
-      const seriesEntries = [...seriesPosts, ...seriesStories].sort(
-        (a, b) => (a.data.seriesOrder ?? 999) - (b.data.seriesOrder ?? 999),
-      );
+      // One reading order for both collections (seriesOrder, then date).
+      const seriesEntries: Article[] = seriesMembers(seriesEntry.id, [...seriesPosts, ...seriesStories]);
 
       return {
         params: { slug: seriesEntry.id },
@@ -46,5 +47,6 @@ const { seriesEntry, seriesEntries } = Astro.props;
     part: entry.data.seriesOrder,
     href: hrefFor(entry),
     kind: entry.collection === 'stories' ? 'story' : 'essay',
+    kindLabel: entry.collection === 'stories' ? SUBTYPE_LABEL[entry.data.storyType] : undefined,
   }))}
 />

@@ -77,13 +77,13 @@ const projectDefs = projects
     "bg-[var(--bg-surface)]",
     "border-[var(--border-subtle)]",
     "hover:border-[var(--accent)] hover:border-opacity-50",
-    "hover:shadow-xl hover:shadow-[var(--accent-subtle)] dark:hover:shadow-[rgba(99,102,241,0.1)]",
+    "hover:shadow-xl hover:shadow-[var(--accent-subtle)] dark:hover:shadow-[var(--s2s-accent-soft)]",
     featured ? "p-8 md:p-10" : "p-6",
   ].join(" ")}
 >
   {
     featured && (
-      <div class="absolute inset-x-0 top-0 h-1 rounded-t-xl bg-gradient-to-r from-indigo-500 to-violet-500" />
+      <div class="absolute inset-x-0 top-0 h-1 rounded-t-xl bg-gradient-to-r from-[var(--s2s-accent)] to-[var(--s2s-accent-hover)]" />
     )
   }
 
@@ -109,7 +109,7 @@ const projectDefs = projects
   <h2
     class={[
       "font-semibold leading-snug text-[var(--text-primary)]",
-      "group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors",
+      "group-hover:text-[var(--s2s-accent)] transition-colors",
       featured ? "text-2xl md:text-3xl mb-3" : "text-lg mb-2",
     ].join(" ")}
   >

@@ -1,0 +1,68 @@
+---
+/**
+ * SubscribeBand — the "Follow new writing" band: a serif title, one line of
+ * body, and an action on the right.
+ *
+ * Today the action is the RSS link (the default). Nick wants a newsletter
+ * but the provider is undecided (2026-09-23; filed in the Writing tree), so
+ * the band is built to take a signup form without redesign: pass it in the
+ * `action` slot and it replaces the RSS button in the same place, e.g.
+ *
+ *   <SubscribeBand title="Get new writing by email." body="…">
+ *     <NewsletterSignup slot="action" />
+ *   </SubscribeBand>
+ *
+ * Labs reuse: "Follow new research" under the Labs index.
+ */
+import Button from '../ui/Button.astro';
+
+interface Props {
+  title?: string;
+  body?: string;
+  /** Default action when no `action` slot is given. */
+  feed?: { label: string; href: string };
+  id?: string;
+  class?: string;
+}
+const {
+  title = 'Follow new writing.',
+  body = 'Every essay and Dev Story is in the RSS feed the day it is published.',
+  feed = { label: 'Subscribe via RSS', href: '/rss.xml' },
+  id = 'subscribe',
+  class: className,
+} = Astro.props;
+const hid = `${id}-title`;
+---
+
+<aside class:list={['s2s-subscribe', className]} id={id} aria-labelledby={hid}>
+  <div class="s2s-subscribe__text">
+    <h2 id={hid} class="s2s-subscribe__title">{title}</h2>
+    <p class="s2s-subscribe__body">{body}</p>
+  </div>
+  <div class="s2s-subscribe__action">
+    {Astro.slots.has('action') ? <slot name="action" /> : (
+      <Button href={feed.href} variant="signal">{feed.label} <span aria-hidden="true">→</span></Button>
+    )}
+  </div>
+</aside>
+
+<style>
+  .s2s-subscribe {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px 24px;
+    padding: 22px 24px;
+    border: 1px solid var(--s2s-rule);
+    border-radius: var(--s2s-radius-card);
+    background:
+      radial-gradient(ellipse at 12% 0%, var(--s2s-accent-soft), transparent 60%),
+      var(--s2s-canvas-raised);
+  }
+  .s2s-subscribe__text { min-width: 0; flex: 1 1 18rem; }
+  /* A signup form in the slot may grow; the RSS button stays compact. */
+  .s2s-subscribe__action { flex: 0 1 auto; min-width: 0; }
+  .s2s-subscribe__title { margin: 0 0 4px; font: 400 1.375rem / 1.2 var(--font-display); color: var(--s2s-ink); }
+  .s2s-subscribe__body { margin: 0; font: 400 var(--type-body-s) / 1.5 var(--font-sans); color: var(--s2s-ink-muted); }
+</style>

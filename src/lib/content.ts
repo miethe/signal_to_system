@@ -1,3 +1,4 @@
+import { inSeries, seriesKey } from './series.mjs';
 import { getCollection, type CollectionEntry } from "astro:content";
 
 // ---------------------------------------------------------------------------
@@ -60,8 +61,8 @@ export async function getPostsByCategory(category: string): Promise<Post[]> {
  */
 export async function getPostsBySeries(seriesSlug: string): Promise<Post[]> {
   const published = await getPublishedPosts();
-  const inSeries = published.filter((p) => p.data.series === seriesSlug);
-  return inSeries.sort((a, b) => {
+  const inSeriesList = published.filter((p) => inSeries(p, seriesSlug));
+  return inSeriesList.sort((a, b) => {
     const orderA = a.data.seriesOrder ?? Infinity;
     const orderB = b.data.seriesOrder ?? Infinity;
     return orderA - orderB;
@@ -87,7 +88,7 @@ function scoreRelated(source: Post, candidate: Post): number {
   // Same series
   if (
     source.data.series &&
-    source.data.series === candidate.data.series
+    seriesKey(source.data.series) === seriesKey(candidate.data.series ?? '')
   ) {
     score += 5;
   }
@@ -166,7 +167,7 @@ export async function getPublishedStories(): Promise<Story[]> {
 export async function getStoriesBySeries(seriesSlug: string): Promise<Story[]> {
   const published = await getPublishedStories();
   return published
-    .filter((s) => s.data.series === seriesSlug)
+    .filter((s) => inSeries(s, seriesSlug))
     .sort(
       (a, b) => (a.data.seriesOrder ?? Infinity) - (b.data.seriesOrder ?? Infinity),
     );
@@ -258,7 +259,7 @@ function scoreArticle(source: Article, candidate: Article): number {
 
   let score = 0;
   if (source.data.relatedSlugs?.includes(candidate.id)) score += 10;
-  if (source.data.series && source.data.series === candidate.data.series) score += 5;
+  if (source.data.series && seriesKey(source.data.series) === seriesKey(candidate.data.series ?? '')) score += 5;
 
   const sourceProjects = new Set(source.data.projects ?? []);
   score +=

@@ -1,6 +1,6 @@
 ---
 import { getCollection, render } from 'astro:content';
-import PostLayout from '../../layouts/PostLayout.astro';
+import ReaderShell from '../../layouts/ReaderShell.astro';
 import { getRelatedArticles } from '../../lib/content';
 import { isPublishable } from '../../lib/publication.mjs';
 
@@ -17,28 +17,6 @@ const { Content, headings } = await render(post);
 const relatedItems = await getRelatedArticles(post);
 ---
 
-<PostLayout
-  slug={post.id}
-  headings={headings}
-  frontmatter={{
-    title: post.data.title,
-    excerpt: post.data.excerpt,
-    date: post.data.date,
-    updatedDate: post.data.updatedDate,
-    readTime: post.data.readTime ? parseInt(post.data.readTime) : undefined,
-    category: post.data.category,
-    tags: post.data.tags,
-    ogImage: post.data.ogImage ?? `/og/essays/${post.id}.png`,
-    heroImage: post.data.heroImage,
-    heroAlt: post.data.heroAlt,
-    whyItMatters: post.data.whyItMatters,
-    leaderTakeaway: post.data.leaderTakeaway,
-    series: post.data.series,
-    seriesPart: post.data.seriesOrder,
-    draft: post.data.status === 'draft',
-    heroPlacement: post.data.heroPlacement,
-  }}
-  relatedItems={relatedItems}
->
+<ReaderShell entry={post} headings={headings} relatedItems={relatedItems}>
   <Content />
-</PostLayout>
+</ReaderShell>

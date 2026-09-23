@@ -49,6 +49,7 @@ const { title, description, heading, accent, eyebrow, lede, noindex, hero = {}, 
 ---
 
 <BaseLayout title={title} description={description} noindex={noindex} ogImage={ogImage}>
+  {Astro.slots.has('head') && <Fragment slot="head"><slot name="head" /></Fragment>}
   <PageHero heading={heading} accent={accent} eyebrow={eyebrow} lede={lede} {...hero}>
     {Astro.slots.has('hero-actions') && <Fragment slot="actions"><slot name="hero-actions" /></Fragment>}
     {Astro.slots.has('hero-aside') && <Fragment slot="aside"><slot name="hero-aside" /></Fragment>}

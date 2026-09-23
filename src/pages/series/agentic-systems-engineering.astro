@@ -1,5 +1,13 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
+/**
+ * /series/agentic-systems-engineering/ — the core reading path
+ * (reading-paths.json), on the v2 shell (M2 ia-facets). Steps are numbered;
+ * unpublished steps are named but not linked, with an "In progress" pill.
+ */
+import HubLayout from '../../layouts/templates/HubLayout.astro';
+import CollectionPanel from '../../components/family/CollectionPanel.astro';
+import Pill from '../../components/family/Pill.astro';
+import FacetRail from '../../components/primitives/FacetRail.astro';
 import pathsData from '../../data/reading-paths.json';
 
 const path = pathsData.paths.find((p) => p.pageSlug === 'agentic-systems-engineering');
@@ -7,64 +15,61 @@ const path = pathsData.paths.find((p) => p.pageSlug === 'agentic-systems-enginee
 if (!path) {
   throw new Error('src/data/reading-paths.json has no path with pageSlug "agentic-systems-engineering".');
 }
+const published = path.steps.filter((s) => s.state === 'published' && s.slug).length;
 ---
 
-<BaseLayout
-  title={path.umbrellaTerm}
-  description={path.rationale}
->
-  <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-    <header class="mb-12">
-      <p class="mb-3 text-xs font-medium uppercase tracking-widest text-[var(--text-disabled)]">
-        Reading path
-      </p>
-      <h1 class="font-serif text-4xl font-bold tracking-tight text-[var(--text-primary)] sm:text-5xl mb-6">
-        {path.umbrellaTerm}
-      </h1>
-      <p class="text-lg leading-relaxed text-[var(--text-secondary)]">
-        {path.rationale}
-      </p>
-    </header>
-
-    <ol class="space-y-4">
+<HubLayout title={path.umbrellaTerm} description={path.rationale} heading={path.umbrellaTerm} eyebrow={['Writing', 'Reading path']} lede={path.rationale}>
+  <CollectionPanel class="s2s-span-major" title="The path" icon="reading-paths" count={path.steps.length} countNoun={['step', 'steps']} description={`${published} of ${path.steps.length} steps published.`}>
+    <ol class="ase-steps">
       {path.steps.map((step, i) => {
         const isPublished = step.state === 'published' && step.slug;
         return (
-          <li class="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6">
-            <div class="flex flex-wrap items-center gap-3">
-              <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-violet-100 text-sm font-semibold text-violet-700 dark:bg-violet-900/40 dark:text-violet-300">
-                {i + 1}
-              </span>
-              {isPublished ? (
-                <a
-                  href={`/essays/${step.slug}/`}
-                  class="text-lg font-semibold text-[var(--text-primary)] hover:text-violet-600 dark:hover:text-violet-400"
-                >
-                  {step.title}
-                </a>
-              ) : (
-                <span class="text-lg font-semibold text-[var(--text-primary)]">{step.title}</span>
-              )}
-              {!isPublished && (
-                <span class="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">
-                  Next, in progress
-                </span>
-              )}
+          <li class="ase-step">
+            <span class="ase-step__n" aria-hidden="true">{i + 1}</span>
+            <div class="ase-step__text">
+              <p class="ase-step__title">
+                {isPublished ? <a class="s2s-focus" href={`/essays/${step.slug}/`}>{step.title}</a> : <span>{step.title}</span>}
+                {!isPublished && <Pill label="Next, in progress" tone="warn" />}
+              </p>
+              <p class="ase-step__sub">{step.whatItAnswers}</p>
             </div>
-            <p class="mt-2 pl-10 text-sm leading-relaxed text-[var(--text-secondary)]">
-              {step.whatItAnswers}
-            </p>
           </li>
         );
       })}
     </ol>
-
-    <p class="mt-12 text-sm leading-relaxed text-[var(--text-tertiary)]">
+    <p class="ase-note">
       This path runs through several series that continue on their own, in parallel:{' '}
-      <a href="/series/governed-agentic-sdlc/" class="text-violet-600 hover:underline dark:text-violet-400">Governed Agentic SDLC</a>,{' '}
-      <a href="/series/ai-workflows/" class="text-violet-600 hover:underline dark:text-violet-400">AI Workflows</a>,{' '}
+      <a href="/series/governed-agentic-sdlc/">Governed Agentic SDLC</a>,{' '}
+      <a href="/series/ai-workflows/">AI Workflows</a>,{' '}
       Attention Is All We Have, and the Dev Stories execution log. Each of those is worth reading for its own depth.
       This page is one throughline across them, not a replacement for any of them.
     </p>
+  </CollectionPanel>
+  <div class="s2s-span-minor">
+    <FacetRail heading="Browse" icon="reading-paths" items={[{ label: 'All series', href: '/series/' }, { label: 'Start here', href: '/start-here/' }, { label: 'All writing', href: '/writing/' }]} />
   </div>
-</BaseLayout>
+</HubLayout>
+
+<style>
+  .ase-steps { display: flex; flex-direction: column; margin: 0; padding: 0; list-style: none; }
+  .ase-step { display: flex; gap: 14px; padding: 14px 4px; }
+  .ase-step + .ase-step { border-top: 1px solid var(--s2s-rule); }
+  .ase-step__n {
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    width: 30px;
+    height: 30px;
+    border: 1px solid var(--s2s-rule-emphasis);
+    border-radius: 999px;
+    font: 400 var(--type-body-s) / 1 var(--font-display);
+    color: var(--s2s-ink-soft);
+  }
+  .ase-step__text { min-width: 0; }
+  .ase-step__title { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0 0 4px; font: 400 1.0625rem / 1.3 var(--font-display); color: var(--s2s-ink); }
+  .ase-step__title a { color: var(--s2s-ink); text-decoration: none; }
+  .ase-step__title a:hover { color: var(--s2s-accent); }
+  .ase-step__sub { margin: 0; font: 400 var(--type-body-s) / 1.5 var(--font-sans); color: var(--s2s-ink-muted); }
+  .ase-note { margin: 18px 0 0; font: 400 var(--type-meta) / 1.6 var(--font-sans); color: var(--s2s-ink-muted); }
+  .ase-note a { color: var(--s2s-accent); }
+</style>

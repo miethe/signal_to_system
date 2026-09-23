@@ -272,20 +272,20 @@ const toc = rawToc.map((heading) => {
 
   :global(.dark) .reading-companion__block {
     overflow: hidden;
-    border-color: #29476b;
+    border-color: var(--reader-edge);
     border-radius: 9px;
-    background: linear-gradient(180deg, #091a31 0%, #07162a 100%);
-    box-shadow: 0 12px 30px rgb(0 0 0 / 22%);
+    background: var(--reader-panel);
+    box-shadow: var(--reader-shadow);
   }
 
-  :global(.dark) .reading-companion__header { padding: 15px; border-color: #203b5d; color: #bfcaf0; }
+  :global(.dark) .reading-companion__header { padding: 15px; border-color: var(--reader-edge-soft); color: var(--s2s-ink-soft); }
   :global(.dark) .reading-companion__body { padding: 9px 7px 12px 15px; }
-  :global(.dark) .reading-companion__rail { width: 2px; background: #29476b; }
-  :global(.dark) .reading-companion__rail-fill { background: #756cff; }
-  :global(.dark) .reading-companion__link { min-height: 25px; padding: 5px 8px 5px 28px; font-size: 11px; color: #aebdd1; }
-  :global(.dark) .reading-companion__index { margin-left: -22px; color: #7790b1; }
-  :global(.dark) .reading-companion__link[aria-current='location'] { background: #17294a; color: #f2efea; }
-  :global(.dark) .reading-companion__link[aria-current='location'] .reading-companion__index { color: #b9a7ff; }
+  :global(.dark) .reading-companion__rail { width: 2px; background: var(--reader-edge); }
+  :global(.dark) .reading-companion__rail-fill { background: var(--reader-mark); }
+  :global(.dark) .reading-companion__link { min-height: 25px; padding: 5px 8px 5px 28px; font-size: 11px; color: var(--s2s-ink-muted); }
+  :global(.dark) .reading-companion__index { margin-left: -22px; color: var(--s2s-ink-subtle); }
+  :global(.dark) .reading-companion__link[aria-current='location'] { background: var(--s2s-accent-soft); color: var(--s2s-ink); }
+  :global(.dark) .reading-companion__link[aria-current='location'] .reading-companion__index { color: var(--reader-mark); }
 
   @media (prefers-reduced-motion: reduce) {
     .reading-companion__link,

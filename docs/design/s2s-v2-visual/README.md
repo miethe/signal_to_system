@@ -40,6 +40,28 @@ here since it duplicates content already in this repo's `analysis/01-build-hando
 | `research_foundry_a_sci_fi_research_dossier.png` | Project dossier (Research Foundry) — overview, capabilities, architecture, interface previews, artifacts, related work |
 | `urban_heat_mapped_research_dashboard.png` | Investigation/Lab detail (Urban Heat) — research-dashboard-style detail page |
 
+### labs-storyboard/ — the NORTH STAR for Labs (added 2026-09-22)
+
+Six Labs storyboard mockups plus `LABS-STORYBOARD-HANDOFF.md`. They are the **visual authority
+for every Labs page and component**: Labs home / investigations index, the investigation report
+(the canonical Labs object), its claims, evidence, sources, figures and artifacts subpages, and
+research-program pages. Where they cover a Labs surface they supersede the single Labs mockups in
+`01-site-mockups/`. The prior build handoff remains the **behavior contract**.
+
+Standing design rule from the handoff: Labs is a "richer research-native sibling of Writing" built
+from the **same component family** (cards, metadata rows, figure/source/artifact cards, sidenav
+modules, section headers, CTAs). Writing components are designed as that shared family so Labs
+reuses rather than forks them.
+
+| File | Page |
+|---|---|
+| `images/signal_to_system_labs_investigations.webp` | Labs home / investigations index |
+| `images/urban_heat_mapped_research_dashboard.webp` | Investigation report overview (Urban Heat, Mapped) |
+| `images/urban_heat_claims_evidence_dashboard.webp` | Claims & Evidence subpage |
+| `images/sources_figures_artifacts_dashboard.webp` | Sources, Figures & Artifacts subpage |
+| `images/signal_to_system_trustworthy_agentic_systems.webp` | Research program page |
+| `images/from_questions_to_a_deeper_world.webp` | Labs journey + shared component storyboard |
+
 ### 02-visual-assets-transparent/ — 4 transparent asset sheets
 
 | File | Contents |

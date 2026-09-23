@@ -1,0 +1,50 @@
+[
+  {
+    "filename": "signal_to_system_labs_investigations.webp",
+    "relative_path": "images/signal_to_system_labs_investigations.webp",
+    "title": "Labs homepage / investigations index",
+    "dimensions": "1448x1086",
+    "what_it_shows": "High-level Labs landing page. Shows the Labs hero, filter/search controls, featured investigation, domain constellation, research programs sidebar, popular domains, and the \u201cInside an investigation\u201d component strip.",
+    "intended_use": "Use as the canonical direction for the Labs homepage. This establishes the shell, IA, primary CTA structure, filter bar, sidebar modules, and the first expression of cross-domain synthesis via the domain constellation card."
+  },
+  {
+    "filename": "urban_heat_mapped_research_dashboard.webp",
+    "relative_path": "images/urban_heat_mapped_research_dashboard.webp",
+    "title": "Investigation report overview page \u2014 Urban Heat, Mapped",
+    "dimensions": "1448x1086",
+    "what_it_shows": "Primary report page / overview state for a single investigation. Shows executive summary, key findings cards, featured figure, evidence-in-context panel, investigation metadata sidebar, research program link, domain constellation, and \u201cExplore the research\u201d section links.",
+    "intended_use": "Use as the main blueprint for a report page. This should be treated as the core output page of Labs \u2014 a full investigation record rather than a simple article."
+  },
+  {
+    "filename": "urban_heat_claims_evidence_dashboard.webp",
+    "relative_path": "images/urban_heat_claims_evidence_dashboard.webp",
+    "title": "Claims & Evidence page / subpage",
+    "dimensions": "1448x1086",
+    "what_it_shows": "Detailed evidence navigation view for a report. Shows claim cards, confidence/status labels, structured evidence items, claim network graph, key domains list, and related materials summary.",
+    "intended_use": "Use as the design reference for claim-first inspection. This is the clearest expression of how claims, evidence, figures, sources, and notebooks can be connected and inspected."
+  },
+  {
+    "filename": "sources_figures_artifacts_dashboard.webp",
+    "relative_path": "images/sources_figures_artifacts_dashboard.webp",
+    "title": "Sources, Figures & Artifacts page / subpage",
+    "dimensions": "1448x1086",
+    "what_it_shows": "Resource-centric subpage for a report. Shows source cards, figure cards, artifact cards, filters, report-resource counts, reuse-in-essays panel, and a research-lineage / provenance strip.",
+    "intended_use": "Use as the reference for the resource browser within a report. This also demonstrates the bridge between Labs and Essays by explicitly supporting \u201creuse in essays.\u201d"
+  },
+  {
+    "filename": "signal_to_system_trustworthy_agentic_systems.webp",
+    "relative_path": "images/signal_to_system_trustworthy_agentic_systems.webp",
+    "title": "Research program page \u2014 Trustworthy Agentic Systems",
+    "dimensions": "1448x1086",
+    "what_it_shows": "Program-level landing page connecting multiple investigations, essays, projects, artifacts, timeline, mission/scope, methods, key questions, and related programs. Includes a cross-domain constellation around the program.",
+    "intended_use": "Use as the pattern for Research Program pages. This is how Labs should expose long-running inquiry tracks that span domains and connect multiple content types."
+  },
+  {
+    "filename": "from_questions_to_a_deeper_world.webp",
+    "relative_path": "images/from_questions_to_a_deeper_world.webp",
+    "title": "Labs journey / component storyboard",
+    "dimensions": "1448x1086",
+    "what_it_shows": "Storyboard view showing the user flow from Labs homepage \u2192 investigation page \u2192 report page \u2192 deeper exploration, plus the set of reusable subpages and the shared component gallery.",
+    "intended_use": "Use as the architectural/UX map for Labs. This explains how the pages relate to one another and how the component system is shared between Labs and Writing."
+  }
+]
