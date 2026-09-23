@@ -1,0 +1,46 @@
+---
+/**
+ * GlanceCard — the report rail's "Investigation at a glance": every fact
+ * on its own axis (release, review, reproduction are separate rows; none
+ * is folded into a status word), exact identifier and version at the foot.
+ */
+import RailCard from '../family/RailCard.astro';
+import Pill from '../family/Pill.astro';
+import type { LabView } from '../../lib/labs/types';
+import { REVIEW, REPRO, CONTRIBUTION, methodLabel, formatIsoDate } from './labels';
+
+interface Props { lab: LabView; class?: string }
+const { lab, class: className } = Astro.props;
+const { investigation: inv, report } = lab;
+const released = lab.timeline.filter((t) => t.kind === 'release').at(-1);
+const review = REVIEW[report.review];
+const repro = REPRO[report.reproduction];
+---
+
+<RailCard heading="Investigation at a glance" icon="claims" class={className}>
+  <dl class="lab-glance">
+    <div><dt>Release</dt><dd><Pill label={`Released · v${report.version}`} tone="ok" dot /></dd></div>
+    <div><dt>Review</dt><dd><Pill label={review.label} tone={review.tone === 'danger' ? 'warn' : review.tone} /></dd></div>
+    <div><dt>Reproduction</dt><dd><Pill label={repro.label} tone={repro.tone} /></dd></div>
+    <div><dt>Published</dt><dd><time datetime={inv.publishedAt}>{formatIsoDate(inv.publishedAt)}</time></dd></div>
+    <div><dt>Updated</dt><dd><time datetime={inv.updatedAt}>{formatIsoDate(inv.updatedAt)}</time></dd></div>
+    {released && <div><dt>Released</dt><dd><time datetime={released.date}>{formatIsoDate(released.date)}</time></dd></div>}
+    <div><dt>Method</dt><dd><a href="#method">{methodLabel(inv.methodProfile)}</a></dd></div>
+    <div><dt>Contribution</dt><dd>{CONTRIBUTION[inv.contribution]}</dd></div>
+    <div><dt>{inv.contributors.length === 1 ? 'Contributor' : 'Contributors'}</dt><dd>{inv.contributors.map((c) => `${c.name} (${c.role})`).join('; ')}</dd></div>
+    <div><dt>License</dt><dd>{inv.license}</dd></div>
+    <div class="lab-glance__id"><dt>Public id</dt><dd><code>{inv.publicId}@{inv.version}</code></dd></div>
+  </dl>
+</RailCard>
+
+<style>
+  .lab-glance { display: grid; gap: 0; margin: 0; }
+  .lab-glance div { display: grid; grid-template-columns: 104px minmax(0, 1fr); gap: 10px; padding: 7px 0; border-top: 1px solid var(--s2s-rule); }
+  .lab-glance div:first-child { border-top: 0; padding-top: 0; }
+  .lab-glance dt { font: 400 var(--type-meta) / 1.5 var(--font-sans); color: var(--s2s-ink-subtle); }
+  .lab-glance dd { margin: 0; font: 400 var(--type-meta) / 1.5 var(--font-sans); color: var(--s2s-ink-soft); min-width: 0; }
+  .lab-glance dd a { color: var(--s2s-accent); text-decoration: none; }
+  .lab-glance dd a:hover { text-decoration: underline; }
+  .lab-glance div.lab-glance__id { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .lab-glance__id code { font: 400 var(--type-micro) / 1.5 var(--font-mono); color: var(--s2s-ink-muted); overflow-wrap: anywhere; }
+</style>

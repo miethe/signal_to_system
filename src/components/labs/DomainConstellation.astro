@@ -1,0 +1,88 @@
+---
+/**
+ * DomainConstellation — the storyboard's cross-domain motif: the
+ * investigation at the centre, its domains on an orbit, each joined by a
+ * faint arc. Server-rendered SVG, token colours only; the domain list is
+ * also the SVG's accessible name, so nothing is locked in the picture.
+ *
+ * Honest input only: `domains` are the investigation's declared domains
+ * (never inferred), capped at 10 on the orbit.
+ */
+import { seriesColor } from './chart';
+
+interface Props {
+  center: string;
+  domains: string[];
+  /** Links each domain label (e.g. to the Labs index filtered by domain). */
+  hrefFor?: (domain: string) => string;
+  compact?: boolean;
+  class?: string;
+}
+const { center, domains, hrefFor, compact = false, class: className } = Astro.props;
+const shown = domains.slice(0, 10);
+// Compact (rail) uses a narrower canvas so text lands at ~11px on screen.
+const W = compact ? 330 : 420, H = compact ? 250 : 270;
+const cx = W / 2, cy = H / 2;
+const rx = compact ? 88 : 128, ry = compact ? 80 : 92;
+const coreR = compact ? 36 : 44;
+const labelSize = 13;
+
+function wrap(text: string, max: number, maxLines: number): string[] {
+  const words = text.split(/\s+/);
+  const lines: string[] = [];
+  let cur = '';
+  for (const w of words) {
+    if ((cur + ' ' + w).trim().length > max && cur) { lines.push(cur); cur = w; } else cur = (cur + ' ' + w).trim();
+  }
+  if (cur) lines.push(cur);
+  return lines.slice(0, maxLines);
+}
+const coreLines = wrap(center, compact ? 10 : 12, 3);
+
+const nodes = shown.map((d, i) => {
+  const a = -Math.PI / 2 + (i / shown.length) * Math.PI * 2 + (shown.length % 2 ? 0 : Math.PI / shown.length);
+  const x = cx + rx * Math.cos(a);
+  const y = cy + ry * Math.sin(a);
+  const ex = cx + coreR * Math.cos(a), ey = cy + coreR * Math.sin(a);
+  // A gentle bow on each spoke so the figure reads as an orbit, not a wheel.
+  const mx = (ex + x) / 2 + 10 * Math.cos(a + Math.PI / 2);
+  const my = (ey + y) / 2 + 10 * Math.sin(a + Math.PI / 2);
+  const right = Math.cos(a) > 0.25, left = Math.cos(a) < -0.25;
+  const anchor = right ? 'start' : left ? 'end' : 'middle';
+  const lines = wrap(d, right || left ? 11 : 18, 2);
+  const lx = right ? x + 10 : left ? x - 10 : x;
+  const top = Math.sin(a) < 0;
+  const ly = right || left ? y + 4 - ((lines.length - 1) * labelSize) / 2 : top ? y - 12 - (lines.length - 1) * labelSize : y + 20;
+  return { d, x, y, path: `M${ex.toFixed(1)} ${ey.toFixed(1)} Q${mx.toFixed(1)} ${my.toFixed(1)} ${x.toFixed(1)} ${y.toFixed(1)}`, anchor, lx, ly, lines, color: seriesColor(i) };
+});
+---
+
+<svg class:list={['lab-constellation', className]} viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`${center} spans ${shown.length} domains: ${shown.join(', ')}.`}>
+  <ellipse class="lab-constellation__orbit" cx={cx} cy={cy} rx={rx} ry={ry} />
+  {nodes.map((n) => <path class="lab-constellation__spoke" d={n.path} />)}
+  <circle class="lab-constellation__halo" cx={cx} cy={cy} r={coreR + 10} />
+  <circle class="lab-constellation__core" cx={cx} cy={cy} r={coreR} />
+  <text class="lab-constellation__center" x={cx} y={cy - (coreLines.length - 1) * 8.5 + 5} text-anchor="middle">
+    {coreLines.map((l, i) => <tspan x={cx} dy={i === 0 ? 0 : 17}>{l}</tspan>)}
+  </text>
+  {nodes.map((n) => (
+    <g class="lab-constellation__node">
+      <circle cx={n.x} cy={n.y} r="7.5" fill={n.color} opacity="0.22" />
+      <circle cx={n.x} cy={n.y} r="4" fill={n.color} />
+      {hrefFor
+        ? <a href={hrefFor(n.d)}><text class="lab-constellation__label" x={n.lx} y={n.ly} text-anchor={n.anchor}>{n.lines.map((l, i) => <tspan x={n.lx} dy={i ? labelSize : 0}>{l}</tspan>)}</text></a>
+        : <text class="lab-constellation__label" x={n.lx} y={n.ly} text-anchor={n.anchor}>{n.lines.map((l, i) => <tspan x={n.lx} dy={i ? labelSize : 0}>{l}</tspan>)}</text>}
+    </g>
+  ))}
+</svg>
+
+<style>
+  .lab-constellation { display: block; width: 100%; height: auto; overflow: visible; }
+  .lab-constellation__orbit { fill: none; stroke: var(--s2s-rule-strong); stroke-dasharray: 2 5; }
+  .lab-constellation__spoke { fill: none; stroke: color-mix(in srgb, var(--s2s-accent) 38%, transparent); stroke-width: 1; }
+  .lab-constellation__halo { fill: var(--s2s-accent-soft); }
+  .lab-constellation__core { fill: var(--s2s-canvas); stroke: color-mix(in srgb, var(--s2s-accent) 70%, transparent); stroke-width: 1.5; }
+  .lab-constellation__center { font: 400 16px var(--font-display); fill: var(--s2s-ink); }
+  .lab-constellation__label { font: 450 12px var(--font-sans); fill: var(--s2s-ink-soft); }
+  .lab-constellation a:hover .lab-constellation__label { fill: var(--s2s-accent); text-decoration: underline; }
+</style>

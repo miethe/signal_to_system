@@ -1,0 +1,45 @@
+---
+/**
+ * ReportMeta — the facts row under a Lab hero (storyboard: "● Published ·
+ * Updated Apr 22 · By … · 12 min read · 12 claims · 38 sources · 14
+ * figures"), then the page's CTA buttons (default slot). Counts are the
+ * gate-filtered counts; review and reproduction ride as their own pills.
+ */
+import Pill from '../family/Pill.astro';
+import MetaLine from '../family/MetaLine.astro';
+import type { LabView } from '../../lib/labs/types';
+import { REVIEW, REPRO, formatIsoDate } from './labels';
+
+interface Props { lab: LabView }
+const { lab } = Astro.props;
+const { investigation: inv, report, counts } = lab;
+const review = REVIEW[report.review];
+const repro = REPRO[report.reproduction];
+---
+
+<div class="lab-meta">
+  <p class="lab-meta__pills">
+    <Pill label={`Released · v${report.version}`} tone="ok" dot />
+    <Pill label={review.label} tone={review.tone === 'danger' ? 'warn' : review.tone} />
+    <Pill label={`Reproduction: ${repro.label.toLowerCase()}`} tone={repro.tone} />
+  </p>
+  <MetaLine
+    class="lab-meta__line"
+    items={[
+      { label: `Updated ${formatIsoDate(inv.updatedAt)}`, datetime: inv.updatedAt, icon: 'timeline' },
+      { label: `By ${inv.contributors.map((c) => c.name).join(', ')}` },
+      ...(inv.readMinutes ? [{ label: `${inv.readMinutes} min read` }] : []),
+      { value: counts.claims, label: counts.claims === 1 ? 'claim' : 'claims', icon: 'claims' },
+      { value: counts.sources, label: counts.sources === 1 ? 'source' : 'sources', icon: 'sources' },
+      { value: counts.figures, label: counts.figures === 1 ? 'figure' : 'figures', icon: 'figures' },
+    ]}
+  />
+  {Astro.slots.has('default') && <div class="lab-meta__actions"><slot /></div>}
+</div>
+
+<style>
+  .lab-meta { display: flex; flex-direction: column; gap: 12px; margin-top: -6px; }
+  .lab-meta__pills { display: flex; flex-wrap: wrap; gap: 6px 8px; margin: 0; }
+  .lab-meta :global(.lab-meta__line) { color: var(--s2s-ink-muted); }
+  .lab-meta__actions { display: flex; flex-wrap: wrap; gap: 10px 12px; margin-top: 6px; }
+</style>

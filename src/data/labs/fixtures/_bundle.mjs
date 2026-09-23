@@ -4,7 +4,7 @@ import { buildRelease } from './_release.mjs';
 
 export const author = [{ name: 'Fixture author', role: 'Synthetic author' }];
 export const digest = (value) => `sha256:${createHash('sha256').update(value).digest('hex')}`;
-export const artifact = (id, publicId, kind, title, mediaType, bytes = 1024) => ({ id, publicId, version: '1.1.0', digest: digest(title), kind, title, summary: `Synthetic ${title.toLowerCase()}.`, mediaType, bytes, license: 'Apache-2.0', href: `https://example.invalid/artifacts/${publicId}` });
+export const artifact = (id, publicId, kind, title, mediaType, bytes = 1024) => ({ id, publicId, version: '1.1.0', digest: digest(title), kind, title, summary: `Fixture ${kind} released for interface testing.`, mediaType, bytes, license: 'Apache-2.0', href: `https://example.invalid/artifacts/${publicId}` });
 export const method = (profile) => ({ profile, fields: METHOD_PROFILES[profile].fields.map(([key, label]) => ({ key, label, value: `Synthetic ${label.toLowerCase()} for this fixture.` })), deviations: ['Synthetic simplification retained for interface review.'], failures: ['Synthetic edge case remains unresolved.'] });
 
 export function smallFixture({ id, releaseId, title, approvedAt, withdrawn, candidate = false }) {

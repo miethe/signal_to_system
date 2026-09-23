@@ -1,0 +1,76 @@
+---
+/**
+ * ExploreStrip — the storyboard's tile row, used twice:
+ *   /labs "Inside an investigation" (what every report holds; no counts)
+ *   a report's "Explore the research" (real counts, each tile a link)
+ * Icons come from the signed-off set; counts are only ever real.
+ */
+import Icon from '../brand/Icon.astro';
+
+interface Tile { label: string; icon: string; sub: string; href?: string; count?: number }
+interface Props { heading: string; icon?: string; intro?: string; tiles: Tile[]; action?: { label: string; href: string }; id?: string; class?: string }
+const { heading, icon = 'labs', intro, tiles, action, id = 'explore', class: className } = Astro.props;
+---
+
+<section class:list={['lab-explore', className]} aria-labelledby={`${id}-title`}>
+  <header class="lab-explore__head">
+    <span class="lab-explore__icon"><Icon name={icon} size={22} /></span>
+    <h2 class="lab-explore__title" id={`${id}-title`}>{heading}</h2>
+    {intro && <p class="lab-explore__intro">{intro}</p>}
+    {action && <a class="lab-explore__action s2s-focus" href={action.href}>{action.label} <span aria-hidden="true">→</span></a>}
+  </header>
+  <ul class="lab-explore__tiles">
+    {tiles.map((t) => {
+      const Tag = t.href ? 'a' : 'div';
+      return (
+        <li>
+          <Tag class:list={['lab-explore__tile', t.href && 's2s-focus']} href={t.href}>
+            <span class="lab-explore__tile-icon"><Icon name={t.icon} size={28} /></span>
+            <span class="lab-explore__tile-text">
+              <span class="lab-explore__tile-label">{t.label}</span>
+              <span class="lab-explore__tile-sub">{t.count !== undefined ? <><span class="lab-explore__count">{t.count}</span> {t.sub}</> : t.sub}</span>
+            </span>
+            {t.href && <span class="lab-explore__arrow" aria-hidden="true">→</span>}
+          </Tag>
+        </li>
+      );
+    })}
+  </ul>
+</section>
+
+<style>
+  .lab-explore {
+    min-width: 0;
+    padding: 16px 18px 18px;
+    border: 1px solid var(--s2s-rule);
+    border-radius: var(--s2s-radius-card);
+    background: var(--s2s-surface);
+  }
+  .lab-explore__head { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; margin-bottom: 14px; }
+  .lab-explore__icon { color: var(--s2s-accent); display: inline-flex; }
+  .lab-explore__title { margin: 0; font: 400 1.25rem / 1.2 var(--font-display); color: var(--s2s-ink); }
+  .lab-explore__intro { flex: 1 1 280px; margin: 0; font: 400 var(--type-meta) / 1.5 var(--font-sans); color: var(--s2s-ink-subtle); }
+  .lab-explore__action { margin-left: auto; font: 450 var(--type-meta) / 1 var(--font-sans); color: var(--s2s-accent); text-decoration: none; }
+  .lab-explore__tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(92px, 1fr)); gap: 10px; margin: 0; padding: 0; list-style: none; }
+  .lab-explore__tile {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    height: 100%;
+    padding: 12px 11px 30px;
+    border: 1px solid var(--s2s-rule);
+    border-radius: 8px;
+    background: var(--s2s-canvas-raised);
+    color: inherit;
+    text-decoration: none;
+    transition: border-color var(--s2s-dur) ease;
+  }
+  a.lab-explore__tile:hover { border-color: var(--s2s-accent); }
+  .lab-explore__tile-icon { color: var(--s2s-ink-soft); }
+  .lab-explore__tile-text { display: flex; flex-direction: column; gap: 3px; }
+  .lab-explore__tile-label { font: 500 var(--type-body-s) / 1.25 var(--font-sans); color: var(--s2s-ink); }
+  .lab-explore__tile-sub { font: 400 var(--type-micro) / 1.4 var(--font-sans); color: var(--s2s-ink-subtle); }
+  .lab-explore__count { font-family: var(--font-mono); color: var(--s2s-ink-soft); }
+  .lab-explore__arrow { position: absolute; left: 12px; bottom: 8px; color: var(--s2s-accent); }
+</style>
