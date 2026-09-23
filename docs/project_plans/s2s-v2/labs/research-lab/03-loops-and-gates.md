@@ -54,7 +54,7 @@ ARC review → Nick promotes → SkillMeat release (workflow / context-entity / 
 | Result review | after S5 | `research-claim-council` | result record + raw-output digests | reviewer outcome decision |
 | Release review | before approval | `release-certification-council` | candidate snapshot tree | Nick's release approval |
 
-ARC runs are created with `POST /api/runs` (council, target, `target_sha256`, objective,
+ARC server execution is **degraded** (RLARC-004, finding `node_01M35WVAPN1G02V0A24QV7H17G`): until it qualifies, a stage review may run as a labelled *substitute* — the same council YAML, reviewer roles and finding schema executed as isolated seat passes on an ICA leg — and the review record says `substitute`, never `arc-executed`. ARC runs are created with `POST /api/runs` (council, target, `target_sha256`, objective,
 constraints, AOS correlation ids) and executed async (`POST /api/runs/{id}/execute` → 202, poll
 `/execute/status`) — [code] P1c §2. The target must sit inside ARC's root on the node, so the Lab
 stages a read-only copy under ARC `inputs/` and pins its digest. Lane disclosure: reviewers run on

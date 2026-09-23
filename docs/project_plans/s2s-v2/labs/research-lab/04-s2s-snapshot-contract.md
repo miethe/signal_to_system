@@ -52,6 +52,8 @@ summary}` records, a manifest, and Nick-only release receipts, and fails closed 
 | Canonical digest | `JSON.stringify` of the record with `digest` removed (key-order sensitive) | Lab emits records with a fixed key order and the same function; M4 adds a canonical-JSON test on both sides |
 | Private-material scan | regex over `node_|tree_|ws_|req_|agentic-nuc|/private/|.ssh/|secrets.env` | Lab additionally scans for LAN addresses, local home paths, workspace names, and any id listed as `denied` |
 
+Every row above is enforced by an executable fail-closed test in M1d, not only documented (RLARC-003); the sidecar check is a digest match between the public manifest and the private `release.json`, and private-only fields (reviews, workspace, unresolved refs) are asserted absent from `public/`.
+
 Record `publicId`s are slugs (`^[a-z][a-z0-9-]{2,79}$`), e.g. `continuity-typed-succession`,
 `continuity-typed-succession-report`. Lab ULIDs never appear publicly.
 
@@ -89,6 +91,8 @@ One row per film scene (and per interactive/figure view, same shape):
 an ambiguity task is filed; the film does not invent the missing quantity (handoff agent contract).
 The prior films carry evidence-status ledgers but no machine-resolvable scene→claim ids (P1d §8),
 so none of them passes this map today; they enter the Lab as *history-only* media.
+
+**Denied evidence in previews (RLARC-005).** A denied source renders as a fixed access-state token (`access: denied`) — no title, locator, count, id or derived summary — in both the private preview and `public/`; a snapshot test pins this.
 
 ## 6. Corrections, freshness, withdrawal
 

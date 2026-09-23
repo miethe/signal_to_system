@@ -54,6 +54,11 @@ deterministic check → one **private** S2S preview with a correct evidence trai
 9. An unavailable adapter reports `unavailable` and is not silently replaced (test).
 10. One interrupted handoff (simulated timeout after write) reconciles without a duplicate write (test).
 11. The private preview shows every claim with its composite ref, access depth and verify state.
+12. Shared-origin counting: two derived assertions sharing one upstream count once, order-independently; naive aggregation is rejected (RLARC-001; M1a primitive, M1b check).
+13. A changed source revision keeps the original ref immutable and records a new one; a duplicate upload is serialized and written once; an external execution with unknown outcome stays pending/unverified (RLARC-006, M1a).
+14. The denied-source access-state token is snapshot-tested in the preview (RLARC-005, M1c).
+
+Design review: substitute council pass (architecture-review-council seats, ICA) — **go-with-changes**; findings RLARC-001/003/004/005/006 accepted and mapped above, RLARC-002 watchlist (→ `lab doctor` remote/ignore check). Artifacts: private mirror `review/`.
 
 ## M2 — Qualified wiring (still private)
 

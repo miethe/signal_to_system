@@ -110,11 +110,11 @@ documentation. At design time:
 | RF write via node `POST /api/runs` | unqualified | scaffolds capture/triage/plan only, no swarm (P1a §1); no write qualified |
 | RF local file-backed workspace (CLI via `uv run`) | unqualified → M1 qualifies | shell Python could not import the package in the leg (P1a §7) |
 | MeatyWiki Portal API (`/api/admin/health`, `/api/workflows/...`) | unqualified | loopback on node; health route found in code only (P1b §6) |
-| ARC (`POST /api/runs`, execute async + poll) | available for review | [live] health 200; first use = this design's review |
+| ARC (`POST /api/runs`, execute async + poll) | **degraded** | [live] health 200, but three executions failed at the first reviewer (finding `node_01M35WVAPN1G02V0A24QV7H17G`); stays degraded until a create → execute → poll → schema-valid-artifacts qualification succeeds (RLARC-004) |
 | IntentTree | available (task state) | [live] CLI; lease fencing **unqualified** (P1c §6) → single operator until M2 |
 | SkillMeat | read_only | [live] `--help`; no deploy receipt |
 
-## 7. Where the coordinator lives — **Nick decision** (HumanRequest filed; id in 05)
+## 7. Where the coordinator lives — **DECIDED 2026-09-23: option A, new private `research-lab` repo** (`req_01M35W258PW07TDNSE9S9KXS5M`)
 
 | Option | For | Against |
 |---|---|---|
@@ -123,7 +123,7 @@ documentation. At design time:
 | C. Package inside `agentic_meta_dev` (`operator_core`) | `op` already routes to rf/arc/itt/meatywiki | the launchpad routes work, it is not an owner of research state (constraint 1: execution is external); mixes the operator's run records with research records |
 | D. Inside S2S | — | rejected: S2S is presentation only, and this repo is public |
 
-**Recommendation: A.** Non-blocking design: M1 is built in a local, remote-less staging repo at
+**Decision: A** (Nick). `lab doctor` verifies the remote is private and the workspace is ignored (RLARC-002). Original non-blocking design, kept for the record: M1 is built in a local, remote-less staging repo at
 `~/dev/homelab/development/research-lab` with no imports from any host; option B or C relocates it
 with `git subtree add` preserving history. The private workspace is a separate directory in every
 option.

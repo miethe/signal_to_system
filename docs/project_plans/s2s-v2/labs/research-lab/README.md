@@ -44,12 +44,12 @@ is not a released one, and a merged PR is not a deployment. Every hop leaves a r
 6. [06-qualification-digest.md](06-qualification-digest.md) — what P1 measured, what it did not,
    and the open questions each milestone must close.
 
-## Decisions pending (Nick) — the design does not block on them
+## Decisions (Nick)
 
 | Decision | Request | Design default while pending |
 |---|---|---|
-| Coordinator home (new `research-lab` repo vs package in RF / launchpad) | see 01 §7, HumanRequest id in 05 | M1 builds in a **local, remote-less staging repo** that relocates by `git subtree` into whichever home is chosen |
-| Where this design package may live (this repo is **public**) | HumanRequest id in 05 | committed locally, **not pushed**, until decided |
+| Coordinator home | `req_01M35W258PW07TDNSE9S9KXS5M` — **decided: new private `research-lab` repo** | — |
+| Where this design package may live (this repo is **public**) | `req_01M35W25DSYX3DYZQ5DPWRE1Q8` — **approved for this repo** | — |
 | Flagship Lab | `req_01M35C53MSYM0R8A1MG0D77EF8` (open) | M1 uses the handoff's own first-slice choice (Machine Continuity packet) privately; flagship selection only matters at M4 |
 | Snapshot store, RF eligibility, approver | answered on the S2S spine requests (`…S8EDMH`, `…S3D4E8`, `…YAWVA3`) | snapshot store deferred to this handoff → the Lab workspace `releases/` is the private candidate store; RF eligibility = synthetic fixtures until the flagship; Nick releases, Metis may withdraw |
 
