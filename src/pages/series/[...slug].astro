@@ -1,7 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import SeriesLayout from '../../layouts/SeriesLayout.astro';
-import { getPostsBySeries, getStoriesBySeries, hrefFor } from '../../lib/content';
+import { getPostsBySeries, getStoriesBySeries, hrefFor, type Article } from '../../lib/content';
 import { seriesMembers } from '../../lib/series.mjs';
 import { SUBTYPE_LABEL } from '../../lib/writing';
 
@@ -17,7 +17,7 @@ export async function getStaticPaths() {
       ]);
 
       // One reading order for both collections (seriesOrder, then date).
-      const seriesEntries = seriesMembers(seriesEntry.id, [...seriesPosts, ...seriesStories]);
+      const seriesEntries: Article[] = seriesMembers(seriesEntry.id, [...seriesPosts, ...seriesStories]);
 
       return {
         params: { slug: seriesEntry.id },
