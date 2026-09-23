@@ -12,7 +12,7 @@
  * `fs.statSync`. A missing asset at build time leaves both fields `null`
  * — a labeled pending slot, not a substitute value.
  */
-import '../../styles/registry-wave-v2.css';
+import '../../styles/reader/shell.css';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
@@ -59,7 +59,7 @@ const filename = beat?.image.src.split('/').pop() ?? '';
 
 {
   beat && (
-    <div class:list={['figure-viewer', thread.slug === 'the-registry-wave-agentic-artifact-supply-chain' && 'registry-wave-focus']} data-focus-kind="figure" data-focus-key={beat.id}>
+    <div class:list={['figure-viewer', 'reader-focus']} data-focus-kind="figure" data-focus-key={beat.id}>
       <div class="figure-viewer__actions">
         <a class="figure-viewer__action" href={`/essays/${thread.slug}/`}>
           &larr; Back to essay

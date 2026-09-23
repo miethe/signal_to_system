@@ -17,8 +17,7 @@
    is the alias bridge the adoption plan calls for ("Where I disagree" #3):
    it goes away when the library is migrated to the role layer.
 
-   The essay reader is pinned to its pre-v2 values in ../reader-legacy.css
-   until M2 re-tokens it.
+   The essay reader's own roles (--reader-*) live in ./reader.css (M2).
    ============================================================ */
 
 /* ---------- (1) Tailwind scale names -> roles ---------- */

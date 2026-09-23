@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "generated": "2026-09-22",
+  "generated": "2026-09-23",
   "note": "Grandfathered raw palette literals per file (pre-v2 debt). This list must only shrink; new colors belong in src/styles/tokens/ as --s2s-* roles.",
   "files": {
     "src/components/cards/EssayCard.astro": 1,
@@ -19,8 +19,7 @@
     "src/content/stories/agentic-os-field-note.mdx": 1,
     "src/pages/studio/brand-preview.astro": 50,
     "src/styles/agentic-operations-flow.css": 55,
-    "src/styles/global.css": 116,
-    "src/styles/registry-wave-v2.css": 53,
+    "src/styles/global.css": 31,
     "src/styles/workflow-showcase.css": 45
   }
 }

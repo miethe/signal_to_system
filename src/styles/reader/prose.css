@@ -1,0 +1,1152 @@
+/* ============================================================
+   READER PROSE — .prose-custom, figure plates, glossary, editorial
+   furniture (callouts, hover lift, series wayfinding, leader takeaway).
+
+   Extracted from global.css in M2 (reader-css). Global because
+   PageLayout/ProjectLayout/ComponentPage also render .prose-custom.
+   Colors come from the reader role layer (../tokens/reader.css) and the
+   bridged editorial names; no raw palette values live here.
+   ============================================================ */
+
+/* ============================================================
+   PROSE — .prose-custom
+   Used for article/essay body content
+   ============================================================ */
+
+/* PostLayout owns this one reading measure. Keeping the layout and prose on
+   the same variable prevents a wider grid from leaving a narrow text column. */
+.post-layout {
+  --measure: 72ch;
+}
+
+@media (min-width: 1024px) {
+  .post-layout {
+    --measure: 84ch;
+  }
+}
+
+.prose-custom {
+  max-width: var(--measure, 72ch);
+  font-size: 1.0625rem;
+  line-height: 1.75;
+  color: var(--text-secondary);
+}
+
+/* --- Headings --- */
+.prose-custom h1,
+.prose-custom h2,
+.prose-custom h3,
+.prose-custom h4,
+.prose-custom h5,
+.prose-custom h6 {
+  color: var(--text-primary);
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  scroll-margin-top: 5rem;
+}
+
+.prose-custom h1 {
+  font-size: 2rem;
+  line-height: 1.2;
+  margin-top: 0;
+  margin-bottom: 1rem;
+}
+
+.prose-custom h2 {
+  font-size: 1.5rem;
+  line-height: 1.3;
+  margin-top: 2.5rem;
+  margin-bottom: 0.875rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.prose-custom h3 {
+  font-size: 1.25rem;
+  line-height: 1.35;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+}
+
+.prose-custom h4 {
+  font-size: 1.0625rem;
+  line-height: 1.4;
+  margin-top: 1.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.prose-custom h5,
+.prose-custom h6 {
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary);
+}
+
+/* Heading anchor links */
+.prose-custom h2 a,
+.prose-custom h3 a,
+.prose-custom h4 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.prose-custom h2 a:hover,
+.prose-custom h3 a:hover,
+.prose-custom h4 a:hover {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+/* --- Paragraphs --- */
+.prose-custom p {
+  margin-top: 0;
+  margin-bottom: 1.25rem;
+  color: var(--text-secondary);
+}
+
+.prose-custom > p:first-child {
+  font-size: 1.125rem;
+  color: var(--text-primary);
+}
+
+/* --- Links --- */
+.prose-custom a {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+  font-weight: 500;
+  transition: color 150ms ease;
+}
+
+.prose-custom a:hover {
+  color: var(--accent-hover);
+  text-decoration-thickness: 2px;
+}
+
+/* --- Glossary terms (dfn) --- */
+/* Visually distinct from .prose-custom a: dotted underline, no color shift,
+   help cursor, so readers can tell "definition" from "link" at a glance. */
+.prose-custom dfn {
+  font-style: normal;
+  cursor: help;
+  border-bottom: 1px dashed var(--text-secondary);
+  text-decoration: none;
+}
+
+.glossary-term {
+  position: relative;
+  display: inline-block;
+}
+
+.glossary-tooltip {
+  position: absolute;
+  z-index: 30;
+  left: 0;
+  bottom: calc(100% + 0.5rem);
+  width: max-content;
+  max-width: min(20rem, calc(100vw - 2.5rem));
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.5rem;
+  background: var(--bg-surface);
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  box-shadow: var(--reader-tooltip-shadow);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(4px);
+  transition: opacity 120ms ease, transform 120ms ease, visibility 120ms;
+  pointer-events: none;
+}
+
+.glossary-term:hover .glossary-tooltip,
+.glossary-term:focus-within .glossary-tooltip,
+.glossary-term dfn:focus-visible ~ .glossary-tooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.glossary-tooltip-definition {
+  display: block;
+  color: var(--text-primary);
+}
+
+.glossary-tooltip-link {
+  display: inline-block;
+  margin-top: 0.5rem;
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  font-weight: 500;
+  border-bottom: none;
+}
+
+/* Keep the tooltip on-screen on narrow viewports instead of overflowing */
+@media (max-width: 900px) {
+  .glossary-tooltip {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    left: 1rem;
+    width: auto;
+    max-width: none;
+    transform: translateY(4px);
+  }
+
+  .glossary-term:hover .glossary-tooltip,
+  .glossary-term:focus-within .glossary-tooltip,
+  .glossary-term dfn:focus-visible ~ .glossary-tooltip {
+    transform: translateY(0);
+  }
+}
+
+/* --- Lists --- */
+.prose-custom ul,
+.prose-custom ol {
+  margin-top: 0;
+  margin-bottom: 1.25rem;
+  padding-left: 1.5rem;
+  color: var(--text-secondary);
+}
+
+.prose-custom ul {
+  list-style-type: disc;
+}
+
+.prose-custom ol {
+  list-style-type: decimal;
+}
+
+.prose-custom li {
+  margin-bottom: 0.375rem;
+  padding-left: 0.25rem;
+}
+
+.prose-custom li::marker {
+  color: var(--accent);
+}
+
+.prose-custom li > ul,
+.prose-custom li > ol {
+  margin-top: 0.375rem;
+  margin-bottom: 0.375rem;
+}
+
+/* --- Blockquotes --- */
+.prose-custom blockquote {
+  margin: 1.75rem 0;
+  padding: 1rem 1.5rem;
+  border-left: 3px solid var(--accent);
+  background-color: var(--accent-subtle);
+  border-radius: 0 0.375rem 0.375rem 0;
+  font-style: italic;
+  color: var(--text-primary);
+}
+
+.prose-custom blockquote p {
+  margin-bottom: 0;
+  color: inherit;
+}
+
+.prose-custom blockquote cite {
+  display: block;
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  font-style: normal;
+  color: var(--text-tertiary);
+}
+
+/* --- Inline code --- */
+.prose-custom :not(pre) > code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  background-color: var(--code-bg);
+  color: var(--code-text);
+  padding: 0.125em 0.375em;
+  border-radius: 0.25rem;
+  border: 1px solid var(--code-border);
+  word-break: break-all;
+}
+
+/* --- Code blocks --- */
+.prose-custom pre {
+  min-width: 0;
+  max-width: 100%;
+  contain: inline-size;
+  font-family: var(--font-mono);
+  font-size: 0.875rem;
+  line-height: 1.7;
+  background-color: var(--code-bg-block);
+  color: var(--code-text-block);
+  padding: 1.25rem 1.5rem;
+  border-radius: 0.5rem;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+  border: 1px solid var(--code-border);
+  tab-size: 2;
+}
+
+.prose-custom pre code {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: inherit;
+  color: inherit;
+  border-radius: 0;
+  word-break: normal;
+}
+
+/* --- Tables --- */
+.prose-custom table {
+  display: block;
+  max-width: 100%;
+  overflow-x: auto;
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9375rem;
+  margin: 1.75rem 0;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border);
+}
+
+.prose-custom thead {
+  background-color: var(--bg-muted);
+}
+
+.prose-custom thead th {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.8125rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-tertiary);
+  border-bottom: 1px solid var(--border);
+}
+
+.prose-custom tbody tr {
+  border-bottom: 1px solid var(--border-subtle);
+  transition: background-color 100ms ease;
+}
+
+.prose-custom tbody tr:last-child {
+  border-bottom: none;
+}
+
+.prose-custom tbody tr:hover {
+  background-color: var(--bg-subtle);
+}
+
+.prose-custom tbody td {
+  padding: 0.75rem 1rem;
+  color: var(--text-secondary);
+  vertical-align: top;
+}
+
+/* --- Native disclosures --- */
+.prose-custom details {
+  margin: 1.25rem 0;
+  padding: 0.625rem 0 0.625rem 1rem;
+  border-left: 2px solid var(--border);
+  color: var(--text-secondary);
+}
+
+.prose-custom summary {
+  cursor: pointer;
+  color: var(--accent);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.5;
+  text-underline-offset: 0.18em;
+}
+
+.prose-custom summary::marker {
+  color: var(--accent);
+}
+
+.prose-custom summary:hover {
+  color: var(--accent-hover);
+  text-decoration: underline;
+}
+
+.prose-custom details[open] > summary {
+  margin-bottom: 0.75rem;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .prose-custom details {
+    transition: border-color 150ms ease;
+  }
+}
+
+/* --- Horizontal rules --- */
+.prose-custom hr {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 2.5rem 0;
+}
+
+/* --- Images in prose --- */
+.prose-custom img {
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-subtle);
+  margin: 2rem auto;
+  box-shadow: var(--shadow-md);
+}
+
+.prose-custom figure {
+  margin: 2rem 0;
+}
+
+.prose-custom figcaption {
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--text-tertiary);
+  margin-top: 0.75rem;
+  font-style: italic;
+}
+
+/* Supporting visual material can borrow a little of the surrounding grid at
+   laptop widths, while prose keeps its deliberate reading measure. */
+@media (min-width: 1024px) {
+  .prose-custom > .figure-plate,
+  .prose-custom > table {
+    width: calc(100% + 3rem);
+    max-width: none;
+    margin-right: -1.5rem;
+    margin-left: -1.5rem;
+  }
+}
+
+/* ============================================================
+   FIGURE PLATE
+   Editorial "engineering plate" treatment for schematic figures.
+   Artwork stays light in its own frame; in dark mode the surrounding plate
+   becomes a restrained navy panel so it belongs to the page.
+   Used via <Figure /> component, and by PostLayout for heroImage.
+   ============================================================ */
+.figure-plate {
+  position: relative;
+  margin: 2.75rem 0;
+  padding: 1.375rem 1.375rem 1.125rem;
+  background: linear-gradient(180deg, var(--reader-plate-bg) 0%, var(--reader-plate-bg-2) 100%);
+  border: 1px solid var(--reader-plate-edge);
+  border-radius: 0.625rem;
+  box-shadow: var(--reader-shadow);
+}
+
+/* v2: one plate treatment in both themes (it used to switch to a navy
+   panel in dark). The header bar and ruled caption are the dark-era shape,
+   kept for every theme. */
+.figure-plate__header { height: 34px; padding: 0 16px; align-items: center; letter-spacing: .18em; }
+.figure-plate__caption,
+.prose-custom .figure-plate__caption { margin-top: 14px; padding: 10px 0 0; border-top: 1px solid var(--reader-edge-soft); }
+
+/* Hero variant — frontispiece on the post */
+.figure-plate--hero {
+  margin: 0 0 3.5rem;
+  padding: 1.5rem 1.5rem 1.25rem;
+}
+
+.reader-shell .figure-plate--hero {
+  width: 100%;
+  height: 220px;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: var(--reader-lift);
+}
+
+.reader-shell .figure-plate--hero .figure-plate__corner,
+.reader-shell .figure-plate--hero .figure-plate__header {
+  display: none;
+}
+
+.reader-shell .figure-plate--hero .figure-plate__frame,
+.reader-shell .figure-plate--hero img {
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  object-fit: cover;
+}
+
+/* Inline comparison plates inherit the reader's navy hierarchy. Accent is
+   reserved for status and controls, not the structural card edges. */
+.reader-shell .managed-variation {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  margin: 22px 0;
+  overflow: hidden;
+  border: 1px solid var(--border-strong);
+  border-radius: 10px;
+  background: var(--bg-surface);
+}
+
+.reader-shell .managed-variation > div { padding: 14px 18px 16px; }
+.reader-shell .managed-variation > div + div { border-left: 1px solid var(--border-subtle); }
+.reader-shell .managed-variation { border-color: var(--reader-edge); background: var(--reader-panel); box-shadow: var(--reader-shadow); }
+.reader-shell .managed-variation > div + div { border-color: var(--reader-edge-soft); }
+@media (max-width: 640px) { .reader-shell .managed-variation { grid-template-columns: 1fr; } .reader-shell .managed-variation > div + div { border-top: 1px solid var(--border-subtle); border-left: 0; } }
+
+@media (max-width: 1279px) {
+  .reader-shell .figure-plate--hero {
+    height: auto;
+    aspect-ratio: 2.25 / 1;
+    margin-bottom: 12px;
+    border-radius: 6px;
+  }
+}
+
+/* Inline variant — stays within the prose measure, cancelling the grid
+   breakout the default plate gets at lg (see the `.prose-custom >
+   .figure-plate` rule below). For small supporting figures. */
+@media (min-width: 1024px) {
+  .prose-custom > .figure-plate.figure-plate--inline {
+    width: 100%;
+    max-width: 100%;
+    margin-right: 0;
+    margin-left: 0;
+  }
+}
+
+/* Wide / technical variants — break out further than the default plate for
+   diagrams that need more than the 72ch reading measure. */
+@media (min-width: 1024px) {
+  .prose-custom > .figure-plate.figure-plate--wide,
+  .prose-custom > .figure-plate.figure-plate--technical {
+    width: min(calc(100% + 6rem), calc(100vw - 2rem));
+    max-width: none;
+    margin-right: -3rem;
+    margin-left: -3rem;
+  }
+}
+
+/* Technical variant — a thinner, dashed "schematic" plate treatment,
+   distinct from the warm editorial plate used for photos/illustrations. */
+.figure-plate--technical {
+  border-width: 1px;
+  border-style: dashed;
+  border-color: var(--reader-plate-technical-edge);
+}
+
+.figure-plate--technical .figure-plate__label {
+  color: var(--reader-plate-technical-label);
+}
+
+/* Corner tick marks — four 10px L-brackets echoing drafting sheets */
+.figure-plate__corner {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  pointer-events: none;
+  opacity: 0.5;
+  border: 1.5px solid var(--reader-plate-corner);
+}
+.figure-plate__corner--tl { top: 7px; left: 7px;  border-right: 0; border-bottom: 0; }
+.figure-plate__corner--tr { top: 7px; right: 7px; border-left: 0;  border-bottom: 0; }
+.figure-plate__corner--bl { bottom: 7px; left: 7px;  border-right: 0; border-top: 0; }
+.figure-plate__corner--br { bottom: 7px; right: 7px; border-left: 0;  border-top: 0; }
+
+/* Image frame inside the plate — reset any inherited prose-custom img styling */
+.figure-plate__frame {
+  position: relative;
+  border-radius: 0.375rem;
+  overflow: hidden;
+  background: var(--reader-paper);
+}
+
+.figure-plate__header {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .45rem .65rem;
+  color: var(--reader-plate-head-ink);
+  background: var(--reader-plate-head-bg);
+  border-bottom: 1px solid var(--reader-edge-soft);
+  font: 700 .625rem var(--font-mono);
+  letter-spacing: .07em;
+  text-transform: uppercase;
+  pointer-events: none;
+}
+
+.figure-plate__enlarge {
+  position: relative;
+  display: block;
+  color: var(--text-primary);
+  cursor: zoom-in;
+}
+
+.figure-plate__enlarge:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.figure-plate__enlarge-affordance {
+  position: absolute;
+  top: 0.625rem;
+  right: 0.625rem;
+  display: grid;
+  width: 2rem;
+  height: 2rem;
+  place-items: center;
+  color: var(--text-primary);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+
+.figure-plate__enlarge:hover .figure-plate__enlarge-affordance,
+.figure-plate__enlarge:focus-visible .figure-plate__enlarge-affordance {
+  opacity: 0.9;
+}
+
+.figure-plate__frame img,
+.prose-custom .figure-plate__frame img {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0;
+  border: 0;
+  border-radius: 0.375rem;
+  box-shadow: none;
+}
+
+/* Caption: mono label in accent + serif-friendly text in paper-readable slate.
+   Caption lives INSIDE the light plate, so colors are fixed (not theme-var) —
+   we are in "paper space" here, not page space. */
+.figure-plate__caption,
+.prose-custom .figure-plate__caption {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+  margin-top: 0.625rem;
+  padding: 0 0.125rem;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  font-style: normal;
+  text-align: left;
+  color: var(--reader-plate-caption-ink);
+}
+
+.figure-plate__caption-main {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+}
+
+.figure-plate__label {
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--reader-plate-label);
+  padding-top: 0.0625rem;
+  white-space: nowrap;
+}
+
+.figure-plate__text {
+  font-family: var(--font-sans);
+  color: var(--reader-plate-caption-ink);
+  font-weight: 400;
+}
+
+.figure-plate__credit {
+  color: var(--s2s-ink-subtle);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  line-height: 1.4;
+}
+
+.figure-plate__credit a {
+  color: inherit;
+  text-underline-offset: 0.18em;
+}
+
+.figure-plate__credit a:hover {
+  color: var(--s2s-ink);
+}
+
+.figure-lightbox {
+  width: min(96vw, 100rem);
+  max-width: 96vw;
+  max-height: 92vh;
+  margin: auto;
+  padding: 0;
+  overflow: visible;
+  color: var(--text-primary);
+  background: transparent;
+  border: 0;
+  animation: figure-lightbox-in 160ms ease-out;
+}
+
+.figure-lightbox::backdrop {
+  background: var(--color-bg-overlay);
+  animation: figure-lightbox-backdrop-in 160ms ease-out;
+}
+
+.figure-lightbox__panel {
+  position: relative;
+  display: flex;
+  max-height: 92vh;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+}
+
+.figure-lightbox__panel img,
+.prose-custom .figure-lightbox__panel img {
+  display: block;
+  width: auto;
+  max-width: calc(96vw - 2rem);
+  height: auto;
+  max-height: calc(92vh - 5rem);
+  margin: auto;
+  border: 0;
+  border-radius: var(--radius-md);
+  box-shadow: none;
+  object-fit: contain;
+}
+
+.figure-lightbox__close {
+  position: absolute;
+  z-index: 1;
+  top: 1.5rem;
+  right: 1.5rem;
+  display: grid;
+  width: 2.25rem;
+  height: 2.25rem;
+  place-items: center;
+  color: var(--text-primary);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  box-shadow: var(--shadow-sm);
+  cursor: pointer;
+}
+
+.figure-lightbox__close:hover {
+  color: var(--accent-hover);
+}
+
+.figure-lightbox__close:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.figure-lightbox__caption {
+  margin: 0;
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
+@keyframes figure-lightbox-in {
+  from { opacity: 0; transform: scale(0.985); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes figure-lightbox-backdrop-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (hover: none) {
+  .figure-plate__enlarge-affordance {
+    opacity: 0.8;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .figure-plate__enlarge-affordance {
+    transition: none;
+  }
+
+  .figure-lightbox,
+  .figure-lightbox::backdrop {
+    animation: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .figure-plate {
+    margin: 2rem 0;
+    padding: 1rem 1rem 0.875rem;
+  }
+  .figure-plate--hero {
+    margin: 0 0 2.5rem;
+    padding: 1.125rem 1.125rem 1rem;
+  }
+  .figure-plate__caption {
+    gap: 0.3rem;
+  }
+  .figure-plate__caption-main {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .reader-shell .prose-custom { font-size: 15px; line-height: 1.45; }
+  .reader-shell .prose-custom > p:first-child { font-size: 15px; line-height: 1.45; }
+  .reader-shell .figure-plate { margin: 18px 0; padding: 8px; border-radius: 7px; }
+  .reader-shell .thread-scene { margin: 22px 0; padding: 12px; }
+}
+
+/* --- Strong & em --- */
+.prose-custom strong {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.prose-custom em {
+  color: var(--text-primary);
+}
+
+/* --- Keyboard / mark --- */
+.prose-custom kbd {
+  font-family: var(--font-mono);
+  font-size: 0.8125em;
+  background-color: var(--bg-muted);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  border-bottom-width: 2px;
+  border-radius: 0.25rem;
+  padding: 0.125em 0.375em;
+}
+
+.prose-custom mark {
+  background-color: var(--reader-highlight);
+  color: var(--s2s-ink);
+  padding: 0.0625em 0.25em;
+  border-radius: 0.125rem;
+}
+
+/* --- Callout / aside pattern --- */
+.prose-custom aside,
+.prose-custom .callout {
+  border-left: 2px solid var(--accent-muted);
+  padding: 0.25rem 0 0.25rem 1rem;
+  margin: 1.25rem 0;
+  font-size: 0.9375rem;
+}
+
+.prose-custom aside p:last-child,
+.prose-custom .callout p:last-child {
+  margin-bottom: 0;
+}
+
+
+/* ============================================================
+   CALLOUT VARIANTS (used from MDX shortcodes)
+   ============================================================ */
+
+.callout-warning {
+  background-color: color-mix(in srgb, var(--s2s-status-warn) 6%, transparent);
+  border-color: color-mix(in srgb, var(--s2s-status-warn) 35%, transparent);
+  color: var(--s2s-status-warn);
+}
+
+.callout-info {
+  background-color: color-mix(in srgb, var(--s2s-status-info) 6%, transparent);
+  border-color: color-mix(in srgb, var(--s2s-status-info) 35%, transparent);
+  color: var(--s2s-status-info);
+}
+
+.callout-success {
+  background-color: color-mix(in srgb, var(--s2s-status-ok) 6%, transparent);
+  border-color: color-mix(in srgb, var(--s2s-status-ok) 35%, transparent);
+  color: var(--s2s-status-ok);
+}
+
+.callout-danger {
+  background-color: color-mix(in srgb, var(--s2s-status-danger) 6%, transparent);
+  border-color: color-mix(in srgb, var(--s2s-status-danger) 35%, transparent);
+  color: var(--s2s-status-danger);
+}
+
+/* ============================================================
+   HOVER LIFT — shared treatment for boxed in-body content
+   Add `lift-hover` to the ROOT element of a boxed MDX/body
+   component (callouts, figures, thread beats, the leader-takeaway
+   card). Never on sidebar cards, and never on inline markers
+   (Evidence, Term) — a baseline-aligned pill must not move.
+
+   The lift is a transform, so it never reflows its neighbours.
+   Surfaces that already carry a resting shadow re-declare
+   --lift-shadow so the hover state is a superset of it rather
+   than a replacement (see .figure-plate below).
+   ============================================================ */
+
+.lift-hover {
+  transition:
+    transform var(--lift-duration) var(--lift-ease),
+    box-shadow var(--lift-duration) ease-out;
+}
+
+/* Pointer devices only: a `:hover` that sticks after a tap is worse than no
+   hover at all. */
+@media (hover: hover) and (pointer: fine) {
+  .lift-hover:hover {
+    transform: translateY(var(--lift-y));
+    box-shadow: var(--lift-shadow);
+  }
+
+  /* A transformed ancestor can become the containing block for fixed
+     descendants; don't lift a figure whose lightbox is open. */
+  .lift-hover:hover:has(dialog[open]) {
+    transform: none;
+  }
+}
+
+/* Reduced motion / lite mode: keep the shadow (it isn't motion), drop the
+   lift and the transition. The global rules below only clamp transition
+   DURATION, so the transform itself has to be cancelled explicitly. */
+@media (prefers-reduced-motion: reduce) {
+  .lift-hover,
+  .lift-hover:hover {
+    transform: none;
+    transition: box-shadow var(--lift-duration) ease-out;
+  }
+}
+
+.perf-lite .lift-hover,
+.perf-lite .lift-hover:hover {
+  transform: none;
+  transition: none;
+}
+
+/* Figure plates and the leader-takeaway card lift onto the shared pop
+   shadow plus a faint accent ring (was a per-theme navy/indigo pair). */
+.figure-plate.lift-hover,
+.leader-takeaway.lift-hover {
+  --lift-shadow: 0 0 0 1px var(--reader-mark-soft), var(--reader-lift);
+}
+
+/* ============================================================
+   SERIES WAYFINDING
+   The one-line "where does this sit?" element between a post's
+   dek and its tag row (components/content/SeriesWayfinding.astro).
+   Two chip kinds, deliberately different in weight: an Arc is a
+   narrative throughline across series (accent-forward), a Series
+   is a mini-series (quiet outline).
+   ============================================================ */
+
+.series-wayfinding {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.wayfind {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.34rem;
+  padding: 0.3rem 0.6875rem 0.32rem 0.5625rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 9999px;
+  background: var(--bg-subtle);
+  color: var(--text-tertiary);
+  font-size: 0.8125rem;
+  line-height: 1.3;
+  text-decoration: none;
+  transition:
+    border-color 150ms ease,
+    background-color 150ms ease,
+    color 150ms ease;
+}
+
+.wayfind__icon {
+  flex: none;
+  color: var(--text-disabled);
+  transition: color 150ms ease;
+}
+
+.wayfind__kicker {
+  font-family: var(--font-mono);
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.wayfind__sep {
+  color: var(--text-disabled);
+}
+
+.wayfind__name {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.wayfind__position {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* The Arc — the throughline. Reads as the primary of the two. */
+.wayfind--arc {
+  border-color: var(--accent-muted);
+  background: var(--accent-subtle);
+  color: var(--accent-text);
+}
+
+.wayfind--arc .wayfind__icon,
+.wayfind--arc .wayfind__sep {
+  color: var(--accent);
+}
+
+.wayfind--arc .wayfind__kicker,
+.wayfind--arc .wayfind__name {
+  color: var(--accent-text);
+}
+
+.dark .wayfind--arc {
+  border-color: var(--reader-signal-edge);
+  background: var(--reader-mark-soft);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  a.wayfind:hover {
+    border-color: var(--accent);
+    color: var(--accent-text);
+  }
+
+  a.wayfind:hover .wayfind__name,
+  a.wayfind:hover .wayfind__icon {
+    color: var(--accent-text);
+  }
+
+  a.wayfind--arc:hover {
+    background: var(--accent-muted);
+  }
+
+  .dark a.wayfind--arc:hover {
+    background: color-mix(in srgb, var(--s2s-accent) 18%, transparent);
+  }
+}
+
+a.wayfind:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* No series page to link to — same chip, no affordance. */
+.wayfind--static {
+  cursor: default;
+}
+
+@media (max-width: 640px) {
+  .wayfind {
+    font-size: 0.78125rem;
+  }
+}
+
+/* ============================================================
+   LEADER TAKEAWAY CARD
+   The post-level executive summary (frontmatter `leaderTakeaway`),
+   rendered by components/content/LeaderTakeaway.astro. Lives here
+   rather than in a scoped block because it needs `.dark` rules.
+   ============================================================ */
+
+.leader-takeaway {
+  position: relative;
+  overflow: hidden;
+  margin: 0 0 1.75rem;
+  padding: 1.125rem 1.25rem 1.1875rem 1.5rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: 0.75rem;
+  background:
+    linear-gradient(135deg, var(--reader-mark-soft) 0%, transparent 58%),
+    var(--bg-surface);
+  box-shadow: var(--reader-shadow);
+}
+
+/* Inset accent edge. Clipped by the card's own overflow so it follows the
+   rounded corners instead of mitring against the 1px border. */
+.leader-takeaway::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: 3px;
+  background: linear-gradient(
+    to bottom,
+    var(--accent) 0%,
+    var(--accent) 62%,
+    var(--accent-muted) 100%
+  );
+}
+
+
+.leader-takeaway__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0 0 0.5rem;
+  color: var(--accent-text);
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+.leader-takeaway__mark {
+  flex: none;
+  color: var(--accent);
+}
+
+.leader-takeaway__body {
+  margin: 0;
+  color: var(--text-secondary);
+  font-family: var(--font-serif);
+  font-size: 1.0625rem;
+  line-height: 1.62;
+}
+
+@media (max-width: 640px) {
+  .leader-takeaway {
+    padding: 1rem 1rem 1.0625rem 1.25rem;
+    border-radius: 0.625rem;
+  }
+
+  .leader-takeaway__body {
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+}
+

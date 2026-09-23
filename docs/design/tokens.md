@@ -48,8 +48,10 @@ same lavender `--s2s-accent-strong` button fill.
 `--bg-*`, `--border*`, `--text-*`, `--accent*`, `--cyan*`, `--code-*` and the Tailwind
 `--color-bg/border/text-*` names are aliases of the roles (`bridge.css`). The shadcn HSL triples
 (`--background`, `--muted`, …) are unchanged so `@miethe/ui` renders exactly as before. The essay
-reader (`PostLayout`, `StoryLayout`) is pinned to its pre-v2 values by `src/styles/reader-legacy.css`
-until M2.
+reader (`ReaderShell`, M2) reads its own role layer, `--reader-*` in `src/styles/tokens/reader.css`,
+which derives every color from the Observatory roles (the only literal is the paper mat behind
+figure artwork). Reader CSS lives in `src/styles/reader/` (`prose.css` global, `shell.css` with the
+shell).
 
 ## Language preview (Studio-only, node_01M35CKMTWWPWA3DJNSGR930A6)
 

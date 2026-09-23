@@ -1,0 +1,425 @@
+---
+/**
+ * ReaderShell — the one reading shell for every essay and Dev Story (M2,
+ * reader-shell node_01M35CKN0DEBE6NBR4ERB40XCJ).
+ *
+ * Replaces PostLayout + StoryLayout. The composition is the Registry Wave
+ * reader, promoted from one essay to all of them: a measure column plus a
+ * rail (author, executive signal, sticky ReadingCompanion) at xl, one column
+ * with in-flow fallbacks below. Styles: ../styles/reader/shell.css (layout
+ * furniture) and ../styles/reader/prose.css (body), colors from
+ * ../styles/tokens/reader.css.
+ *
+ * Series previous/next has exactly one implementation: getSeriesNav()
+ * (src/lib/reading-paths.ts, resolved through src/lib/series.mjs) rendered by
+ * ReadingPathNav. Pages pass the entry; the shell derives everything else.
+ *
+ * Dev Stories keep their own furniture inside the same shell: the
+ * collection eyebrow, the automated-provenance banner and StoryMetaHeader.
+ */
+import '../styles/reader/shell.css';
+import { getCollection } from 'astro:content';
+import BaseLayout from './BaseLayout.astro';
+import Figure from '../components/content/Figure.astro';
+import RelatedContent from '../components/content/RelatedContent.astro';
+import AuthorProfile from '../components/content/AuthorProfile.astro';
+import ReadingCompanion from '../components/content/ReadingCompanion.astro';
+import SectionMarker from '../components/content/SectionMarker.astro';
+import FocusTemplates from '../components/content/FocusTemplates.astro';
+import FocusHost from '../components/content/FocusHost.astro';
+import MobileContents from '../components/content/MobileContents.astro';
+import SeriesWayfinding from '../components/content/SeriesWayfinding.astro';
+import ExecutiveSignal from '../components/content/ExecutiveSignal.astro';
+import LeaderTakeaway from '../components/content/LeaderTakeaway.astro';
+import ReadingPathNav from '../components/content/ReadingPathNav.astro';
+import AutomatedDisclaimer from '../components/content/AutomatedDisclaimer.astro';
+import StoryMetaHeader from '../components/content/StoryMetaHeader.astro';
+import { generateJsonLd, buildCanonicalUrl } from '../lib/seo';
+import { formatDate, formatDateISO } from '../lib/utils';
+import { hrefFor, type Article } from '../lib/content';
+import { getSeriesNav } from '../lib/reading-paths';
+import { findSeries } from '../lib/series.mjs';
+import { isPublishable } from '../lib/publication.mjs';
+import { FORMAT_LABEL, SUBTYPE_LABEL } from '../lib/writing';
+import { site } from '../data/site';
+
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  entry: Article;
+  headings?: Heading[];
+  /** From getRelatedArticles(), resolved on the page. */
+  relatedItems?: Article[];
+}
+
+const { entry, headings = [], relatedItems = [] } = Astro.props;
+const isStory = entry.collection === 'stories';
+const d = entry.data;
+const slug = entry.id;
+
+const title = d.title;
+const excerpt = d.excerpt;
+const readTime = d.readTime ? parseInt(d.readTime, 10) : undefined;
+const tags = d.tags ?? [];
+const heroImage = d.heroImage;
+const heroAlt = 'heroAlt' in d ? d.heroAlt : undefined;
+const whyItMatters = d.whyItMatters;
+const leaderTakeaway = d.leaderTakeaway;
+const heroPlacement = !isStory && entry.collection === 'posts' ? entry.data.heroPlacement ?? 'default' : 'default';
+const isFrontispiece = heroPlacement === 'frontispiece' && Boolean(heroImage);
+const ogImage = d.ogImage ?? `/og/${isStory ? 'dev-stories' : 'essays'}/${slug}.png`;
+
+const resolvedHeroAlt = heroAlt
+  || (heroImage === '/assets/posts/the-registry-wave-agentic-artifact-supply-chain/hero-governed-cube.png'
+    ? 'A shared capability pattern connects several project workbenches, each retaining a distinct adaptation.'
+    : `Hero illustration for ${title}`);
+
+// Eyebrow: essays show their format + category; stories show the collection
+// and subtype. Both link back to their index.
+const format = isStory ? 'dev-story' : entry.collection === 'posts' ? entry.data.format ?? entry.data.contentType : 'essay';
+const eyebrow = isStory
+  ? { href: '/dev-stories/', label: 'Dev Stories', detail: SUBTYPE_LABEL[entry.data.storyType] }
+  : { href: '/essays/', label: FORMAT_LABEL[format], detail: entry.collection === 'posts' ? entry.data.category : undefined };
+
+// Series previous/next — the single implementation.
+const [posts, stories, allSeries] = await Promise.all([
+  getCollection('posts', isPublishable),
+  getCollection('stories', isPublishable),
+  getCollection('series'),
+]);
+const seriesNav = getSeriesNav(entry, [...posts, ...stories]);
+const seriesTitle = findSeries(d.series, allSeries)?.data.title ?? d.series;
+const navItem = (e: Article | null) => (e ? { title: e.data.title, slug: e.id, href: hrefFor(e) } : null);
+
+const pageDescription = excerpt || site.description;
+const canonicalUrl = buildCanonicalUrl(Astro.url.pathname);
+const publishedISO = formatDateISO(d.date);
+const updatedISO = d.updatedDate ? formatDateISO(d.updatedDate) : undefined;
+
+const jsonLd = generateJsonLd('article', {
+  title,
+  description: pageDescription,
+  url: canonicalUrl,
+  image: ogImage,
+  datePublished: publishedISO,
+  dateModified: updatedISO,
+  tags,
+});
+
+const storyData = isStory ? (entry.data as import('astro:content').CollectionEntry<'stories'>['data']) : undefined;
+---
+
+<BaseLayout
+  reader
+  title={title}
+  description={pageDescription}
+  ogImage={ogImage}
+  canonicalUrl={canonicalUrl}
+  jsonLd={jsonLd}
+>
+  <div id="reading-progress" class="reader-progress" style="width: 0%;" aria-hidden="true"></div>
+
+  <article
+    class:list={[
+      'post-layout reader-shell mx-auto grid w-full max-w-[var(--measure)] items-start px-4 py-12 sm:px-6 lg:px-8 xl:max-w-7xl xl:grid-cols-[minmax(0,var(--measure))_minmax(14rem,18rem)] xl:justify-center xl:gap-x-12',
+      `reader-shell--${format}`,
+    ]}
+    data-format={format}
+  >
+    {
+      isFrontispiece && (
+        <div class="post-frontispiece w-full pt-0 xl:col-start-1 xl:row-start-1">
+          <Figure src={heroImage!} alt={resolvedHeroAlt} variant="hero" />
+          <span class="post-frontispiece__caption">Editorial illustration</span>
+        </div>
+      )
+    }
+
+    <header
+      id="post-header"
+      class:list={['mb-16 min-w-0 space-y-6 pb-4 xl:col-start-1', isFrontispiece ? 'xl:row-start-2' : 'xl:row-start-1']}
+    >
+      <div class="post-category">
+        <a class="reader-eyebrow" href={eyebrow.href}>
+          <span class="reader-eyebrow__label">{eyebrow.label}</span>
+          {eyebrow.detail && <span class="reader-eyebrow__detail">{eyebrow.detail}</span>}
+        </a>
+      </div>
+
+      <h1>{title}</h1>
+
+      {excerpt && <p>{excerpt}</p>}
+
+      <SeriesWayfinding slug={slug} collection={entry.collection} series={d.series} seriesPart={d.seriesOrder} />
+
+      <div class="post-meta font-mono flex flex-wrap items-center gap-x-4 gap-y-1">
+        <time datetime={publishedISO}>{formatDate(d.date)}</time>
+        {
+          d.updatedDate && (
+            <>
+              <span aria-hidden="true">&middot;</span>
+              <span>Updated <time datetime={updatedISO}>{formatDate(d.updatedDate)}</time></span>
+            </>
+          )
+        }
+        {
+          readTime && (
+            <>
+              <span aria-hidden="true">&middot;</span>
+              <span>{readTime} min read</span>
+            </>
+          )
+        }
+      </div>
+
+      {
+        tags.length > 0 && (
+          <div class="post-tags flex flex-wrap gap-2 pt-1">
+            {tags.map((tag) => <a href={`/tags/${tag}`}>#{tag}</a>)}
+          </div>
+        )
+      }
+    </header>
+
+    <!-- Desktop rail: author card in flow, then the executive signal, then
+         the sticky ReadingCompanion (outline + ThreadDock + notes). -->
+    <div class="reader-rail hidden xl:col-start-2 xl:row-span-3 xl:row-start-1 xl:block xl:self-stretch" data-reader-rail="true">
+      <div class="mb-4">
+        <AuthorProfile variant="sidebar" headingLevel="h2" />
+      </div>
+      {
+        whyItMatters && (
+          <div class="mb-4">
+            <ExecutiveSignal whyItMatters={whyItMatters} takeaway={leaderTakeaway} placement="rail" />
+          </div>
+        )
+      }
+      <div class="xl:sticky xl:top-24 xl:pr-1">
+        <ReadingCompanion slug={slug} headings={headings} />
+      </div>
+    </div>
+
+    <div class:list={['min-w-0 xl:col-start-1', isFrontispiece ? 'xl:row-start-3' : 'xl:row-start-2']}>
+      <div class="mb-10 xl:hidden">
+        <AuthorProfile variant="compact" headingLevel="h2" />
+      </div>
+
+      {
+        storyData && (
+          <>
+            {storyData.automated && <AutomatedDisclaimer variant="banner" sourceAar={storyData.sourceAar} class="mb-8" />}
+            <StoryMetaHeader
+              storyType={storyData.storyType}
+              projects={storyData.projects}
+              aos={storyData.aos}
+              aosAreas={storyData.aosAreas}
+              workflow={storyData.workflow}
+            />
+          </>
+        )
+      }
+
+      {!isFrontispiece && heroImage && <Figure src={heroImage} alt={resolvedHeroAlt} variant="hero" />}
+
+      {
+        whyItMatters && (
+          <div class="reader-signal-fallback xl:hidden">
+            <ExecutiveSignal whyItMatters={whyItMatters} takeaway={leaderTakeaway} />
+          </div>
+        )
+      }
+      {!whyItMatters && leaderTakeaway && <LeaderTakeaway text={leaderTakeaway} />}
+
+      <div class="prose-custom">
+        <slot />
+        <SectionMarker />
+      </div>
+
+      <footer class="reader-footer">
+        {
+          seriesNav && (
+            <ReadingPathNav
+              prev={navItem(seriesNav.prev)}
+              next={navItem(seriesNav.next)}
+              seriesTitle={seriesTitle}
+              currentIndex={seriesNav.currentIndex + 1}
+              total={seriesNav.total}
+            />
+          )
+        }
+
+        <RelatedContent items={relatedItems} />
+
+        <div class="reader-footer__links">
+          {
+            isStory ? (
+              <>
+                <a href="/dev-stories/">&larr; All Dev Stories</a>
+                {storyData?.projects?.[0] && <a class="reader-footer__quiet" href={`/systems/${storyData.projects[0]}/`}>More on this system</a>}
+              </>
+            ) : (
+              <>
+                <a href="/essays/">&larr; All essays</a>
+              </>
+            )
+          }
+        </div>
+      </footer>
+    </div>
+  </article>
+
+  <!-- <template> fragments FocusHost clones on open; no-op without a thread. -->
+  <FocusTemplates slug={slug} />
+  <FocusHost slug={slug} />
+  <MobileContents slug={slug} headings={headings} />
+
+  <button id="scroll-to-top" type="button" aria-label="Scroll to top" class="reader-top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="m18 15-6-6-6 6" />
+    </svg>
+  </button>
+
+  <script>
+    const progressBar = document.getElementById('reading-progress');
+    const articleEl = document.querySelector('article.reader-shell');
+    const scrollToTopBtn = document.getElementById('scroll-to-top');
+    const isLite = document.documentElement.classList.contains('perf-lite');
+
+    if (progressBar && articleEl && !isLite) {
+      const updateProgress = () => {
+        const rect = articleEl.getBoundingClientRect();
+        const articleTop = rect.top + window.scrollY;
+        const scrolled = window.scrollY - articleTop;
+        const progress = Math.min(Math.max(scrolled / (rect.height - window.innerHeight), 0), 1);
+        progressBar.style.width = `${progress * 100}%`;
+      };
+      window.addEventListener('scroll', updateProgress, { passive: true });
+      updateProgress();
+    } else if (progressBar && isLite) {
+      progressBar.style.display = 'none';
+    }
+
+    if (scrollToTopBtn) {
+      const toggle = () => scrollToTopBtn.classList.toggle('is-visible', window.scrollY > window.innerHeight * 0.5);
+      window.addEventListener('scroll', toggle, { passive: true });
+      toggle();
+      scrollToTopBtn.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    }
+  </script>
+</BaseLayout>
+
+<style>
+  /* Header base (all widths). reader/shell.css refines size and order at
+     its breakpoints with higher-specificity selectors. */
+  #post-header h1 {
+    margin: 0;
+    font: 400 clamp(2rem, 1.35rem + 2.2vw, 3rem) / 1.08 var(--font-display);
+    letter-spacing: var(--type-tracking-display);
+    color: var(--s2s-ink);
+    text-wrap: balance;
+  }
+  #post-header > p {
+    margin: 0;
+    font: 400 1.1875rem / 1.5 var(--font-serif);
+    color: var(--s2s-ink-muted);
+  }
+  .post-meta {
+    font: 400 var(--type-meta) / 1.5 var(--font-mono);
+    color: var(--s2s-ink-subtle);
+  }
+  .post-tags a {
+    padding: 4px 10px;
+    border: 1px solid var(--reader-edge);
+    border-radius: var(--s2s-radius-pill);
+    font: 450 var(--type-micro) / 1.4 var(--font-sans);
+    color: var(--s2s-ink-muted);
+    text-decoration: none;
+  }
+  .post-tags a:hover { border-color: var(--s2s-accent); color: var(--s2s-ink); text-decoration: none; }
+
+  /* Narrow layouts carry the executive signal in flow, unless the body
+     already places its own (Registry Wave does, mid-essay). */
+  .reader-signal-fallback { margin-bottom: 28px; }
+  :global(.reader-shell:has(.prose-custom > .executive-signal)) .reader-signal-fallback { display: none; }
+
+  .reader-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 60;
+    height: 3px;
+    background: var(--s2s-accent);
+  }
+
+  .reader-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 4px 10px;
+    border: 1px solid var(--reader-edge);
+    border-radius: var(--s2s-radius-pill);
+    font: 500 var(--type-micro) / 1.4 var(--font-sans);
+    letter-spacing: 0.04em;
+    color: var(--s2s-ink);
+    text-decoration: none;
+  }
+  .reader-eyebrow:hover { border-color: var(--s2s-accent); color: var(--s2s-ink); text-decoration: none; }
+  .reader-eyebrow__label { color: var(--s2s-accent); text-transform: uppercase; letter-spacing: 0.12em; }
+  .reader-eyebrow__detail { color: var(--s2s-ink-muted); }
+  .reader-eyebrow__label + .reader-eyebrow__detail::before {
+    content: '';
+    display: inline-block;
+    width: 1px;
+    height: 10px;
+    margin-right: 8px;
+    vertical-align: -1px;
+    background: var(--reader-edge);
+  }
+
+  .reader-footer {
+    margin-top: 48px;
+    padding-top: 32px;
+    border-top: 1px solid var(--s2s-rule);
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+  .reader-footer :global(nav[aria-label='Series navigation']) { margin-top: 0; padding-top: 0; border-top: 0; }
+  .reader-footer__links {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+    font: 500 var(--type-ui) / 1.4 var(--font-sans);
+  }
+  .reader-footer__links a { color: var(--s2s-accent); }
+  .reader-footer__links .reader-footer__quiet { color: var(--s2s-ink-subtle); }
+  .reader-footer__links .reader-footer__quiet:hover { color: var(--s2s-ink); }
+
+  .reader-top {
+    position: fixed;
+    right: 32px;
+    bottom: 32px;
+    z-index: 50;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--s2s-rule-strong);
+    border-radius: 999px;
+    background: var(--s2s-surface);
+    color: var(--s2s-ink-muted);
+    box-shadow: var(--s2s-shadow-card);
+    opacity: 0;
+    transform: translateY(16px);
+    pointer-events: none;
+    transition: opacity 300ms ease, transform 300ms ease, color 150ms ease, border-color 150ms ease;
+  }
+  .reader-top.is-visible { opacity: 1; transform: none; pointer-events: auto; }
+  .reader-top:hover { color: var(--s2s-accent); border-color: var(--s2s-accent); }
+  .reader-top:focus-visible { outline: 2px solid var(--s2s-focus); outline-offset: 2px; }
+</style>
