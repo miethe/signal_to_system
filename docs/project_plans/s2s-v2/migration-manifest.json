@@ -111,6 +111,22 @@
       "target": "/dev-stories/orchestrator/Fable 5/"
     },
     {
+      "path": "/feeds/dev-story.xml",
+      "output": "feeds/dev-story.xml",
+      "family": "feeds",
+      "action": "add",
+      "target": "/feeds/dev-story.xml",
+      "milestone": "M2"
+    },
+    {
+      "path": "/feeds/essay.xml",
+      "output": "feeds/essay.xml",
+      "family": "feeds",
+      "action": "add",
+      "target": "/feeds/essay.xml",
+      "milestone": "M2"
+    },
+    {
       "path": "/essays/agentic-operations-flow/",
       "output": "essays/agentic-operations-flow/index.html",
       "family": "essay-reader",

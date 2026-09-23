@@ -1,0 +1,19 @@
+---
+import HubLayout from '../../layouts/templates/HubLayout.astro';
+import CollectionPanel from './CollectionPanel.astro';
+import PublicationList from './PublicationList.astro';
+import type { PublicationSummary } from '../../lib/writing';
+interface Props { title: string; description: string; eyebrow?: string[]; items: PublicationSummary[]; panelTitle?: string; panelDescription?: string; back?: { href: string; label: string }; }
+const { title, description, eyebrow = ['Writing'], items, panelTitle = 'Published writing', panelDescription, back } = Astro.props;
+---
+<HubLayout title={title} description={description} heading={title} eyebrow={eyebrow} lede={description}>
+  <CollectionPanel class="s2s-span-major" title={panelTitle} icon="essays" count={items.length} description={panelDescription}>
+    <PublicationList items={items} />
+  </CollectionPanel>
+  {back && <aside class="s2s-span-minor s2s-facet-back"><a href={back.href}>{back.label} <span aria-hidden="true">→</span></a></aside>}
+</HubLayout>
+<style>
+.s2s-facet-back { align-self: start; padding: 16px; border-top: 1px solid var(--s2s-rule); }
+.s2s-facet-back a { color: var(--s2s-accent); font: 450 var(--type-meta) / 1.4 var(--font-sans); text-decoration: none; }
+.s2s-facet-back a:hover { color: var(--s2s-accent-hover); text-decoration: none; }
+</style>
