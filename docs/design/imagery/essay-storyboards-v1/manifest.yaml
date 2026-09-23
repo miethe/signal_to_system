@@ -1,0 +1,99 @@
+version: 3
+pack: essay-storyboards-v1
+revision: opus-taste-pass-2026-09-23
+style_reference: 00-style-reference.md
+standards_reference: docs/design/imagery/graphics-standards-v1.yaml
+
+# status vocabulary:
+#   replace-existing     replaces a named legacy asset in an existing Figure/hero slot
+#   required-net-new     new asset required by the standards (hero night twins, social art)
+#   optional-net-new     additive; not a publishing blocker
+#   existing-exemplar    reference only; do NOT regenerate
+# priority: 1 = heroes (both halves), 2 = core plates, 3 = second-wave plates, 4 = optional
+# pairs: a hero listed as "dark+light pair" is two renders; the signal-dark half is an EDIT of the approved paper-light half.
+dependencies:
+  - id: og-per-post-art
+    what: src/lib/og/render.ts loads one fixed image (:118); later work must resolve a per-post art path with fallback while preserving live title composition; social assets are art-only
+    blocks: [aof-social, pp-social, contract-social, rw-social]
+  - id: mdx-renumber
+    what: agentic-operations-flow Figures 01-02 are cut and 03-07 renumber to 01-05; new Figures added in the-contract-is-the-work
+    blocks: landing only, not generation
+
+assets:
+
+  # ── agentic-operations-flow ─────────────────────────────────────────────
+  - {id: aof-hero, essay: agentic-operations-flow, class: hero, template: subject-hero, scheme: paper-light+signal-dark, variant: "dark+light pair", ratio: "16:9", master_px: 2400x1350, status: replace-existing, priority: 1,
+     replaces: public/assets/posts/agentic-operations-flow/hero-artifact-graph.jpg,
+     target: "public/images/agentic-operations-flow/hero/agentic-operations-flow--hero--transcript-to-graph--{paper-light,signal-dark}.{avif,webp}", storyboard: agentic-operations-flow.md}
+  - {id: aof-plate-01-triage, essay: agentic-operations-flow, class: figure, form: plate, template: serial-plate, scheme: paper-light, variant: single, ratio: "16:9", master_px: 2000x1125, status: replace-existing, priority: 2,
+     replaces: public/assets/posts/agentic-operations-flow/deck/slide-10-triage-decision.jpg,
+     target: public/assets/posts/agentic-operations-flow/agentic-operations-flow--figure--01-triage.png, storyboard: agentic-operations-flow.md}
+  - {id: aof-plate-02-autonomy, essay: agentic-operations-flow, class: figure, form: plate, template: serial-plate, scheme: paper-light, variant: single, ratio: "16:9", master_px: 2000x1125, status: replace-existing, priority: 3,
+     replaces: public/assets/posts/agentic-operations-flow/deck/slide-13-tiered-autonomy.jpg,
+     target: public/assets/posts/agentic-operations-flow/agentic-operations-flow--figure--02-autonomy.png, storyboard: agentic-operations-flow.md}
+  - {id: aof-plate-03-execution, essay: agentic-operations-flow, class: figure, form: plate, template: serial-plate, scheme: paper-light, variant: single, ratio: "16:9", master_px: 2000x1125, status: replace-existing, priority: 2,
+     replaces: public/assets/posts/agentic-operations-flow/deck/slide-17-execution-graph.jpg,
+     target: public/assets/posts/agentic-operations-flow/agentic-operations-flow--figure--03-execution.png, storyboard: agentic-operations-flow.md}
+  - {id: aof-plate-04-gates, essay: agentic-operations-flow, class: figure, form: plate, template: serial-plate, scheme: paper-light, variant: single, ratio: "16:9", master_px: 2000x1125, status: replace-existing, priority: 2,
+     replaces: public/assets/posts/agentic-operations-flow/deck/slide-25-mode-d-boundary.jpg,
+     target: public/assets/posts/agentic-operations-flow/agentic-operations-flow--figure--04-gates.png, storyboard: agentic-operations-flow.md}
+  - {id: aof-plate-05-evidence, essay: agentic-operations-flow, class: figure, form: plate, template: serial-plate, scheme: paper-light, variant: single, ratio: "16:9", master_px: 2000x1125, status: replace-existing, priority: 3,
+     replaces: public/assets/posts/agentic-operations-flow/evidence-stack.jpg,
+     target: public/assets/posts/agentic-operations-flow/agentic-operations-flow--figure--05-evidence.png, storyboard: agentic-operations-flow.md}
+  - {id: aof-social, essay: agentic-operations-flow, class: social-card, template: social-art, source: aof-hero signal-dark half, scheme: signal-dark, variant: single, master_px: 1520x1260, status: required-net-new, priority: 1,
+     target: public/images/agentic-operations-flow/social/agentic-operations-flow--social-card--art.jpg, storyboard: agentic-operations-flow.md}
+  # cut: deck/slide-04-work-is-a-graph.jpg (Fig 01) and deck/slide-05-operating-loop.jpg (Fig 02); hero + interactive carry them
+
+  # ── governed-agentic-sdlc-01-productivity-paradox ──────────────────────
+  - {id: pp-hero, essay: governed-agentic-sdlc-01-productivity-paradox, class: hero, template: subject-hero, scheme: paper-light+signal-dark, variant: "dark+light pair", ratio: "16:9", master_px: 2400x1350, status: replace-existing, priority: 1,
+     replaces: public/assets/posts/governed-agentic-sdlc-01/hero-02-missing-layer.jpeg,
+     target: "public/images/governed-agentic-sdlc-01/hero/governed-agentic-sdlc-01--hero--narrow-door--{paper-light,signal-dark}.{avif,webp}", storyboard: governed-agentic-sdlc-01-productivity-paradox.md}
+  - {id: pp-plate-01-failures, essay: governed-agentic-sdlc-01-productivity-paradox, class: figure, form: plate, template: serial-plate, scheme: paper-light, variant: single, ratio: "16:9", master_px: 2000x1125, status: replace-existing, priority: 2,
+     replaces: public/assets/posts/governed-agentic-sdlc-01/diagram-four-failures.jpeg,
+     target: public/assets/posts/governed-agentic-sdlc-01/governed-agentic-sdlc-01--figure--01-four-failures.png, storyboard: governed-agentic-sdlc-01-productivity-paradox.md}
+  - {id: pp-plate-02-transitions, essay: governed-agentic-sdlc-01-productivity-paradox, class: figure, form: plate, template: serial-plate, scheme: paper-light, variant: single, ratio: "16:9", master_px: 2000x1125, status: replace-existing, priority: 2,
+     replaces: public/assets/posts/governed-agentic-sdlc-01/diagram-transitions.jpeg,
+     target: public/assets/posts/governed-agentic-sdlc-01/governed-agentic-sdlc-01--figure--02-transitions.png, storyboard: governed-agentic-sdlc-01-productivity-paradox.md}
+  - {id: pp-plate-03-gates, essay: governed-agentic-sdlc-01-productivity-paradox, class: figure, form: plate, template: comparison-plate, scheme: paper-light, variant: single, ratio: "16:9", master_px: 2000x1125, status: replace-existing, priority: 3,
+     replaces: public/assets/posts/governed-agentic-sdlc-01/hero-03-swarm-gate.jpeg,
+     target: public/assets/posts/governed-agentic-sdlc-01/governed-agentic-sdlc-01--figure--03-inspect-or-govern.png, storyboard: governed-agentic-sdlc-01-productivity-paradox.md}
+  - {id: pp-social, essay: governed-agentic-sdlc-01-productivity-paradox, class: social-card, template: social-art, source: pp-hero signal-dark half, scheme: signal-dark, variant: single, master_px: 1520x1260, status: required-net-new, priority: 1,
+     target: public/images/governed-agentic-sdlc-01/social/governed-agentic-sdlc-01--social-card--art.jpg, storyboard: governed-agentic-sdlc-01-productivity-paradox.md}
+
+  # ── the-contract-is-the-work ────────────────────────────────────────────
+  - {id: contract-hero, essay: the-contract-is-the-work, class: hero, template: subject-hero, scheme: paper-light+signal-dark, variant: "dark+light pair", ratio: "16:9", master_px: 2400x1350, status: replace-existing, priority: 1,
+     replaces: "public/assets/posts/the-contract-is-the-work/hero-maturity-model.svg (hero slot only; idea moves inline)",
+     target: "public/images/the-contract-is-the-work/hero/the-contract-is-the-work--hero--one-sheet--{paper-light,signal-dark}.{avif,webp}", storyboard: the-contract-is-the-work.md}
+  - {id: contract-plate-01-handoff, essay: the-contract-is-the-work, class: figure, form: plate, template: comparison-plate, scheme: paper-light, variant: single, ratio: "16:9", master_px: 2000x1125, status: optional-net-new, priority: 2,
+     target: public/assets/posts/the-contract-is-the-work/the-contract-is-the-work--figure--01-handoff.png, storyboard: the-contract-is-the-work.md}
+  - {id: contract-plate-02-maturity, essay: the-contract-is-the-work, class: figure, form: plate, template: serial-plate, scheme: paper-light, variant: single, ratio: "16:9", master_px: 2000x1125, status: replace-existing, priority: 2,
+     replaces: public/assets/posts/the-contract-is-the-work/hero-maturity-model.svg,
+     target: public/assets/posts/the-contract-is-the-work/the-contract-is-the-work--figure--02-six-stages.png, storyboard: the-contract-is-the-work.md}
+  - {id: contract-social, essay: the-contract-is-the-work, class: social-card, template: social-art, source: contract-hero signal-dark half, scheme: signal-dark, variant: single, master_px: 1520x1260, status: required-net-new, priority: 1,
+     target: public/images/the-contract-is-the-work/social/the-contract-is-the-work--social-card--art.jpg, storyboard: the-contract-is-the-work.md}
+
+  # ── contract-as-spec-worked-example ─────────────────────────────────────
+  - {id: worked-plate-claim-binding, essay: contract-as-spec-worked-example, class: figure, form: plate, template: serial-plate (frame only, matrix lower section), scheme: paper-light, variant: single, ratio: "16:9", master_px: 2000x1125, status: optional-net-new, priority: 4,
+     fallback_form: diagram,
+     target: public/assets/posts/contract-as-spec-worked-example/contract-as-spec-worked-example--figure--claim-binding.png, storyboard: contract-as-spec-worked-example.md}
+  # social: reuses contract-social
+
+  # ── the-registry-wave-agentic-artifact-supply-chain ────────────────────
+  - {id: rw-hero-governed-cube, essay: the-registry-wave-agentic-artifact-supply-chain, class: hero, template: atelier-hero, scheme: paper-light, variant: "dark+light pair (paper-light half)", status: existing-exemplar,
+     path: public/assets/posts/the-registry-wave-agentic-artifact-supply-chain/hero-governed-cube.png, storyboard: the-registry-wave-agentic-artifact-supply-chain.md}
+  - {id: rw-hero-night, essay: the-registry-wave-agentic-artifact-supply-chain, class: hero, template: night-twin edit of rw-hero-governed-cube, scheme: signal-dark, variant: "dark+light pair (signal-dark half)", ratio: "16:9", master_px: 2400x1350, status: required-net-new, priority: 1,
+     target: "public/images/the-registry-wave-agentic-artifact-supply-chain/hero/the-registry-wave-agentic-artifact-supply-chain--hero--governed-cube--signal-dark.{avif,webp}", storyboard: the-registry-wave-agentic-artifact-supply-chain.md}
+  - {id: rw-social, essay: the-registry-wave-agentic-artifact-supply-chain, class: social-card, template: social-art, source: rw-hero-night, scheme: signal-dark, variant: single, master_px: 1520x1260, status: required-net-new, priority: 1,
+     target: public/images/the-registry-wave-agentic-artifact-supply-chain/social/the-registry-wave-agentic-artifact-supply-chain--social-card--art.jpg, storyboard: the-registry-wave-agentic-artifact-supply-chain.md}
+  - {id: rw-plate-not-every-difference, essay: the-registry-wave-agentic-artifact-supply-chain, class: figure, form: plate, template: serial-plate frame re-set, scheme: paper-light, variant: single, status: optional-net-new, priority: 4,
+     replaces: public/assets/posts/the-registry-wave-agentic-artifact-supply-chain/not-every-difference-is-drift.png, storyboard: the-registry-wave-agentic-artifact-supply-chain.md}
+  - {id: rw-figure-thread-01-incident, class: figure, form: plate, status: existing-exemplar, path: public/assets/posts/the-registry-wave-agentic-artifact-supply-chain/registry-wave-incident-resolution-flow.png}
+  - {id: rw-figure-thread-02-deployment, class: figure, form: plate, status: existing-exemplar, path: public/assets/posts/the-registry-wave-agentic-artifact-supply-chain/registry-wave-from-source-to-outcome.png}
+  - {id: rw-figure-thread-03-use, class: figure, form: plate, status: existing-exemplar, path: public/assets/posts/the-registry-wave-agentic-artifact-supply-chain/registry-wave-presence-vs-behavior.png}
+  - {id: rw-figure-thread-04-drift, class: figure, form: plate, status: existing-exemplar, path: public/assets/posts/the-registry-wave-agentic-artifact-supply-chain/registry-wave-drift-across-five-days.png}
+  - {id: rw-figure-thread-05-detection, class: figure, form: plate, status: existing-exemplar, path: public/assets/posts/the-registry-wave-agentic-artifact-supply-chain/registry-wave-detecting-silent-drift.png}
+  - {id: rw-figure-thread-06-outcome, class: figure, form: plate, status: existing-exemplar, path: public/assets/posts/the-registry-wave-agentic-artifact-supply-chain/registry-wave-run-level-provenance-infographic.png}
+  - {id: rw-figure-before-after, class: figure, form: plate, status: existing-exemplar, path: public/assets/posts/the-registry-wave-agentic-artifact-supply-chain/agentic-os-artifact-estate-before-and-after.png}
+  - {id: rw-figure-estate-map, class: figure, form: plate, status: existing-exemplar, note: reference only; too dense to imitate, path: public/assets/posts/the-registry-wave-agentic-artifact-supply-chain/the-agentic-os-artifact-estate.png}
+  - {id: rw-illustration-some-copies, class: illustration, template: thesis-plate, status: existing-exemplar, note: in the asset folder but not placed by either essay version, path: public/assets/posts/the-registry-wave-agentic-artifact-supply-chain/some-copies-must-change.png}
+  # cut: registry-threaded-control-loop (redundant with the six-thread series; internally inconsistent)

@@ -1,0 +1,151 @@
+version: 1
+revision: opus-taste-pass-2026-09-23
+scope: taxonomy and delivery contract; not final visual style
+prose: docs/design/imagery/graphics-standards-v1.md
+
+classes: [hero, figure, illustration, spot, social-card]
+figure_forms:
+  plate: typeset raster explanatory plate; external generator; house style for essay figures
+  diagram: coded SVG; accessible/editable twin or standalone schematic; follows plate structure
+  evidence: screenshot, chart, map, or capture of a real artifact
+text_baking:
+  hero: none
+  figure: labels expected
+  illustration: one short thesis line allowed; no small labels
+  spot: none essential
+  social-card: none in art; renderer sets title (src/lib/og/render.ts)
+
+surfaces:
+  essay:     {hero: optional one, figure: optional 0-8, illustration: optional 0-2, spot: optional, social-card: required one}
+  home:      {hero: required one, figure: never, illustration: optional 0-2, spot: optional, social-card: required one}
+  lab:       {hero: optional one, figure: optional 0-6, illustration: optional 0-1, spot: optional, social-card: required one}
+  projects:  {hero: optional one, figure: optional 0-6, illustration: optional 0-2, spot: optional, social-card: required one}
+  notebooks: {hero: optional one, figure: optional 0-4, illustration: optional 0-1, spot: optional, social-card: required one}
+  studio:    {hero: optional one, figure: optional 0-4, illustration: optional 0-2, spot: required marks and icons, social-card: required one}
+  series:    {hero: optional one, figure: optional 0-2, illustration: optional 0-1, spot: optional, social-card: required one}
+listing_thumbnails: crops of the hero (centred 4:3 and 1:1); not a class
+
+schemes:
+  signal-dark:
+    source: src/styles/tokens/observatory.css (dark block)
+    roles:
+      ground: --s2s-canvas; observatory.css:112
+      surface: --s2s-surface; observatory.css:114
+      ink: --s2s-ink; observatory.css:125
+      muted: --s2s-ink-muted; observatory.css:127
+      accent-1: decided by design-language package  # do not select violet or copper for dark imagery
+      accent-2: --s2s-viz-5; observatory.css:152   # existing reference only; copper is current paper-light precedent, not a dark decision
+      accent-3..6: --s2s-viz-1..4, -6; observatory.css:148-153
+      rule: --s2s-viz-grid, --s2s-rule; observatory.css:154, 120
+      highlight: --s2s-accent-strong; observatory.css:133
+      annotation: --s2s-accent-label; observatory.css:137
+      state-ok: --s2s-status-ok; observatory.css:142
+      state-warn: --s2s-status-warn; observatory.css:143
+      state-danger: --s2s-status-danger; observatory.css:144
+      state-inactive: --s2s-ink-subtle; observatory.css:128
+  paper-light:
+    source: design-language package (values TBD); matted on paper in both themes
+    precedent: [src/components/content/Figure.astro:5-7, src/styles/tokens/reader.css:56 --reader-paper]
+    not_an_alias_of: site light mode (observatory.css:21-79)
+    roles_observed_in_registry_wave:
+      ground: warm paper
+      surface: lifted paper
+      ink: deep navy
+      muted: slate navy
+      accent-1: cobalt blue
+      accent-2: copper to rust
+      accent-3..6: TBD
+      rule: navy hairline, low opacity
+      highlight: pale wash of accent-1
+      annotation: muted navy tracked caps
+      state-ok: green ring + pale green fill
+      state-warn: amber/copper dashed
+      state-danger: red ring + pale red fill
+      state-inactive: navy outline, empty ring
+
+default_scheme:
+  hero:
+    essay: paper-light master + signal-dark night twin
+    series: paper-light master + signal-dark night twin
+    home: signal-dark
+    lab: signal-dark
+    projects: signal-dark
+    notebooks: signal-dark
+    studio: signal-dark (skins may override)
+  figure: {default: paper-light, lab: signal-dark}
+  illustration: {reader: paper-light, home: signal-dark, studio: signal-dark}
+  spot: scheme-agnostic currentColor SVG
+  social-card: signal-dark
+
+variant_policy:
+  vocabulary: [single, dark+light pair]
+  rule: pair only where the image sits unmatted against page ground
+  defaults:
+    hero: {essay: dark+light pair, series: dark+light pair, other: single}
+    figure: single        # matted on paper in both themes; never pair
+    illustration: single  # pair only if unmatted full-bleed
+    spot: single          # use currentColor, no raster pairs
+    social-card: single
+  selection: [picture media prefers-color-scheme, html.dark/.light class]
+  delivery_precedent: src/components/media/V2Image.astro
+  fallback: serve the other half; each half legible alone; never hide explanatory information
+  naming: slug--class--purpose--scheme.ext; omit scheme for single; append --widthw for derivatives
+
+technical_spec:
+  hero:
+    ratio: 16:9; 3:2 permitted
+    master: 2400x1350
+    formats: [png master, avif, webp]
+    safe_area: 8 percent outer; focal subject survives centred 4:3 (1800x1350) and 1:1 (1350x1350)
+    directory: public/images/<slug>/hero
+    max_weight: avif 180KB; webp 260KB per variant
+    accessibility: decorative empty alt when page title carries meaning; no caption default
+  figure_plate:
+    ratio: 16:9 or 4:3
+    master: 2000x1125 or 2000x1500
+    formats: [png master, webp]
+    safe_area: 6 percent label edge; smallest label >= 14px at 720px render
+    directory: public/assets/posts/<slug>
+    max_weight: 350KB delivered
+    accessibility: alt, caption, long description reproducing every baked label
+  figure_diagram:
+    viewbox: 1600x900 or 1600x1200
+    formats: [svg]
+    max_weight: 250KB
+    accessibility: title, desc, caption
+  figure_evidence:
+    formats: [png, webp]
+    max_weight: 350KB
+  illustration:
+    ratio: 3:2, 1:1, or 16:9
+    master: 1800x1200, 1600x1600, or 2400x1350
+    formats: [avif, webp]
+    safe_area: 10 percent edge
+    directory: public/images/<slug>/illustrations
+    max_weight: avif 160KB; webp 240KB
+  spot:
+    master: 512x512 raster maximum
+    formats: [svg preferred, avif, webp]
+    max_weight: svg 30KB; raster 60KB
+    accessibility: decorative empty alt or aria-hidden
+  social-card:
+    art_plate: 1520x1260 (renderer right panel 760x630 at 2x)
+    focal: right 60 percent of plate; left 20 percent may be veiled
+    formats: [png, jpeg]
+    directory: public/images/<slug>/social
+    max_weight: 300KB
+    renderer: src/lib/og/render.ts (sets title; one fixed image at :118 today; per-post art is a dependency)
+
+token_package_interface:
+  supplies:
+    schemes: {each: [ground, surface, ink, muted, accent-1, accent-2, accent-3, accent-4, accent-5, accent-6, rule, highlight, annotation, state-ok, state-warn, state-danger, state-inactive]}
+    type: [display, label, body, mono]
+    stroke: [primary, secondary, annotation, orbit]
+    motifs: [reticle-node, waypoint, plate-frame, key-point-band, hero-overlay]
+    night_twin: [sky, interior_light, overlay_ink]
+    surfaces: [radius-figure-card, figure-card-shadow, hero-veil, hero-veil-strong]
+    proof: one reference render per scheme of reticle-node, waypoint, plate-frame
+  must_not_decide: [class set, form set, scheme per class, pair placement, safe areas, text-baking rules, state semantics, registry wave structural templates]
+
+brief_fields: [id, surface, class, form, purpose, placement, scheme, variant_policy, ratio_and_master, template, focal_subject, exact_text, live_html_copy, safe_areas, accessibility, acceptance_checks]
+templates: [atelier-hero (Registry Wave only), subject-hero, serial-plate, comparison-plate, thesis-plate, social-art]
