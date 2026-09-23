@@ -83,7 +83,7 @@ const resolvedHeroAlt = heroAlt
 const format = isStory ? 'dev-story' : entry.collection === 'posts' ? entry.data.format ?? entry.data.contentType : 'essay';
 const eyebrow = isStory
   ? { href: '/dev-stories/', label: 'Dev Stories', detail: SUBTYPE_LABEL[entry.data.storyType] }
-  : { href: '/essays/', label: FORMAT_LABEL[format], detail: entry.collection === 'posts' ? entry.data.category : undefined };
+  : { href: '/writing/', label: FORMAT_LABEL[format], detail: entry.collection === 'posts' ? entry.data.category : undefined };
 
 // Series previous/next — the single implementation.
 const [posts, stories, allSeries] = await Promise.all([
@@ -263,7 +263,8 @@ const storyData = isStory ? (entry.data as import('astro:content').CollectionEnt
               </>
             ) : (
               <>
-                <a href="/essays/">&larr; All essays</a>
+                <a href="/writing/">&larr; All writing</a>
+                <a class="reader-footer__quiet" href="/essays/">All essays</a>
               </>
             )
           }

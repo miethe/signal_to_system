@@ -929,6 +929,14 @@
       "action": "add",
       "target": "/series/i-let-claude-build-my-app/",
       "milestone": "M2"
+    },
+    {
+      "path": "/writing/",
+      "output": "writing/index.html",
+      "family": "writing",
+      "action": "add",
+      "target": "/writing/",
+      "milestone": "M2"
     }
   ]
 }
