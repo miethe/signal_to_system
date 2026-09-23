@@ -57,7 +57,7 @@ export function digestProjection(record) {
 }
 
 const privateFieldNames = new Set(['reviews', 'workspace', 'unresolvedReferences']);
-const privateMaterialPattern = /(?:^|[^a-z])(node_|tree_|ws_|req_|agentic-nuc|\/private\/|\.ssh\/|secrets?\.env|\/Users\/|\/home\/|(?:10\.|192\.168\.|172\.(?:1[6-9]|2\d|3[0-1])\.))/i;
+const privateMaterialPattern = /(?:^|[^a-z])(node_|tree_|ws_|req_|agentic-nuc|\/private\/|\.ssh\/|secrets?\.env|\/Users\/|\/home\/|(?<![\w.])(?:10\.(?:25[0-5]|2[0-4]\d|1?\d?\d)\.(?:25[0-5]|2[0-4]\d|1?\d?\d)\.(?:25[0-5]|2[0-4]\d|1?\d?\d)|172\.(?:1[6-9]|2\d|3[0-1])\.(?:25[0-5]|2[0-4]\d|1?\d?\d)\.(?:25[0-5]|2[0-4]\d|1?\d?\d)|192\.168\.(?:25[0-5]|2[0-4]\d|1?\d?\d)\.(?:25[0-5]|2[0-4]\d|1?\d?\d))(?![\w.]))/i;
 
 function hasPrivateMaterial(value, denied = []) {
   const serialized = JSON.stringify(value);
