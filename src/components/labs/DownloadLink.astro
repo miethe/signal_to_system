@@ -1,0 +1,45 @@
+---
+/**
+ * DownloadLink — a digest-bearing download (lens-figures, rec-repro): the
+ * file's kind and size, and its sha256 (short form visible, full digest in
+ * the title and a copyable <code>). Only approved artifacts reach here.
+ */
+import Icon from '../brand/Icon.astro';
+import type { Artifact } from '../../lib/labs/types';
+import { formatBytes, shortDigest } from './labels';
+
+interface Props { artifact: Artifact; label?: string; class?: string }
+const { artifact, label = 'Download', class: className } = Astro.props;
+const ext = artifact.href.split('?')[0].split('.').pop()?.toUpperCase();
+---
+
+<span class:list={['lab-dl', className]}>
+  <a class="lab-dl__link s2s-focus" href={artifact.href} download>
+    <Icon name="download" size={15} />
+    <span>{label}</span>
+    <span class="lab-dl__meta">{[ext && ext.length <= 5 ? ext : null, formatBytes(artifact.bytes)].filter(Boolean).join(' · ')}</span>
+  </a>
+  <code class="lab-dl__digest" title={artifact.digest}>{shortDigest(artifact.digest)}</code>
+</span>
+
+<style>
+  .lab-dl { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; min-width: 0; }
+  .lab-dl__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 5px 11px;
+    border: 1px solid var(--s2s-rule-emphasis);
+    border-radius: var(--s2s-radius-control);
+    font: 500 var(--type-ui) / 1.2 var(--font-sans);
+    color: var(--s2s-ink-soft);
+    text-decoration: none;
+  }
+  .lab-dl__link:hover { border-color: var(--s2s-accent); color: var(--s2s-ink); }
+  .lab-dl__meta { font: 400 var(--type-micro) / 1 var(--font-mono); color: var(--s2s-ink-subtle); }
+  .lab-dl__digest {
+    font: 400 var(--type-micro) / 1.3 var(--font-mono);
+    color: var(--s2s-ink-subtle);
+    overflow-wrap: anywhere;
+  }
+</style>

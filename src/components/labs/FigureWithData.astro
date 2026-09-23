@@ -1,0 +1,278 @@
+---
+/**
+ * FigureWithData (lens-figures, S2S-024) — a Lab figure that owns its data:
+ * an inline SVG chart drawn at build time from the released rows, units on
+ * both axes, the stated uncertainty, its classification (measured /
+ * simulated / reconstructed / illustrative), a table fallback that works
+ * without JS, and the digest-bearing data + code downloads.
+ *
+ * Extends the reader's Figure language (mono "Figure N" label, caption
+ * under the plate) onto the Observatory panel the Labs storyboard uses.
+ *
+ * States (never a chart without its data):
+ *   chart + approved data artifact  -> chart, table, downloads
+ *   chart + data not released        -> a "data not released" plate, no chart
+ *   chart === null                   -> a described, non-data figure
+ * An unreviewed figure always carries "Not reviewed · illustrative only".
+ *
+ * variant="thumb": a small decorative chart for cards (aria-hidden; the card
+ * carries the words).
+ */
+import Icon from '../brand/Icon.astro';
+import Pill from '../family/Pill.astro';
+import DownloadLink from './DownloadLink.astro';
+import type { Artifact, FigureRecord } from '../../lib/labs/types';
+import { FIGURE_CLASS } from './labels';
+import { layout, fmtTick, seriesColor } from './chart';
+
+interface Props {
+  figure: FigureRecord;
+  data: Artifact | null;
+  code?: Artifact | null;
+  variant?: 'full' | 'thumb';
+  /** Link to the figure's full record (resources page anchor). */
+  href?: string;
+  headingLevel?: 2 | 3 | 4;
+  featured?: boolean;
+  /** Distinct id prefix when one figure renders twice on a page. */
+  uid?: string;
+  class?: string;
+}
+const { figure, data, code = null, variant = 'full', href, headingLevel = 3, featured = false, uid: uidProp, class: className } = Astro.props as Props;
+const H = `h${headingLevel}` as 'h2' | 'h3' | 'h4';
+const chart: FigureRecord['chart'] = figure.chart;
+const drawable = Boolean(chart && data);
+const uid = uidProp ?? `fig-${figure.id.toLowerCase()}`;
+
+const frame = variant === 'thumb'
+  ? { width: 320, height: 200, left: 8, right: 8, top: 10, bottom: 10 }
+  : { width: 640, height: 360, left: 58, right: 14, top: 14, bottom: 50 };
+const geo = drawable && chart ? layout(chart, frame, chart.type === 'line') : null;
+const rows = chart ? chart.series.flatMap((s) => s.points.map((p) => ({ series: s.name, x: p[0], y: p[1] }))) : [];
+const unreviewed = !figure.reviewed;
+---
+
+{variant === 'thumb' ? (
+  <div class:list={['lab-fig-thumb', className]} aria-hidden="true">
+    {geo && chart ? (
+      <svg viewBox={`0 0 ${frame.width} ${frame.height}`} preserveAspectRatio="none">
+        {geo.yd.ticks.map((t) => <line class="lab-fig__grid" x1={frame.left} x2={frame.width - frame.right} y1={geo.sy(t)} y2={geo.sy(t)} />)}
+        {chart.type === 'scatter'
+          ? chart.series.map((s, i) => s.points.map(([x, y]) => <circle cx={geo.sx(x)} cy={geo.sy(y)} r="2.4" fill={seriesColor(i)} fill-opacity="0.8" />))
+          : geo.lines.map((d, i) => <path d={d} fill="none" stroke={seriesColor(i)} stroke-width="2.5" />)}
+        {geo.fit && <line class="lab-fig__fit" x1={geo.fit.x1} y1={geo.fit.y1} x2={geo.fit.x2} y2={geo.fit.y2} />}
+      </svg>
+    ) : (
+      <span class="lab-fig-thumb__glyph"><Icon name="figures" size={36} /></span>
+    )}
+  </div>
+) : (
+  <figure class:list={['lab-fig', featured && 'lab-fig--featured', className]} id={`figure-${figure.id.toLowerCase()}`} aria-labelledby={`${uid}-title`}>
+    <header class="lab-fig__head">
+      <div class="lab-fig__heading">
+        <p class="lab-fig__eyebrow">
+          <span class="lab-fig__num">Figure {figure.number}</span>
+          <Pill label={FIGURE_CLASS[figure.classification]} tone={figure.classification === 'measured' ? 'secondary' : 'neutral'} />
+          {unreviewed && <Pill label="Not reviewed · illustrative only" tone="warn" dot />}
+        </p>
+        <H class="lab-fig__title" id={`${uid}-title`}>{href ? <a class="s2s-focus" href={href}>{figure.title}</a> : figure.title}</H>
+        {chart && <p class="lab-fig__units">{chart.y.label} ({chart.y.unit}) vs {chart.x.label.toLowerCase()} ({chart.x.unit})</p>}
+      </div>
+    </header>
+
+    {geo && chart ? (
+      <div class="lab-fig__plot">
+        <svg class="lab-fig__svg" viewBox={`0 0 ${frame.width} ${frame.height}`} role="img" aria-labelledby={`${uid}-title ${uid}-alt`}>
+          <desc id={`${uid}-alt`}>{figure.alt}</desc>
+          {geo.yd.ticks.map((t) => (
+            <g>
+              <line class="lab-fig__grid" x1={frame.left} x2={frame.width - frame.right} y1={geo.sy(t)} y2={geo.sy(t)} />
+              <text class="lab-fig__tick" x={frame.left - 8} y={geo.sy(t) + 4} text-anchor="end">{fmtTick(t, geo.yd.step)}</text>
+            </g>
+          ))}
+          {geo.xd.ticks.map((t) => (
+            <text class="lab-fig__tick" x={geo.sx(t)} y={frame.height - frame.bottom + 20} text-anchor="middle">{fmtTick(t, geo.xd.step)}</text>
+          ))}
+          <line class="lab-fig__axis" x1={frame.left} x2={frame.width - frame.right} y1={frame.height - frame.bottom} y2={frame.height - frame.bottom} />
+          <text class="lab-fig__axis-label" x={frame.left + geo.pw / 2} y={frame.height - 6} text-anchor="middle">{chart.x.label} ({chart.x.unit})</text>
+          <text class="lab-fig__axis-label" transform={`translate(14 ${frame.top + geo.ph / 2}) rotate(-90)`} text-anchor="middle">{chart.y.label} ({chart.y.unit})</text>
+          {chart.type === 'scatter'
+            ? chart.series.map((s, i) => (
+                <g fill={seriesColor(i)} fill-opacity="0.72">
+                  {s.points.map(([x, y]) => <circle cx={geo.sx(x).toFixed(1)} cy={geo.sy(y).toFixed(1)} r="3" />)}
+                </g>
+              ))
+            : chart.series.map((s, i) => (
+                <g>
+                  <path d={geo.lines[i]} fill="none" stroke={seriesColor(i)} stroke-width="2.25" stroke-linejoin="round" />
+                  {s.points.map(([x, y]) => <circle cx={geo.sx(x).toFixed(1)} cy={geo.sy(y).toFixed(1)} r="3" fill={seriesColor(i)} />)}
+                </g>
+              ))}
+          {geo.fit && <line class="lab-fig__fit" x1={geo.fit.x1} y1={geo.fit.y1} x2={geo.fit.x2} y2={geo.fit.y2} />}
+        </svg>
+        <div class="lab-fig__legend">
+          <p class="lab-fig__legend-title">Series</p>
+          <ul>
+            {chart.series.map((s, i) => (
+              <li><span class="lab-fig__swatch" style={`--swatch: ${seriesColor(i)}`} data-shape={chart.type} />{s.name}</li>
+            ))}
+            {chart.fit && <li><span class="lab-fig__swatch lab-fig__swatch--fit" />Fitted line</li>}
+          </ul>
+          {chart.fit && (
+            <dl class="lab-fig__stats">
+              <div><dt>R²</dt><dd>{chart.fit.r2.toFixed(2)}</dd></div>
+              <div><dt>Slope</dt><dd>{`${chart.fit.slope} ${chart.y.unit} per ${chart.x.unit.replace(/s$/, '')}`}</dd></div>
+              <div class="lab-fig__stats-note">{chart.fit.note}</div>
+            </dl>
+          )}
+        </div>
+      </div>
+    ) : chart ? (
+      <div class="lab-fig__withheld" role="note">
+        <Icon name="datasets" size={28} />
+        <div>
+          <p class="lab-fig__withheld-title">Figure data not released</p>
+          <p>This figure's data file has not passed the release gate, so the chart is withheld instead of being drawn from unreleased numbers.</p>
+          <p class="lab-fig__withheld-alt"><span>Described:</span>{' '}{figure.alt}</p>
+        </div>
+      </div>
+    ) : (
+      <div class="lab-fig__described" role="img" aria-label={figure.alt}>
+        <Icon name="figures" size={28} />
+        <p><span>Non-data figure, described:</span>{' '}{figure.alt}</p>
+      </div>
+    )}
+
+    <figcaption class="lab-fig__caption">
+      <p><strong>Figure {figure.number}.</strong>{' '}{figure.caption}</p>
+      <p class="lab-fig__uncertainty"><span>Uncertainty</span>{' '}{figure.uncertainty}</p>
+    </figcaption>
+
+    {(drawable || code) && (
+      <div class="lab-fig__actions">
+        {drawable && chart && (
+          <details class="lab-fig__table">
+            <summary class="s2s-focus"><Icon name="datasets" size={15} /> Data table <span>({rows.length} rows)</span></summary>
+            <div class="lab-fig__table-scroll" tabindex="0" role="region" aria-label={`Figure ${figure.number} data`}>
+              <table>
+                <caption class="sr-only">Figure {figure.number} data: {figure.title}</caption>
+                <thead><tr><th scope="col">Series</th><th scope="col">{chart.x.label} ({chart.x.unit})</th><th scope="col">{chart.y.label} ({chart.y.unit})</th></tr></thead>
+                <tbody>{rows.map((r) => <tr><td>{r.series}</td><td>{r.x}</td><td>{r.y}</td></tr>)}</tbody>
+              </table>
+            </div>
+          </details>
+        )}
+        {data && <DownloadLink artifact={data} label="Download data" />}
+        {code && <DownloadLink artifact={code} label="Generating code" />}
+      </div>
+    )}
+  </figure>
+)}
+
+<style>
+  .lab-fig {
+    container-type: inline-size;
+    min-width: 0;
+    margin: 0;
+    padding: 16px;
+    border: 1px solid var(--s2s-rule);
+    border-radius: var(--s2s-radius-card);
+    background: var(--s2s-surface);
+  }
+  .lab-fig__head { display: flex; justify-content: space-between; gap: 12px; }
+  .lab-fig__eyebrow { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin: 0 0 8px; }
+  .lab-fig__num {
+    padding: 2px 9px;
+    border: 1px solid color-mix(in srgb, var(--s2s-secondary) 55%, var(--s2s-rule));
+    border-radius: var(--s2s-radius-pill);
+    font: 600 var(--type-micro) / 1.45 var(--font-mono);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--s2s-secondary);
+  }
+  .lab-fig__title {
+    margin: 0;
+    font: 400 var(--type-section) / 1.25 var(--font-display);
+    color: var(--s2s-ink);
+  }
+  .lab-fig__title a { color: inherit; text-decoration: none; }
+  .lab-fig__title a:hover { color: var(--s2s-accent); }
+  .lab-fig__units { margin: 4px 0 0; font: 400 var(--type-meta) / 1.4 var(--font-sans); color: var(--s2s-ink-subtle); }
+
+  .lab-fig__plot { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; margin-top: 14px; }
+  @container (min-width: 700px) { .lab-fig__plot { grid-template-columns: minmax(0, 1fr) 160px; } }
+  .lab-fig__svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .lab-fig__grid { stroke: var(--s2s-viz-grid); stroke-width: 1; }
+  .lab-fig__axis { stroke: var(--s2s-rule-emphasis); stroke-width: 1; }
+  .lab-fig__tick { font: 400 12.5px var(--font-mono); fill: var(--s2s-ink-subtle); }
+  .lab-fig__axis-label { font: 500 13px var(--font-sans); fill: var(--s2s-ink-muted); }
+  .lab-fig__fit { stroke: var(--s2s-ink); stroke-width: 2; stroke-linecap: round; opacity: 0.85; }
+
+  .lab-fig__legend { font: 400 var(--type-meta) / 1.4 var(--font-sans); color: var(--s2s-ink-muted); }
+  .lab-fig__legend-title { margin: 0 0 6px; font-weight: 600; color: var(--s2s-ink-soft); }
+  @container (max-width: 699px) { .lab-fig__legend-title { display: none; } }
+  .lab-fig__legend ul { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 6px 14px; }
+  @container (min-width: 700px) { .lab-fig__legend ul { flex-direction: column; } .lab-fig__legend { border-top: 0; padding-top: 0; } }
+  .lab-fig__legend { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 18px; }
+  @container (min-width: 700px) { .lab-fig__legend { display: block; } }
+  .lab-fig__legend li { display: inline-flex; align-items: center; gap: 8px; }
+  .lab-fig__swatch { width: 9px; height: 9px; border-radius: 50%; background: var(--swatch); flex: none; }
+  .lab-fig__swatch[data-shape='line'] { width: 14px; height: 3px; border-radius: 2px; }
+  .lab-fig__swatch--fit { width: 14px; height: 2px; border-radius: 1px; background: var(--s2s-ink); }
+  .lab-fig__stats { margin: 0; display: flex; flex-wrap: wrap; gap: 4px 14px; }
+  @container (min-width: 700px) { .lab-fig__stats { display: grid; margin-top: 14px; } }
+  .lab-fig__stats div { display: flex; gap: 8px; }
+  .lab-fig__stats dt { font-family: var(--font-mono); color: var(--s2s-ink-subtle); }
+  .lab-fig__stats dd { margin: 0; font-family: var(--font-mono); color: var(--s2s-ink-soft); }
+  .lab-fig__stats-note { margin: 2px 0 0; color: var(--s2s-ink-subtle); }
+
+  .lab-fig__withheld, .lab-fig__described {
+    display: flex;
+    gap: 14px;
+    margin-top: 14px;
+    padding: 22px 18px;
+    border: 1px dashed var(--s2s-rule-emphasis);
+    border-radius: calc(var(--s2s-radius-card) - 2px);
+    background: var(--s2s-inset);
+    color: var(--s2s-ink-subtle);
+    font: 400 var(--type-body-s) / 1.55 var(--font-sans);
+  }
+  .lab-fig__withheld p, .lab-fig__described p { margin: 0; color: var(--s2s-ink-muted); }
+  .lab-fig__withheld-title { font-weight: 600; color: var(--s2s-status-warn) !important; margin-bottom: 4px !important; }
+  .lab-fig__withheld-alt { margin-top: 8px !important; }
+  .lab-fig__withheld-alt span, .lab-fig__described span { color: var(--s2s-ink-subtle); font-style: italic; }
+
+  .lab-fig__caption { margin-top: 14px; font: 400 var(--type-body-s) / 1.55 var(--font-sans); color: var(--s2s-ink-muted); }
+  .lab-fig__caption p { margin: 0; }
+  .lab-fig__caption strong { color: var(--s2s-ink-soft); font-weight: 600; }
+  .lab-fig__uncertainty { margin-top: 6px !important; }
+  .lab-fig__uncertainty span {
+    margin-right: 6px;
+    font: 600 var(--type-micro) / 1 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--s2s-accent-label);
+  }
+
+  .lab-fig__actions { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 10px 14px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--s2s-rule); }
+  .lab-fig__table { flex: 1 1 100%; order: 2; }
+  .lab-fig__table summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    cursor: pointer;
+    font: 500 var(--type-ui) / 1.2 var(--font-sans);
+    color: var(--s2s-accent);
+    list-style: none;
+  }
+  .lab-fig__table summary::-webkit-details-marker { display: none; }
+  .lab-fig__table summary span { color: var(--s2s-ink-subtle); font-weight: 400; }
+  .lab-fig__table-scroll { max-height: 260px; overflow: auto; margin-top: 10px; border: 1px solid var(--s2s-rule); border-radius: var(--s2s-radius-control); }
+  .lab-fig__table table { width: 100%; border-collapse: collapse; font: 400 var(--type-meta) / 1.4 var(--font-mono); color: var(--s2s-ink-muted); }
+  .lab-fig__table th { position: sticky; top: 0; background: var(--s2s-inset); text-align: left; font-family: var(--font-sans); font-weight: 600; color: var(--s2s-ink-soft); }
+  .lab-fig__table th, .lab-fig__table td { padding: 5px 10px; border-bottom: 1px solid var(--s2s-rule); }
+
+  .lab-fig-thumb { position: relative; width: 100%; height: 100%; min-height: 120px; background: var(--s2s-inset); }
+  .lab-fig-thumb svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .lab-fig-thumb__glyph { position: absolute; inset: 0; display: grid; place-items: center; color: var(--s2s-ink-faint); }
+</style>
