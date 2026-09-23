@@ -1,0 +1,143 @@
+---
+/**
+ * /labs/<id>/resources/ — Sources, Figures & Artifacts (lens-figures,
+ * rec-repro). Visual authority: labs-storyboard/images/
+ * sources_figures_artifacts_dashboard.webp.
+ *
+ * The complete released record behind the report: every source (denied
+ * ones as a fixed access token), every figure with its data table and
+ * digest-bearing downloads, and every gate-approved artifact. The rail
+ * counts are the released counts, and "Research lineage" walks one real
+ * path through this record (source -> claim -> figure -> artifact).
+ *
+ * The storyboard's "Reuse in essays" panel is deferred: there is no
+ * essay-embed path for Lab figures yet, and the page does not promise one.
+ */
+import LabShell from '../../../../components/labs/LabShell.astro';
+import LabSection from '../../../../components/labs/LabSection.astro';
+import SourceCard from '../../../../components/labs/SourceCard.astro';
+import ArtifactCard from '../../../../components/labs/ArtifactCard.astro';
+import FigureWithData from '../../../../components/labs/FigureWithData.astro';
+import StatTile from '../../../../components/primitives/StatTile.astro';
+import Card from '../../../../components/primitives/Card.astro';
+import RailCard from '../../../../components/family/RailCard.astro';
+import StateNotice from '../../../../components/primitives/StateNotice.astro';
+import Button from '../../../../components/ui/Button.astro';
+import Icon from '../../../../components/brand/Icon.astro';
+import { getLabCatalog } from '../../../../lib/labs/site';
+import type { LabView } from '../../../../lib/labs/types';
+import { REVIEW, methodLabel, formatIsoDate, reportTabs, claimHref } from '../../../../components/labs/labels';
+
+export async function getStaticPaths() {
+  const { labs } = await getLabCatalog();
+  return labs.map((lab) => ({ params: { slug: lab.investigation.publicId }, props: { lab } }));
+}
+
+interface Props { lab: LabView }
+const { lab } = Astro.props;
+const inv = lab.investigation;
+
+// One real lineage path: the first claim with a released figure, its first
+// supporting evidence's source, and the figure's data artifact.
+const lineage = (() => {
+  for (const c of lab.claims) {
+    const fig = c.figureIds.map((id) => lab.figures.find((f) => f.id === id)).find((f) => f && lab.figureData[f.id]);
+    if (!fig) continue;
+    const ev = c.evidence.filter((e) => e.relation === 'supports').map((e) => lab.evidence.find((x) => x.id === e.evidenceId)).find((e) => e && e.access !== 'denied' && e.sourceIds.length);
+    const src = ev ? lab.sources.find((s) => s.id === ev.sourceIds[0] && s.access !== 'denied') : undefined;
+    const pkg = lab.artifacts.find((a) => a.id === lab.reproduce.packageArtifactId) ?? lab.figureData[fig.id];
+    return { claim: c, fig, src, art: pkg };
+  }
+  return null;
+})();
+const byKind = (k: string) => lab.artifacts.filter((a) => a.kind === k).length;
+---
+
+<LabShell
+  title={`Sources, Figures & Artifacts · ${inv.title}`}
+  description={`The released sources, figures with data, and artifacts behind ${inv.title}.`}
+  heading="Sources, Figures & Artifacts"
+  eyebrow={['Labs', 'Investigations', 'Resources']}
+  lede={`The complete released record for ${inv.title}: the sources, the data and code behind each figure, and every artifact, with digests.`}
+  tabs={reportTabs(lab.href, 'resources')}
+  synthetic={lab.synthetic}
+>
+  <div slot="hero-meta" class="lab-res-hero">
+    <dl class="lab-res-strip">
+      <div><dt>Version</dt><dd>v{lab.report.version}</dd></div>
+      <div><dt>Published</dt><dd>{formatIsoDate(inv.publishedAt)}</dd></div>
+      <div><dt>Domains</dt><dd>{inv.domains.slice(0, 3).join(' · ')}{inv.domains.length > 3 ? ` +${inv.domains.length - 3}` : ''}</dd></div>
+      <div><dt>Method</dt><dd>{methodLabel(inv.methodProfile)}</dd></div>
+      <div><dt>Review</dt><dd>{REVIEW[lab.report.review].label}</dd></div>
+    </dl>
+    <div class="lab-res-actions">
+      <Button href={lab.href} variant="signal" size="md">Read report <span aria-hidden="true">→</span></Button>
+      <Button href={`${lab.href}capsule/reproduction.json`} variant="outline" size="md"><Icon name="sparkle" size={16} /> Reproduction capsule</Button>
+    </div>
+  </div>
+
+  <LabSection id="sources" title="Sources" icon="sources" description="Original materials, datasets and references.">
+    <div class="lab-res-grid">
+      {lab.sources.map((s) => <SourceCard source={s} />)}
+    </div>
+  </LabSection>
+
+  <LabSection id="figures" title="Figures" icon="figures" description="Each data figure carries its data table, units, uncertainty and downloads.">
+    <div class="lab-res-figs">
+      {lab.figures.map((f) => (
+        <FigureWithData
+          figure={f}
+          data={lab.figureData[f.id]}
+          code={lab.artifacts.find((a) => a.id === f.codeArtifactId) ?? null}
+          headingLevel={3}
+        />
+      ))}
+    </div>
+  </LabSection>
+
+  <LabSection id="artifacts" title="Artifacts" icon="artifacts" description="Released code, notebooks, data and packages. Only artifacts that passed the release gate appear.">
+    {lab.artifacts.length ? (
+      <div class="lab-res-grid">{lab.artifacts.map((a) => <ArtifactCard artifact={a} />)}</div>
+    ) : (
+      <StateNotice kind="empty" compact art={false} title="No artifacts are released for this investigation." />
+    )}
+  </LabSection>
+
+  <Fragment slot="rail">
+    <Card class="lab-res-stats">
+      <p class="lab-res-stats__h"><Icon name="evidence" size={20} /> Report resources</p>
+      <StatTile value={lab.counts.sources} label="Sources" icon="sources" href="#sources" />
+      <StatTile value={lab.counts.figures} label="Figures" icon="figures" href="#figures" />
+      <StatTile value={lab.counts.artifacts} label="Artifacts released" icon="artifacts" href="#artifacts" note={[byKind('dataset') && `${byKind('dataset')} data`, byKind('notebook') && `${byKind('notebook')} notebook`, byKind('code') && `${byKind('code')} code`].filter(Boolean).join(' · ') || undefined} />
+    </Card>
+    {lineage && (
+      <RailCard heading="Research lineage" icon="timeline">
+        <ol class="lab-lineage">
+          {lineage.src && <li><span class="lab-lineage__n">1</span><span><strong>Source material</strong><a href={`#source-${lineage.src.id.toLowerCase()}`}>{lineage.src.title}</a></span></li>}
+          <li><span class="lab-lineage__n">{lineage.src ? 2 : 1}</span><span><strong>Supports claim</strong><a href={claimHref(lab.href, lineage.claim.label, lineage.claim.version)}>{lineage.claim.label}: {lineage.claim.statement}</a></span></li>
+          <li><span class="lab-lineage__n">{lineage.src ? 3 : 2}</span><span><strong>Visualized in figure</strong><a href={`#figure-${lineage.fig.id.toLowerCase()}`}>Figure {lineage.fig.number}: {lineage.fig.title}</a></span></li>
+          {lineage.art && <li><span class="lab-lineage__n">{lineage.src ? 4 : 3}</span><span><strong>Reproducible via artifact</strong><a href={`#artifact-${lineage.art.id.toLowerCase()}`}>{lineage.art.title}</a></span></li>}
+        </ol>
+      </RailCard>
+    )}
+  </Fragment>
+</LabShell>
+
+<style>
+  .lab-res-hero { display: flex; flex-direction: column; gap: 16px; margin-top: -4px; }
+  .lab-res-strip { display: flex; flex-wrap: wrap; gap: 10px 26px; margin: 0; }
+  .lab-res-strip dt { font: 600 0.625rem / 1.3 var(--font-sans); letter-spacing: 0.14em; text-transform: uppercase; color: var(--s2s-ink-subtle); }
+  .lab-res-strip dd { margin: 3px 0 0; font: 400 var(--type-meta) / 1.4 var(--font-sans); color: var(--s2s-ink-soft); }
+  .lab-res-actions { display: flex; flex-wrap: wrap; gap: 10px 12px; }
+  .lab-res-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr)); gap: 12px; }
+  .lab-res-figs { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  :global(.lab-res-stats) { display: flex; flex-direction: column; }
+  .lab-res-stats__h { display: flex; align-items: center; gap: 10px; margin: 0 0 8px; font: 400 1.25rem / 1.2 var(--font-display); color: var(--s2s-ink); }
+  .lab-res-stats__h :global(svg) { color: var(--s2s-secondary); }
+  .lab-lineage { margin: 0; padding: 0; list-style: none; display: grid; gap: 10px; }
+  .lab-lineage li { display: flex; gap: 12px; }
+  .lab-lineage__n { flex: none; display: grid; place-items: center; width: 24px; height: 24px; border: 1px solid var(--s2s-rule-emphasis); border-radius: 50%; font: 600 var(--type-micro) / 1 var(--font-mono); color: var(--s2s-ink); }
+  .lab-lineage strong { display: block; font: 600 var(--type-meta) / 1.3 var(--font-sans); color: var(--s2s-ink); }
+  .lab-lineage a { display: block; margin-top: 2px; font: 400 var(--type-micro) / 1.45 var(--font-sans); color: var(--s2s-ink-muted); text-decoration: none; }
+  .lab-lineage a:hover { color: var(--s2s-accent); }
+</style>

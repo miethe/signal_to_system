@@ -1,0 +1,41 @@
+---
+/**
+ * ArtifactCard — a released artifact (code, notebook, dataset, package,
+ * document): kind tag, title, summary, media type, license, version, and
+ * the digest-bearing download. Only gate-approved artifacts are passed in.
+ */
+import Icon from '../brand/Icon.astro';
+import DownloadLink from './DownloadLink.astro';
+import type { Artifact } from '../../lib/labs/types';
+import { ARTIFACT_KIND } from './labels';
+
+interface Props { artifact: Artifact; class?: string }
+const { artifact, class: className } = Astro.props;
+const kind = ARTIFACT_KIND[artifact.kind];
+---
+
+<article class:list={['lab-art', className]} id={`artifact-${artifact.id.toLowerCase()}`}>
+  <div class="lab-art__head">
+    <span class="lab-art__well" aria-hidden="true"><Icon name={kind.icon} size={24} /></span>
+    <div class="lab-art__titles">
+      <p class="lab-art__tags"><span class="lab-art__tag">{kind.label}</span><span class="lab-art__id">{artifact.id}</span></p>
+      <h3 class="lab-art__title">{artifact.title}</h3>
+    </div>
+  </div>
+  <p class="lab-art__summary">{artifact.summary}</p>
+  <p class="lab-art__meta"><span>{artifact.mediaType}</span><span>{artifact.license}</span><span>v{artifact.version}</span></p>
+  <DownloadLink artifact={artifact} />
+</article>
+
+<style>
+  .lab-art { display: flex; flex-direction: column; gap: 10px; min-width: 0; padding: 14px; border: 1px solid var(--s2s-rule); border-radius: var(--s2s-radius-card); background: var(--s2s-surface); }
+  .lab-art__head { display: flex; gap: 12px; align-items: flex-start; }
+  .lab-art__well { display: grid; place-items: center; flex: none; width: 46px; height: 46px; border-radius: 8px; background: var(--s2s-inset); color: var(--s2s-accent); }
+  .lab-art__titles { min-width: 0; }
+  .lab-art__tags { display: flex; align-items: center; gap: 8px; margin: 0; }
+  .lab-art__tag { padding: 1px 8px; border: 1px solid color-mix(in srgb, var(--s2s-secondary) 55%, var(--s2s-rule)); border-radius: var(--s2s-radius-pill); font: 600 0.625rem / 1.6 var(--font-sans); letter-spacing: 0.12em; text-transform: uppercase; color: var(--s2s-secondary); }
+  .lab-art__id { font: 500 var(--type-micro) / 1 var(--font-mono); color: var(--s2s-ink-subtle); }
+  .lab-art__title { margin: 6px 0 0; font: 400 var(--type-card) / 1.3 var(--font-display); color: var(--s2s-ink); overflow-wrap: anywhere; }
+  .lab-art__summary { margin: 0; font: 400 var(--type-body-s) / 1.5 var(--font-sans); color: var(--s2s-ink-muted); flex: 1; }
+  .lab-art__meta { display: flex; flex-wrap: wrap; gap: 4px 12px; margin: 0; font: 400 var(--type-micro) / 1.4 var(--font-mono); color: var(--s2s-ink-subtle); }
+</style>

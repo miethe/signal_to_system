@@ -1,0 +1,118 @@
+---
+/**
+ * ReproducePanel (rec-repro, S2S-025) — the reproduction entry: the three
+ * scopes kept distinct (rerun / reproduce / replicate, each with its own
+ * state; a rerun is never called a replication), the environment chips,
+ * prerequisites, the exact steps, expected output, what is unavailable,
+ * and the approved, digest-bearing package. Only gate-approved artifacts
+ * reach `pkg`; if the package was not released the panel says so.
+ */
+import Pill from '../family/Pill.astro';
+import Icon from '../brand/Icon.astro';
+import DownloadLink from './DownloadLink.astro';
+import type { Artifact, ReproduceRecord } from '../../lib/labs/types';
+import { REPRO, REPRO_SCOPE } from './labels';
+
+interface Props { reproduce: ReproduceRecord; pkg: Artifact | null; class?: string }
+const { reproduce, pkg, class: className } = Astro.props;
+const declaredPackage = Boolean(reproduce.packageArtifactId);
+const hasLeft = reproduce.environment.length + reproduce.prerequisites.length + reproduce.unavailable.length > 0;
+---
+
+<div class:list={['lab-repro', className]}>
+  <ol class="lab-repro__scopes">
+    {reproduce.scopes.map((s) => {
+      const st = REPRO[s.state];
+      const sc = REPRO_SCOPE[s.scope];
+      return (
+        <li class="lab-repro__scope">
+          <p class="lab-repro__scope-head"><span class="lab-repro__scope-label">{sc.label}</span><Pill label={st.label} tone={st.tone} dot /></p>
+          <p class="lab-repro__scope-sub">{sc.sub}</p>
+          <p class="lab-repro__scope-note">{s.note}</p>
+        </li>
+      );
+    })}
+  </ol>
+
+  <div class:list={['lab-repro__grid', !hasLeft && 'lab-repro__grid--single']}>
+    {hasLeft && <div class="lab-repro__col">
+      {reproduce.environment.length > 0 && (
+        <>
+          <p class="lab-repro__sub">Environment</p>
+          <ul class="lab-repro__chips">{reproduce.environment.map((e) => <li><span>{e.label}</span> {e.value}</li>)}</ul>
+        </>
+      )}
+      {reproduce.prerequisites.length > 0 && (
+        <>
+          <p class="lab-repro__sub">Prerequisites</p>
+          <ul class="lab-repro__list">{reproduce.prerequisites.map((p) => <li>{p}</li>)}</ul>
+        </>
+      )}
+      {reproduce.unavailable.length > 0 && (
+        <>
+          <p class="lab-repro__sub">Not available</p>
+          <ul class="lab-repro__list lab-repro__list--muted">{reproduce.unavailable.map((p) => <li>{p}</li>)}</ul>
+        </>
+      )}
+    </div>}
+    <div class="lab-repro__col">
+      {reproduce.steps.length > 0 && (
+        <>
+          <p class="lab-repro__sub">Steps</p>
+          <ol class="lab-repro__steps">
+            {reproduce.steps.map((s) => (
+              <li>
+                <span>{s.label}</span>
+                {s.command && <pre><code>{s.command}</code></pre>}
+              </li>
+            ))}
+          </ol>
+        </>
+      )}
+      <p class="lab-repro__sub">Expected result</p>
+      <p class="lab-repro__expected">{reproduce.expected}</p>
+    </div>
+  </div>
+
+  <div class="lab-repro__pkg">
+    <Icon name="reproduce" size={22} />
+    {pkg ? (
+      <div>
+        <p class="lab-repro__pkg-title">{pkg.title} <span>v{pkg.version} · {pkg.license}</span></p>
+        <DownloadLink artifact={pkg} label="Download package" />
+      </div>
+    ) : (
+      <p class="lab-repro__pkg-none">{declaredPackage ? 'The reproduction package has not passed the release gate, so it is not offered here.' : 'No reproduction package is released for this investigation.'}</p>
+    )}
+  </div>
+</div>
+
+<style>
+  .lab-repro { min-width: 0; display: grid; gap: 16px; }
+  .lab-repro__scopes { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; margin: 0; padding: 0; list-style: none; counter-reset: scope; }
+  @media (min-width: 720px) { .lab-repro__scopes { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .lab-repro__scope { padding: 12px 14px; border: 1px solid var(--s2s-rule); border-radius: var(--s2s-radius-card); background: var(--s2s-surface); }
+  .lab-repro__scope-head { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; margin: 0; }
+  .lab-repro__scope-label { font: 500 var(--type-body-s) / 1.3 var(--font-sans); color: var(--s2s-ink); }
+  .lab-repro__scope-sub { margin: 4px 0 0; font: 400 var(--type-micro) / 1.4 var(--font-sans); color: var(--s2s-ink-subtle); }
+  .lab-repro__scope-note { margin: 8px 0 0; font: 400 var(--type-meta) / 1.5 var(--font-sans); color: var(--s2s-ink-muted); }
+  .lab-repro__grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+  @media (min-width: 720px) { .lab-repro__grid:not(.lab-repro__grid--single) { grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); } }
+  .lab-repro__col { min-width: 0; }
+  .lab-repro__sub { margin: 0 0 8px; font: 600 var(--type-micro) / 1.4 var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--s2s-ink-subtle); }
+  .lab-repro__sub:not(:first-child) { margin-top: 14px; }
+  .lab-repro__chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; padding: 0; list-style: none; }
+  .lab-repro__chips li { padding: 3px 10px; border-radius: var(--s2s-radius-control); background: var(--s2s-chip); font: 400 var(--type-meta) / 1.4 var(--font-mono); color: var(--s2s-ink-soft); overflow-wrap: anywhere; }
+  .lab-repro__chips span { font-family: var(--font-sans); color: var(--s2s-ink-subtle); }
+  .lab-repro__list { list-style: disc; margin: 0; padding-left: 18px; font: 400 var(--type-body-s) / 1.5 var(--font-sans); color: var(--s2s-ink-soft); }
+  .lab-repro__list--muted { color: var(--s2s-ink-muted); }
+  .lab-repro__steps { list-style: decimal; margin: 0; padding-left: 20px; font: 400 var(--type-body-s) / 1.5 var(--font-sans); color: var(--s2s-ink-soft); }
+  .lab-repro__steps li + li { margin-top: 10px; }
+  .lab-repro__steps pre { margin: 6px 0 0; padding: 10px 12px; border: 1px solid var(--s2s-rule); border-radius: var(--s2s-radius-control); background: var(--s2s-inset); overflow-x: auto; }
+  .lab-repro__steps code { font: 400 var(--type-meta) / 1.5 var(--font-mono); color: var(--s2s-ink); white-space: pre; }
+  .lab-repro__expected { margin: 0; font: 400 var(--type-body-s) / 1.5 var(--font-sans); color: var(--s2s-ink-soft); }
+  .lab-repro__pkg { display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; border: 1px solid color-mix(in srgb, var(--s2s-accent) 30%, var(--s2s-rule)); border-radius: var(--s2s-radius-card); background: var(--s2s-accent-soft); color: var(--s2s-accent); }
+  .lab-repro__pkg-title { margin: 0 0 8px; font: 500 var(--type-body-s) / 1.3 var(--font-sans); color: var(--s2s-ink); }
+  .lab-repro__pkg-title span { font: 400 var(--type-micro) / 1 var(--font-mono); color: var(--s2s-ink-subtle); margin-left: 6px; }
+  .lab-repro__pkg-none { margin: 0; font: 400 var(--type-body-s) / 1.5 var(--font-sans); color: var(--s2s-ink-muted); }
+</style>
