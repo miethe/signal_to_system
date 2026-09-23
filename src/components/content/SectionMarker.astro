@@ -99,13 +99,6 @@
   :global(.section-marker.is-active .section-marker__rule) { background: var(--accent); }
   :global(.section-marker.is-active .section-marker__ordinal) { border-color: var(--accent); color: var(--accent-text); }
 
-  :global(.dark .section-marker) { grid-template-columns: 4px 40px minmax(0, 1fr); column-gap: 14px; align-items: center; margin-top: 30px; padding-bottom: 10px; border-bottom: 1px solid #29476b; }
-  :global(.dark .section-marker__gutter) { display: contents; }
-  :global(.dark .section-marker__ordinal) { grid-column: 2; width: 40px; height: 40px; border-color: #274a73; border-radius: 8px; color: #b9a7ff; font-size: 14px; }
-  :global(.dark .section-marker__rule) { grid-column: 1; grid-row: 1; width: 4px; min-height: 40px; margin: 0; background: #806cff; }
-  :global(.dark .section-marker.is-active .section-marker__rule) { background: #8f72ff; }
-  :global(.dark .section-marker > h2) { grid-column: 3; padding: 0; border: 0; font-size: 30px; line-height: 1.12; }
-
   :global(.reader-shell .section-marker) { grid-template-columns: 4px 40px minmax(0, 1fr); column-gap: 14px; align-items: center; margin-top: 30px; padding-bottom: 10px; border-bottom: 1px solid var(--border-strong); }
   :global(.reader-shell .section-marker__gutter) { display: contents; }
   :global(.reader-shell .section-marker__ordinal) { grid-column: 2; width: 40px; height: 40px; border-color: var(--border-strong); border-radius: 8px; color: var(--accent-text); font-size: 14px; }
