@@ -1,0 +1,42 @@
+---
+/**
+ * ClaimRef (lens-claims) — a quiet inline claim link, "C1", whose target is
+ * the claim's exact-version resolution page (a full record, no JS needed).
+ * The status rides along as a small dot so a contradicted claim never looks
+ * like a supported one, even inline.
+ */
+import type { Claim } from '../../lib/labs/types';
+import { STATUS, claimHref } from './labels';
+
+interface Props { claim: Pick<Claim, 'label' | 'version' | 'status' | 'statement'>; labHref: string; class?: string }
+const { claim, labHref, class: className } = Astro.props;
+const s = STATUS[claim.status];
+---
+
+<a class:list={['lab-claimref', `lab-claimref--${s.tone}`, className, 's2s-focus']} href={claimHref(labHref, claim.label, claim.version)} title={`${claim.label} · ${s.label}: ${claim.statement}`}>
+  <span class="lab-claimref__dot" aria-hidden="true" />{claim.label}<span class="sr-only"> ({s.label})</span>
+</a>
+
+<style>
+  .lab-claimref {
+    --tone: var(--s2s-ink-subtle);
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 0 7px;
+    border: 1px solid var(--s2s-rule-strong);
+    border-radius: var(--s2s-radius-control);
+    font: 600 var(--type-micro) / 1.7 var(--font-mono);
+    color: var(--s2s-ink-soft);
+    text-decoration: none;
+    white-space: nowrap;
+    vertical-align: 0.1em;
+  }
+  .lab-claimref:hover { border-color: var(--s2s-accent); color: var(--s2s-accent); }
+  .lab-claimref__dot { width: 6px; height: 6px; border-radius: 50%; background: var(--tone); }
+  .lab-claimref--ok { --tone: var(--s2s-status-ok); }
+  .lab-claimref--warn { --tone: var(--s2s-status-warn); }
+  .lab-claimref--danger { --tone: var(--s2s-status-danger); }
+  .lab-claimref--info { --tone: var(--s2s-status-info); }
+  .lab-claimref--neutral .lab-claimref__dot { background: transparent; border: 1px solid var(--s2s-ink-subtle); }
+</style>

@@ -1,0 +1,140 @@
+---
+/**
+ * EvidenceCard (lens-claims) — one evidence item as the storyboard's
+ * "Evidence for C1" column draws it: E-label, kind, review state, title,
+ * origin, summary, a figure thumbnail when it has a released chart, and
+ * its relations to claims (Supports / Contradicts / Qualifies).
+ *
+ * The storyboard's green "Verified" check is replaced by the item's actual
+ * review state (spec 04: no generic verified badge).
+ * access "denied" renders the fixed access token only: no title, locator,
+ * count or id (snapshot contract, RLARC-005).
+ */
+import Icon from '../brand/Icon.astro';
+import Pill from '../family/Pill.astro';
+import ClaimRef from './ClaimRef.astro';
+import FigureWithData from './FigureWithData.astro';
+import type { Claim, EvidenceItem, EvidenceRelation, LabView } from '../../lib/labs/types';
+import { EVIDENCE_KIND, REVIEW, RELATION, ACCESS, formatIsoDate } from './labels';
+
+interface Props {
+  item: EvidenceItem;
+  lab: LabView;
+  /** Relations to show; defaults to every claim that cites this item. */
+  relations?: { claim: Claim; relation: EvidenceRelation }[];
+  class?: string;
+}
+const { item, lab, relations, class: className } = Astro.props;
+const rels = relations ?? lab.claims.flatMap((c) => c.evidence.filter((e) => e.evidenceId === item.id).map((e) => ({ claim: c, relation: e.relation })));
+const kind = EVIDENCE_KIND[item.kind];
+const review = REVIEW[item.review];
+const figure = item.figureIds.map((id) => lab.figures.find((f) => f.id === id)).find((f) => f?.chart && lab.figureData[f.id]);
+const denied = item.access === 'denied';
+---
+
+<div class="lab-ev-wrap">
+{denied ? (
+  <article class:list={['lab-ev', 'lab-ev--denied', className]} aria-label="Evidence item withheld">
+    <span class="lab-ev__token"><Icon name="evidence" size={15} />{ACCESS.denied}</span>
+    <p class="lab-ev__denied-note">Withheld from the public record. Nothing about this item is published.</p>
+  </article>
+) : (
+  <article class:list={['lab-ev', className]} id={`evidence-${item.id.toLowerCase()}`}>
+    <div class="lab-ev__main">
+      <header class="lab-ev__head">
+        <span class="lab-ev__label">{item.id}</span>
+        <span class="lab-ev__kind"><Icon name={kind.icon} size={14} />{kind.label}</span>
+        <Pill label={review.label} tone={review.tone === 'danger' ? 'warn' : review.tone} />
+        {item.access !== 'public' && <Pill label={ACCESS[item.access]} tone="neutral" />}
+      </header>
+      {item.title && <h4 class="lab-ev__title">{item.title}</h4>}
+      {(item.origin || item.period) && <p class="lab-ev__origin">{[item.origin, item.period].filter(Boolean).join(' · ')}</p>}
+      {item.summary && <p class="lab-ev__summary">{item.summary}</p>}
+      <footer class="lab-ev__foot">
+        {rels.map((r) => (
+          <span class={`lab-ev__rel lab-ev__rel--${RELATION[r.relation].tone}`}>{RELATION[r.relation].label} <ClaimRef claim={r.claim} labHref={lab.href} /></span>
+        ))}
+        {item.figureIds.map((f) => <a class="lab-ev__fig s2s-focus" href={`${lab.href}resources/#figure-${f.toLowerCase()}`}><Icon name="figures" size={13} />Figure {f.replace(/^F/, '')}</a>)}
+        {item.date && <time class="lab-ev__date" datetime={item.date}>{formatIsoDate(item.date)}</time>}
+      </footer>
+    </div>
+    {figure && (
+      <a class="lab-ev__thumb s2s-focus" href={`${lab.href}resources/#figure-${figure.id.toLowerCase()}`} aria-label={`Figure ${figure.number}: ${figure.title}`}>
+        <FigureWithData figure={figure} data={lab.figureData[figure.id]} variant="thumb" />
+      </a>
+    )}
+  </article>
+)}
+</div>
+
+<style>
+  .lab-ev {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+    min-width: 0;
+    padding: 14px 16px;
+    border: 1px solid var(--s2s-rule);
+    border-radius: var(--s2s-radius-card);
+    background: var(--s2s-surface);
+  }
+  .lab-ev-wrap { container-type: inline-size; min-width: 0; }
+  @container (min-width: 360px) { .lab-ev:has(.lab-ev__thumb) { grid-template-columns: minmax(0, 1fr) 120px; } }
+  @container (max-width: 359px) { .lab-ev__thumb { max-width: 220px; } }
+  .lab-ev__head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; }
+  .lab-ev__label {
+    display: inline-grid;
+    place-items: center;
+    min-width: 28px;
+    height: 22px;
+    padding: 0 5px;
+    border: 1px solid var(--s2s-rule-emphasis);
+    border-radius: var(--s2s-radius-control);
+    font: 600 var(--type-micro) / 1 var(--font-mono);
+    color: var(--s2s-ink);
+  }
+  .lab-ev__kind {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 8px;
+    border-radius: var(--s2s-radius-control);
+    background: var(--s2s-chip);
+    font: 500 var(--type-micro) / 1.45 var(--font-sans);
+    color: var(--s2s-ink-soft);
+  }
+  .lab-ev__title { margin: 10px 0 0; font: 400 var(--type-card) / 1.3 var(--font-display); color: var(--s2s-ink); }
+  .lab-ev__origin { margin: 3px 0 0; font: 400 var(--type-meta) / 1.4 var(--font-sans); color: var(--s2s-ink-subtle); }
+  .lab-ev__summary { margin: 8px 0 0; font: 400 var(--type-body-s) / 1.5 var(--font-sans); color: var(--s2s-ink-muted); }
+  .lab-ev__foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 14px;
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px solid var(--s2s-rule);
+    font: 400 var(--type-micro) / 1.4 var(--font-sans);
+    color: var(--s2s-ink-subtle);
+  }
+  .lab-ev__rel { display: inline-flex; align-items: center; gap: 6px; font-weight: 500; }
+  .lab-ev__rel--ok { color: var(--s2s-status-ok); }
+  .lab-ev__rel--danger { color: var(--s2s-status-danger); }
+  .lab-ev__rel--warn { color: var(--s2s-status-warn); }
+  .lab-ev__fig { display: inline-flex; align-items: center; gap: 5px; color: var(--s2s-ink-muted); text-decoration: none; }
+  .lab-ev__fig:hover { color: var(--s2s-accent); }
+  .lab-ev__date { font-family: var(--font-mono); margin-left: auto; }
+  .lab-ev__thumb { display: block; overflow: hidden; border: 1px solid var(--s2s-rule); border-radius: var(--s2s-radius-control); aspect-ratio: 4 / 3; align-self: start; }
+
+  .lab-ev--denied { border-style: dashed; background: transparent; gap: 6px; }
+  .lab-ev__token {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font: 600 var(--type-micro) / 1.4 var(--font-mono);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--s2s-ink-subtle);
+  }
+  .lab-ev__denied-note { margin: 0; font: 400 var(--type-meta) / 1.5 var(--font-sans); color: var(--s2s-ink-subtle); }
+</style>

@@ -1,0 +1,183 @@
+---
+/**
+ * /labs/<id>/claims/ — Claims & Evidence (lens-claims, S2S-021). Visual
+ * authority: labs-storyboard/images/urban_heat_claims_evidence_dashboard.webp.
+ *
+ * Claim-first inspection: every claim with its status, confidence and
+ * receipts (left), every evidence item with its relations to claims
+ * (right), and the claim network in the rail. Contested, unresolved,
+ * inference and speculation claims are listed in the same column as the
+ * supported ones, never in an appendix. Filtering is progressive
+ * enhancement; without JS everything shows.
+ */
+import LabShell from '../../../../components/labs/LabShell.astro';
+import ClaimCard from '../../../../components/labs/ClaimCard.astro';
+import EvidenceCard from '../../../../components/labs/EvidenceCard.astro';
+import ClaimNetwork from '../../../../components/labs/ClaimNetwork.astro';
+import FigureWithData from '../../../../components/labs/FigureWithData.astro';
+import FilterToolbar from '../../../../components/primitives/FilterToolbar.astro';
+import RailCard from '../../../../components/family/RailCard.astro';
+import Button from '../../../../components/ui/Button.astro';
+import Icon from '../../../../components/brand/Icon.astro';
+import { getLabCatalog } from '../../../../lib/labs/site';
+import type { LabView } from '../../../../lib/labs/types';
+import { STATUS, CLAIM_TYPE, CONFIDENCE, reportTabs, claimHref } from '../../../../components/labs/labels';
+import { seriesColor } from '../../../../components/labs/chart';
+
+export async function getStaticPaths() {
+  const { labs } = await getLabCatalog();
+  return labs.map((lab) => ({ params: { slug: lab.investigation.publicId }, props: { lab } }));
+}
+
+interface Props { lab: LabView }
+const { lab } = Astro.props;
+const inv = lab.investigation;
+const featured = lab.figures.find((f) => f.id === inv.featuredFigureId && f.chart && lab.figureData[f.id]);
+const networkClaim = lab.claims.find((c) => c.evidence.length > 0) ?? lab.claims[0];
+
+const statuses = [...new Set(lab.claims.map((c) => c.status))];
+const types = [...new Set(lab.claims.map((c) => c.type))];
+const domainCounts = new Map<string, number>();
+for (const c of lab.claims) for (const d of c.domains) domainCounts.set(d, (domainCounts.get(d) ?? 0) + 1);
+const domains = [...domainCounts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+const maxDomain = Math.max(1, ...domains.map((d) => d[1]));
+
+const filters = [
+  { id: 'status', label: 'Claim status', icon: 'claims', options: [{ value: '', label: 'All statuses' }, ...statuses.map((s) => ({ value: s, label: STATUS[s].label }))] },
+  { id: 'type', label: 'Claim type', icon: 'evidence', options: [{ value: '', label: 'All types' }, ...types.map((t) => ({ value: t, label: CLAIM_TYPE[t] }))] },
+  { id: 'confidence', label: 'Confidence', icon: 'figures', options: [{ value: '', label: 'All levels' }, ...(['high', 'moderate', 'low', 'not-assessed'] as const).filter((c) => lab.claims.some((x) => x.confidence === c)).map((c) => ({ value: c, label: CONFIDENCE[c].label }))] },
+];
+---
+
+<LabShell
+  title={`Claims & Evidence · ${inv.title}`}
+  description={`Every claim in ${inv.title}, with its status, confidence, receipts and evidence.`}
+  heading={inv.title}
+  subheading="Claims & Evidence"
+  eyebrow={['Labs', 'Investigations', 'Claims']}
+  lede="Each claim is shown with its own status, confidence and receipts, and each evidence item with what it supports, contradicts or qualifies."
+  tabs={reportTabs(lab.href, 'claims')}
+  synthetic={lab.synthetic}
+>
+  <div slot="hero-meta" class="lab-claims-actions">
+    <Button href={lab.href} variant="signal" size="md">View full report <span aria-hidden="true">→</span></Button>
+    <Button href={`${lab.href}capsule/evidence.json`} variant="outline" size="md"><Icon name="sparkle" size={16} /> Evidence capsule</Button>
+  </div>
+
+  <div class="lab-claims" data-lab-claims>
+    <FilterToolbar label="Filter claims" filters={filters} count={`${lab.counts.claims} claims · ${lab.counts.evidence} evidence items`} class="lab-claims__filters" />
+    <p class="lab-claims__empty" data-claims-empty hidden>No claim matches these filters.</p>
+
+    <div class="lab-claims__cols">
+      <section class="lab-claims__col" aria-labelledby="claims-title">
+        <h2 class="lab-claims__h" id="claims-title"><Icon name="claims" size={20} /> Claims <span>{lab.counts.claims}</span></h2>
+        <div class="lab-claims__list">
+          {lab.claims.map((c, i) => (
+            <div data-claim data-status={c.status} data-type={c.type} data-confidence={c.confidence}>
+              <ClaimCard claim={c} labHref={lab.href} evidence={lab.evidence} selected={i === 0} />
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section class="lab-claims__col" id="evidence" aria-labelledby="evidence-title">
+        <h2 class="lab-claims__h" id="evidence-title"><Icon name="evidence" size={20} /> Evidence <span>{lab.counts.evidence}</span></h2>
+        <div class="lab-claims__list">
+          {lab.evidence.map((e) => <EvidenceCard item={e} lab={lab} />)}
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <Fragment slot="rail">
+    <RailCard heading="About this report" icon="essays" action={{ label: 'Full report', href: lab.href }}>
+      <div class="lab-about">
+        {featured && <a class="lab-about__thumb" href={lab.href} aria-hidden="true" tabindex="-1"><FigureWithData figure={featured} data={lab.figureData[featured.id]} variant="thumb" /></a>}
+        <p>{inv.dek}</p>
+      </div>
+    </RailCard>
+    {networkClaim && (
+      <RailCard heading="Claim network" icon="topics" action={{ label: `${networkClaim.label} record`, href: claimHref(lab.href, networkClaim.label, networkClaim.version) }}>
+        <ClaimNetwork claim={networkClaim} lab={lab} />
+        <p class="lab-rail-note">Each claim's own network is on its record page.</p>
+      </RailCard>
+    )}
+    {domains.length > 0 && (
+      <RailCard heading="Key domains in this report" icon="topics">
+        <ul class="lab-bars">
+          {domains.slice(0, 8).map(([d, n], i) => (
+            <li>
+              <span class="lab-bars__label">{d}</span>
+              <span class="lab-bars__track"><span class="lab-bars__fill" style={`width: ${(n / maxDomain) * 100}%; background: ${seriesColor(i)}`} /></span>
+              <span class="lab-bars__n">{n}</span>
+            </li>
+          ))}
+        </ul>
+        <p class="lab-rail-note">Claims tagged with each domain.</p>
+      </RailCard>
+    )}
+    <RailCard heading="Related materials" icon="artifacts">
+      <ul class="lab-related">
+        <li><a href={`${lab.href}resources/#figures`}>Figures</a><span>{lab.counts.figures}</span></li>
+        <li><a href={`${lab.href}resources/#sources`}>Sources</a><span>{lab.counts.sources}</span></li>
+        <li><a href={`${lab.href}resources/#artifacts`}>Artifacts (code, data, docs)</a><span>{lab.counts.artifacts}</span></li>
+      </ul>
+    </RailCard>
+  </Fragment>
+</LabShell>
+
+<script>
+  const root = document.querySelector<HTMLElement>('[data-lab-claims]');
+  if (root) {
+    const selects = [...root.querySelectorAll<HTMLSelectElement>('select[data-filter]')];
+    const items = [...root.querySelectorAll<HTMLElement>('[data-claim]')];
+    const empty = root.querySelector<HTMLElement>('[data-claims-empty]');
+    const apply = () => {
+      const v = Object.fromEntries(selects.map((s) => [s.dataset.filter, s.value]));
+      let shown = 0;
+      for (const el of items) {
+        const ok = (!v.status || el.dataset.status === v.status) && (!v.type || el.dataset.type === v.type) && (!v.confidence || el.dataset.confidence === v.confidence);
+        el.hidden = !ok;
+        if (ok) shown++;
+      }
+      if (empty) empty.hidden = shown > 0;
+    };
+    selects.forEach((s) => s.addEventListener('change', apply));
+  }
+</script>
+
+<style>
+  .lab-claims-actions { display: flex; flex-wrap: wrap; gap: 10px 12px; }
+  .lab-claims { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+  .lab-claims :global(.lab-claims__filters .s2s-filter) { flex: 1 1 170px; min-width: 0; }
+  .lab-claims :global(.lab-claims__filters .s2s-filters__count) { flex: 0 0 auto; margin-left: auto; }
+  .lab-claims__empty { margin: 0; font: 400 var(--type-body-s) / 1.5 var(--font-sans); color: var(--s2s-ink-muted); }
+  .lab-claims__cols { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; }
+  @media (min-width: 1240px) { .lab-claims__cols { grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr); gap: 18px; } }
+  .lab-claims__col { min-width: 0; scroll-margin-top: calc(var(--s2s-header-h) + 16px); }
+  .lab-claims__h { display: flex; align-items: center; gap: 8px; margin: 0 0 12px; font: 400 1.25rem / 1.2 var(--font-display); color: var(--s2s-ink); }
+  .lab-claims__h :global(svg) { color: var(--s2s-accent); }
+  .lab-claims__h span { font: 500 var(--type-meta) / 1 var(--font-mono); color: var(--s2s-ink-subtle); }
+  .lab-claims__list { display: flex; flex-direction: column; gap: 12px; }
+  .lab-claims__list [hidden] { display: none; }
+
+  .lab-about { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 12px; align-items: start; }
+  .lab-about:not(:has(.lab-about__thumb)) { grid-template-columns: minmax(0, 1fr); }
+  .lab-about__thumb { display: block; aspect-ratio: 1; overflow: hidden; border-radius: 8px; border: 1px solid var(--s2s-rule); }
+  .lab-about p { margin: 0; }
+  .lab-rail-note { margin: 10px 0 0 !important; font: 400 var(--type-micro) / 1.4 var(--font-sans); color: var(--s2s-ink-subtle); }
+
+  .lab-bars { margin: 0; padding: 0; list-style: none; display: grid; gap: 8px; }
+  .lab-bars li { display: grid; grid-template-columns: minmax(0, 1fr) 90px 18px; align-items: center; gap: 10px; }
+  .lab-bars__label { font: 400 var(--type-meta) / 1.3 var(--font-sans); color: var(--s2s-ink-soft); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .lab-bars__track { height: 7px; border-radius: 4px; background: var(--s2s-inset); overflow: hidden; }
+  .lab-bars__fill { display: block; height: 100%; border-radius: 4px; }
+  .lab-bars__n { font: 500 var(--type-micro) / 1 var(--font-mono); color: var(--s2s-ink-subtle); text-align: right; }
+
+  .lab-related { margin: 0; padding: 0; list-style: none; }
+  .lab-related li { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; padding: 6px 0; border-top: 1px solid var(--s2s-rule); }
+  .lab-related li:first-child { border-top: 0; }
+  .lab-related a { color: var(--s2s-ink-soft); text-decoration: none; }
+  .lab-related a:hover { color: var(--s2s-accent); }
+  .lab-related span { font: 500 var(--type-meta) / 1.4 var(--font-mono); color: var(--s2s-ink-subtle); }
+</style>
