@@ -11,7 +11,10 @@ const safeUrl = z.string().url().refine((value) => {
 }, 'expected http(s) URL');
 
 export const lifecycleSchema = z.enum(['candidate', 'approved', 'withdrawn']);
-export const projectionKindSchema = z.enum(['rf-claim', 'skillmeat-artifact', 'wiki-ref']);
+export const projectionKindSchema = z.enum([
+  'rf-claim', 'skillmeat-artifact', 'wiki-ref',
+  'lab-investigation', 'lab-report', 'lab-experiment', 'lab-artifact', 'lab-film',
+]);
 export const projectionRecordSchema = z.object({
   publicId,
   kind: projectionKindSchema,
@@ -28,6 +31,8 @@ export const releaseManifestSchema = z.object({
   schemaVersion: z.literal('1'),
   releaseId: publicId,
   records: z.array(z.object({ publicId, kind: projectionKindSchema, version: exactVersion, digest: sha256 }).strict()).min(1),
+  // Optional private-release sidecar digest binds a Lab public release to its private source record.
+  releaseSidecarDigest: sha256.optional(),
 }).strict();
 
 export const approvalReceiptSchema = z.object({
@@ -41,22 +46,37 @@ export const approvalReceiptSchema = z.object({
   if (receipt.action === 'withdraw' && receipt.approver === 'agent:metis' && (!receipt.reason || !receipt.followUpReport)) context.addIssue({ code: 'custom', message: 'Metis withdrawal requires reason and followUpReport' });
 });
 
-/** Return the canonical SHA-256 identifier for exact serialized projection bytes. */
+/**
+ * Return the SHA-256 identifier for exact serialized projection bytes.
+ *
+ * This intentionally preserves insertion order: Lab producers must emit the fixed schema order
+ * (publicId through summary, with digest omitted) before calling this function.
+ */
 export function digestProjection(record) {
   return `sha256:${createHash('sha256').update(JSON.stringify(record)).digest('hex')}`;
 }
 
-function hasPrivateMaterial(value) {
-  return /(?:^|[^a-z])(node_|tree_|ws_|req_|agentic-nuc|\/private\/|\.ssh\/|secrets?\.env)/i.test(JSON.stringify(value));
+const privateFieldNames = new Set(['reviews', 'workspace', 'unresolvedReferences']);
+const privateMaterialPattern = /(?:^|[^a-z])(node_|tree_|ws_|req_|agentic-nuc|\/private\/|\.ssh\/|secrets?\.env|\/Users\/|\/home\/|(?:10\.|192\.168\.|172\.(?:1[6-9]|2\d|3[0-1])\.))/i;
+
+function hasPrivateMaterial(value, denied = []) {
+  const serialized = JSON.stringify(value);
+  return privateMaterialPattern.test(serialized) || denied.some((identifier) => serialized.includes(identifier));
+}
+
+function hasPrivateFields(records) {
+  return records.some((record) => Object.keys(record).some((key) => privateFieldNames.has(key)));
 }
 
 /** Fail-closed semantic release gate: an error makes every record unavailable. */
-export function evaluateReleaseGate(manifestInput, receiptInputs, recordInputs) {
+export function evaluateReleaseGate(manifestInput, receiptInputs, recordInputs, options = {}) {
   const manifest = releaseManifestSchema.safeParse(manifestInput);
   const receipts = z.array(approvalReceiptSchema).safeParse(receiptInputs);
   const records = z.array(projectionRecordSchema).safeParse(recordInputs);
-  if (!manifest.success || !receipts.success || !records.success) return { publishable: [], errors: ['schema-invalid'] };
-  if (hasPrivateMaterial({ manifest: manifest.data, receipts: receipts.data, records: records.data })) return { publishable: [], errors: ['private-material'] };
+  const denied = options.denied === undefined ? [] : options.denied;
+  if (!manifest.success || !receipts.success || !records.success || !Array.isArray(denied)) return { publishable: [], errors: ['schema-invalid'] };
+  if (hasPrivateFields(recordInputs) || hasPrivateMaterial({ manifest: manifest.data, receipts: receipts.data, records: records.data }, denied)) return { publishable: [], errors: ['private-material'] };
+  if (manifest.data.releaseSidecarDigest && options.releaseSidecarDigest !== manifest.data.releaseSidecarDigest) return { publishable: [], errors: ['release-sidecar-mismatch'] };
   const declared = new Map(manifest.data.records.map((entry) => [entry.publicId, entry]));
   const byId = new Map(records.data.map((record) => [record.publicId, record]));
   const errors = [];
