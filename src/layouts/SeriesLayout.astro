@@ -30,6 +30,8 @@ interface SeriesPost {
   href?: string;
   /** Row kind chip: "essay" (posts) vs "story" (dev stories/build notes). */
   kind?: 'essay' | 'story';
+  /** Exact chip text (e.g. "After-action review"); overrides the kind default. */
+  kindLabel?: string;
 }
 
 interface Props {
@@ -65,12 +67,10 @@ const canonicalUrl = buildCanonicalUrl(Astro.url.pathname);
 const statusLabel: Record<string, string> = { active: 'Active', planned: 'Planned', complete: 'Complete' };
 const kindLabel: Record<string, string> = { essay: 'Essay', story: 'Build note' };
 
-// Sort posts by part number, then by date
-const sortedPosts = [...posts].sort((a, b) => {
-  if (a.part !== undefined && b.part !== undefined) return a.part - b.part;
-  if (a.date && b.date) return new Date(a.date).getTime() - new Date(b.date).getTime();
-  return 0;
-});
+// Callers pass parts already in reading order (seriesMembers: seriesOrder,
+// then date). The row number is the position in that order, never the raw
+// seriesOrder, so a gap or a missing order cannot repeat or skip a number.
+const sortedPosts = posts;
 
 const topicHub = topic ? TOPIC_HUBS.find((h) => h.label.toLowerCase() === topic.toLowerCase()) : undefined;
 ---
@@ -97,10 +97,10 @@ const topicHub = topic ? TOPIC_HUBS.find((h) => h.label.toLowerCase() === topic.
           {sortedPosts.map((post, index) => (
             <li>
               <Card as="article" variant="panel" href={post.href ?? `/essays/${post.slug}/`} class="sl-row">
-                <span class="sl-row__n" aria-hidden="true">{String(post.part ?? index + 1).padStart(2, '0')}</span>
+                <span class="sl-row__n" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
                 <div class="sl-row__body">
                   <div class="sl-row__top">
-                    {post.kind && <Badge variant="chip" text={kindLabel[post.kind]} />}
+                    {post.kind && <Badge variant="chip" text={post.kindLabel ?? kindLabel[post.kind]} />}
                     {post.date && <time class="s2s-meta" datetime={formatDateISO(post.date)}>{formatDate(post.date)}</time>}
                   </div>
                   <h3 class="sl-row__title">{post.title}</h3>
