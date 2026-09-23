@@ -955,6 +955,14 @@
       "milestone": "M2"
     },
     {
+      "path": "/labs/",
+      "output": "labs/index.html",
+      "family": "labs",
+      "action": "add",
+      "target": "/labs/",
+      "milestone": "M3"
+    },
+    {
       "path": "/feeds/companion.xml",
       "output": "feeds/companion.xml",
       "family": "feeds",
