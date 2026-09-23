@@ -46,13 +46,22 @@ test('keeps canonical Lab digests stable only for the required fixed key order',
   assert.equal(digestProjection(canonical), record.digest);
   assert.notEqual(digestProjection({ kind: canonical.kind, publicId: canonical.publicId, ...canonical }), record.digest);
 });
-test('fails closed for LAN addresses and absolute home paths', () => {
+test('fails closed for bounded private IPv4 addresses and absolute home paths', () => {
   const material = [
-    ['10', '1', '2', '3'].join('.'), ['172', '16', '0', '1'].join('.'), ['192', '168', '1', '1'].join('.'),
+    ['10', '1', '2', '3'].join('.'), ['172', '20', '0', '1'].join('.'), ['192', '168', '1', '1'].join('.'),
     ['/', 'Users', 'person', 'file'].join('/').replace('//', '/'), ['/', 'home', 'person', 'file'].join('/').replace('//', '/'),
   ];
   for (const value of material) {
     const altered = structuredClone(records); altered[0].summary = value; assertClosed(manifest, receipts, altered);
+  }
+});
+test('does not mistake decimal fragments, percentages, or versions for private IPv4', () => {
+  for (const value of ['1.10.2', '10.5 percent', 'v10.4']) {
+    const altered = structuredClone(records); altered[0].summary = value;
+    altered[0].digest = digestProjection({ ...altered[0], digest: undefined });
+    const alteredManifest = structuredClone(manifest); alteredManifest.records[0].digest = altered[0].digest;
+    const alteredReceipts = structuredClone(receipts); alteredReceipts[0].digest = altered[0].digest;
+    assert.equal(gate(alteredManifest, alteredReceipts, altered).publishable.length, 1);
   }
 });
 test('fails closed for a caller-supplied denied workspace identifier', () => { assertClosed(manifest, receipts, records, { denied: ['synthetic-claim-001'] }); });
