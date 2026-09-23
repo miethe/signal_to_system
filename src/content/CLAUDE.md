@@ -104,3 +104,5 @@ For drafting workflow, voice guidance, and research integration, see `docs/CLAUD
 When writing content, use the `/voice-writer` skill to match Nick's voice. Use `/blog-drafter` for the full workflow from spec to publication-ready MDX.
 
 Post planning template available at `docs/templates/post-planning.md`.
+
+Before publishing, complete the [pre-publish review checklist](../../docs/authoring/review-checklist.md).
