@@ -16,7 +16,10 @@ for (const file of files) {
   for (const match of html.matchAll(/\b(?:href|src)=["']([^"']+)["']/g)) {
     const value = match[1];
     if (!value.startsWith('/') || value.startsWith('//') || value.startsWith('/_astro/') || value === '/brand/apple-touch-icon.png' || value.startsWith('/categories/')) continue;
-    const pathname = value.split(/[?#]/, 1)[0];
+    // A server maps a percent-encoded URL to the decoded file name
+    // (e.g. /dev-stories/orchestrator/Fable%205/ -> "Fable 5/").
+    let pathname = value.split(/[?#]/, 1)[0];
+    try { pathname = decodeURIComponent(pathname); } catch { /* keep raw */ }
     if (!pathname) continue;
     const candidates = [join('dist', pathname), join('dist', pathname, 'index.html'), join('dist', `${pathname}.html`)];
     try {

@@ -1,254 +1,403 @@
 ---
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import StoryCard from '../../components/cards/StoryCard.astro';
-import AutomatedDisclaimer from '../../components/content/AutomatedDisclaimer.astro';
-import InteractiveNetwork from '../../components/interactive/InteractiveNetwork';
-import { getPublishedStories, getAllProjects } from '../../lib/content';
+/**
+ * /dev-stories — the Dev Stories index (M2, ia-devstories
+ * node_01M35CKN6XRP0ZRD7R8HRR2NW0).
+ * Visual authority: docs/design/s2s-v2-visual/01-site-mockups/
+ * signal_to_system_dev_stories.png.
+ *
+ * Two lanes, split on the recorded `automated` flag:
+ *   Builder Notes    automated: false (written directly, or closely with agents)
+ *   Automated AARs   automated: true  (drafted from the execution workflow)
+ * The "Reviewed" pill appears only where a story's frontmatter records
+ * `reviewed: true`; nothing infers it. Where the mockup shows data the site
+ * does not have (like and comment counts, per-workflow run times), the page
+ * omits it; the rail lists orchestrators and projects the stories really name.
+ *
+ * Built from the shared Writing/Labs family (src/components/family/).
+ * Filtering is progressive enhancement; ?project=<slug>, ?type=<storyType>
+ * and ?provenance=<value> preselect a filter (old chip links keep working).
+ */
+import HubLayout from '../../layouts/templates/HubLayout.astro';
+import Button from '../../components/ui/Button.astro';
+import Icon from '../../components/brand/Icon.astro';
+import Tabs from '../../components/primitives/Tabs.astro';
+import FilterToolbar from '../../components/primitives/FilterToolbar.astro';
+import FacetRail from '../../components/primitives/FacetRail.astro';
+import StateNotice from '../../components/primitives/StateNotice.astro';
+import DotTimeline from '../../components/diagrams/DotTimeline.astro';
+import CollectionPanel from '../../components/family/CollectionPanel.astro';
+import FeatureCard from '../../components/family/FeatureCard.astro';
+import PathList from '../../components/family/PathList.astro';
+import RailCard from '../../components/family/RailCard.astro';
+import type { PillTone } from '../../components/family/Pill.astro';
+import { getPublications, SUBTYPE_LABEL, type PublicationSummary, type Provenance } from '../../lib/writing';
+import { getPublishedStories } from '../../lib/content';
 import { projectsBySlug } from '../../data/taxonomy';
+import { formatDate, formatDateISO } from '../../lib/utils';
 import { site } from '../../data/site';
 
-// ---------------------------------------------------------------------------
-// Data — the full published set is rendered up front; filtering is client-side
-// so it works on the static (GitHub Pages) build, where request-time query
-// params are not available. Chip links keep shareable/bookmarkable URLs.
-// ---------------------------------------------------------------------------
+const stories = (await getPublications()).filter((p) => p.format === 'dev-story');
+const entries = await getPublishedStories();
+const workflowById = new Map(entries.map((e) => [e.id, e.data.workflow]));
 
-const allStories = await getPublishedStories();
+const builder = stories.filter((s) => s.provenance === 'authored');
+const automated = stories.filter((s) => s.provenance !== 'authored');
 
-// Project chips — restricted to slugs that actually appear on a dev story.
-const allProjectFacets = await getAllProjects();
-const storyProjectSlugs = new Set<string>();
-for (const story of allStories) {
-  for (const slug of story.data.projects ?? []) storyProjectSlugs.add(slug);
+const PROVENANCE: Record<Provenance, { label: string; tone: PillTone }> = {
+  authored: { label: 'Human + agent', tone: 'secondary' },
+  automated: { label: 'Automated', tone: 'accent' },
+  'automated-reviewed': { label: 'Automated', tone: 'accent' },
+};
+
+const projectLabel = (slug: string) => projectsBySlug[slug]?.label ?? slug;
+
+// Card pills use the short type names (mockup: "AAR", "Build Log").
+const TYPE_PILL = { 'after-action': 'AAR', 'feature-story': 'Feature story', 'build-note': 'Build note' } as const;
+const pills = (s: PublicationSummary) => [
+  { label: s.subtype ? TYPE_PILL[s.subtype] : 'Dev Story' },
+  PROVENANCE[s.provenance],
+  ...(s.provenance === 'automated-reviewed' ? [{ label: 'Reviewed', tone: 'ok' as const }] : []),
+];
+
+const meta = (s: PublicationSummary) => {
+  const lead = s.projects.find((p) => p !== 'aos') ?? s.projects[0];
+  return [
+    { label: formatDate(s.publishedAt), datetime: formatDateISO(s.publishedAt), icon: 'timeline' },
+    ...(s.readMinutes ? [{ label: `${s.readMinutes} min read` }] : []),
+    ...(lead ? [{ label: projectLabel(lead), icon: 'projects' }] : []),
+  ];
+};
+
+const cardImage = (s: PublicationSummary) =>
+  s.heroImage && !s.heroImage.endsWith('.svg') ? s.heroImage : undefined;
+
+const attrs = (s: PublicationSummary) => ({
+  'data-entry': '',
+  'data-date': s.publishedAt.toISOString(),
+  'data-type': s.subtype ?? '',
+  'data-provenance': s.provenance,
+  'data-projects': s.projects.join(' '),
+});
+
+// Filters: only values the published stories actually carry.
+function tally<T>(values: T[]): [T, number][] {
+  const m = new Map<T, number>();
+  for (const v of values) m.set(v, (m.get(v) ?? 0) + 1);
+  return [...m.entries()].sort((a, b) => b[1] - a[1] || String(a[0]).localeCompare(String(b[0])));
 }
-const projectFacets = allProjectFacets.filter((f) => storyProjectSlugs.has(f.slug));
+const typeCounts = tally(stories.map((s) => s.subtype).filter((t): t is NonNullable<typeof t> => Boolean(t)));
+const projectCounts = tally(stories.flatMap((s) => s.projects));
+const provenanceOptions = [
+  { value: 'authored', label: 'Builder notes (human + agent)', n: builder.length },
+  { value: 'automated', label: 'Automated', n: stories.filter((s) => s.provenance === 'automated').length },
+  { value: 'automated-reviewed', label: 'Automated + reviewed', n: stories.filter((s) => s.provenance === 'automated-reviewed').length },
+].filter((o) => o.n > 0);
 
-// Workflow-version chips — distinct workflow.version values across published stories.
-const versionCounts = new Map<string, number>();
-for (const story of allStories) {
-  const version = story.data.workflow?.version;
-  if (version) versionCounts.set(version, (versionCounts.get(version) ?? 0) + 1);
-}
-const versionFacets = Array.from(versionCounts.entries())
-  .map(([version, count]) => ({ version, count }))
-  .sort((a, b) => a.version.localeCompare(b.version, undefined, { numeric: true }));
+const filters = [
+  {
+    id: 'type', label: 'Post type', icon: 'dev-stories',
+    options: [{ value: '', label: 'All post types' }, ...typeCounts.map(([t]) => ({ value: t, label: SUBTYPE_LABEL[t] }))],
+  },
+  {
+    id: 'provenance', label: 'Provenance', icon: 'evidence',
+    options: [{ value: '', label: 'All provenance' }, ...provenanceOptions.map((o) => ({ value: o.value, label: o.label }))],
+  },
+  {
+    id: 'project', label: 'Project', icon: 'projects',
+    options: [{ value: '', label: 'All projects' }, ...projectCounts.map(([p]) => ({ value: p, label: projectLabel(p) }))],
+  },
+  {
+    id: 'sort', label: 'Sort', icon: 'timeline',
+    options: [{ value: 'new', label: 'Most recent' }, { value: 'old', label: 'Oldest first' }],
+  },
+];
 
-const totalCount = allStories.length;
-const featureStories = allStories.filter((s) => s.data.storyType === 'feature-story');
-const otherStories = allStories.filter((s) => s.data.storyType !== 'feature-story');
+const lanes = [
+  {
+    key: 'authored', id: 'builder-notes', title: 'Builder Notes', icon: 'field-notes', items: builder,
+    badge: { label: 'Human + agent', tone: 'secondary' as const },
+    description: 'Posts written directly, or in close collaboration with agents: builder notes, feature stories and practical lessons from the front lines.',
+    checks: ['Written directly, or closely with agents', 'Practical and in-the-moment', 'Reflections, build notes and lessons'],
+  },
+  {
+    key: 'automated', id: 'automated-aars', title: 'Automated AARs', icon: 'methods', items: automated,
+    badge: { label: 'Automated', tone: 'accent' as const },
+    description: 'After-action reviews drafted from the records of the agentic execution workflow, then edited for readability. The raw detail is preserved.',
+    checks: ['Drafted from agentic workflow records', 'Labeled as automated on every page', 'Execution details, results and learnings'],
+  },
+];
 
-const chipBase =
-  'filter-chip inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-sm font-medium transition-colors';
-const chipInactive =
-  'bg-[var(--bg-muted)] text-[var(--text-secondary)] hover:bg-[var(--bg-subtle)] hover:text-[var(--text-primary)]';
-const chipActive = 'is-active bg-[var(--accent)] text-white dark:text-[var(--text-inverse)]';
+// Rail: orchestrators and projects the stories actually name.
+const orchestrators = tally(
+  stories.map((s) => workflowById.get(s.id)?.orchestrator).filter((o): o is string => Boolean(o)),
+);
+const projectItems = projectCounts.slice(0, 6).map(([p, n]) => ({
+  label: projectLabel(p),
+  href: `/dev-stories/?project=${encodeURIComponent(p)}#dev-stories-list`,
+  count: n,
+}));
+
+const pipeline = [
+  { label: 'Agents execute the work', detail: 'Tasks run through the execution workflow and leave an after-action record.' },
+  { label: 'The record is drafted', detail: 'Assembled into a story with the help of AI agents.' },
+  { label: 'Edited for readability', detail: 'The raw build detail is preserved, rough edges included.' },
+  { label: 'Published with its label', detail: 'Automated stories say so on the card and on the page.', state: 'current' as const },
+];
 ---
 
-<BaseLayout
+<HubLayout
   title="Dev Stories"
-  description="Field notes from the agentic build loop — after-action reports, feature stories, and build notes drawn from the execution workflow."
+  description="Field notes from the agentic build loop: builder notes, feature stories and automated after-action reviews drawn from the execution workflow."
+  heading="Dev Stories from the agentic build loop."
+  accent="agentic build loop."
+  eyebrow={['Writing', 'Dev Stories']}
+  lede="A behind-the-scenes look at building with AI agents: real work, real systems, real lessons. From builder notes to automated after-action reviews, these stories document the messy, interesting path from idea to working system."
+  hero={{
+    photo: 'observatory',
+    quote: { text: 'Systems get real\nin the doing.' },
+    rail: ['Observe', 'Investigate', 'Build', 'Share', 'Repeat'],
+    railFoot: ['A quieter', 'brighter', 'tomorrow'],
+  }}
 >
-  <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
-    <!-- Page header -->
-    <header class="dark relative mb-10 overflow-hidden rounded-3xl border border-[var(--border-subtle)] shadow-sm bg-[var(--bg-surface)]">
-      <div class="absolute inset-0 z-0 opacity-80" aria-hidden="true">
-        <InteractiveNetwork className="w-full h-full" client:idle />
-      </div>
-      <div class="relative z-10 px-8 py-16 sm:px-12 sm:py-24">
-        <h1 class="font-serif text-5xl font-bold tracking-tight text-[var(--text-primary)] mb-6">
-          <span class="italic text-[var(--accent)]">Dev</span> Stories
-        </h1>
-        <p class="text-xl text-[var(--text-secondary)] max-w-2xl leading-relaxed">
-          {site.devStories.tagline}
-          <span class="text-[var(--text-primary)]"><span id="dev-count">{totalCount}</span> published</span><span id="dev-filter-label"></span>.
-        </p>
-      </div>
-    </header>
+  <Fragment slot="hero-actions">
+    <Button href="#builder-notes" variant="signal" size="lg">Browse builder notes <span aria-hidden="true">→</span></Button>
+    <Button href="#about-dev-stories" variant="outline" size="lg"><Icon name="guides" size={16} /> How Dev Stories work</Button>
+  </Fragment>
 
-    <!-- Provenance banner -->
-    <AutomatedDisclaimer variant="banner" class="mb-10" />
+  <Fragment slot="subnav">
+    <Tabs
+      label="Writing sections"
+      items={[
+        { label: 'All writing', href: '/writing/', icon: 'writing' },
+        { label: 'Essays', href: '/essays/', icon: 'essays' },
+        { label: 'Dev Stories', href: '/dev-stories/', icon: 'dev-stories', current: true },
+      ]}
+    />
+  </Fragment>
 
-    <!-- Project filter -->
-    {projectFacets.length > 0 && (
-      <nav class="mb-3 flex flex-wrap gap-2" aria-label="Filter by project" data-filter-group="project">
-        <a href="/dev-stories/" data-project="" class:list={[chipBase, chipActive]}>All Projects</a>
-        {projectFacets.map((f) => {
-          const label = projectsBySlug[f.slug]?.label ?? f.slug;
-          return (
-            <a href={`/dev-stories/?project=${encodeURIComponent(f.slug)}`} data-project={f.slug} class:list={[chipBase, chipInactive]}>
-              {label}
-              <span class="text-xs opacity-70">({f.count})</span>
-            </a>
-          );
-        })}
-      </nav>
-    )}
+  <div class="ds-main s2s-span-major" id="dev-stories-list">
+    <FilterToolbar
+      label="Filter Dev Stories"
+      filters={filters}
+      count={`${stories.length} ${stories.length === 1 ? 'story' : 'stories'}`}
+      class="ds-filters"
+    />
 
-    <!-- Workflow version filter -->
-    {versionFacets.length > 0 && (
-      <nav class="mb-10 flex flex-wrap gap-2" aria-label="Filter by workflow version" data-filter-group="version">
-        <a href="/dev-stories/" data-version="" class:list={[chipBase, chipActive]}>All Versions</a>
-        {versionFacets.map(({ version, count }) => (
-          <a href={`/dev-stories/?version=${encodeURIComponent(version)}`} data-version={version} class:list={[chipBase, chipInactive]}>
-            {version}
-            <span class="text-xs opacity-70">({count})</span>
-          </a>
-        ))}
-      </nav>
-    )}
+    <p class="ds-empty" data-ds-empty hidden>
+      No stories match these filters. <button type="button" class="ds-reset s2s-focus" data-ds-reset>Clear filters</button>
+    </p>
 
-    <!-- Empty state (shown by the filter script when nothing matches) -->
-    <div id="dev-empty" class="hidden rounded-xl border border-dashed border-[var(--border)] p-16 text-center">
-      <p class="text-[var(--text-secondary)] text-lg">No dev stories match this filter.</p>
-      <a href="/dev-stories/" class="mt-4 inline-block text-sm text-[var(--accent)] hover:underline">Clear filters</a>
-    </div>
-
-    <div class="space-y-16" id="dev-stories-list">
-      <!-- Feature Stories -->
-      {featureStories.length > 0 && (
-        <section data-section="feature">
-          {otherStories.length > 0 && (
-            <h2 class="font-mono text-xs font-bold uppercase tracking-widest text-[var(--text-disabled)] mb-8">
-              Feature Stories — <span data-section-count>{featureStories.length}</span>
-            </h2>
-          )}
-          <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {featureStories.map((story) => (
-              <div
-                class="story-item"
-                data-projects={(story.data.projects ?? []).join(' ')}
-                data-version={story.data.workflow?.version ?? ''}
-              >
-                <StoryCard
-                  title={story.data.title}
-                  excerpt={story.data.excerpt}
-                  date={story.data.date}
-                  readTime={story.data.readTime}
-                  slug={story.id}
-                  storyType={story.data.storyType}
-                  projects={story.data.projects}
-                  automated={story.data.automated}
-                  workflow={story.data.workflow}
-                  tags={story.data.tags}
-                  featured={story.data.featured ?? false}
+    {lanes.map((lane) => (
+      <CollectionPanel
+        id={lane.id}
+        title={lane.title}
+        icon={lane.icon}
+        badge={lane.badge}
+        count={lane.items.length}
+        countNoun={['story', 'stories']}
+        description={lane.description}
+        data-panel={lane.key}
+      >
+        <ul slot="aside" class="ds-checks">
+          {lane.checks.map((c) => <li>{c}</li>)}
+        </ul>
+        {lane.items.length > 0 ? (
+          <ul class:list={['ds-grid', lane.items.length === 1 && 'ds-grid--single']}>
+            {lane.items.map((s) => (
+              <li {...attrs(s)}>
+                <FeatureCard
+                  href={s.canonicalPath}
+                  title={s.title}
+                  dek={s.summary}
+                  image={cardImage(s)}
+                  glyph={lane.icon}
+                  pills={pills(s)}
+                  meta={meta(s)}
+                  layout={lane.items.length === 1 ? 'wide' : 'stack'}
                 />
-              </div>
+              </li>
             ))}
-          </div>
-        </section>
-      )}
-
-      <!-- After-Action & Build Notes -->
-      {otherStories.length > 0 && (
-        <section data-section="other">
-          <h2 class="font-mono text-xs font-bold uppercase tracking-widest text-[var(--text-disabled)] mb-8">
-            After-Action & Build Notes — <span data-section-count>{otherStories.length}</span>
-          </h2>
-          <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {otherStories.map((story) => (
-              <div
-                class="story-item"
-                data-projects={(story.data.projects ?? []).join(' ')}
-                data-version={story.data.workflow?.version ?? ''}
-              >
-                <StoryCard
-                  title={story.data.title}
-                  excerpt={story.data.excerpt}
-                  date={story.data.date}
-                  readTime={story.data.readTime}
-                  slug={story.id}
-                  storyType={story.data.storyType}
-                  projects={story.data.projects}
-                  automated={story.data.automated}
-                  workflow={story.data.workflow}
-                  tags={story.data.tags}
-                  featured={false}
-                />
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-    </div>
+          </ul>
+        ) : (
+          <StateNotice
+            kind="in-preparation"
+            compact
+            art={false}
+            title={`No ${lane.title.toLowerCase()} yet.`}
+            body="This lane is part of the Dev Stories model; the first pieces are in preparation."
+          />
+        )}
+      </CollectionPanel>
+    ))}
   </div>
 
-  <script is:inline define:vars={{ projectLabels: Object.fromEntries(projectFacets.map((f) => [f.slug, projectsBySlug[f.slug]?.label ?? f.slug])) }}>
-    (function () {
-      function apply() {
-        const params = new URLSearchParams(window.location.search);
-        const project = (params.get('project') || '').toLowerCase();
-        const version = (params.get('version') || '').toLowerCase();
+  <div class="ds-rail s2s-span-minor">
+    <RailCard heading="About Dev Stories" icon="guides" id="about-dev-stories">
+      <p>{site.devStories.disclaimer}</p>
+      <p class="ds-note">
+        <Icon name="evidence" size={18} />
+        <span>Automated stories carry an <strong>Automated</strong> label on the card and a disclaimer on the page. A <strong>Reviewed</strong> label appears only where a review is recorded.</span>
+      </p>
+      <p><a class="ds-link s2s-focus" href="/writing/">More about the writing <span aria-hidden="true">→</span></a></p>
+    </RailCard>
 
-        // Filter cards
-        let visible = 0;
-        document.querySelectorAll('.story-item').forEach((el) => {
-          const projects = (el.getAttribute('data-projects') || '').toLowerCase().split(/\s+/).filter(Boolean);
-          const v = (el.getAttribute('data-version') || '').toLowerCase();
-          const ok = (!project || projects.includes(project)) && (!version || v === version);
-          el.classList.toggle('hidden', !ok);
-          if (ok) visible++;
-        });
+    <RailCard heading="From execution to a published story" icon="timeline">
+      <DotTimeline items={pipeline} orientation="vertical" numbered label="How a Dev Story is made" />
+    </RailCard>
 
-        // Per-section visibility + counts
-        document.querySelectorAll('[data-section]').forEach((section) => {
-          const items = section.querySelectorAll('.story-item');
-          let shown = 0;
-          items.forEach((it) => { if (!it.classList.contains('hidden')) shown++; });
-          section.classList.toggle('hidden', shown === 0);
-          const countEl = section.querySelector('[data-section-count]');
-          if (countEl) countEl.textContent = String(shown);
-        });
+    {orchestrators.length > 0 && (
+      <PathList
+        heading="Orchestrators"
+        icon="methods"
+        items={orchestrators.map(([o, n]) => ({
+          title: o,
+          href: `/dev-stories/orchestrator/${encodeURIComponent(o)}/`,
+          sub: `${n} ${n === 1 ? 'story' : 'stories'} · orchestrated run`,
+          icon: 'methods',
+        }))}
+      />
+    )}
 
-        // Header count + filter label
-        const countEl = document.getElementById('dev-count');
-        if (countEl) countEl.textContent = String(visible);
-        const labelEl = document.getElementById('dev-filter-label');
-        if (labelEl) {
-          const bits = [];
-          if (project) bits.push(projectLabels[project] || project);
-          if (version) bits.push('workflow ' + params.get('version'));
-          labelEl.textContent = bits.length ? ' for ' + bits.join(', ') : '';
+    {projectItems.length > 0 && (
+      <FacetRail heading="Frequently referenced projects" icon="projects" items={projectItems} />
+    )}
+  </div>
+</HubLayout>
+
+<script>
+  // Progressive enhancement: filter and sort cards by data attributes.
+  const root = document.querySelector<HTMLElement>('.ds-main');
+  if (root) {
+    const selects = [...root.querySelectorAll<HTMLSelectElement>('select[data-filter]')];
+    const panels = [...root.querySelectorAll<HTMLElement>('[data-panel]')];
+    const empty = root.querySelector<HTMLElement>('[data-ds-empty]');
+    const select = (id: string) => selects.find((s) => s.dataset.filter === id);
+    const value = (id: string) => select(id)?.value ?? '';
+
+    // Preselect from the URL (?project= / ?type= / ?provenance=).
+    const params = new URLSearchParams(location.search);
+    for (const id of ['project', 'type', 'provenance']) {
+      const v = params.get(id);
+      const el = select(id);
+      if (v && el && [...el.options].some((o) => o.value === v)) el.value = v;
+    }
+
+    const apply = () => {
+      const type = value('type');
+      const provenance = value('provenance');
+      const project = value('project');
+      const oldest = value('sort') === 'old';
+      const filtering = Boolean(type || provenance || project);
+      let visible = 0;
+      for (const panel of panels) {
+        let shown = 0;
+        for (const e of panel.querySelectorAll<HTMLElement>('[data-entry]')) {
+          const ok = (!type || e.dataset.type === type)
+            && (!provenance || e.dataset.provenance === provenance)
+            && (!project || (e.dataset.projects ?? '').split(' ').includes(project));
+          e.hidden = !ok;
+          if (ok) shown++;
         }
-
-        // Empty state
-        const empty = document.getElementById('dev-empty');
-        if (empty) empty.classList.toggle('hidden', visible !== 0);
-
-        // Active chip state
-        document.querySelectorAll('[data-filter-group="project"] .filter-chip').forEach((chip) => {
-          const val = (chip.getAttribute('data-project') || '').toLowerCase();
-          setActive(chip, val === project);
-        });
-        document.querySelectorAll('[data-filter-group="version"] .filter-chip').forEach((chip) => {
-          const val = (chip.getAttribute('data-version') || '').toLowerCase();
-          setActive(chip, val === version);
-        });
+        const grid = panel.querySelector('.ds-grid');
+        if (grid) {
+          const cards = [...grid.children] as HTMLElement[];
+          cards.sort((a, b) => ((a.dataset.date ?? '') < (b.dataset.date ?? '') ? 1 : -1) * (oldest ? -1 : 1));
+          cards.forEach((c) => grid.appendChild(c));
+        }
+        panel.hidden = filtering && shown === 0;
+        if (!panel.hidden) visible++;
       }
+      if (empty) empty.hidden = visible > 0;
+    };
 
-      function setActive(chip, isActive) {
-        chip.classList.toggle('is-active', isActive);
-        chip.classList.toggle('bg-[var(--accent)]', isActive);
-        chip.classList.toggle('text-white', isActive);
-        chip.classList.toggle('dark:text-[var(--text-inverse)]', isActive);
-        chip.classList.toggle('bg-[var(--bg-muted)]', !isActive);
-        chip.classList.toggle('text-[var(--text-secondary)]', !isActive);
-        chip.classList.toggle('hover:bg-[var(--bg-subtle)]', !isActive);
-        chip.classList.toggle('hover:text-[var(--text-primary)]', !isActive);
-      }
-
-      // Intercept chip clicks so we filter in place (and keep shareable URLs).
-      document.querySelectorAll('.filter-chip').forEach((chip) => {
-        chip.addEventListener('click', (e) => {
-          e.preventDefault();
-          const href = chip.getAttribute('href') || '/dev-stories/';
-          window.history.pushState({}, '', href);
-          apply();
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-      });
-
-      window.addEventListener('popstate', apply);
+    selects.forEach((s) => s.addEventListener('change', apply));
+    root.querySelector('[data-ds-reset]')?.addEventListener('click', () => {
+      selects.forEach((s) => { s.selectedIndex = 0; });
+      history.replaceState(null, '', location.pathname);
       apply();
-    })();
-  </script>
-</BaseLayout>
+    });
+    apply();
+  }
+</script>
+
+<style>
+  .ds-main, .ds-rail { min-width: 0; }
+  .ds-main { display: flex; flex-direction: column; gap: 18px; }
+  .ds-rail { display: flex; flex-direction: column; gap: 16px; }
+  .ds-main :global([data-panel][hidden]),
+  .ds-main :global([data-entry][hidden]) { display: none; }
+  .ds-main :global(.ds-filters .s2s-filter) { flex: 1 1 150px; min-width: 0; }
+  .ds-main :global(.ds-filters .s2s-filters__count) { flex: 0 0 auto; margin-left: auto; }
+
+  .ds-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 232px), 1fr));
+    gap: 14px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .ds-grid--single { grid-template-columns: minmax(0, 1fr); }
+  .ds-grid > li { display: flex; min-width: 0; }
+  .ds-grid > li > :global(*) { flex: 1; }
+
+  .ds-checks {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-width: 19rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font: 400 var(--type-meta) / 1.4 var(--font-sans);
+    color: var(--s2s-ink-muted);
+  }
+  .ds-checks li { position: relative; padding-left: 22px; }
+  /* A plain CSS tick in a sage ring (a list marker, not a brand icon). */
+  .ds-checks li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.1em;
+    width: 14px;
+    height: 14px;
+    border: 1px solid color-mix(in srgb, var(--s2s-status-ok) 60%, transparent);
+    border-radius: 999px;
+  }
+  .ds-checks li::after {
+    content: '';
+    position: absolute;
+    left: 5px;
+    top: calc(0.1em + 3px);
+    width: 3px;
+    height: 6px;
+    border: solid var(--s2s-status-ok);
+    border-width: 0 1.5px 1.5px 0;
+    transform: rotate(45deg);
+  }
+
+  .ds-empty { margin: 0; font: 400 var(--type-body-s) / 1.5 var(--font-sans); color: var(--s2s-ink-muted); }
+  .ds-reset {
+    margin-left: 8px;
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    color: var(--s2s-accent);
+    cursor: pointer;
+  }
+
+  .ds-note {
+    display: flex;
+    gap: 10px;
+    padding: 10px 12px;
+    border: 1px solid var(--s2s-rule-strong);
+    border-radius: calc(var(--s2s-radius-card) - 4px);
+    background: var(--s2s-inset);
+    font-size: var(--type-meta);
+  }
+  .ds-note :global(.s2s-icon) { flex-shrink: 0; margin-top: 1px; color: var(--s2s-secondary); }
+  .ds-note strong { color: var(--s2s-ink); font-weight: 500; }
+  .ds-link { color: var(--s2s-accent); text-decoration: none; font: 450 var(--type-meta) / 1.3 var(--font-sans); }
+  .ds-link:hover { color: var(--s2s-accent-hover); text-decoration: none; }
+</style>

@@ -2,7 +2,8 @@
 /**
  * CollectionPanel — a bordered section for one kind of thing: icon, small
  * caps title, count, a one-line description, a "View all →" action, then
- * its body (a featured card, a list, a grid).
+ * its body (a featured card, a list, a grid). Optional `badge` pill beside
+ * the title and an `aside` slot beside the description.
  *
  * Writing: the four format panels on /writing (Essays, Field Notes, Dev
  * Stories, Guides / Companions). Labs reuse (labs-storyboard): "All
@@ -10,6 +11,7 @@
  * report, which are the same shape with a card grid as the body.
  */
 import Icon from '../brand/Icon.astro';
+import Pill, { type PillTone } from './Pill.astro';
 
 interface Props {
   title: string;
@@ -18,11 +20,13 @@ interface Props {
   countNoun?: [string, string];
   description?: string;
   action?: { label: string; href: string };
+  /** A caps pill beside the title: the panel's provenance or state ("HUMAN + AGENT"). */
+  badge?: { label: string; tone?: PillTone };
   id?: string;
   class?: string;
   [key: string]: unknown;
 }
-const { title, icon, count, countNoun = ['piece', 'pieces'], description, action, id, class: className, ...rest } = Astro.props;
+const { title, icon, count, countNoun = ['piece', 'pieces'], description, action, badge, id, class: className, ...rest } = Astro.props;
 const hid = id ?? `panel-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
 ---
 
@@ -31,10 +35,12 @@ const hid = id ?? `panel-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
     {icon && <span class="s2s-panel__icon"><Icon name={icon} size={24} /></span>}
     <div class="s2s-panel__titles">
       <h2 class="s2s-panel__title" id={hid}>{title}</h2>
+      {badge && <Pill label={badge.label} tone={badge.tone ?? 'accent'} caps />}
       {count !== undefined && <span class="s2s-panel__count">{count} {count === 1 ? countNoun[0] : countNoun[1]}</span>}
     </div>
     {action && <a class="s2s-panel__action s2s-focus" href={action.href}>{action.label} <span aria-hidden="true">→</span></a>}
     {description && <p class="s2s-panel__desc">{description}</p>}
+    {Astro.slots.has('aside') && <div class="s2s-panel__aside"><slot name="aside" /></div>}
   </header>
   <div class="s2s-panel__body"><slot /></div>
 </section>
@@ -80,6 +86,12 @@ const hid = id ?? `panel-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
     color: var(--s2s-ink-muted);
   }
   .s2s-panel:not(:has(.s2s-panel__icon)) .s2s-panel__desc { grid-column: 1 / -1; }
+  /* aside: a short list beside the description (Dev Stories "what this lane is"). */
+  .s2s-panel__aside { grid-column: 2 / -1; min-width: 0; }
+  @media (min-width: 900px) {
+    .s2s-panel__head:has(.s2s-panel__aside) .s2s-panel__desc { grid-column: 2; }
+    .s2s-panel__aside { grid-column: 3; grid-row: 2; }
+  }
   @media (max-width: 480px) {
     .s2s-panel { padding: 14px; }
     .s2s-panel__head { grid-template-columns: auto minmax(0, 1fr); }
