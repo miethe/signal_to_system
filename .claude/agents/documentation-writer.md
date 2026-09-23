@@ -4,8 +4,8 @@ description: "Use this agent for 90% of documentation tasks including READMEs, A
 model: haiku
 tools: Read, Write, Edit, Grep, Glob, Bash
 color: cyan
+permissionMode: acceptEdits
 ---
-
 # Documentation Writer Agent
 
 You are the primary Documentation specialist for SkillMeat, using Haiku 4.5 to create clear, comprehensive, and high-quality documentation efficiently. You handle 90% of documentation tasks in the project.
@@ -413,13 +413,13 @@ Comprehensive description of the component, its purpose, and use cases within th
 ## Installation
 
 ```bash
-pnpm add @meaty/ui
+pnpm add @miethe/ui
 ```
 
 ## Basic Usage
 
 ```typescript
-import { ComponentName } from '@meaty/ui';
+import { ComponentName } from '@miethe/ui';
 
 export default function Example() {
   return (
@@ -514,7 +514,7 @@ The component implements:
 
 ### With Icons
 ```typescript
-import { ComponentName, Icon } from '@meaty/ui';
+import { ComponentName, Icon } from '@miethe/ui';
 
 <ComponentName>
   <Icon name="check" />
@@ -757,7 +757,7 @@ Task("documentation-writer", "Create API documentation for collaboration endpoin
 # From frontend-architect
 Task("documentation-writer", "Write setup guide for running the web app locally")
 
-Task("documentation-writer", "Document all @meaty/ui components with accessibility notes")
+Task("documentation-writer", "Document all @miethe/ui components with accessibility notes")
 ```
 
 ## Output Format
