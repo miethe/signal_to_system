@@ -24,7 +24,7 @@ const socialLinks = [
 <aside
   aria-label={`About the author, ${site.author.name}`}
   class:list={[
-    'author-profile relative overflow-hidden border border-[var(--border-subtle)] bg-[var(--bg-surface)] shadow-ambient',
+    'author-profile relative overflow-hidden border border-[var(--s2s-rule)] bg-[var(--s2s-surface)] shadow-ambient',
     isFeatured && 'rounded-2xl p-6 sm:p-7',
     isSidebar && 'rounded-xl p-5',
     variant === 'compact' && 'rounded-xl p-5 sm:p-6',
@@ -32,7 +32,7 @@ const socialLinks = [
 >
   {isFeatured && (
     <div
-      class="pointer-events-none absolute -right-10 -top-14 h-36 w-36 rounded-full bg-[var(--accent-subtle)] opacity-60 blur-2xl"
+      class="pointer-events-none absolute -right-10 -top-14 h-36 w-36 rounded-full bg-[var(--s2s-accent-soft)] opacity-60 blur-2xl"
       aria-hidden="true"
     />
   )}
@@ -47,24 +47,24 @@ const socialLinks = [
         loading={isFeatured ? 'eager' : 'lazy'}
         decoding="async"
         class:list={[
-          'shrink-0 rounded-full border border-[var(--border)] bg-[var(--bg-muted)] object-cover object-top ring-2 ring-[var(--bg-surface)]',
+          'shrink-0 rounded-full border border-[var(--s2s-rule-strong)] bg-[var(--s2s-chip)] object-cover object-top ring-2 ring-[var(--s2s-surface)]',
           isFeatured ? '!m-0 !h-20 !w-20 !rounded-full' : isSidebar ? '!m-0 !h-[38px] !w-[38px] !rounded-full' : '!m-0 !h-14 !w-14 !rounded-full',
         ]}
       />
       <div class="min-w-0">
-        <p class="font-mono mb-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--accent)]">
+        <p class="font-mono mb-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--s2s-accent)]">
           {isSidebar ? 'Written by' : 'The author'}
         </p>
-        <Heading class:list={['font-serif font-bold text-[var(--text-primary)]', isFeatured ? 'text-2xl' : 'text-lg']}>
+        <Heading class:list={['font-serif font-bold text-[var(--s2s-ink)]', isFeatured ? 'text-2xl' : 'text-lg']}>
           {site.author.name}
         </Heading>
-        <p class="author-profile__role mt-1 text-xs leading-relaxed text-[var(--text-tertiary)]">{site.author.role}</p>
+        <p class="author-profile__role mt-1 text-xs leading-relaxed text-[var(--s2s-ink-subtle)]">{site.author.role}</p>
       </div>
     </div>
 
-    <div class:list={['author-profile__extra border-[var(--border-subtle)]', variant === 'compact' ? 'mt-5 border-t pt-5 sm:mt-0 sm:border-l sm:border-t-0 sm:pl-5 sm:pt-0' : 'mt-5 border-t pt-5']}>
+    <div class:list={['author-profile__extra border-[var(--s2s-rule)]', variant === 'compact' ? 'mt-5 border-t pt-5 sm:mt-0 sm:border-l sm:border-t-0 sm:pl-5 sm:pt-0' : 'mt-5 border-t pt-5']}>
       <div class="author-profile__extra-inner">
-      <p class:list={['leading-relaxed text-[var(--text-secondary)]', isSidebar ? 'text-sm' : 'text-sm sm:text-[15px]']}>
+      <p class:list={['leading-relaxed text-[var(--s2s-ink-muted)]', isSidebar ? 'text-sm' : 'text-sm sm:text-[15px]']}>
         {isFeatured ? site.author.bioLong : site.author.bioShort}
       </p>
 
@@ -75,7 +75,7 @@ const socialLinks = [
             href={link.href}
             class:list={[
               'focus-ring inline-flex min-h-11 items-center gap-1.5 rounded-md px-2 text-sm font-medium underline-offset-4 hover:underline',
-              index === 0 ? 'text-[var(--accent)] hover:text-[var(--accent-hover)]' : 'text-[var(--text-secondary)] hover:text-[var(--text-primary)]',
+              index === 0 ? 'text-[var(--s2s-accent)] hover:text-[var(--s2s-accent-hover)]' : 'text-[var(--s2s-ink-muted)] hover:text-[var(--s2s-ink)]',
             ]}
           >
             {link.label}
@@ -88,13 +88,13 @@ const socialLinks = [
       )}
 
       {shouldShowSocials && (
-        <nav aria-label="Author social profiles" class:list={['flex flex-wrap items-center gap-1', profileLinks.length > 0 ? 'border-t border-[var(--border-subtle)] pt-1' : 'mt-4']}>
+        <nav aria-label="Author social profiles" class:list={['flex flex-wrap items-center gap-1', profileLinks.length > 0 ? 'border-t border-[var(--s2s-rule)] pt-1' : 'mt-4']}>
           {socialLinks.map((link) => (
             <a
               href={link.href}
               target="_blank"
               rel="noopener noreferrer"
-              class="focus-ring inline-flex min-h-11 items-center gap-1.5 rounded-md px-2 text-xs font-medium text-[var(--text-tertiary)] underline-offset-4 hover:text-[var(--text-primary)] hover:underline"
+              class="focus-ring inline-flex min-h-11 items-center gap-1.5 rounded-md px-2 text-xs font-medium text-[var(--s2s-ink-subtle)] underline-offset-4 hover:text-[var(--s2s-ink)] hover:underline"
             >
               {link.label}
               <svg aria-hidden="true" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -113,9 +113,9 @@ const socialLinks = [
   /* Keep the card's compact rhythm when embedded inside `.prose-custom`. */
   .author-profile {
     margin: 0;
-    border-color: var(--border-subtle);
-    background-color: var(--bg-surface);
-    color: var(--text-primary);
+    border-color: var(--s2s-rule);
+    background-color: var(--s2s-surface);
+    color: var(--s2s-ink);
     font-style: normal;
   }
 
@@ -203,10 +203,10 @@ const socialLinks = [
 
   :global(.dark) .author-profile {
     padding: 16px;
-    border-color: #29476b;
+    border-color: var(--reader-edge);
     border-radius: 9px;
-    background: linear-gradient(145deg, rgb(13 29 51 / 96%), rgb(10 23 42 / 92%));
-    box-shadow: 0 10px 28px rgb(0 0 0 / 20%);
+    background: var(--reader-panel);
+    box-shadow: var(--reader-shadow);
   }
 
   :global(.dark) .author-profile img { width: 38px !important; height: 38px !important; }
@@ -217,9 +217,9 @@ const socialLinks = [
   /* The Registry Wave rail is intentionally compact in both themes. */
   :global(.reader-shell .reader-rail .author-profile) {
     padding: 16px;
-    border-color: var(--border-strong);
+    border-color: var(--s2s-rule-emphasis);
     border-radius: 9px;
-    background: var(--bg-surface);
+    background: var(--s2s-surface);
     box-shadow: var(--shadow-sm);
   }
   :global(.reader-shell .reader-rail .author-profile :is(h2, h3)) { font-size: 18px; line-height: 1.15; white-space: nowrap; }
