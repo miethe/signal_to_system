@@ -1,0 +1,76 @@
+version: 1
+pack: essay-storyboards-v1
+style_reference: 00-style-reference.md
+assets:
+  - id: aof-hero-artifact-path
+    essay: agentic-operations-flow
+    class: hero
+    status: replace-existing
+    target: public/assets/posts/agentic-operations-flow/hero-artifact-path.png
+    storyboard: agentic-operations-flow.md
+  - id: aof-first-artifact-route
+    essay: agentic-operations-flow
+    class: figure
+    status: replace-existing
+    target: public/assets/posts/agentic-operations-flow/first-artifact-route.svg
+    storyboard: agentic-operations-flow.md
+  - id: aof-execution-graph
+    essay: agentic-operations-flow
+    class: figure
+    status: replace-existing
+    target: public/assets/posts/agentic-operations-flow/execution-graph.svg
+    storyboard: agentic-operations-flow.md
+  - id: worked-contract-record
+    essay: contract-as-spec-worked-example
+    class: figure
+    status: optional-net-new
+    target: public/assets/posts/contract-as-spec-worked-example/feature-contract-record.svg
+    storyboard: contract-as-spec-worked-example.md
+  - id: worked-claim-binding
+    essay: contract-as-spec-worked-example
+    class: figure
+    status: optional-net-new
+    target: public/assets/posts/contract-as-spec-worked-example/claim-binding.svg
+    storyboard: contract-as-spec-worked-example.md
+  - id: productivity-hero-control-gap
+    essay: governed-agentic-sdlc-01-productivity-paradox
+    class: hero
+    status: replace-existing
+    target: public/assets/posts/governed-agentic-sdlc-01/hero-control-gap.png
+    storyboard: governed-agentic-sdlc-01-productivity-paradox.md
+  - id: productivity-four-failures
+    essay: governed-agentic-sdlc-01-productivity-paradox
+    class: figure
+    status: replace-existing
+    target: public/assets/posts/governed-agentic-sdlc-01/four-structural-failures.svg
+    storyboard: governed-agentic-sdlc-01-productivity-paradox.md
+  - id: productivity-governance-transition
+    essay: governed-agentic-sdlc-01-productivity-paradox
+    class: figure
+    status: replace-existing
+    target: public/assets/posts/governed-agentic-sdlc-01/governance-transition.svg
+    storyboard: governed-agentic-sdlc-01-productivity-paradox.md
+  - id: contract-hero-binding
+    essay: the-contract-is-the-work
+    class: hero
+    status: replace-existing
+    target: public/assets/posts/the-contract-is-the-work/hero-contract-binding.png
+    storyboard: the-contract-is-the-work.md
+  - id: contract-four-obligations
+    essay: the-contract-is-the-work
+    class: figure
+    status: replace-existing
+    target: public/assets/posts/the-contract-is-the-work/contract-four-obligations.svg
+    storyboard: the-contract-is-the-work.md
+  - id: contract-maturity-path
+    essay: the-contract-is-the-work
+    class: figure
+    status: replace-existing
+    target: public/assets/posts/the-contract-is-the-work/contract-maturity-path.svg
+    storyboard: the-contract-is-the-work.md
+  - id: registry-threaded-control-loop
+    essay: the-registry-wave-agentic-artifact-supply-chain
+    class: illustration
+    status: optional-net-new-promotion-candidate
+    target: public/assets/posts/the-registry-wave-agentic-artifact-supply-chain/threaded-control-loop.svg
+    storyboard: the-registry-wave-agentic-artifact-supply-chain.md
