@@ -53,6 +53,8 @@ export interface PublicationSummary {
   heroImage?: string;
   state: 'published' | 'evergreen';
   provenance: Provenance;
+  /** Recorded review date (stories with `reviewed: true` and `reviewedAt`). */
+  reviewedAt?: Date;
 }
 
 export const FORMAT_LABEL: Record<WritingFormat, string> = {
@@ -117,6 +119,7 @@ export function toSummary(
       format: 'dev-story',
       subtype: s.storyType,
       provenance: s.automated ? (s.reviewed ? 'automated-reviewed' : 'automated') : 'authored',
+      reviewedAt: s.reviewed ? s.reviewedAt : undefined,
     };
   }
 

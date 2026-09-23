@@ -45,3 +45,14 @@ test('every story has its type and explicit automated provenance', () => {
     assert.ok(['true', 'false'].includes(data.automated), path.relative(repoRoot, file) + ': automated must be boolean');
   }
 });
+
+test('reviewedAt is only recorded alongside reviewed: true', () => {
+  const dir = path.join(repoRoot, 'src/content/stories');
+  for (const f of readdirSync(dir).filter((n) => /\.mdx?$/.test(n))) {
+    const text = readFileSync(path.join(dir, f), 'utf8');
+    const fm = (text.match(/^---\n([\s\S]*?)\n---/) ?? [, ''])[1];
+    if (/^reviewedAt:/m.test(fm)) {
+      assert.match(fm, /^reviewed:\s*true\s*$/m, `${f}: reviewedAt without reviewed: true`);
+    }
+  }
+});

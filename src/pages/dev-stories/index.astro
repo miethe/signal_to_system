@@ -56,6 +56,8 @@ const TYPE_PILL = { 'after-action': 'AAR', 'feature-story': 'Feature story', 'bu
 const pills = (s: PublicationSummary) => [
   { label: s.subtype ? TYPE_PILL[s.subtype] : 'Dev Story' },
   PROVENANCE[s.provenance],
+  // Only on a story that records `reviewed: true` (Nick, 2026-09-23: reviews
+  // are recorded per story, never inferred from the site disclaimer).
   ...(s.provenance === 'automated-reviewed' ? [{ label: 'Reviewed', tone: 'ok' as const }] : []),
 ];
 

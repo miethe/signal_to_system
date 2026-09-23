@@ -178,6 +178,8 @@ const stories = defineCollection({
     // True only when a person has reviewed an automated story before
     // publication. Drives the "Reviewed" provenance pill; never inferred.
     reviewed: z.boolean().optional(),
+    // When that review happened (optional; only meaningful with reviewed: true).
+    reviewedAt: z.coerce.date().optional(),
     sourceAar: z.string().optional(),
 
     // Cross-collection discovery (shared vocab with posts)

@@ -25,6 +25,7 @@ import CollectionPanel from '../../components/family/CollectionPanel.astro';
 import FeatureCard from '../../components/family/FeatureCard.astro';
 import EntryRow from '../../components/family/EntryRow.astro';
 import PathList from '../../components/family/PathList.astro';
+import SubscribeBand from '../../components/family/SubscribeBand.astro';
 import { getPublications, byFormat, FORMAT_LABEL, SUBTYPE_LABEL, type PublicationSummary } from '../../lib/writing';
 import { getTagLabel } from '../../lib/tags';
 import { formatDate, formatDateISO } from '../../lib/utils';
@@ -192,13 +193,7 @@ const attrs = (p: PublicationSummary) => ({
       })}
     </div>
 
-    <aside class="writing-follow" aria-labelledby="writing-follow-title">
-      <div>
-        <h2 id="writing-follow-title" class="writing-follow__title">Follow new writing.</h2>
-        <p class="writing-follow__body">Every essay and Dev Story is in the RSS feed the day it is published.</p>
-      </div>
-      <Button href="/rss.xml" variant="signal">Subscribe via RSS <span aria-hidden="true">→</span></Button>
-    </aside>
+    <SubscribeBand id="writing-follow" />
   </div>
 
   <div class="writing-rail s2s-span-minor">
@@ -289,19 +284,4 @@ const attrs = (p: PublicationSummary) => ({
     cursor: pointer;
   }
 
-  .writing-follow {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: space-between;
-    gap: 16px 24px;
-    padding: 22px 24px;
-    border: 1px solid var(--s2s-rule);
-    border-radius: var(--s2s-radius-card);
-    background:
-      radial-gradient(ellipse at 12% 0%, var(--s2s-accent-soft), transparent 60%),
-      var(--s2s-canvas-raised);
-  }
-  .writing-follow__title { margin: 0 0 4px; font: 400 1.375rem / 1.2 var(--font-display); color: var(--s2s-ink); }
-  .writing-follow__body { margin: 0; font: 400 var(--type-body-s) / 1.5 var(--font-sans); color: var(--s2s-ink-muted); }
 </style>

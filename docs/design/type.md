@@ -19,6 +19,6 @@ Scale (`--type-*` in `type.css`): hero `clamp(2.5rem…3.25rem)`, display, title
 20px, card 17px, body 16px, UI 13px, nav 12px, meta 12px, micro 11px. Display weight 360,
 headings 400, tracked caps 0.32em.
 
-The pre-v2 reader faces (Noto Serif, Space Grotesk) are no longer loaded: since M2 the essay
+The pre-v2 reader faces were removed in M2 (packages and references): the essay
 reader (ReaderShell) uses the three v2 roles above, with Newsreader for body copy. Material
 Symbols (used by the old Home and Projects bodies) is self-hosted the same way.

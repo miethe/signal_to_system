@@ -12,6 +12,7 @@ like a richer research-native sibling of Writing").
 | `EntryRow` | more pieces in a panel | compact claim, source and timeline rows |
 | `PathList` | Start here, Reading paths, Dev Stories orchestrators | Start in Labs, Research programs, Explore the research |
 | `Pill` | Dev Stories type + provenance ("AAR", "Human + agent", "Automated", "Reviewed" only when recorded) | evidence / claim status, report state |
+| `SubscribeBand` | "Follow new writing" (RSS today; a newsletter signup drops into its `action` slot) | "Follow new research" |
 | `RailCard` | "About Dev Stories", "From execution to a published story" | "About Labs", a report's Method / Status notes |
 
 `CollectionPanel` also takes a `badge` pill and an `aside` slot (the Dev
