@@ -1,302 +1,230 @@
 # Registry Wave — Visual Style Reference
 
-**Images opened and documented** (complete list; Read tool used on each):
-
-**main worktree** — `public/assets/posts/the-registry-wave-agentic-artifact-supply-chain/`
-- `hero-governed-cube.png`
-- `agentic-os-artifact-estate-before-and-after.png`
-- `diagram-artifact-taxonomy.svg`
-- `diagram-registry-control-plane.svg`
-- `diagram-intent-outcome-chain.svg`
-- `registry-wave-detecting-silent-drift.png`
-- `registry-wave-drift-across-five-days.png`
-- `registry-wave-from-source-to-outcome.png` (Thread 02 Deployment)
-- `registry-wave-incident-resolution-flow.png` (Thread 01 Incident)
-- `registry-wave-presence-vs-behavior.png` (Thread 03 Use)
-- `registry-wave-run-level-provenance-infographic.png` (Thread 06 Outcome)
-
-**rw-v2-essay worktree** — `public/assets/posts/the-registry-wave-agentic-artifact-supply-chain/`
-- `not-every-difference-is-drift.png`
-- `some-copies-must-change.png`
-- `the-agentic-os-artifact-estate.png`
-
-**rw-v2-features worktree** — `public/assets/posts/the-registry-wave-agentic-artifact-supply-chain/`
-- `diagram-market-wave.svg` (SVG source, read as text)
-- `diagram-thread-01-incident.svg` (SVG source, read as text)
+Read this before generating anything. It describes what the Registry Wave images **actually do**
+(re-read image by image in the Opus taste pass, 2026-09-23), names the four reusable templates
+every new board is built from, and gives the night-twin recipe that makes a paper-light hero work
+in the dark site. Role names come from `../graphics-standards-v1.md` §3.1. No hex values here.
 
 ---
 
-## Per-image documentation
+## 1. Which images are the authority
 
-### hero-governed-cube.png
+All paths are under `public/assets/posts/the-registry-wave-agentic-artifact-supply-chain/`
+(identical on main and the `rw-v2-essay` worktree).
 
-**What's in frame:**
-An airy atelier/workshop rendered as a paper-light illustration. Four workers sit at drafting tables in the lower half, each holding or inspecting a colored 3D cube. A supply-chain network radiates from a central hub (document-with-cube icon, approx 50% x / 28% y) down to four dashed-circle nodes (at approx 20%, 35%, 65%, 80% x / 42% y) via navy curved arcs with orange connection-dot waypoints. Each circle contains a distinct cube variant: white outlined, copper/warm, electric-blue solid, navy solid. Dashed arrows descend from circles to the workers. Background left: faint graph/network (uncontrolled-copies reference). Background right: faint document fans with dashed connectors. Foliage/plants at outer edges. No baked text.
+| Tier | Files | Use as |
+|---|---|---|
+| **Family core** (attach as style refs) | `hero-governed-cube.png`; `registry-wave-incident-resolution-flow.png` (01 Incident); `registry-wave-presence-vs-behavior.png` (03 Use); `agentic-os-artifact-estate-before-and-after.png`; `some-copies-must-change.png` | The look. Attach these five to every generation call, chosen per template (§4). |
+| Family, secondary | `registry-wave-from-source-to-outcome.png` (02), `registry-wave-drift-across-five-days.png` (04), `registry-wave-detecting-silent-drift.png` (05), `registry-wave-run-level-provenance-infographic.png` (06) | Lower-section variations of the serial plate. |
+| Reference only, **do not imitate** | `the-agentic-os-artifact-estate.png` | A dense map; right for its job, too dense to be a template. |
+| **Off-family outlier** | `not-every-difference-is-drift.png` | Condensed grotesk all-caps title, no plate frame, no reticles. Its *content structure* (rows to a decision card) is good; its *type and frame* are not the family. Never attach as a style ref. |
+| Coded twins, **not style authority** | `diagram-*.svg` (main) and `diagram-thread-0N-*.svg`, `diagram-market-wave.svg` (rw-v2-features) | Slate-on-white Inter drawings. They carry structure and accessibility, not the look. |
 
-**Composition grid:**
-```
-+-------------------------------------------------------------------+
-| [faint graph network]   [HUB: doc-cube]   [faint doc fans]      |
-|                     arc arcs radiate outward                     |
-|          [o cube]    [o cube]    [o cube]    [o cube]            |
-|         /dashed down  dashed down  dashed down  dashed down\     |
-| [plant] [worker/desk] [worker/desk] [worker/desk] [worker/desk]  |
-+-------------------------------------------------------------------+
-```
-
-**Motifs:** Hub-and-spoke governance (registry as distributor); 3D cube = tangible governed artifact; atelier = craft and care, not automation throughput.
-
-**Line / shape language:** Gently curved 2-3px navy arcs; orange filled circle waypoints at arc midpoints (not arrowheads); thin dashed navy descending arrows from circles to workers; dashed-border node circles (soft, not hard engineering lines).
-
-**Labeling style:** No baked text. Icon language only: document-with-cube at hub; solid colored cube inside each node circle; physical cube on each table.
-
-**Density:** Low. Six focal elements, generous negative space.
-
-**Ground treatment:** Warm cream / paper-light (NOT signal-dark). Daylit interior.
-NOTE: This conflicts with `graphics-standards-v1.md` §3 which defaults heroes to `signal-dark`. The Registry Wave hero is an established paper-light exception. See Alignment Rule A-1.
-
-**Palette roles:**
-- ground: paper-light (warm cream)
-- ink: navy dark arc lines approx `--s2s-ink`
-- accent-1: electric blue (node circle icons, solid cube variants) approx `--s2s-accent`
-- accent-2: warm copper/orange (connection dots, copper cube) approx `--s2s-secondary`
-- muted: warm grey (background faint graph, foliage) approx `--s2s-ink-muted`
-
-**How the hero differs from inline figures:** Atmospheric, scene-based, figurative — no data, no node labels, no baked technical terms. Paper-light ground. Large negative space. Meaning conveyed through visual metaphor, not labels.
+Where the essay uses them today: main and `rw-v2-essay` open with `hero-governed-cube.png` and
+place the before/after and estate plates as `variant="technical"` Figures; `rw-v2-features`
+swaps in the SVG twins. The PNG plates are the crafted language Nick pointed at.
 
 ---
 
-### agentic-os-artifact-estate-before-and-after.png
+## 2. What the images actually do
 
-**What's in frame:**
-Full-bleed 16:9 comparison infographic. Header band: "THE REGISTRY WAVE" small-caps centered; "IDEAS / SYSTEMS / EVIDENCE / OUTCOMES" stacked upper-left; "A MORE CAPABLE / TOMORROW" stacked upper-right. Display headline: "One Estate, Before and After" — bold navy serif + copper accent on "After". Subtitle: "From uncontrolled copies to governed deployment." Two-column body separated by right-facing arrow. BEFORE (left ~48%): red-dashed border region, two actor circles (person "Nick · laptop / DEVELOPER" and robot "Agent · ICA / AUTONOMOUS AGENT"), four repo boxes with divergent version labels and hash IDs, three red X badge callouts (VERSION DRIFT / NO VERIFICATION / FRAGMENTED KNOWLEDGE). AFTER (right ~48%): teal/navy bordered region, single "SkillMeat Registry" circle at top labeled "VERSIONED / VERIFIED / TRACEABLE / DEPLOYABLE", four repo boxes each showing matching v1.4 #c4a747 with green checkmarks (SAME BYTES EVERYWHERE / AUDITABLE LINEAGE / SAFE EVOLUTION). Footer: rule + center arrow + tagline.
+### 2.1 The hero — `hero-governed-cube.png` (template: atelier-hero)
 
-**Composition grid:**
-```
-+-------------------------------------------------------------------+
-| IDEAS/SYSTEMS/...    THE REGISTRY WAVE    A MORE CAPABLE...      |
-|              "One Estate, Before and After"                      |
-|         "From uncontrolled copies to governed deployment."       |
-+-------------------------------+---+-------------------------------+
-| BEFORE                        | > | AFTER                        |
-| [Nick] <--cross-links--> [ICA]|   | [SkillMeat Registry top]     |
-| [repo][repo][repo][repo]      |   | [repo][repo][repo][repo]     |
-| X VERSION DRIFT               |   | check SAME BYTES EVERYWHERE  |
-| X NO VERIFICATION             |   | check AUDITABLE LINEAGE      |
-| X FRAGMENTED KNOWLEDGE        |   | check SAFE EVOLUTION         |
-+-------------------------------+---+-------------------------------+
-| PEOPLE TOOLS...  ---arrow---> one source + verifiable deploys   |
-+-------------------------------------------------------------------+
-```
+- **Medium:** pencil drawing with loose watercolor wash on warm paper. Figurative, human, daylit.
+  Faint drafting construction lines (compass arcs, circles, ruled grids) float in the background
+  like pinned-up studies.
+- **Scene:** an airy studio. Four people at four drafting tables in the lower half, each working on
+  a physical cube. Plants at the edges, windows left, shelving right, a foreground table of
+  rolled drawings and books slightly out of focus (depth, not clutter).
+- **The overlay:** a crisp ink diagram drawn *in the air* above the people: a central hub (a
+  document holding a cube, on a disc) sends four curved lines down to four dashed-circle badges,
+  one above each worker, each badge showing that worker's cube variant; short dashed drop-lines
+  fall from badge to desk. Small `waypoint` dots sit on the curves. Left, a faint node graph (the
+  ungoverned past); right, a fan of documents (the outputs).
+- **Why it works:** the metaphor is a *scene with a diagram in it*. Human craft below, the
+  governing structure above, no words anywhere. The overlay is the only saturated element: ink and
+  accent-1 cobalt for governed solids, accent-2 copper on one cube and the waypoints.
+- **Density:** six focal elements. Large calm areas of paper.
 
-**Labeling style:** Large bold serif display headline (navy + copper); ALL-CAPS section labels; monospace version/hash strings (v1.4, #c4a747, v0.9-stale); small role labels under actor icons.
+### 2.2 The serial plate — threads 01-06 (template: serial-plate)
 
-**Density:** Medium-high. Structured by panel regions, every label earns its place.
+- **Frame (`plate-frame`):** tracked-caps eyebrow `THE REGISTRY WAVE` top centre over a short
+  accent-2 rule; four corner tag stacks in tiny tracked caps (top-left `IDEAS / SYSTEMS / EVIDENCE
+  / OUTCOMES`, top-right `A MORE / CAPABLE / TOMORROW`, bottom-left `PEOPLE / TOOLS / POLICY /
+  INFRASTRUCTURE`, bottom-right `TRUST / TRANSPARENCY / COMPOUNDING / VALUE`), each with a thin
+  vertical rule and a faint dot grid; a footer tagline in tracked serif caps between two accent-2
+  rules that end in dots.
+- **Title:** high-contrast bold **serif** display, ink: `Registry Wave — ` then the beat number and
+  beat name in accent-2 (copper shading to rust). Subtitle: one sentence in wide-tracked light sans.
+- **Backbone:** five `reticle-node`s in a row, numbered `01`-`05` in accent-2 above each. A
+  reticle is a solid ring with an icon, inside a dotted orbit with four tick marks (a registration
+  / instrument mark). Between nodes: a line, a `waypoint` (small ring with an accent-2 centre
+  dot), then a small ink arrowhead. Bold serif node name below, two short lines of sans below that.
+- **State:** state-ok = green ring, pale green fill, check; state-danger = red ring, pale red fill,
+  X; the **active** node gets a heavier ring and a highlight fill; state-inactive = empty ring;
+  pending = dashed accent-2 connector with a short italic serif annotation (`not yet deployed`,
+  `loads`).
+- **Lower section (the beat):** one of: a `key-point-band` (reticle icon, `KEY POINT` label, one
+  display-serif sentence); two split panels with tracked-caps headers and a display-serif verdict
+  in the state color (03 Use); a five-day timeline (04); a decision node (05); a small table (06).
+- **Density:** backbone sparse; lower section medium. Every label is a real noun from the essay.
 
-**Palette roles:**
-- ground: paper-light (cream)
-- ink: navy `--s2s-ink`
-- accent-1: navy for AFTER panel borders
-- accent-2: copper/orange for headline accent, center arrow, actor connectors
-- warning: red dashed borders, X badges, stale version fills
-- success: green checkmarks (accent-3 or `--s2s-accent-strong` equivalent)
+### 2.3 The comparison plate — `agentic-os-artifact-estate-before-and-after.png` (template: comparison-plate)
 
----
+Same `plate-frame` and serif title (`One Estate, ` ink + `Before and After` accent-2). Two panels
+separated by a circled arrow: **BEFORE** in a red dashed border (tracked caps label in
+state-danger, serif panel title, crossing dashed red lines between actors and repo cards, three
+X-badged failure notes along the bottom); **AFTER** in a fine ink dashed border (one hub, a clean
+tree to identical cards, green checks, three check-badged outcome notes). Versions and hashes in
+mono; stale values on pale red, verified on pale green. Footer tagline states the transition.
 
-### Serialized numbered figures: 01 Incident / 02 Deployment / 03 Use / 04 Drift / 05 Detection / 06 Outcome
+### 2.4 The thesis plate — `some-copies-must-change.png` (template: thesis-plate)
 
-These six images share one template. The 5-node horizontal pipeline is the family signature.
+Square. Crosshair registration marks at the corners, tick marks on the edges, a faint centre
+crosshair. Two-line display-serif thesis, ink with the key verb in accent-2 (`change.`,
+`survive.`). Below, an abstract flow: many small squares (ink solid, ink outline, accent-1,
+accent-2, muted) stream through curves into one centre reticle and fan out to five target rings,
+some accent-1, some accent-2. Eyebrow at the bottom. Precision-instrument feel, no labels.
 
-**Template composition grid:**
-```
-+-------------------------------------------------------------------+
-| IDEAS/SYSTEMS/... THE REGISTRY WAVE  A MORE CAPABLE TOMORROW    |
-|                                                                   |
-|    "Registry Wave -- [NN] [Beat Name]"   (NN in orange)          |
-|    [subtitle sentence]                                           |
-|                                                                   |
-|  01          02          03          04          05              |
-| [O icon]-o-[O icon]-o-[O icon]-o-[O icon]-o-[O icon]            |
-| Source   Registry   Deployed   Agent      Run                    |
-| repo               copies     session    record                  |
-|                                                                   |
-| +----- beat-specific content (varies by figure) ---------------+ |
-| | timeline / split panels / table / banner / decision diamond  | |
-| +--------------------------------------------------------------+ |
-|                                                                   |
-| PEOPLE/TOOLS...  ---o---  tagline  ---o---  TRUST/TRANSPARENCY  |
-+-------------------------------------------------------------------+
-```
+### 2.5 What the first draft of this file got wrong
 
-Beat-specific lower sections:
-- 01 Incident: key-point card + lightbulb: "A fix can exist in the source and registry before any deployed copy receives it." Nodes 1+2 green, node 3 red/X.
-- 02 Deployment: warning banner: '"task-completion-validator" now means two different things.' Node 3 explodes into prod/staging/dev sub-boxes, all red X.
-- 03 Use: split panel: "WHAT WE CAN VERIFY" (presence, green check) vs "WHAT WE CANNOT VERIFY" (behavior, orange ?).
-- 04 Drift: two-row horizontal timeline chart, Day 1-5: green line (Registry = guard present) vs red shaded (Deployed = guard missing).
-- 05 Detection: decision diamond "compare bytes" with "expected bytes" left and "actual bytes" right; date label "Aug 6, 2026"; red outcome banner "DRIFT DETECTED -- 3 copies stale".
-- 06 Outcome: run records table (RUN_ID / VERSION LOADED / GUARD PRESENT / OUTCOME), three rows: unknown/incident; stale/policy-violation; v1.4.0/success.
-
-**Line / shape language:**
-- Pipeline: large ~70px circles with inner icon (code-doc / database / stacked cubes / person / document)
-- Orange filled circles (~10px) at arc midpoints as "connection waypoints" — the family's distinctive connector language
-- State coloring: green border+fill for OK; red border+X for failed; amber/orange for stale-transitional; grey outline for inactive
-- Dashed orange arc + "not yet deployed" text annotation for pending-deployment scenarios
-- Red banners: full-width rounded-rect outcome callouts
-- Corner text: very small stacked tags at all four corners
-
-**Labeling style:**
-- Title format: "Registry Wave -- " navy bold; "[NN]" in copper/orange; "[Beat Name]" navy bold
-- Node labels: bold name below circle; small descriptive text below name
-- Numbers 01-05: small numerals + tick mark above
-
-**Density:** Medium. Pipeline zone always sparse; lower half varies.
-
-**Palette roles:**
-- ground: paper-light (warm cream)
-- ink: dark navy `--s2s-ink`
-- accent-2: orange/copper — node connector dots, title beat number
-- highlight: green — ok node fills, checkmarks approx `--s2s-accent-strong`
-- warning: red — failed fills, X marks, outcome banners
-- grid/rule: footer horizontal rule approx `--s2s-viz-grid`
+- The connector language is not "orange filled circles instead of arrowheads". It is a
+  **waypoint ring on the line followed by an arrowhead**, and the nodes are **reticles** (dotted
+  orbit + ticks). The reticle is the family's signature; the draft never named it.
+- Titles are **serif**, not Inter. The draft's README told the generator to use Inter.
+- The plate ground is near-white warm paper; the hero is warmer cream with watercolor. Both are
+  paper-light; they are not the same paper.
+- The draft mapped copper to `--s2s-secondary` and cobalt to `--s2s-accent`. In the live site
+  those are sage green and violet (`observatory.css:131,139`). Imagery roles are now defined in the
+  standards §3.1; paper-light values are not site tokens.
+- `not-every-difference-is-drift.png` was listed as a style reference. It is the one outlier.
 
 ---
 
-### not-every-difference-is-drift.png
+## 3. Night twin recipe (paper-light hero to signal-dark hero)
 
-**What's in frame:**
-Large bold ALL-CAPS title "NOT EVERY DIFFERENCE IS DRIFT" with red underline rule beneath "DRIFT". Subtitle "SAME LINEAGE. DIFFERENT REASONS. DIFFERENT ACTIONS." Left column: "Upstream Source (v2.4.0, latest)" box arrow-to "Curated Collection (v2.3.0, date)" labeled "INGEST CURATE PUBLISH". Right: three project rows (Project A Behind Update; Project B Useful Local Improvement; Project C Deliberate Older Pin), each a four-card row: INTENDED BINDING -> DEPLOYED CONTENT -> RUNTIME STATE -> DECISION (orange bordered). Footer: four-part legend.
+Every essay hero is delivered as a pair (standards §4). The twin is **the same drawing at night**,
+not a new image:
 
-**Composition grid:**
-```
-+-------------------------------------------------------------------+
-| NOT EVERY DIFFERENCE IS DRIFT (red underline on DRIFT)          |
-| SAME LINEAGE. DIFFERENT REASONS. DIFFERENT ACTIONS.             |
-+---------------------+---------------------------------------------+
-| [Upstream Source]   | Project A -- BEHIND (UPDATE)               |
-|    |                |  [Intended]->[Deployed]->[Runtime]->[Update]|
-|  INGEST             |                                             |
-|  CURATE             | Project B -- USEFUL LOCAL IMPROVEMENT       |
-|  PUBLISH            |  [Intended]->[Deployed]->[Runtime]->[Reconcile]|
-|    |                |                                             |
-| [Curated            | Project C -- DELIBERATE OLDER PIN           |
-|  Collection]        |  [Intended]->[Deployed]->[Runtime]->[Preserve]|
-+---------------------+---------------------------------------------+
-| -> LINEAGE  [i] INTENDED  [c] DEPLOYED  [>] RUNTIME  [D] DECISION|
-+-------------------------------------------------------------------+
-```
+1. **Same camera, same composition, same figures, same overlay geometry.** Generate the twin by
+   editing the approved paper-light master, never from the prompt alone.
+2. **Sky:** windows and any open background show a deep violet-to-ink night sky with a light
+   scatter of stars, the Observatory register of the v2 site mockups (`01-site-mockups/*`).
+3. **Interior light:** the room drops to ground-dark; warm pools from desk lamps light each
+   worker's hands and object. Paper textures stay visible, just unlit.
+4. **Overlay:** the in-air diagram becomes pale ink linework (ink role) with a soft glow;
+   accent-1 governed solids lean toward the site accent (violet-blue); waypoints stay accent-2
+   copper, now glowing. It must stay the brightest, crispest element.
+5. **Contrast:** overlay lines >= 3:1 against the dark surround; faces and hands readable.
+6. **Nothing added, nothing removed.** If the twin needs a new element to read, the master is wrong.
 
-**Density:** High. Four-column project grid x three rows.
-
-**Palette roles:**
-- ground: paper-light (cream)
-- ink: navy `--s2s-ink`
-- accent-2: copper/orange — DECISION card borders
-- warning: light-red fills for stale version cells
-- title accent rule: red underline on key term
+Social art (standards §5) is cut from the approved night twin: recompose to a 1520x1260 plate
+with the overlay hub or the key object in the right 60%.
 
 ---
 
-### some-copies-must-change.png
+## 4. Templates (reuse these blocks verbatim in prompts)
 
-**What's in frame:**
-Near-square plate. Crosshair registration marks at four corners; tick marks at top/bottom center; thin edge rules. Display headline (two centered lines): "Some copies must / change." in navy bold serif, with "change" in copper. "Some differences / must survive." below, "survive" in copper. Abstract data-flow in lower two-thirds: many small squares (navy filled, navy outlined, orange/copper filled, grey muted outlined) clustered left, converging through sinuous bezier curves to a central registration point, re-dispersing as five bullseye target circles (navy outline + navy dot center) at varying heights right. Bottom center: "THE REGISTRY WAVE" small serif caps.
+Storyboards reference a template by name and then give only what is specific to the board.
 
-**Composition grid:**
-```
- (+)                                                       (+)
- +-----------------------------------------------------------+
- |                                                           |
- |          "Some copies must                                |
- |               change."                                   |
- |          "Some differences                               |
- |               must survive."                             |
- |                                                           |
- |  [squares]               [o]                            |
- |  [squares] ~curves~  *  [o]                             |
- |  [squares]               [o]                            |
- |                           [o]                           |
- |                           [o]                           |
- |                THE REGISTRY WAVE                         |
- +-----------------------------------------------------------+
- (+)                                                       (+)
-```
+### T1 atelier-hero
 
-**Motif:** Convergence through governance, controlled divergence; precision instrument / cartographic aesthetic.
+> Editorial illustration, pencil drawing with loose watercolor wash on warm cream paper, daylit
+> architectural studio, calm and spacious. People at work in the lower half, drawn with care and
+> individuality, doing real craft with physical objects. Above them, drawn in the air in crisp
+> deep-navy ink, a sparse technical diagram that explains what they are doing: thin curved lines,
+> small ringed waypoint dots with a copper centre, dashed circular badges, one hub. Faint
+> drafting construction lines in the background. Accent color only in the overlay and on one or
+> two objects: cobalt blue for governed solids, copper for one accent. No text, no letters, no
+> numbers, no logos, no UI. 16:9. Keep the centre-third crop and centred square crop meaningful.
+> Style references: hero-governed-cube.png.
 
-**Density:** Low-medium. Text dominant upper half; abstract diagram lower half.
+Negative (all heroes): text, lettering, numbers, logos, screens with UI, robots, glowing
+brains, circuit boards, stock-office clichés, neon, dark background (master), photorealism, 3D
+render, isometric blocks, more than six focal elements.
 
-**Palette roles:** navy ink + copper/orange accent words + cream ground; no additional colors.
+### T2 serial-plate
+
+> Registry Wave serial plate, 16:9, near-white warm paper ground. Plate frame exactly as in the
+> reference: tracked-caps eyebrow `<EYEBROW>` top centre over a short copper rule; four corner tag
+> stacks in tiny tracked caps with thin vertical rules and faint dot grids; footer tagline in
+> tracked serif caps between two copper rules ending in dots. Title in bold high-contrast serif,
+> deep navy, with the beat number and beat name in copper-to-rust. One-sentence subtitle in wide
+> tracked light sans. A row of `<N>` reticle nodes (solid ring with a line icon, inside a dotted
+> orbit with four tick marks), numbered above in copper, bold serif name and two short sans lines
+> below; connectors are a line, a small ring with a copper centre dot, then a small navy
+> arrowhead. State colors: green ring+pale green fill+check = ok; red ring+pale red fill+X =
+> failed; heavier ring+pale fill = active; empty ring = inactive; dashed copper connector with
+> italic serif note = pending. Lower section as specified. Style references:
+> registry-wave-incident-resolution-flow.png, registry-wave-presence-vs-behavior.png.
+
+Corner tags are family furniture. For a non-Registry-Wave essay keep the four stacks and replace
+their words with the essay's own four-word stacks given in the board (never reuse the Registry
+Wave words on another essay).
+
+### T3 comparison-plate
+
+> Same plate frame, title and subtitle rules as T2. Two panels side by side separated by a circled
+> navy arrow. Left panel `BEFORE — <name>` in a fine red dashed border, red tracked-caps label,
+> crossing dashed red connectors, three red X-badged failure notes along its bottom. Right panel
+> `AFTER — <name>` in a fine navy dashed border, one hub and clean tree, green checks, three
+> green check-badged outcome notes along its bottom. Mono for any version or ID. Style
+> reference: agentic-os-artifact-estate-before-and-after.png.
+
+### T4 thesis-plate
+
+> Square 1:1, warm cream paper, crosshair registration marks in the corners, edge ticks, faint
+> centre crosshair. Two-line thesis in bold high-contrast serif, deep navy, with the key word of
+> each line in copper. Below, an abstract flow diagram of small squares and rings, no labels.
+> Eyebrow in tracked caps at the bottom over a short copper rule. Style reference:
+> some-copies-must-change.png.
+
+Negative (all plates): condensed grotesk titles, all-caps titles, Inter/Helvetica titles,
+gradients, drop shadows, 3D, isometric blocks, clip-art icons, emoji, stock photos, dashboard
+chrome, dark ground, more than one accent color family, paraphrased or invented labels,
+lorem ipsum.
 
 ---
 
-### the-agentic-os-artifact-estate.png
+## 5. Alignment checklist (every board must pass)
 
-**What's in frame:**
-Full-bleed 16:9 dense reference plate. Title "The Agentic OS Artifact Estate" with subtitle "What is built, what is partial, and what is still designed." Seven labeled zones: WORKTREES/PROJECTS (left column, four project boxes feeding PROPOSE/SYNC/PUBLISH arrow into center); THE AGENTIC OS center section (SkillMeat box + verb list + AOS CATALOGS row); PROVENANCE & SUPPLY CHAIN + EXTERNAL ECOSYSTEMS + SCOPES & INSTANCES (right column); GOVERNED ARTIFACT TYPES horizontal icon row (10 artifact types); AUTONOMY & OPERATIONS (lower left, two cards); OUTCOMES (lower center, four icons); LINEAGE/STATE LEGEND (lower right, three line variants: solid Built/Running; dashed orange Partial; dotted navy Designed).
+**A. Ground and scheme**
+1. Essay heroes: paper-light master **and** a night twin made by §3. Figures: paper-light single.
+2. Plates and thesis plates use the same warm near-white; heroes may be warmer cream.
+3. Nothing in the family uses a dark ground except night twins and social art.
 
-**Density:** Very high. Reference document; not for re-rendering as a new image.
+**B. Type and text**
+4. One claim per image: title + subtitle for plates; the scene for heroes.
+5. Titles: serif display; ink with **one** accent-2 phrase (beat number + name, or one key word).
+6. Tracked caps for eyebrows, panel headers, corner tags. Sentence case for node sub-labels. Mono
+   for versions, IDs, hashes, file names.
+7. Node labels: bold serif name + at most two short sans lines.
+8. Exact on-image text is verbatim. Heroes and social art carry **no** text.
+9. Word budget for the beat's own content (excluding frame furniture and backbone labels):
+   serial plate <= 40 words, comparison plate <= 70. The Registry Wave before/after carries ~90
+   and is the ceiling, not the target. Past the budget, split the plate or move text to caption.
 
-**Palette roles:** navy + copper/orange (dashed partial lines, Agent-Mode card border) + cream ground + muted dotted designed lines.
+**C. Structure**
+10. Serial plates use the reticle backbone; the active node is marked; the lower section shows the
+    beat's one idea.
+11. Comparisons use the two-panel T3 split with the circled arrow; red dashed = ungoverned,
+    navy dashed = governed.
+12. Plate frame and corner stacks appear on plates only, never on heroes.
 
----
+**D. Marks and state**
+13. Connectors: line, waypoint, arrowhead. Weight: primary 3, secondary 2, annotation 1.5 (px at
+    1600 wide).
+14. State semantics fixed: green ok, red failed, heavier ring active, empty ring inactive, dashed
+    accent-2 pending, dotted = designed/not built.
+15. accent-2 is a semantic accent: one phrase, the waypoint centres, the eyebrow and footer rules.
+    Never a fill, never body text.
 
-### SVG diagrams: diagram-artifact-taxonomy / diagram-registry-control-plane / diagram-intent-outcome-chain
+**E. Density**
+16. Heroes <= six focal elements. Backbone zone sparse. No decorative filler anywhere.
 
-**Shared substrate:** fill="#f8fafc" background (near-white); font-family Inter/Arial; title 34px bold #0f172a; subtitle 18px #475569; node labels 20-28px bold in accent color; body 15-16px #334155; arrows 3px #64748b.
+## 6. Role slots
 
-**diagram-artifact-taxonomy:** Taxonomy tree. Root box "Agentic Artifacts" (dark fill, white text) at center-top; six category nodes in two rows: Instruction/Tool/Context (top) and Governance/Execution/Evidence (bottom), each with category-color border. Vertical trunk from root to horizontal bar; six drops.
-
-**diagram-registry-control-plane:** Two-column comparison. Left: "Registry" (blue border) with discover/install/update/publish verbs and blue bullet circles. Right: "Control Plane" (green border) with approve/certify/deploy/observe/revoke verbs and green bullet circles. Headline: "A registry is not the same thing as a control plane."
-
-**diagram-intent-outcome-chain:** Seven-stage horizontal chain: Human intent -> Governed context -> Approved artifacts -> Agent session -> Code/docs/tests -> PR/release/change -> Evidence/outcome. Each in its accent-color bordered box; 3px grey arrows connecting. Headline: "The enterprise unit is intent to outcome."
-
----
-
-## Alignment rules checklist
-
-Every new image in this family must pass ALL of these before approval:
-
-### A. Scheme and ground
-1. **The Registry Wave essay uses paper-light throughout, including the hero.** This is the visual-authority fact. New essay heroes outside the Registry Wave family may use signal-dark per the standards. Do not apply signal-dark to images destined for the Registry Wave essay.
-2. **SVG diagrams use #f8fafc or equivalent near-white.** Both read as paper-light in context.
-3. **Illustrations that float** use paper-light or transparent; never signal-dark.
-
-### B. Typography and labels
-4. **One legible claim per image** in the title + subtitle pair. Captions advance the argument; never restate the title.
-5. **Headline color:** navy primary + copper/orange for ONE semantic accent word or beat number per title line. Never all-orange titles.
-6. **Section labels in ALL-CAPS** small sans. Body text sentence case. No prose paragraphs baked into images.
-7. **Version strings, IDs, hashes** in monospace; stale states in light-red fill; verified states in light-green fill.
-8. **Maximum two text lines per node label.**
-
-### C. Composition and layout
-9. **Thread-series figures always use the 5-node horizontal backbone** as structural spine.
-10. **Comparison plates use strict two-column layout** with a centered directional separator. Red dashed = uncontrolled/bad side; teal/navy solid = governed/good side.
-11. **Heroes are scene-based and low-density.** No baked labels, large negative space, one focal subject.
-12. **Corner text (IDEAS/SYSTEMS/EVIDENCE/OUTCOMES etc.)** is reserved for the numbered-thread infographic template only.
-
-### D. Nodes and connectors
-13. **Orange filled circle dots** are the transition-waypoint language for the pipeline series. Use between nodes; do not substitute arrowheads alone.
-14. **State semantics:** green circle/check = verified/ok; red circle/X = failed/stale/missing; orange/amber = transitional; grey outlined = inactive.
-15. **Dashed lines = pending/not-yet-deployed.** Dotted = designed/not-built. Solid = active.
-16. **Connector weight:** 3px primary flow; 2px secondary; 1.5px annotation.
-
-### E. Density and negative space
-17. **Heroes:** max six focal elements; no baked labels.
-18. **Thread figures:** pipeline zone sparse; lower beat zone may be medium-dense when data requires.
-19. **Comparison plates:** every label earns its place; no decorative filler or lorem ipsum.
-20. **copper/orange (`--s2s-secondary`) is a semantic accent**, not a background fill or primary text color. One semantic use per image maximum.
-
-## Token slots (do not invent final hex values)
-
-Consume semantic roles from `src/styles/tokens/observatory.css`. Refer to them as:
-- ground (`--s2s-canvas` for signal-dark; paper-light TBD)
-- ink (`--s2s-ink`)
-- muted (`--s2s-ink-muted`)
-- accent-1 (`--s2s-accent`)
-- accent-2 (`--s2s-secondary`)
-- accent-3..6 (`--s2s-viz-3..6`)
-- highlight (`--s2s-accent-strong`)
-- annotation (`--s2s-accent-label`)
-- grid/rule (`--s2s-viz-grid`)
-
-Final palette and type values arrive with the design-language package. `src/styles/tokens/bridge.css` confirms new work uses `--s2s-*` directly.
+Use the role names in `../graphics-standards-v1.md` §3.1 (`ground`, `surface`, `ink`, `muted`,
+`accent-1`, `accent-2`, `rule`, `highlight`, `annotation`, `state-*`). The words "navy", "cobalt",
+"copper", "cream" in prompts describe the observed Registry Wave rendering of those roles for a
+generator that cannot read tokens; final values arrive with the design-language package.

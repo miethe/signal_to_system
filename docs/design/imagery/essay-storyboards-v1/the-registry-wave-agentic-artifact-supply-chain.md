@@ -1,34 +1,23 @@
-# The Registry Wave: Agentic Artifact Supply Chain
+# The Registry Wave: Agentic Artifact Supply Chain — storyboard
 
-## Current imagery and gaps vs. standards
+Essay: `src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx` (main and
+`rw-v2-essay`). This essay **is** the visual authority; `00-style-reference.md` documents it.
+Nothing here re-art-directs the existing plates.
 
-This essay is the visual authority. The existing asset set is documented below as exemplars. The standards (`graphics-standards-v1.md`) require one `social-card` per essay surface; that is the only class-level gap. The six-thread v2 series (`diagram-thread-01..06-*.svg` in rw-v2-features) has not been promoted to main yet; those are promotion candidates, not gaps.
+## Disposition
 
-**Existing assets on main:**
-- `hero-governed-cube.png` — hero, paper-light, no dark-mode variant (gap: missing dark+light pair per variant policy)
-- `diagram-artifact-taxonomy.svg` — figure
-- `diagram-registry-control-plane.svg` — figure
-- `diagram-intent-outcome-chain.svg` — figure
-- `agentic-os-artifact-estate-before-and-after.png` — figure (also in rw-v2-essay)
-- `registry-wave-incident-resolution-flow.png` — figure (Thread 01)
-- `registry-wave-from-source-to-outcome.png` — figure (Thread 02 Deployment)
-- `registry-wave-presence-vs-behavior.png` — figure (Thread 03 Use)
-- `registry-wave-drift-across-five-days.png` — figure (Thread 04 Drift)
-- `registry-wave-detecting-silent-drift.png` — figure (Thread 05 Detection)
-- `registry-wave-run-level-provenance-infographic.png` — figure (Thread 06 Outcome)
-- `not-every-difference-is-drift.png` — figure (in rw-v2-essay)
-- `some-copies-must-change.png` — illustration (in rw-v2-essay; near-square, ~1:1)
-- `the-agentic-os-artifact-estate.png` — figure (in rw-v2-essay)
+| Asset | Decision |
+|---|---|
+| `hero-governed-cube.png` | **Keep** as the paper-light master. **Add** its night twin, `rw-hero-night` (required by the pair policy, standards §4). |
+| Thread plates 01-06, before/after, estate map | **Keep.** Exemplars. |
+| `some-copies-must-change.png` | **Keep.** Thesis-plate exemplar (illustration class). The file ships in the asset folder, but neither essay version places it today (unplaced exemplar). |
+| `not-every-difference-is-drift.png` | **Keep in the essay; optional re-set** (`rw-plate-not-every-difference`, below). Its content is right; its type and frame are off-family. |
+| `diagram-*.svg`, `diagram-thread-0N-*.svg` | Coded twins. Promotion is a separate decision (rw-v2-features); not a style question. |
+| social art | **New**, `rw-social`, cut from the night twin. |
 
-**Gaps against standards:**
-1. No `social-card` (required R:1 per essay surface matrix) — see board below.
-2. Hero has no `dark+light pair` variant — the governed-cube hero is paper-light only; no signal-dark companion exists.
-3. `some-copies-must-change.png` is near-square (~1:1) but would function as an illustration. No 1.91:1 social card exists as a separate asset.
-4. v2-features thread SVGs (`diagram-thread-01..06`) and `diagram-market-wave.svg` / `diagram-estate-before-after.svg` are not yet promoted to main.
-
-Do not replace the main hero without visual regression review. Promote the v2-features thread SVGs as a single batch when approved.
-
----
+Cut from the first draft: `registry-threaded-control-loop`. The six-thread series already *is*
+the lifecycle, a ring restating it adds nothing, the draft's layout, text and Mermaid disagreed
+on which stage loops back, and "illustration" was the wrong class for a labelled diagram.
 
 ## Existing imagery documented as exemplars
 
@@ -55,7 +44,7 @@ Do not replace the main hero without visual regression review. Promote the v2-fe
 - upper-left bg (~15% x / 25% y): faint graph network of circles and lines
 - upper-right bg (~80% x / 25% y): faint document fan array with dashed connectors to hub
 - mid-band four nodes (~20%, 35%, 65%, 80% x / ~42% y): dashed-border circles each containing a colored cube variant
-- navy arcs with orange waypoint dots connecting hub to each circle
+- navy arcs with copper-centred waypoint rings connecting hub to each circle
 - lower half: four workers at drafting tables, each holding a physical cube, evenly distributed
 - outer edges: foliage/plants (atmospheric warmth)
 
@@ -70,7 +59,7 @@ Do not replace the main hero without visual regression review. Promote the v2-fe
 +-------------------------------------------------------------------+
 ```
 
-**Scheme role slots:** ground=paper-light, ink=navy (`--s2s-ink`), accent-1=electric-blue (`--s2s-accent`), accent-2=copper/orange (`--s2s-secondary`), muted=warm-grey (`--s2s-ink-muted`)
+**Scheme role slots:** ground=paper-light (warm cream), ink=navy, accent-1=cobalt (governed cube solids), accent-2=copper (one cube, waypoint centres), muted=warm grey. Role names per `../graphics-standards-v1.md` §3.1; not site tokens.
 
 **Alt:** A network radiates governed artifact copies from a central hub to four workers at drafting tables, each receiving an identical cube.
 
@@ -113,16 +102,16 @@ Do not replace the main hero without visual regression review. Promote the v2-fe
 - top-left corner: stacked vertical tags (IDEAS / SYSTEMS / EVIDENCE / OUTCOMES)
 - top-center: “THE REGISTRY WAVE” small-caps
 - top-right: “A MORE CAPABLE / TOMORROW”
-- title row: “Registry Wave -- 01 Incident” (NN in orange)
+- title row: “Registry Wave -- 01 Incident” (NN and beat name in copper)
 - subtitle row: descriptive sentence
-- pipeline: 5 numbered circle nodes, horizontal, with orange waypoint dots between
+- pipeline: 5 numbered circle nodes, horizontal, with copper-centred waypoint rings between
 - node 1 (Source repo): green border, green checkmark in upper-right
 - node 2 (Registry): green border, green checkmark
-- dashed orange arc between node 2 and 3, with “not yet deployed” annotation
+- dashed copper connector between node 2 and 3, with “not yet deployed” annotation
 - node 3 (Deployed copies): red border, X mark
 - nodes 4+5 (Agent session, Run record): grey/inactive
 - lower half: key-point card with lightbulb icon + large text
-- footer: “SAME LINEAGE. BRIGHTER OUTCOMES.” with orange bullet at center
+- footer: “SAME LINEAGE. BRIGHTER OUTCOMES.” with copper rule-end dots at center
 
 **Layout diagram:**
 ```
@@ -153,12 +142,9 @@ flowchart LR
   R -->|not yet deployed\ndashed| D[Deployed copies\nv2.0 pre-fix]
   D -.->|not active| A[Agent session]
   A -.->|not active| O[Run record]
-  style D fill:#fee2e2,stroke:#dc2626
-  style S fill:#dcfce7,stroke:#16a34a
-  style R fill:#dcfce7,stroke:#16a34a
 ```
 
-**Scheme role slots:** ground=paper-light, ink=`--s2s-ink`, accent-2=`--s2s-secondary` (orange waypoints), highlight=green (ok nodes), warning=red (failed node)
+**Scheme role slots:** ground=paper-light, ink=navy, accent-2=copper (beat number, waypoint centres, rules), state-ok=green, state-danger=red, state-inactive=empty ring.
 
 **Alt:** A five-node supply chain pipeline shows the source and registry corrected with green checkmarks, while the deployed copies node shows a red X and a “not yet deployed” annotation.
 
@@ -218,8 +204,6 @@ flowchart LR
   R[Registry\nexpected bytes] -->|compare| C{compare bytes\nAug 6, 2026}
   D[Deployed copies\nactual bytes] -->|compare| C
   C -->|match fails| OUT[DRIFT DETECTED\n3 copies stale]
-  style OUT fill:#fee2e2,stroke:#dc2626
-  style C fill:#fef3c7,stroke:#d97706
 ```
 
 **Alt:** A five-node pipeline highlights the deployed copies node as the comparison point; a diamond shows expected vs actual bytes; a red banner reads “DRIFT DETECTED -- 3 copies stale.”
@@ -278,11 +262,9 @@ flowchart LR
     SM -->|hash verified| rc2[aural-geometry-lab]
     SM -->|hash verified| rd2[skillmeat]
   end
-  style BEFORE fill:#fff1f2,stroke:#dc2626,stroke-dasharray:5
-  style AFTER fill:#f0fdf4,stroke:#16a34a
 ```
 
-**Scheme role slots:** ground=paper-light, ink=`--s2s-ink`, accent-2=`--s2s-secondary`, warning=red, success=green
+**Scheme role slots:** ground=paper-light, ink=navy, accent-2=copper (accent phrase, centre arrow), state-danger=red (BEFORE), state-ok=green (AFTER).
 
 **Alt:** A before/after comparison shows four repositories with divergent artifact versions on the left and a SkillMeat Registry distributing identical hash-verified copies on the right.
 
@@ -290,138 +272,49 @@ flowchart LR
 
 ---
 
-## New board
+## New boards
 
-### rw-social-card — REQUIRED, net-new
+### rw-hero-night — night twin of the governed cube (required)
 
 | Field | Value |
 |---|---|
-| id | `rw-social-card` |
-| class | social-card |
-| surface | essay |
-| scheme | signal-dark |
-| variant | single |
-| aspect | 1.91:1; 2400x1260 master / 1200x630 render |
-| status | required, does not yet exist |
+| class / surface | hero / essay |
+| template | §3 night twin, generated as an **edit of** `hero-governed-cube.png` |
+| scheme / variant | signal-dark / second half of the pair |
+| master | 16:9, 2400x1350 (match the master's framing exactly) |
+| exact text | none |
+| target | `public/images/the-registry-wave-agentic-artifact-supply-chain/hero/the-registry-wave-agentic-artifact-supply-chain--hero--governed-cube--signal-dark.{avif,webp}` (the existing PNG becomes the `--paper-light` half) |
 
-**Placement:** OG/metadata asset for the essay URL; not rendered inline. Target: `public/og/posts/the-registry-wave-agentic-artifact-supply-chain.png`
+**Recipe specifics:** windows at left show a violet night sky with a scatter of stars; the four
+workers are lit by warm desk lamps; the hub, arcs, and four badges become pale luminous ink with
+a soft glow; cobalt cubes lean violet-blue; the copper cube and waypoints glow copper. Plants,
+shelves, and foreground table stay, unlit. No element added or removed.
 
-**Purpose:** Represent the essay in social feeds and link previews with the essay title and series mark.
-
-**EXACT ON-IMAGE TEXT:**
-- `THE REGISTRY WAVE`
-- `Agentic Artifact Supply Chain`
-- `Signal to System`
-
-**Element list with positions:**
-- ground: signal-dark canvas (`--s2s-canvas`)
-- center zone (within 70% of frame width): essay title text block
-- upper-left or lower-right: S2S mark / series mark
-- accent rule or subtle network motif (low density, not a full diagram)
-
-**Layout diagram:**
-```
-+-------------------------------------------------------------------+
-|                                                                   |
-|   [S2S mark small]                                               |
-|                                                                   |
-|              THE REGISTRY WAVE                                   |
-|         Agentic Artifact Supply Chain                            |
-|                                                                   |
-|                                              [Signal to System]  |
-+-------------------------------------------------------------------+
-```
-
-**Scheme role slots:** ground=`--s2s-canvas`, ink=`--s2s-ink`, accent-1=`--s2s-accent`, accent-2=`--s2s-secondary`
-
-**Variant flag:** single
-
-**Alt:** (metadata only — not content image)
-
-**Caption:** (none — metadata asset)
-
-**Generator prompt:** Registry Wave dark social card; observatory-ground canvas; series title centered in 70% safe zone; S2S mark; subtle governed-network motif; no dense diagram.
-
-**Negative prompt:** dense infographic, baked body copy, logos other than S2S mark, screenshotted UI.
-
-**Acceptance checks:**
-- All three text strings present and readable at 1200x630 render
-- Title within central 70% safe zone
-- Signal-dark ground; no paper-light bleed
-- PNG export under 350KB
+**Checks:** overlay aligns with the master when the two are toggled; overlay >= 3:1 on the dark
+surround; faces and hands readable; no text.
 
 ---
 
-### registry-threaded-control-loop — optional net-new / promotion candidate
+### rw-social — social art
 
-| Field | Value |
-|---|---|
-| id | `registry-threaded-control-loop` |
-| class | illustration |
-| surface | essay |
-| scheme | paper-light |
-| variant | dark+light pair |
-| aspect | 16:9; 2400x1350 master |
-| status | optional net-new / promotion candidate |
+1520x1260, signal-dark, no text, recropped from the approved `rw-hero-night`: the hub and two
+right-hand badges with their workers in the right 60%. Target:
+`public/images/the-registry-wave-agentic-artifact-supply-chain/social/the-registry-wave-agentic-artifact-supply-chain--social-card--art.jpg`.
+The renderer (`src/lib/og/render.ts`) sets title and mark.
 
-**Placement:** After the supply-chain framing; anchor: `”An artifact has a life after publication.”`
+---
 
-**Purpose:** Consolidate lifecycle accountability across the six thread beats into one closed-loop visual.
+### rw-plate-not-every-difference — family re-set (optional)
 
-**EXACT ON-IMAGE TEXT:**
-- `INCIDENT`
-- `DEPLOYMENT`
-- `USE`
-- `DRIFT`
-- `DETECTION`
-- `OUTCOME`
-- `artifact lifecycle`
+**What changes:** only type and frame. Keep the content structure exactly (upstream source →
+curated collection → three project rows of intended / deployed / runtime → decision card; the
+legend). Apply T2's `plate-frame` (eyebrow `THE REGISTRY WAVE`, the Registry Wave corner stacks,
+footer rule) and the serif title rule.
 
-**Element list with positions:**
-- center: governed artifact record box labeled “artifact lifecycle”
-- six numbered modules arranged in a clockwise ring around the center
-- each module has one inbound and one outbound directed connector
-- DETECTION has a visibly returning connector to INCIDENT (intervention, not mere observation)
+**Exact text changes:** title becomes `Not Every Difference Is Drift` in the serif display,
+`Drift` in accent-2 (sentence case, not all caps); subtitle `Same lineage. Different reasons.
+Different actions.` in the wide-tracked sans; footer tagline `SOME COPIES MUST CHANGE. SOME
+DIFFERENCES MUST SURVIVE.` Every other string stays byte-identical to the current PNG.
 
-**Layout diagram:**
-```
-+-------------------------------------------------------------------+
-|                                                                   |
-|             [INCIDENT]  -->  [DEPLOYMENT]                        |
-|              ^                      |                            |
-|              |                      v                            |
-|          [DETECTION]   [artifact lifecycle]   [USE]              |
-|              ^                      |                            |
-|              |                      v                            |
-|             [OUTCOME]  <--  [DRIFT]                              |
-|                                                                   |
-+-------------------------------------------------------------------+
-```
-
-**Conceptual diagram:**
-```mermaid
-flowchart LR
-  INC[INCIDENT] --> DEP[DEPLOYMENT]
-  DEP --> USE[USE]
-  USE --> DRI[DRIFT]
-  DRI --> DET[DETECTION]
-  DET --> OUT[OUTCOME]
-  OUT -.->|intervention| INC
-  DET & DEP & USE & DRI & OUT & INC --- ART([artifact lifecycle])
-```
-
-**Scheme role slots:** ground=paper-light (or canvas for dark variant), ink=`--s2s-ink`, accent-1=`--s2s-accent`, accent-2=`--s2s-secondary`
-
-**Alt:** Six lifecycle stages form a closed loop around a governed artifact record.
-
-**Caption:** A registry wave is a lifecycle of accountable change, not a publication event.
-
-**Generator prompt:** Registry Wave modular editorial lifecycle illustration; six restrained labeled stages in a clockwise ring; central governed record; explicit return connector from DETECTION to INCIDENT; print-like technical quality; paper-light ground.
-
-**Negative prompt:** circular arrows without state boundaries, dashboards, supply-chain stock photos, logos, dense prose labels.
-
-**Acceptance checks:**
-- Six labels exact
-- Loop direction obvious clockwise
-- DETECTION return connector visually distinct (dashed or contrasting)
-- Compatible with existing Registry Wave figure family (same ground, same connector language)
+**Checks:** a side-by-side with `registry-wave-presence-vs-behavior.png` reads as one family;
+all version strings unchanged.

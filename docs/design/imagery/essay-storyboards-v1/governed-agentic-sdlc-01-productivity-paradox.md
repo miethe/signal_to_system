@@ -1,283 +1,178 @@
-# The Productivity Paradox
+# The AI Productivity Paradox — storyboard
 
-## Current imagery and disposition
+Essay: `src/content/posts/governed-agentic-sdlc-01-productivity-paradox.mdx` (series
+`governed-agentic-sdlc`, part 1). Templates and checklist: `00-style-reference.md`.
 
-Current hero `hero-02-missing-layer.jpeg`, `diagram-four-failures.jpeg`, `diagram-transitions.jpeg`, and `hero-03-swarm-gate.jpeg` cover the argument but combine metaphorical hero treatments and diagrams. Retain their subject matter; re-art-direct the hero and two core explanatory plates as a Registry Wave-aligned family. A social card is required (not yet present).
+## Disposition
+
+| Current | Fig | Section | Decision |
+|---|---|---|---|
+| `hero-02-missing-layer.jpeg` | hero | frontispiece | **Replace** with `pp-hero` (pair) |
+| `diagram-four-failures.jpeg` | 01 | Why the Gains Don't Compound | **Replace** with `pp-plate-01-failures` |
+| `diagram-transitions.jpeg` | 02 | The Infrastructure Gap | **Replace** with `pp-plate-02-transitions` |
+| `hero-03-swarm-gate.jpeg` | 03 | The Infrastructure Gap (gate passage) | **Replace** with `pp-plate-03-gates` |
+| `hero-01-divergence.jpeg` | — | not referenced by the MDX | Leave; retire in a cleanup pass |
+
+The first draft invented four failure names ("Unbounded work", "Unclear authority", ...) and
+replaced Fig 02 with a prompt-vs-intent diagram the essay does not contain. Both corrected: the
+plates below use the essay's own four failure modes and its own three-transition argument.
+
+## Family constants
+
+- Template: T2 serial-plate (plates 01, 02) and T3 comparison-plate (plate 03). 16:9, 2000x1125,
+  paper-light, single.
+- Eyebrow: `GOVERNED AGENTIC SDLC · PART 1`
+- Corner stacks: TL `CAPABILITY / CONTEXT / CONTROL / DELIVERY` · TR `GAINS THAT / ACTUALLY / COMPOUND` ·
+  BL `REVIEW / TEST / RELEASE / OPERATE` · BR `SCOPE / TRUST / EVIDENCE / OWNERSHIP`
+- Footer rule style as the family; tagline per board.
 
 ---
 
-## Boards
-
-### productivity-hero-control-gap
+## pp-hero — the fast benches and the narrow door
 
 | Field | Value |
 |---|---|
-| id | `productivity-hero-control-gap` |
-| class | hero |
-| surface | essay |
-| scheme | signal-dark |
-| variant | single |
-| aspect | 16:9; 2400x1350 master |
-| status | replace-existing (`hero-02-missing-layer.jpeg`) |
+| class / surface | hero / essay |
+| template | T1 atelier-hero + §3 night twin |
+| scheme / variant | paper-light master + signal-dark twin / dark+light pair |
+| master | 16:9, 2400x1350 |
+| exact text | none |
+| targets | `public/images/governed-agentic-sdlc-01/hero/governed-agentic-sdlc-01--hero--narrow-door--{paper-light,signal-dark}.{avif,webp}` |
 
-**Placement:** Frontispiece, before the opening paragraph; anchor: `”The Productivity Paradox”`
+**Purpose:** the paradox in one scene: the gains are real at the bench and do not arrive at
+delivery, because the system around the tools was sized for the old speed.
 
-**Purpose:** Show that autonomous capability without a governance layer creates a structural control gap — the missing layer, not weak models, is the problem.
+**Composition:**
+- Foreground and midground: four or five workers at benches, calm and competent, each with a
+  generous, tidy stack of finished cubes (the task-level gains are real, not a mess).
+- Background centre: a single narrow doorway or hatch in the back wall, one reviewer beside it
+  with a clipboard, a small orderly queue of cubes waiting on a narrow table in front of it.
+- **Overlay (focal):** from each bench a fast, confident ink line sweeps toward the door; the lines
+  converge into one reticle at the doorway where their copper waypoints bunch up and overlap. Past
+  the door, a single thin line continues, carrying one cube.
+- Tone: observational, not comic. No one is panicking; the geometry carries the point.
+- Crop safety: door, reviewer, and convergence reticle sit on the centre vertical.
 
-**EXACT ON-IMAGE TEXT:**
-- `CAPABILITY`
-- `CONTROL`
-- `THE MISSING LAYER`
-
-**Element list with positions:**
-- ground: signal-dark canvas
-- left mass (~15-35% x / 30-70% y): “CAPABILITY” labeled block — luminous, stable geometry
-- right mass (~65-85% x / 30-70% y): “CONTROL” labeled block — luminous, stable geometry
-- center gap (~45-55% x / 45-55% y): incomplete bridge or interrupted connection structure
-- “THE MISSING LAYER” label sits over the gap, ~50% x / 40% y
-- large negative space above and below, no decorative clutter
-
-**Layout diagram:**
 ```
-+-------------------------------------------------------------------+
-|                                                                   |
-|                                                                   |
-|   [CAPABILITY]    ==broken bridge==  THE MISSING LAYER  [CONTROL]|
-|    (luminous)     ====gap====                            (luminous)|
-|                                                                   |
-|                                                                   |
-+-------------------------------------------------------------------+
++----------------------------------------------------------------------+
+|        \    \      |      /    /     (ink lines converge in the air)  |
+|         \    \   (o@@o)  /    /      waypoints bunch at one reticle   |
+|   [bench+cubes]  |door|  [bench+cubes]                                |
+|  [bench+cubes]  queue+reviewer  [bench+cubes]                         |
++----------------------------------------------------------------------+
 ```
 
-**Conceptual diagram:**
+**Prompt (after T1):** as composed above; cubes in accent-1 cobalt at the benches, one copper
+cube passing through the door; the convergence is the most saturated point in the frame.
+
+**Negative (after T1):** factories, conveyor belts, robots, chaos, people in distress, clocks,
+warning signs.
+
+**Night twin:** §3; lamps over each bench; the doorway is the brightest opening.
+**Alt:** decorative (empty). **Checks:** "plenty made, little shipped" reads before detail; no text.
+
+---
+
+## pp-plate-01-failures (replaces Fig 01)
+
+**Placement:** "Why the Gains Don't Compound", after the "Four Failure Modes" callout.
+
+**Backbone (five reticles):** `01 Generate` `Where the gains land.` (active, state-ok) ·
+`02 Review` `Sized for old throughput.` · `03 Test` `Validates what was built.` ·
+`04 Release` `Aggregate risk unseen.` · `05 Operate` `Ownership dissolves.`
+Nodes 02-05 inactive. A fifth, dashed, unnumbered reticle floats **below and outside** the
+backbone line, joined to nothing: `Unmanaged tools`.
+
+**Exact text:**
+- Title: `Productivity Paradox — 01 Four Failures`
+- Subtitle: `Each one looks like a tooling problem. Each is a governance problem.`
+- The ten backbone strings above, plus `Unmanaged tools`
+- Four failure cards, each hung by a thin drop-line from the node where it bites:
+  `The Volume Trap` `Output outruns review.` (from 02) ·
+  `The Context Collapse` `Plausible code, missing context.` (from 03) ·
+  `The Accountability Gap` `No one owns the change.` (from 05) ·
+  `The Shadow AI Problem` `Work outside the managed path.` (from the dashed reticle)
+- Footer: `THE CONSTRAINT WAS NEVER TYPING SPEED.`
+
+**Lower section:** four equal cards in a row, each: small state-warn reticle, bold serif name,
+one sans line. Equal weight; none more alarming than the others.
+
 ```mermaid
 flowchart LR
-  CAP[CAPABILITY\nautonomous agents\nfast execution] -- THE MISSING LAYER --> CTRL[CONTROL\ngovernance\nevidence]
-  style CAP fill:#1e3a5f,stroke:#3b82f6
-  style CTRL fill:#1e3a5f,stroke:#3b82f6
+  G[01 Generate] --> R[02 Review] --> T[03 Test] --> L[04 Release] --> O[05 Operate]
+  R --- V[The Volume Trap]
+  T --- C[The Context Collapse]
+  O --- A[The Accountability Gap]
+  S((Unmanaged tools)) --- H[The Shadow AI Problem]
 ```
 
-**Scheme role slots:** ground=`--s2s-canvas`, ink=`--s2s-ink`, accent-1=`--s2s-accent` (CAPABILITY glow), accent-2=`--s2s-secondary` (gap annotation), highlight=`--s2s-accent-strong` (CONTROL glow)
-
-**Variant flag:** single
-
-**Alt:** A luminous “CAPABILITY” mass and a “CONTROL” mass face each other across an incomplete bridge labeled “THE MISSING LAYER” on a dark field.
-
-**Caption:** More autonomous capability does not supply its own control plane.
-
-**Generator prompt:** Spacious Registry Wave dark conceptual hero; signal-dark canvas; two luminous stable masses labeled CAPABILITY and CONTROL on opposite sides; incomplete bridge between them; “THE MISSING LAYER” over the gap; large negative space; restrained role-slot glow.
-
-**Negative prompt:** robots, factories, people, sci-fi cityscape, generic warning icons, dashboard screenshots, gear icons.
-
-**Acceptance checks:**
-- Gap reads immediately before any detail is inspected
-- Labels CAPABILITY, CONTROL, THE MISSING LAYER all legible at article width
-- No implied solution — only the structural gap
-- signal-dark ground; no paper-light bleed
+**Alt:** "Serial plate: a five-step delivery pipeline where only generation is lit. Four failure
+modes hang from where they bite: the volume trap at review, context collapse at test, the
+accountability gap at operate, and shadow AI outside the pipeline entirely."
+**Caption:** `The gains land at generation; the four failure modes sit downstream of it.`
+**Checks:** failure names exactly as the essay's headings; Shadow AI visibly off the pipeline;
+no red/amber/green scoring.
 
 ---
 
-### productivity-four-failures
+## pp-plate-02-transitions (replaces Fig 02)
 
-| Field | Value |
-|---|---|
-| id | `productivity-four-failures` |
-| class | figure |
-| surface | essay |
-| scheme | paper-light |
-| variant | dark+light pair |
-| aspect | 16:9; 2000x1125 master |
-| status | replace-existing (`diagram-four-failures.jpeg`) |
+**Placement:** "The Infrastructure Gap", after the "distributed intelligence" pull quote.
 
-**Placement:** After the four-failures discussion; anchor: `”The failures are structural.”`
+**Backbone (four reticles, wider spacing):**
+`01 Monolith` `One process, one deploy.` (state-ok) ·
+`02 Distributed apps` `Needed meshes and tracing.` (state-ok) ·
+`03 Distributed infrastructure` `Needed Kubernetes, Terraform, platforms.` (state-ok) ·
+`04 Distributed intelligence` `Needed: not yet built.` (active; dashed accent-2 ring; the
+connector into it is dashed with the italic note `we are here`)
 
-**Purpose:** Distinguish four recurring governance failures without turning them into a checklist or traffic-light report.
+**Exact text:**
+- Title: `Productivity Paradox — 02 Transitions`
+- Subtitle: `Every shift in how software is distributed demanded new infrastructure.`
+- The eight backbone strings above and `we are here`
+- Key-point band: label `KEY POINT`; sentence `We have Git, CI/CD and Backstage. We have no platform for cognitive infrastructure.`
+- Footer: `FROM DISTRIBUTED INFRASTRUCTURE TO DISTRIBUTED INTELLIGENCE.`
 
-**EXACT ON-IMAGE TEXT:**
-- `FOUR STRUCTURAL FAILURES`
-- `Unbounded work`
-- `Unclear authority`
-- `Unverifiable output`
-- `Unmanaged drift`
-- `delivery risk`
+**Lower section:** `key-point-band` (reticle with a lightbulb icon, as Registry Wave 01).
 
-**Element list with positions:**
-- title “FOUR STRUCTURAL FAILURES”: upper center, ~50% x / 10% y
-- 2x2 card grid (~15-85% x / 20-75% y):
-  - upper-left: “Unbounded work” card with compact failure-state glyph
-  - upper-right: “Unclear authority” card with glyph
-  - lower-left: “Unverifiable output” card with glyph
-  - lower-right: “Unmanaged drift” card with glyph
-- from each card: one connector converging downward
-- bottom center (~50% x / 85% y): “delivery risk” footer label (muted, not a triumphalist target)
-
-**Layout diagram:**
-```
-+-------------------------------------------------------------------+
-|                 FOUR STRUCTURAL FAILURES                         |
-|                                                                   |
-|  [Unbounded work]             [Unclear authority]                |
-|       |                              |                           |
-|       |                              |                           |
-|  [Unverifiable output]        [Unmanaged drift]                  |
-|       |                              |                           |
-|       +----------+   +--------------+                           |
-|                  v   v                                           |
-|               delivery risk                                      |
-+-------------------------------------------------------------------+
-```
-
-**Conceptual diagram:**
-```mermaid
-flowchart TD
-  UW[Unbounded work] --> DR[delivery risk]
-  UA[Unclear authority] --> DR
-  UO[Unverifiable output] --> DR
-  UD[Unmanaged drift] --> DR
-```
-
-**Scheme role slots:** ground=paper-light, ink=`--s2s-ink`, accent-1=`--s2s-accent` (card borders), muted=`--s2s-ink-muted` (delivery risk footer), annotation=`--s2s-accent-label`
-
-**Variant flag:** dark+light pair
-
-**Alt:** Four labeled cards — unbounded work, unclear authority, unverifiable output, unmanaged drift — converge downward to a “delivery risk” footer.
-
-**Caption:** The paradox is a set of missing operating constraints, not a model-quality problem.
-
-**Generator prompt:** Registry Wave technical comparison plate; 2x2 card grid; balanced equal-weight cards; compact failure-state glyph in each; thin rules; converging connectors to muted footer; exact labels; paper-light ground.
-
-**Negative prompt:** traffic-light scoring, red/yellow/green color ladder, generic warning triangles, dense prose inside cards, percent figures.
-
-**Acceptance checks:**
-- All five label strings present and exact
-- Four cards have equal visual weight (no card more alarming than others by size or color)
-- Footer “delivery risk” is muted, not a highlighted endpoint
-- No causal measurement implied by connector convergence
+**Alt:** "Serial plate: three completed transitions, monolith, distributed apps and distributed
+infrastructure, each with the infrastructure it demanded, lead to a fourth, distributed
+intelligence, whose infrastructure is not yet built."
+**Caption:** `The third transition has arrived without its platform layer.`
+**Checks:** four nodes; only node 04 dashed; key-point sentence exact.
 
 ---
 
-### productivity-governance-transition
+## pp-plate-03-gates (replaces Fig 03)
 
-| Field | Value |
-|---|---|
-| id | `productivity-governance-transition` |
-| class | figure |
-| surface | essay |
-| scheme | paper-light |
-| variant | single |
-| aspect | 16:9; 2000x1125 master |
-| status | replace-existing (`diagram-transitions.jpeg`) |
+**Placement:** "The Infrastructure Gap", after "Gate-based governance is reactive".
 
-**Placement:** After the governance-transition passage; anchor: `”Governance changes the shape of the work.”`
+**Template:** T3 comparison-plate.
 
-**Purpose:** Make the shift from a prompt-to-output chain to an intent-to-outcome governed path visible as a structural comparison.
+**Exact text:**
+- Title: `Inspect After, or Govern Before` (accent phrase: `Govern Before`)
+- Subtitle: `Reactive gates were sized for human-pace production.`
+- Left panel: `BEFORE — Reactive gates` / `Inspects artifacts after they are produced.`
+- Left notes (X): `REVIEW GATES` `Volume exceeds capacity.` · `QA GATES` `Tests confirm the build, not the intent.` · `RELEASE GATES` `Aggregate risk goes unassessed.`
+- Right panel: `AFTER — Embedded governance` / `Constrains what gets generated.`
+- Right notes (check): `DEFINED SCOPES` `Context in, free rein out.` · `PROPORTIONAL VERIFICATION` `Trust sets review depth.` · `CONTEXT AS ARTIFACT` `Versioned and deployed.`
+- Footer: `GOVERN THE GENERATION, NOT ONLY THE INSPECTION.`
 
-**EXACT ON-IMAGE TEXT:**
-- `PROMPT`
-- `OUTPUT`
-- `INTENT`
-- `CONTRACT`
-- `EVIDENCE`
-- `OUTCOME`
-- `governed transition`
+**Panel drawings:** Left: a dense swarm of small agent dots streaming toward one small gate
+reticle; several dashed red lines slip around the gate on both sides. Right: one hub reticle
+labelled by icon only (a document stack) sending clean lines *into* each of four agent reticles
+before they produce; their outputs leave on single solid lines with green checks.
 
-**Element list with positions:**
-- top path (~20-80% x / 25% y): faded/thin direct arrow “PROMPT -> OUTPUT” — the ungoverned chain
-- vertical comparison rule or separator (~50% y): separates the two paths
-- bottom path (~20-80% x / 70% y): bright four-stage chain “INTENT -> CONTRACT -> EVIDENCE -> OUTCOME”
-- “governed transition” annotation label at ~15% x / 60% y (beside the lower path)
-- upper path: muted/grey treatment — diminished weight
-- lower path: accent-1 treatment — luminous, primary weight
-
-**Layout diagram:**
-```
-+-------------------------------------------------------------------+
-|                                                                   |
-|   [PROMPT] -----------------> [OUTPUT]                           |
-|   (faded, thin line, muted)                                      |
-|                                                                   |
-| ·····················comparison separator·····················   |
-|                                                                   |
-| governed   [INTENT] ---> [CONTRACT] ---> [EVIDENCE] ---> [OUTCOME]|
-| transition                                                        |
-|            (bright, primary weight, staged)                      |
-|                                                                   |
-+-------------------------------------------------------------------+
-```
-
-**Conceptual diagram:**
-```mermaid
-flowchart LR
-  subgraph ungoverned[“ “]
-    P[PROMPT] --> O[OUTPUT]
-  end
-  subgraph governed[“governed transition”]
-    I[INTENT] --> C[CONTRACT] --> E[EVIDENCE] --> OUT[OUTCOME]
-  end
-  style ungoverned fill:none,stroke:#94a3b8,stroke-dasharray:4
-  style P fill:#f1f5f9,stroke:#94a3b8,color:#94a3b8
-  style O fill:#f1f5f9,stroke:#94a3b8,color:#94a3b8
-```
-
-**Scheme role slots:** ground=paper-light, ink=`--s2s-ink`, accent-1=`--s2s-accent` (governed path), muted=`--s2s-ink-muted` (ungoverned faded path), annotation=`--s2s-accent-label`
-
-**Variant flag:** single
-
-**Alt:** A faded direct “PROMPT to OUTPUT” arrow sits above a bright four-stage governed path: INTENT to CONTRACT to EVIDENCE to OUTCOME.
-
-**Caption:** Governance inserts inspectable commitments between request and result.
-
-**Generator prompt:** Minimalist Registry Wave before-and-after flow comparison; one faded thin ungoverned path top; one bright four-stage governed path bottom; explicit vertical separator; exact labels; paper-light ground.
-
-**Negative prompt:** process clip art, product screenshots, excessive arrows, circular flows, checklist bullets.
-
-**Acceptance checks:**
-- Comparison legible at a three-second glance
-- Lower path has exactly four discrete stages (INTENT / CONTRACT / EVIDENCE / OUTCOME)
-- Upper path is clearly subordinate (faded treatment)
-- Direction unmistakable left-to-right on both paths
+**Alt:** "Comparison plate. Before: a swarm of agents floods a single inspection gate and work
+slips around it. After: a governance hub feeds scoped context into each agent before it
+generates, and each output leaves verified."
+**Caption:** `Proactive governance moves the constraint into the generation context.`
+**Checks:** T3 frame; left red dashed, right navy dashed; six notes exact; no gate-shaped 3D prop.
 
 ---
 
-### productivity-social-card
+## pp-social — social art
 
-| Field | Value |
-|---|---|
-| id | `productivity-social-card` |
-| class | social-card |
-| surface | essay |
-| scheme | signal-dark |
-| variant | single |
-| aspect | 1.91:1; 2400x1260 master / 1200x630 render |
-| status | required, does not yet exist |
-
-**Placement:** OG/metadata asset. Target: `public/og/posts/governed-agentic-sdlc-01-productivity-paradox.png`
-
-**EXACT ON-IMAGE TEXT:**
-- `The AI Productivity Paradox`
-- `Governed Agentic SDLC`
-- `Signal to System`
-
-**Layout diagram:**
-```
-+-------------------------------------------------------------------+
-| [S2S mark]                                                        |
-|                                                                   |
-|              The AI Productivity Paradox                         |
-|                  Governed Agentic SDLC                           |
-|                                                                   |
-|                                         [Signal to System]       |
-+-------------------------------------------------------------------+
-```
-
-**Scheme role slots:** ground=`--s2s-canvas`, ink=`--s2s-ink`, accent-1=`--s2s-accent`
-
-**Alt:** (metadata only)
-
-**Generator prompt:** Dark editorial social card; essay title and series centered in 70% safe zone; signal-dark canvas; subtle control-gap motif; S2S mark.
-
-**Negative prompt:** paper-light background, dense infographic, baked body copy.
-
-**Acceptance checks:**
-- Title readable at 1200x630 render within central 70% safe zone
-- PNG under 350KB
+1520x1260, signal-dark, no text, from the approved `pp-hero` night twin: recompose with the lit
+doorway and convergence reticle in the right 60%. Target:
+`public/images/governed-agentic-sdlc-01/social/governed-agentic-sdlc-01--social-card--art.jpg`.

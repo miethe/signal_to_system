@@ -1,285 +1,139 @@
-# The Contract Is the Work
+# The Contract Is the Work — storyboard
 
-## Current imagery and disposition
+Essay: `src/content/posts/the-contract-is-the-work.mdx`. Templates and checklist:
+`00-style-reference.md`.
 
-The current `hero-maturity-model.svg` is an explanatory asset, not a conceptual hero. Replace the opening with a Registry-Wave-aligned hero; retain and restyle the maturity idea as an inline figure. A social card is required (not yet present).
+## Disposition
 
----
+| Current | Where | Decision |
+|---|---|---|
+| `hero-maturity-model.svg` | used as hero | **Move** its idea inline as `contract-plate-02-maturity`; the opening gets a real hero, `contract-hero` (pair) |
+| — | "Completion should be visible before execution begins" | **New** `contract-plate-01-handoff` |
 
-## Boards
+Cut from the first draft: the four-rails "sealed record" hero and the four-quadrant
+"four obligations" figure. They were the same picture twice (four things converging on a box),
+the hero baked five labels against the no-text rule, and neither showed what the essay argues:
+that one binding document replaces separate descriptions passed down a chain.
 
-### contract-hero-binding
-
-| Field | Value |
-|---|---|
-| id | `contract-hero-binding` |
-| class | hero |
-| surface | essay |
-| scheme | signal-dark |
-| variant | single |
-| aspect | 16:9; 2400x1350 master |
-| status | replace-existing (`hero-maturity-model.svg` used as hero frontispiece) |
-
-**Placement:** Frontispiece, before the opening paragraph; anchor: `”The Contract Is the Work”`
-
-**Purpose:** State that intent gains operational force only when it is bound to acceptance criteria, evidence obligations, and named decision authority — the contract is not the documentation; it is the structure.
-
-**EXACT ON-IMAGE TEXT:**
-- `THE CONTRACT IS THE WORK`
-- `INTENT`
-- `ACCEPTANCE`
-- `EVIDENCE`
-- `AUTHORITY`
-
-**Element list with positions:**
-- ground: signal-dark canvas
-- title “THE CONTRACT IS THE WORK”: upper-left, ~10% x / 12% y
-- center (~50% x / 50% y): luminous sealed contract record (rectangular or hexagonal object with glow)
-- four cardinal rails converging on the central record:
-  - top (~50% x / 20% y): “INTENT” label, arrow pointing down
-  - right (~82% x / 50% y): “AUTHORITY” label, arrow pointing left
-  - bottom (~50% x / 80% y): “EVIDENCE” label, arrow pointing up
-  - left (~18% x / 50% y): “ACCEPTANCE” label, arrow pointing right
-- rails terminate at the record boundary; the record is sealed by all four
-- large negative space around the outside
-
-**Layout diagram:**
-```
-+-------------------------------------------------------------------+
-| THE CONTRACT IS THE WORK                                         |
-|                                                                   |
-|                          INTENT                                  |
-|                            |                                     |
-|              ACCEPTANCE -> [CONTRACT] <- AUTHORITY               |
-|                            |                                     |
-|                          EVIDENCE                                |
-|                                                                   |
-+-------------------------------------------------------------------+
-```
-
-**Conceptual diagram:**
-```mermaid
-flowchart TD
-  I[INTENT] --> CTR
-  A[ACCEPTANCE] --> CTR
-  E[EVIDENCE] --> CTR
-  AU[AUTHORITY] --> CTR
-  CTR([CONTRACT\nsealed record])
-  style CTR fill:#1e3a5f,stroke:#3b82f6,stroke-width:3
-```
-
-**Scheme role slots:** ground=`--s2s-canvas`, ink=`--s2s-ink`, accent-1=`--s2s-accent` (record glow, cardinal arrows), annotation=`--s2s-accent-label` (rail labels), muted=`--s2s-ink-muted` (background field)
-
-**Variant flag:** single
-
-**Alt:** A luminous central contract record is bound by four labeled rails arriving from each cardinal direction: INTENT above, AUTHORITY right, EVIDENCE below, ACCEPTANCE left.
-
-**Caption:** A contract is the structure that makes delegated work governable.
-
-**Generator prompt:** Registry Wave dark editorial systems hero; signal-dark canvas; one central luminous sealed evidence record; four sparse structural rails from cardinal directions labeled INTENT, ACCEPTANCE, EVIDENCE, AUTHORITY; title upper-left; large negative space; no legal paperwork motifs.
-
-**Negative prompt:** legal paperwork, handshakes, signatures, product UI, robots, people, decorative background texture.
-
-**Acceptance checks:**
-- Central record dominates the frame
-- All four rail labels (INTENT / ACCEPTANCE / EVIDENCE / AUTHORITY) legible
-- Rails terminate at the record; the record is enclosed by all four
-- Title legible at article width
+Eyebrow (plates): `THE CONTRACT IS THE WORK`. Corner stacks: TL `INTENT / CRITERIA / EVIDENCE /
+AUTHORITY` · TR `ONE DOCUMENT / NOT THREE / DESCRIPTIONS` · BL `PLANNER / SPECIALIST / VERIFIER /
+DECIDER` · BR `CLAIM / VERIFY / ACCEPT / REUSE`.
 
 ---
 
-### contract-four-obligations
+## contract-hero — one sheet down the table
 
 | Field | Value |
 |---|---|
-| id | `contract-four-obligations` |
-| class | figure |
-| surface | essay |
-| scheme | paper-light |
-| variant | dark+light pair |
-| aspect | 16:9; 2000x1125 master |
-| status | replace-existing |
+| class / surface | hero / essay |
+| template | T1 atelier-hero + §3 night twin |
+| scheme / variant | paper-light master + signal-dark twin / dark+light pair |
+| master | 16:9, 2400x1350 |
+| exact text | none |
+| targets | `public/images/the-contract-is-the-work/hero/the-contract-is-the-work--hero--one-sheet--{paper-light,signal-dark}.{avif,webp}` |
 
-**Placement:** After the four-obligations passage; anchor: `”A Feature Contract has four obligations.”`
+**Purpose:** specialists, verifiers, and decision-makers share one document instead of three
+separate descriptions of it.
 
-**Purpose:** Make the four irreducible contract fields visible as a spatial record, so a reader can scan the structure of obligation in one pass.
+**Composition:**
+- One long drafting table crosses the lower half. A single very long sheet of drawing paper is
+  unrolled along its whole length.
+- Four people work on the **same sheet** at different points along it: one drafting at the left
+  end, one building a small model from the drawing, one inspecting a detail with a loupe, one at
+  the right end holding a stamp above a marked box on the sheet, about to decide.
+- **Overlay (focal):** a clean ink band drawn in the air, running parallel above the sheet, with
+  four dashed-circle badges spaced along it (a target, a checklist, a magnifier, a stamp as icons).
+  Dashed drop-lines tie each badge to its person's hands on the sheet. Copper waypoints along the
+  band.
+- The point is *one* sheet: no second document anywhere in the scene.
+- Crop safety: the loupe inspector and the band's midpoint sit near centre.
 
-**EXACT ON-IMAGE TEXT:**
-- `FEATURE CONTRACT`
-- `Intent`
-- `Acceptance criteria`
-- `Evidence obligations`
-- `Decision authority`
-
-**Element list with positions:**
-- center (~50% x / 50% y): “FEATURE CONTRACT” record identifier card (box with label)
-- four field cards in quadrant positions:
-  - upper-left (~20% x / 25% y): “Intent” card with single connector line to center
-  - upper-right (~80% x / 25% y): “Decision authority” card
-  - lower-left (~20% x / 75% y): “Acceptance criteria” card
-  - lower-right (~80% x / 75% y): “Evidence obligations” card
-- connector lines: thin, semantic, from each card to the center record
-- no body prose inside cards; label only
-
-**Layout diagram:**
 ```
-+-------------------------------------------------------------------+
-|                                                                   |
-|  [Intent]                              [Decision authority]      |
-|      \                                      /                    |
-|       \                                    /                     |
-|        +---- [FEATURE CONTRACT] ----------+                      |
-|       /                                    \                     |
-|      /                                      \                    |
-|  [Acceptance criteria]            [Evidence obligations]         |
-|                                                                   |
-+-------------------------------------------------------------------+
++----------------------------------------------------------------------+
+|     (o)--o--------(o)--o--------(o)--o--------(o)    ink band        |
+|      :             :             :             :                      |
+|  [drafter]     [model-maker]  [inspector]   [decider+stamp]           |
+|  ====================== one long sheet ===========================   |
++----------------------------------------------------------------------+
 ```
 
-**Conceptual diagram:**
-```mermaid
-flowchart LR
-  I[Intent] --> FC
-  AC[Acceptance criteria] --> FC
-  EO[Evidence obligations] --> FC
-  DA[Decision authority] --> FC
-  FC([FEATURE CONTRACT])
-  style FC fill:#eff6ff,stroke:#2563eb,stroke-width:2
-```
+**Prompt (after T1):** as composed; the sheet is the continuous element tying all four;
+accent-1 cobalt on the model, accent-2 copper on the stamp and waypoints.
 
-**Scheme role slots:** ground=paper-light, ink=`--s2s-ink`, accent-1=`--s2s-accent` (record box border), muted=`--s2s-ink-muted` (connector lines), annotation=`--s2s-accent-label`
+**Negative (after T1):** handshakes, legal paperwork, signatures, gavels, multiple documents,
+people passing papers hand to hand.
 
-**Variant flag:** dark+light pair (field-card color semantics need contrast in both modes)
-
-**Alt:** Four field cards — Intent, Acceptance criteria, Evidence obligations, Decision authority — connect to a central Feature Contract record.
-
-**Caption:** The contract makes intent, verification, and authority visible in the same place.
-
-**Generator prompt:** Registry Wave canonical-record plate; four rounded field cards in quadrant positions; thin semantic connector lines to central record; exact labels only (no body prose); paper-light ground.
-
-**Negative prompt:** lengthy lorem ipsum, app chrome, generic document icon, flowchart process arrows, sequential ordering.
-
-**Acceptance checks:**
-- All five label strings present and exact
-- Four field cards have equal visual weight
-- Record remains visually central
-- Connectors read as binding, not sequence
+**Night twin:** §3; one lamp per person, the sheet glows faintly where each lamp falls.
+**Alt:** decorative (empty). **Checks:** exactly one document in frame; four roles legible by
+action; no text.
 
 ---
 
-### contract-maturity-path
+## contract-plate-01-handoff (new)
 
-| Field | Value |
-|---|---|
-| id | `contract-maturity-path` |
-| class | figure |
-| surface | essay |
-| scheme | paper-light |
-| variant | single |
-| aspect | 16:9; 2000x1125 master |
-| status | replace-existing (`hero-maturity-model.svg`) |
+**Placement:** "Completion should be visible before execution begins", after the
+`fc-example-041` code block ("share one document instead of three separate descriptions of it").
 
-**Placement:** Where the current maturity-model SVG appears in the essay; anchor: `”Maturity is evidence-bearing work.”`
+**Template:** T3 comparison-plate.
 
-**Purpose:** Reframe maturity as increasing verification binding between claims and evidence — not a process trophy or capability ladder.
+**Exact text:**
+- Title: `One Contract, Not Three Descriptions` (accent phrase: `One Contract`)
+- Subtitle: `The handoff carries the relationship between intent, evidence, and authority.`
+- Left: `BEFORE — Unauthenticated handoff` / `Each stage receives its own description of the work.`
+- Left notes (X): `A PASSING TEST` `stands in for coverage.` · `A POLISHED REPORT` `stands in for verified claims.` · `AN APPROVAL` `stands in for authority.`
+- Right: `AFTER — Contract-bound handoff` / `Every stage works from one binding document.`
+- Right bar: `FEATURE CONTRACT` with tabs `INTENT` · `ACCEPTANCE CRITERIA` · `EVIDENCE OBLIGATIONS` · `DECISION AUTHORITY`
+- Right notes (check): `DONE IS DEFINED` `before execution.` · `CLAIMS MEET EVIDENCE` `by name.` · `ACCEPTANCE HAS AN OWNER` `who may decide.`
+- Node labels (both panels): `Planner` · `Specialist` · `Verifier` · `Decider`
+- Footer: `THE CONTRACT IS THE WORK'S SOURCE OF AUTHORITY.`
 
-**EXACT ON-IMAGE TEXT:**
-- `OUTPUT`
-- `ARTIFACT`
-- `CONTRACT`
-- `EVIDENCE-BEARING WORK`
-- `increasing verification`
+**Panel drawings:** Left: four reticles in a row, each holding its own small slip of paper; the
+slips differ slightly in shape; dashed red lines between them drift off-line. Right: the same
+four reticles in a row with one long `FEATURE CONTRACT` bar above them; a solid drop-line from the
+bar to each reticle; the four tabs sit on the bar.
 
-**Element list with positions:**
-- horizontal path (~15-85% x / 45% y): four stages left-to-right
-  - stage 1 (~15% x): “OUTPUT” box
-  - stage 2 (~38% x): “ARTIFACT” box
-  - stage 3 (~62% x): “CONTRACT” box
-  - stage 4 (~85% x): “EVIDENCE-BEARING WORK” box (sealed/closed appearance)
-- connector arrows between stages: same weight, no graduation in size
-- below stages (~65% y): “increasing verification” annotation spanning the path width, with a left-to-right indicator
-- verification thread: a visual line or band that thickens from stage 1 to stage 4 (represents the accumulation of binding)
-- no trophy, award, or height-based elevation
-
-**Layout diagram:**
-```
-+-------------------------------------------------------------------+
-|                                                                   |
-|   [OUTPUT] ----> [ARTIFACT] ----> [CONTRACT] ----> [EVIDENCE-   |
-|                                                    BEARING WORK] |
-|                                                                   |
-|   ==================== increasing verification ==================|
-|   (thin line)                                       (thick line) |
-|                                                                   |
-+-------------------------------------------------------------------+
-```
-
-**Conceptual diagram:**
-```mermaid
-flowchart LR
-  O[OUTPUT\nno binding] --> A[ARTIFACT\nversioned] --> C[CONTRACT\naccepted] --> E[EVIDENCE-BEARING WORK\nverified binding]
-  style E fill:#eff6ff,stroke:#2563eb,stroke-width:3
-```
-
-**Scheme role slots:** ground=paper-light, ink=`--s2s-ink`, accent-1=`--s2s-accent` (final stage border, thick verification thread), muted=`--s2s-ink-muted` (early stage borders, thin thread)
-
-**Variant flag:** single
-
-**Alt:** Four stages progress left to right from OUTPUT to EVIDENCE-BEARING WORK with an “increasing verification” band beneath.
-
-**Caption:** Maturity is not more automation; it is stronger evidence binding.
-
-**Generator prompt:** Registry Wave progression diagram; four equally spaced stages left-to-right; verification thread that thickens across the path; careful pacing — no triumphalist height/size escalation; sealed final record; exact labels; paper-light editorial plate.
-
-**Negative prompt:** maturity ladders with ascending tiers, trophy imagery, percentage scores, gamification, height-based elevation, colored tier backgrounds.
-
-**Acceptance checks:**
-- Sequence clearly left-to-right through all four stages
-- “increasing verification” label present and positioned under the path
-- No implied universal hierarchy beyond the stated verification dimension
-- Final stage visually distinct as sealed/closed
+**Alt:** "Comparison plate. Before: planner, specialist, verifier and decider each hold their
+own description, and a passing test, a polished report and an approval stand in for real
+completion. After: all four work from one Feature Contract with intent, acceptance criteria,
+evidence obligations and decision authority."
+**Caption:** `Without a binding document, every handoff is a chance for the objective to drift.`
+**Checks:** exactly four nodes per panel; one contract bar only on the right; notes exact.
 
 ---
 
-### contract-social-card
+## contract-plate-02-maturity (replaces the SVG hero, moved inline)
 
-| Field | Value |
-|---|---|
-| id | `contract-social-card` |
-| class | social-card |
-| surface | essay |
-| scheme | signal-dark |
-| variant | single |
-| aspect | 1.91:1; 2400x1260 master / 1200x630 render |
-| status | required, does not yet exist |
+**Placement:** "From sources to decision authority", after the second paragraph (before
+"### 1. Output").
 
-**Placement:** OG/metadata asset. Target: `public/og/posts/the-contract-is-the-work.png`
+**Template:** T2 serial-plate, **six** reticles. Because the essay says the stages are
+"dimensions more than a strict ladder", the connectors between nodes are **plain thin rules with
+no arrowheads and no waypoints**, and a single italic serif annotation floats above the row.
 
-**EXACT ON-IMAGE TEXT:**
-- `The Contract Is the Work`
-- `Agentic SDLC`
-- `Signal to System`
+**Exact text:**
+- Title: `The Contract Is the Work — Six Stages` (accent phrase: `Six Stages`)
+- Subtitle: `Workflows that produce outputs are not yet workflows that can justify decisions.`
+- Annotation above the row: `dimensions, not a strict ladder`
+- Nodes: `01 Output` `An answer or a change.` · `02 Traceable source` `Points back to its material.` ·
+  `03 Explicit claim` `Claims bound to evidence.` · `04 Verification` `Supported, contradicted, or open.` ·
+  `05 Decision authority` `Accepted by who may decide.` · `06 Reusable capability` `Holds up without its author.`
+- Bracket over nodes 04-06: `FRONTIER AT ORGANIZATIONAL SCALE`
+- Key-point band: `KEY POINT` / `Technical confidence is not organizational authority.`
+- Footer: `EXPOSE THE MISSING STAGE; DO NOT DEMAND THE HIGHEST ONE.`
 
-**Layout diagram:**
-```
-+-------------------------------------------------------------------+
-| [S2S mark]                                                        |
-|                                                                   |
-|                 The Contract Is the Work                         |
-|                       Agentic SDLC                               |
-|                                                                   |
-|                                         [Signal to System]       |
-+-------------------------------------------------------------------+
-```
+**Node treatment:** 01-03 standard ink reticles; 04-06 the same but with the dashed-orbit
+variant under the bracket. No state colors (this is a taxonomy, not a status).
 
-**Scheme role slots:** ground=`--s2s-canvas`, ink=`--s2s-ink`, accent-1=`--s2s-accent`
+**Alt:** "Serial plate: six stages of evidence and authority, output, traceable source, explicit
+claim, verification, decision authority and reusable capability, drawn as dimensions rather than
+a strict ladder. Stages four to six are bracketed as frontier at organizational scale."
+**Caption:** `The maturity model exposes missing stages without insisting on the highest one.`
+**Checks:** six nodes; no arrowheads; bracket spans exactly 04-06; key point exact.
 
-**Alt:** (metadata only)
+---
 
-**Generator prompt:** Dark editorial social card; essay title and series centered in 70% safe zone; signal-dark canvas; subtle four-rails binding motif; S2S mark.
+## contract-social — social art
 
-**Negative prompt:** paper-light background, dense infographic, baked body copy, legal imagery.
-
-**Acceptance checks:**
-- Title readable at 1200x630 render within central 70% safe zone
-- PNG under 350KB
+1520x1260, signal-dark, no text, recropped from the approved `contract-hero` night twin with the
+inspector and decider in the right 60%. Target:
+`public/images/the-contract-is-the-work/social/the-contract-is-the-work--social-card--art.jpg`.
