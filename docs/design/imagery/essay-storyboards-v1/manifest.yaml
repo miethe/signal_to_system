@@ -1,76 +1,332 @@
-version: 1
+version: 2
 pack: essay-storyboards-v1
 style_reference: 00-style-reference.md
+standards_reference: docs/design/imagery/graphics-standards-v1.yaml
+generated: 2026-09-23
+
+# status vocabulary:
+#   replace-existing        replace a named legacy asset
+#   required-net-new        new asset, required by standards (e.g. missing social-card)
+#   optional-net-new        additive proposal; not a publishing blocker
+#   optional-net-new-promotion-candidate  exists in a worktree; awaiting approval to land on main
+#   existing-exemplar       documented here for reference; do NOT regenerate
+
 assets:
+
+  # ── agentic-operations-flow ────────────────────────────────────────────────
+
   - id: aof-hero-artifact-path
     essay: agentic-operations-flow
     class: hero
+    scheme: signal-dark
+    variant: single
+    ratio: "16:9"
+    master_px: "2400x1350"
     status: replace-existing
-    target: public/assets/posts/agentic-operations-flow/hero-artifact-path.png
+    replaces: public/assets/posts/agentic-operations-flow/hero-artifact-graph.jpg
+    target: public/assets/posts/agentic-operations-flow/hero--hero--artifact-path.png
+    formats: [avif, webp]
     storyboard: agentic-operations-flow.md
+
   - id: aof-first-artifact-route
     essay: agentic-operations-flow
     class: figure
+    scheme: paper-light
+    variant: "dark+light pair"
+    ratio: "16:9"
+    master_px: "2000x1125"
     status: replace-existing
-    target: public/assets/posts/agentic-operations-flow/first-artifact-route.svg
+    target: public/assets/posts/agentic-operations-flow/agentic-operations-flow--figure--first-artifact-route--paper-light.svg
+    formats: [svg, png]
     storyboard: agentic-operations-flow.md
+
   - id: aof-execution-graph
     essay: agentic-operations-flow
     class: figure
+    scheme: paper-light
+    variant: single
+    ratio: "16:9"
+    master_px: "2000x1125"
     status: replace-existing
-    target: public/assets/posts/agentic-operations-flow/execution-graph.svg
+    target: public/assets/posts/agentic-operations-flow/agentic-operations-flow--figure--execution-graph.svg
+    formats: [svg, png]
     storyboard: agentic-operations-flow.md
+
+  - id: aof-social-card
+    essay: agentic-operations-flow
+    class: social-card
+    scheme: signal-dark
+    variant: single
+    ratio: "1.91:1"
+    master_px: "2400x1260"
+    render_px: "1200x630"
+    status: required-net-new
+    target: public/og/posts/agentic-operations-flow.png
+    formats: [png]
+    storyboard: agentic-operations-flow.md
+
+  # ── contract-as-spec-worked-example ────────────────────────────────────────
+
   - id: worked-contract-record
     essay: contract-as-spec-worked-example
     class: figure
+    scheme: paper-light
+    variant: single
+    ratio: "4:3"
+    master_px: "1800x1350"
     status: optional-net-new
-    target: public/assets/posts/contract-as-spec-worked-example/feature-contract-record.svg
+    target: public/assets/posts/contract-as-spec-worked-example/contract-as-spec-worked-example--figure--contract-record.svg
+    formats: [svg, png]
     storyboard: contract-as-spec-worked-example.md
+
   - id: worked-claim-binding
     essay: contract-as-spec-worked-example
     class: figure
+    scheme: paper-light
+    variant: single
+    ratio: "16:9"
+    master_px: "2000x1125"
     status: optional-net-new
-    target: public/assets/posts/contract-as-spec-worked-example/claim-binding.svg
+    target: public/assets/posts/contract-as-spec-worked-example/contract-as-spec-worked-example--figure--claim-binding.svg
+    formats: [svg, png]
     storyboard: contract-as-spec-worked-example.md
+
+  - id: worked-example-social-card
+    essay: contract-as-spec-worked-example
+    class: social-card
+    scheme: signal-dark
+    variant: single
+    ratio: "1.91:1"
+    master_px: "2400x1260"
+    render_px: "1200x630"
+    status: optional-net-new
+    note: companion post may share parent essay social card
+    target: public/og/posts/contract-as-spec-worked-example.png
+    formats: [png]
+    storyboard: contract-as-spec-worked-example.md
+
+  # ── governed-agentic-sdlc-01-productivity-paradox ──────────────────────────
+
   - id: productivity-hero-control-gap
     essay: governed-agentic-sdlc-01-productivity-paradox
     class: hero
+    scheme: signal-dark
+    variant: single
+    ratio: "16:9"
+    master_px: "2400x1350"
     status: replace-existing
-    target: public/assets/posts/governed-agentic-sdlc-01/hero-control-gap.png
+    replaces: public/assets/posts/governed-agentic-sdlc-01/hero-02-missing-layer.jpeg
+    target: public/images/governed-agentic-sdlc-01/hero/governed-agentic-sdlc-01--hero--control-gap.png
+    formats: [avif, webp]
     storyboard: governed-agentic-sdlc-01-productivity-paradox.md
+
   - id: productivity-four-failures
     essay: governed-agentic-sdlc-01-productivity-paradox
     class: figure
+    scheme: paper-light
+    variant: "dark+light pair"
+    ratio: "16:9"
+    master_px: "2000x1125"
     status: replace-existing
-    target: public/assets/posts/governed-agentic-sdlc-01/four-structural-failures.svg
+    replaces: public/assets/posts/governed-agentic-sdlc-01/diagram-four-failures.jpeg
+    target: public/assets/posts/governed-agentic-sdlc-01/governed-agentic-sdlc-01--figure--four-structural-failures--paper-light.svg
+    formats: [svg, png]
     storyboard: governed-agentic-sdlc-01-productivity-paradox.md
+
   - id: productivity-governance-transition
     essay: governed-agentic-sdlc-01-productivity-paradox
     class: figure
+    scheme: paper-light
+    variant: single
+    ratio: "16:9"
+    master_px: "2000x1125"
     status: replace-existing
-    target: public/assets/posts/governed-agentic-sdlc-01/governance-transition.svg
+    replaces: public/assets/posts/governed-agentic-sdlc-01/diagram-transitions.jpeg
+    target: public/assets/posts/governed-agentic-sdlc-01/governed-agentic-sdlc-01--figure--governance-transition.svg
+    formats: [svg, png]
     storyboard: governed-agentic-sdlc-01-productivity-paradox.md
+
+  - id: productivity-social-card
+    essay: governed-agentic-sdlc-01-productivity-paradox
+    class: social-card
+    scheme: signal-dark
+    variant: single
+    ratio: "1.91:1"
+    master_px: "2400x1260"
+    render_px: "1200x630"
+    status: required-net-new
+    target: public/og/posts/governed-agentic-sdlc-01-productivity-paradox.png
+    formats: [png]
+    storyboard: governed-agentic-sdlc-01-productivity-paradox.md
+
+  # ── the-contract-is-the-work ───────────────────────────────────────────────
+
   - id: contract-hero-binding
     essay: the-contract-is-the-work
     class: hero
+    scheme: signal-dark
+    variant: single
+    ratio: "16:9"
+    master_px: "2400x1350"
     status: replace-existing
-    target: public/assets/posts/the-contract-is-the-work/hero-contract-binding.png
+    replaces: public/assets/posts/the-contract-is-the-work/hero-maturity-model.svg
+    target: public/images/the-contract-is-the-work/hero/the-contract-is-the-work--hero--contract-binding.png
+    formats: [avif, webp]
     storyboard: the-contract-is-the-work.md
+
   - id: contract-four-obligations
     essay: the-contract-is-the-work
     class: figure
+    scheme: paper-light
+    variant: "dark+light pair"
+    ratio: "16:9"
+    master_px: "2000x1125"
     status: replace-existing
-    target: public/assets/posts/the-contract-is-the-work/contract-four-obligations.svg
+    target: public/assets/posts/the-contract-is-the-work/the-contract-is-the-work--figure--four-obligations--paper-light.svg
+    formats: [svg, png]
     storyboard: the-contract-is-the-work.md
+
   - id: contract-maturity-path
     essay: the-contract-is-the-work
     class: figure
+    scheme: paper-light
+    variant: single
+    ratio: "16:9"
+    master_px: "2000x1125"
     status: replace-existing
-    target: public/assets/posts/the-contract-is-the-work/contract-maturity-path.svg
+    target: public/assets/posts/the-contract-is-the-work/the-contract-is-the-work--figure--maturity-path.svg
+    formats: [svg, png]
     storyboard: the-contract-is-the-work.md
+
+  - id: contract-social-card
+    essay: the-contract-is-the-work
+    class: social-card
+    scheme: signal-dark
+    variant: single
+    ratio: "1.91:1"
+    master_px: "2400x1260"
+    render_px: "1200x630"
+    status: required-net-new
+    target: public/og/posts/the-contract-is-the-work.png
+    formats: [png]
+    storyboard: the-contract-is-the-work.md
+
+  # ── the-registry-wave-agentic-artifact-supply-chain ────────────────────────
+
+  - id: rw-hero-governed-cube
+    essay: the-registry-wave-agentic-artifact-supply-chain
+    class: hero
+    scheme: paper-light
+    variant: single
+    ratio: "16:9"
+    master_px: "2400x1350"
+    status: existing-exemplar
+    path: public/assets/posts/the-registry-wave-agentic-artifact-supply-chain/hero-governed-cube.png
+    note: do not replace without visual regression review; missing dark variant is a known gap
+    storyboard: the-registry-wave-agentic-artifact-supply-chain.md
+
+  - id: rw-figure-thread-01-incident
+    essay: the-registry-wave-agentic-artifact-supply-chain
+    class: figure
+    scheme: paper-light
+    variant: single
+    ratio: "16:9"
+    status: existing-exemplar
+    path: public/assets/posts/the-registry-wave-agentic-artifact-supply-chain/registry-wave-incident-resolution-flow.png
+    storyboard: the-registry-wave-agentic-artifact-supply-chain.md
+
+  - id: rw-figure-thread-02-deployment
+    essay: the-registry-wave-agentic-artifact-supply-chain
+    class: figure
+    scheme: paper-light
+    variant: single
+    ratio: "16:9"
+    status: existing-exemplar
+    path: public/assets/posts/the-registry-wave-agentic-artifact-supply-chain/registry-wave-from-source-to-outcome.png
+    storyboard: the-registry-wave-agentic-artifact-supply-chain.md
+
+  - id: rw-figure-thread-03-use
+    essay: the-registry-wave-agentic-artifact-supply-chain
+    class: figure
+    scheme: paper-light
+    variant: single
+    ratio: "16:9"
+    status: existing-exemplar
+    path: public/assets/posts/the-registry-wave-agentic-artifact-supply-chain/registry-wave-presence-vs-behavior.png
+    storyboard: the-registry-wave-agentic-artifact-supply-chain.md
+
+  - id: rw-figure-thread-04-drift
+    essay: the-registry-wave-agentic-artifact-supply-chain
+    class: figure
+    scheme: paper-light
+    variant: single
+    ratio: "16:9"
+    status: existing-exemplar
+    path: public/assets/posts/the-registry-wave-agentic-artifact-supply-chain/registry-wave-drift-across-five-days.png
+    storyboard: the-registry-wave-agentic-artifact-supply-chain.md
+
+  - id: rw-figure-thread-05-detection
+    essay: the-registry-wave-agentic-artifact-supply-chain
+    class: figure
+    scheme: paper-light
+    variant: single
+    ratio: "16:9"
+    status: existing-exemplar
+    path: public/assets/posts/the-registry-wave-agentic-artifact-supply-chain/registry-wave-detecting-silent-drift.png
+    storyboard: the-registry-wave-agentic-artifact-supply-chain.md
+
+  - id: rw-figure-thread-06-outcome
+    essay: the-registry-wave-agentic-artifact-supply-chain
+    class: figure
+    scheme: paper-light
+    variant: single
+    ratio: "16:9"
+    status: existing-exemplar
+    path: public/assets/posts/the-registry-wave-agentic-artifact-supply-chain/registry-wave-run-level-provenance-infographic.png
+    storyboard: the-registry-wave-agentic-artifact-supply-chain.md
+
+  - id: rw-figure-before-after
+    essay: the-registry-wave-agentic-artifact-supply-chain
+    class: figure
+    scheme: paper-light
+    variant: single
+    ratio: "16:9"
+    status: existing-exemplar
+    path: public/assets/posts/the-registry-wave-agentic-artifact-supply-chain/agentic-os-artifact-estate-before-and-after.png
+    storyboard: the-registry-wave-agentic-artifact-supply-chain.md
+
+  - id: rw-illustration-some-copies
+    essay: the-registry-wave-agentic-artifact-supply-chain
+    class: illustration
+    scheme: paper-light
+    variant: single
+    ratio: "1:1"
+    status: existing-exemplar
+    path: rw-v2-essay/public/assets/posts/the-registry-wave-agentic-artifact-supply-chain/some-copies-must-change.png
+    note: near-square ~1:1; lives in rw-v2-essay worktree; not yet promoted to main
+    storyboard: the-registry-wave-agentic-artifact-supply-chain.md
+
+  - id: rw-social-card
+    essay: the-registry-wave-agentic-artifact-supply-chain
+    class: social-card
+    scheme: signal-dark
+    variant: single
+    ratio: "1.91:1"
+    master_px: "2400x1260"
+    render_px: "1200x630"
+    status: required-net-new
+    target: public/og/posts/the-registry-wave-agentic-artifact-supply-chain.png
+    formats: [png]
+    storyboard: the-registry-wave-agentic-artifact-supply-chain.md
+
   - id: registry-threaded-control-loop
     essay: the-registry-wave-agentic-artifact-supply-chain
     class: illustration
+    scheme: paper-light
+    variant: "dark+light pair"
+    ratio: "16:9"
+    master_px: "2400x1350"
     status: optional-net-new-promotion-candidate
-    target: public/assets/posts/the-registry-wave-agentic-artifact-supply-chain/threaded-control-loop.svg
+    target: public/assets/posts/the-registry-wave-agentic-artifact-supply-chain/the-registry-wave--illustration--threaded-control-loop--paper-light.svg
+    formats: [svg, png]
     storyboard: the-registry-wave-agentic-artifact-supply-chain.md
