@@ -1,0 +1,41 @@
+---
+/**
+ * ProvenanceTimeline (rec-method) — runs, reviews, corrections and
+ * releases in date order. Release entries come from the gate's release
+ * receipts (the loader adds them); authors cannot hand-write one.
+ * Corrections are shown as prominently as releases.
+ */
+import type { TimelineEvent } from '../../lib/labs/types';
+import { TIMELINE_KIND, formatIsoDate } from './labels';
+
+interface Props { events: TimelineEvent[]; class?: string }
+const { events, class: className } = Astro.props;
+---
+
+<ol class:list={['lab-tl', className]}>
+  {events.map((e) => (
+    <li class={`lab-tl__item lab-tl__item--${e.kind}`}>
+      <span class="lab-tl__dot" aria-hidden="true" />
+      <p class="lab-tl__meta"><time datetime={e.date}>{formatIsoDate(e.date)}</time><span class="lab-tl__kind">{TIMELINE_KIND[e.kind]}</span>{e.version && <code>v{e.version}</code>}</p>
+      <p class="lab-tl__label">{e.label}</p>
+      {e.note && <p class="lab-tl__note">{e.note}</p>}
+    </li>
+  ))}
+</ol>
+
+<style>
+  .lab-tl { position: relative; margin: 0; padding: 0; list-style: none; display: grid; gap: 14px; }
+  .lab-tl::before { content: ''; position: absolute; left: 5px; top: 6px; bottom: 6px; width: 1px; background: var(--s2s-rule-emphasis); }
+  .lab-tl__item { --tone: var(--s2s-accent); position: relative; padding-left: 24px; }
+  .lab-tl__item--release { --tone: var(--s2s-status-ok); }
+  .lab-tl__item--correction { --tone: var(--s2s-status-warn); }
+  .lab-tl__item--withdrawal { --tone: var(--s2s-status-danger); }
+  .lab-tl__item--review { --tone: var(--s2s-status-info); }
+  .lab-tl__dot { position: absolute; left: 0; top: 4px; width: 11px; height: 11px; border-radius: 50%; border: 2px solid var(--tone); background: var(--s2s-canvas); }
+  .lab-tl__item--release .lab-tl__dot, .lab-tl__item--correction .lab-tl__dot { background: var(--tone); }
+  .lab-tl__meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; margin: 0; font: 400 var(--type-micro) / 1.4 var(--font-mono); color: var(--s2s-ink-subtle); }
+  .lab-tl__kind { font-family: var(--font-sans); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: var(--tone); }
+  .lab-tl__meta code { font: inherit; }
+  .lab-tl__label { margin: 2px 0 0; font: 400 var(--type-body-s) / 1.4 var(--font-sans); color: var(--s2s-ink); }
+  .lab-tl__note { margin: 2px 0 0; font: 400 var(--type-meta) / 1.5 var(--font-sans); color: var(--s2s-ink-muted); }
+</style>
