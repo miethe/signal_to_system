@@ -15,13 +15,13 @@ if (!path) {
 >
   <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-16 sm:py-20">
     <header class="mb-12">
-      <p class="mb-3 text-xs font-medium uppercase tracking-widest text-[var(--text-disabled)]">
+      <p class="mb-3 text-xs font-medium uppercase tracking-widest text-[var(--s2s-ink-muted)]">
         Reading path
       </p>
-      <h1 class="font-serif text-4xl font-bold tracking-tight text-[var(--text-primary)] sm:text-5xl mb-6">
+      <h1 class="font-serif text-4xl font-bold tracking-tight text-[var(--s2s-ink)] sm:text-5xl mb-6">
         {path.umbrellaTerm}
       </h1>
-      <p class="text-lg leading-relaxed text-[var(--text-secondary)]">
+      <p class="text-lg leading-relaxed text-[var(--s2s-ink-muted)]">
         {path.rationale}
       </p>
     </header>
@@ -30,7 +30,7 @@ if (!path) {
       {path.steps.map((step, i) => {
         const isPublished = step.state === 'published' && step.slug;
         return (
-          <li class="rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-6">
+          <li class="rounded-xl border border-[var(--s2s-rule)] bg-[var(--s2s-surface)] p-6">
             <div class="flex flex-wrap items-center gap-3">
               <span class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-violet-100 text-sm font-semibold text-violet-700 dark:bg-violet-900/40 dark:text-violet-300">
                 {i + 1}
@@ -38,12 +38,12 @@ if (!path) {
               {isPublished ? (
                 <a
                   href={`/essays/${step.slug}/`}
-                  class="text-lg font-semibold text-[var(--text-primary)] hover:text-violet-600 dark:hover:text-violet-400"
+                  class="text-lg font-semibold text-[var(--s2s-ink)] hover:text-violet-600 dark:hover:text-violet-400"
                 >
                   {step.title}
                 </a>
               ) : (
-                <span class="text-lg font-semibold text-[var(--text-primary)]">{step.title}</span>
+                <span class="text-lg font-semibold text-[var(--s2s-ink)]">{step.title}</span>
               )}
               {!isPublished && (
                 <span class="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">
@@ -51,7 +51,7 @@ if (!path) {
                 </span>
               )}
             </div>
-            <p class="mt-2 pl-10 text-sm leading-relaxed text-[var(--text-secondary)]">
+            <p class="mt-2 pl-10 text-sm leading-relaxed text-[var(--s2s-ink-muted)]">
               {step.whatItAnswers}
             </p>
           </li>
@@ -59,7 +59,7 @@ if (!path) {
       })}
     </ol>
 
-    <p class="mt-12 text-sm leading-relaxed text-[var(--text-tertiary)]">
+    <p class="mt-12 text-sm leading-relaxed text-[var(--s2s-ink-muted)]">
       This path runs through several series that continue on their own, in parallel:{' '}
       <a href="/series/governed-agentic-sdlc/" class="text-violet-600 hover:underline dark:text-violet-400">Governed Agentic SDLC</a>,{' '}
       <a href="/series/ai-workflows/" class="text-violet-600 hover:underline dark:text-violet-400">AI Workflows</a>,{' '}
