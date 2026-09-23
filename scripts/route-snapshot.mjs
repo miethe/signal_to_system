@@ -27,6 +27,12 @@ if (process.argv.includes('--write')) {
   const manifest = JSON.parse(await readFile('docs/project_plans/s2s-v2/migration-manifest.json', 'utf8'));
   const snapshot = JSON.parse(await readFile(snapshotPath, 'utf8'));
   const manifestRoutes = manifest.routes.map(({ path }) => path).sort();
+  const redirectRoutes = manifest.routes.filter(({ action }) => action === 'redirect').map(({ path }) => path);
+  assert.deepEqual(
+    redirectRoutes.filter((path) => !routeList.includes(path)),
+    [],
+    'redirect sources are missing from build output',
+  );
   assert.equal(new Set(manifestRoutes).size, manifestRoutes.length, 'manifest has duplicate paths');
   assert.deepEqual(routeList, manifestRoutes, 'built routes differ from migration manifest');
   assert.deepEqual(routeList, snapshot.routes.slice().sort(), 'built routes differ from route snapshot');

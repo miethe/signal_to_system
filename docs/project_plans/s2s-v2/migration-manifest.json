@@ -8,7 +8,7 @@
   },
   "policy": {
     "defaultAction": "preserve",
-    "redirects": "None are authorized by this baseline. Future redirects require collision, chain, and loop tests.",
+    "redirects": "None are authorized by this baseline. A route with action \"redirect\" must declare target as an existing canonical path; collision, chain, loop, and dangling-target tests are required.",
     "fragments": "Fragment identifiers are client-side anchors and are not emitted as separate files."
   },
   "routes": [
