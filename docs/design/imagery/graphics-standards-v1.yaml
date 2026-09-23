@@ -33,8 +33,8 @@ schemes:
       surface: --s2s-surface; observatory.css:114
       ink: --s2s-ink; observatory.css:125
       muted: --s2s-ink-muted; observatory.css:127
-      accent-1: --s2s-accent; observatory.css:131
-      accent-2: --s2s-viz-5; observatory.css:152   # copper; NOT --s2s-secondary (sage reads as ok)
+      accent-1: decided by design-language package  # do not select violet or copper for dark imagery
+      accent-2: --s2s-viz-5; observatory.css:152   # existing reference only; copper is current paper-light precedent, not a dark decision
       accent-3..6: --s2s-viz-1..4, -6; observatory.css:148-153
       rule: --s2s-viz-grid, --s2s-rule; observatory.css:154, 120
       highlight: --s2s-accent-strong; observatory.css:133
@@ -148,4 +148,4 @@ token_package_interface:
   must_not_decide: [class set, form set, scheme per class, pair placement, safe areas, text-baking rules, state semantics, registry wave structural templates]
 
 brief_fields: [id, surface, class, form, purpose, placement, scheme, variant_policy, ratio_and_master, template, focal_subject, exact_text, live_html_copy, safe_areas, accessibility, acceptance_checks]
-templates: [atelier-hero, serial-plate, comparison-plate, thesis-plate, social-art]
+templates: [atelier-hero (Registry Wave only), subject-hero, serial-plate, comparison-plate, thesis-plate, social-art]

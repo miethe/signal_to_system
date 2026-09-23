@@ -107,18 +107,13 @@ left sitting beside the new family.
 
 ## 5. Questions only Nick can answer
 
-1. **Is the atelier scene the house hero for every essay, or Registry Wave's alone?** I made it
-   the house hero because you asked for alignment with Registry Wave. The alternative is a
-   thesis-plate hero (like `some-copies-must-change.png`) for the more abstract essays.
-2. **Should copper stay the imagery accent in dark mode, instead of the site's violet?** I kept
-   copper (`--s2s-viz-5`) so a hero and its twin read as one family. Violet would tie the night
-   twins closer to the site UI and further from the Registry Wave.
-3. **Are the corner stacks brand furniture or per-essay?** The Registry Wave words (`IDEAS /
-   SYSTEMS / EVIDENCE / OUTCOMES`, `A MORE CAPABLE TOMORROW`) echo the v2 mockups' own corner text
-   (`A QUIETER BRIGHTER TOMORROW`). I wrote per-essay stacks. If these are the site's voice, they
-   should be one fixed set everywhere.
-4. **Can the deck provenance go?** The AOF essay's source note says it is built from your deck.
+1. **Is the atelier scene the house hero for every essay, or Registry Wave's alone?**
+   **Resolved 2026-09-23:** Registry Wave alone uses the studio/atelier hero. Every other essay gets a subject-specific hero within the shared plate/ringed-node/serif-title family.
+2. **Should copper stay the imagery accent in dark mode, instead of the site's violet?**
+   **Resolved 2026-09-23:** Neither is selected. Retain the `accent-1` role; its dark-mode value is **decided by design-language package**. Copper remains only the current paper-light reference.
+3. **Are the corner stacks brand furniture or per-essay?**
+   **Resolved 2026-09-23:** Per-essay. Each storyboard lists its exact subject-tied corner-word set verbatim; Registry Wave's set is not reused.
+4. **Can the deck provenance go?** **OPEN.** The AOF essay's source note says it is built from your deck.
    The plan cuts two deck slides and redraws the rest. Is losing the "original deck frame" OK?
-5. **Should social cards be built or bespoke?** Built means approving the small `render.ts`
-   change so the build composites per-post art under a live title. Bespoke means baked-text cards
-   made by the generator.
+5. **Should social cards be built or bespoke?**
+   **Resolved 2026-09-23:** Build art-only plates. The site OG renderer composites titles live; a later `render.ts` change must resolve per-post art with fallback. Do not generate baked-text cards.

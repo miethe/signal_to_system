@@ -28,48 +28,40 @@ plates below use the essay's own four failure modes and its own three-transition
 
 ---
 
-## pp-hero — the fast benches and the narrow door
+## pp-hero — the fast lanes and the narrow gate
 
 | Field | Value |
 |---|---|
 | class / surface | hero / essay |
-| template | T1 atelier-hero + §3 night twin |
+| template | T1b subject-hero + §3 night twin |
 | scheme / variant | paper-light master + signal-dark twin / dark+light pair |
 | master | 16:9, 2400x1350 |
 | exact text | none |
 | targets | `public/images/governed-agentic-sdlc-01/hero/governed-agentic-sdlc-01--hero--narrow-door--{paper-light,signal-dark}.{avif,webp}` |
 
-**Purpose:** the paradox in one scene: the gains are real at the bench and do not arrive at
-delivery, because the system around the tools was sized for the old speed.
+**Anchor:** task-level gains are real, but delivery throughput remains constrained by the surrounding system.
 
-**Composition:**
-- Foreground and midground: four or five workers at benches, calm and competent, each with a
-  generous, tidy stack of finished cubes (the task-level gains are real, not a mess).
-- Background centre: a single narrow doorway or hatch in the back wall, one reviewer beside it
-  with a clipboard, a small orderly queue of cubes waiting on a narrow table in front of it.
-- **Overlay (focal):** from each bench a fast, confident ink line sweeps toward the door; the lines
-  converge into one reticle at the doorway where their copper waypoints bunch up and overlap. Past
-  the door, a single thin line continues, carrying one cube.
-- Tone: observational, not comic. No one is panicking; the geometry carries the point.
-- Crop safety: door, reviewer, and convergence reticle sit on the centre vertical.
+**Purpose:** a subject-specific throughput diagram in an architectural threshold, not an atelier: abundant parallel work converges on one governed passage.
 
-```
+**Strings:** none (hero text is live HTML).
+
+**Composition:** Four broad, parallel paper lanes enter from left and right, each carrying orderly small cube tokens. They curve into one narrow central gate reticle set in a plain wall-like threshold; beyond it, only one thin verified line continues. The foreground is a sparse instrument field, not a workspace: no benches, desks, workers, or factory machinery. The in-air `hero-overlay` makes the convergence explicit with dotted-orbit reticles, tick marks, and tightly grouped waypoint rings at the gate. Keep gate and convergence at frame centre.
+
+```text
 +----------------------------------------------------------------------+
-|        \    \      |      /    /     (ink lines converge in the air)  |
-|         \    \   (o@@o)  /    /      waypoints bunch at one reticle   |
-|   [bench+cubes]  |door|  [bench+cubes]                                |
-|  [bench+cubes]  queue+reviewer  [bench+cubes]                         |
+| [ ]====>                     ( gate reticle )                  <====[ ] |
+| [ ]====>====o====o===============||===============o====o====<====[ ]    |
+|                         one verified line -->                         |
 +----------------------------------------------------------------------+
 ```
 
-**Prompt (after T1):** as composed above; cubes in accent-1 cobalt at the benches, one copper
-cube passing through the door; the convergence is the most saturated point in the frame.
+**Prompt (after T1b):** warm-paper editorial subject hero, four clean parallel delivery lanes carrying small cube tokens converge through one narrow central governed gate in a quiet architectural threshold; one thin verified line continues beyond; crisp deep-ink ringed reticle overlay with dotted orbits, ticks, curved connectors, and bunched waypoint rings; sparse and observational, no people or studio; paper-light observed Registry Wave accents only.
 
-**Negative (after T1):** factories, conveyor belts, robots, chaos, people in distress, clocks,
-warning signs.
+**Negative (after T1b):** studio, atelier, benches, desks, workers, factories, conveyor belts, robots, chaos, clocks, warning signs.
 
-**Night twin:** §3; lamps over each bench; the doorway is the brightest opening.
-**Alt:** decorative (empty). **Checks:** "plenty made, little shipped" reads before detail; no text.
+**Night twin:** §3; practical light concentrates at the gate only. The signal-dark `accent-1` value is decided by design-language package.
+
+**Acceptance:** “plenty enters, little ships” reads before detail; gate is central; no text or people; no atelier staging; centred crops retain the convergence; twin geometry matches master.
 
 ---
 
@@ -175,4 +167,4 @@ generates, and each output leaves verified."
 
 1520x1260, signal-dark, no text, from the approved `pp-hero` night twin: recompose with the lit
 doorway and convergence reticle in the right 60%. Target:
-`public/images/governed-agentic-sdlc-01/social/governed-agentic-sdlc-01--social-card--art.jpg`.
+`public/images/governed-agentic-sdlc-01/social/governed-agentic-sdlc-01--social-card--art.jpg`. This is an art-only plate: no baked title, mark, or other text. The later per-post-art dependency in `src/lib/og/render.ts` preserves live title composition.

@@ -13,7 +13,7 @@ standards_reference: docs/design/imagery/graphics-standards-v1.yaml
 # pairs: a hero listed as "dark+light pair" is two renders; the signal-dark half is an EDIT of the approved paper-light half.
 dependencies:
   - id: og-per-post-art
-    what: src/lib/og/render.ts loads one fixed image (:118); social art needs a per-post art path with fallback
+    what: src/lib/og/render.ts loads one fixed image (:118); later work must resolve a per-post art path with fallback while preserving live title composition; social assets are art-only
     blocks: [aof-social, pp-social, contract-social, rw-social]
   - id: mdx-renumber
     what: agentic-operations-flow Figures 01-02 are cut and 03-07 renumber to 01-05; new Figures added in the-contract-is-the-work
@@ -22,7 +22,7 @@ dependencies:
 assets:
 
   # ── agentic-operations-flow ─────────────────────────────────────────────
-  - {id: aof-hero, essay: agentic-operations-flow, class: hero, template: atelier-hero, scheme: paper-light+signal-dark, variant: "dark+light pair", ratio: "16:9", master_px: 2400x1350, status: replace-existing, priority: 1,
+  - {id: aof-hero, essay: agentic-operations-flow, class: hero, template: subject-hero, scheme: paper-light+signal-dark, variant: "dark+light pair", ratio: "16:9", master_px: 2400x1350, status: replace-existing, priority: 1,
      replaces: public/assets/posts/agentic-operations-flow/hero-artifact-graph.jpg,
      target: "public/images/agentic-operations-flow/hero/agentic-operations-flow--hero--transcript-to-graph--{paper-light,signal-dark}.{avif,webp}", storyboard: agentic-operations-flow.md}
   - {id: aof-plate-01-triage, essay: agentic-operations-flow, class: figure, form: plate, template: serial-plate, scheme: paper-light, variant: single, ratio: "16:9", master_px: 2000x1125, status: replace-existing, priority: 2,
@@ -45,7 +45,7 @@ assets:
   # cut: deck/slide-04-work-is-a-graph.jpg (Fig 01) and deck/slide-05-operating-loop.jpg (Fig 02); hero + interactive carry them
 
   # ── governed-agentic-sdlc-01-productivity-paradox ──────────────────────
-  - {id: pp-hero, essay: governed-agentic-sdlc-01-productivity-paradox, class: hero, template: atelier-hero, scheme: paper-light+signal-dark, variant: "dark+light pair", ratio: "16:9", master_px: 2400x1350, status: replace-existing, priority: 1,
+  - {id: pp-hero, essay: governed-agentic-sdlc-01-productivity-paradox, class: hero, template: subject-hero, scheme: paper-light+signal-dark, variant: "dark+light pair", ratio: "16:9", master_px: 2400x1350, status: replace-existing, priority: 1,
      replaces: public/assets/posts/governed-agentic-sdlc-01/hero-02-missing-layer.jpeg,
      target: "public/images/governed-agentic-sdlc-01/hero/governed-agentic-sdlc-01--hero--narrow-door--{paper-light,signal-dark}.{avif,webp}", storyboard: governed-agentic-sdlc-01-productivity-paradox.md}
   - {id: pp-plate-01-failures, essay: governed-agentic-sdlc-01-productivity-paradox, class: figure, form: plate, template: serial-plate, scheme: paper-light, variant: single, ratio: "16:9", master_px: 2000x1125, status: replace-existing, priority: 2,
@@ -61,7 +61,7 @@ assets:
      target: public/images/governed-agentic-sdlc-01/social/governed-agentic-sdlc-01--social-card--art.jpg, storyboard: governed-agentic-sdlc-01-productivity-paradox.md}
 
   # ── the-contract-is-the-work ────────────────────────────────────────────
-  - {id: contract-hero, essay: the-contract-is-the-work, class: hero, template: atelier-hero, scheme: paper-light+signal-dark, variant: "dark+light pair", ratio: "16:9", master_px: 2400x1350, status: replace-existing, priority: 1,
+  - {id: contract-hero, essay: the-contract-is-the-work, class: hero, template: subject-hero, scheme: paper-light+signal-dark, variant: "dark+light pair", ratio: "16:9", master_px: 2400x1350, status: replace-existing, priority: 1,
      replaces: "public/assets/posts/the-contract-is-the-work/hero-maturity-model.svg (hero slot only; idea moves inline)",
      target: "public/images/the-contract-is-the-work/hero/the-contract-is-the-work--hero--one-sheet--{paper-light,signal-dark}.{avif,webp}", storyboard: the-contract-is-the-work.md}
   - {id: contract-plate-01-handoff, essay: the-contract-is-the-work, class: figure, form: plate, template: comparison-plate, scheme: paper-light, variant: single, ratio: "16:9", master_px: 2000x1125, status: optional-net-new, priority: 2,
@@ -79,7 +79,7 @@ assets:
   # social: reuses contract-social
 
   # ── the-registry-wave-agentic-artifact-supply-chain ────────────────────
-  - {id: rw-hero-governed-cube, essay: the-registry-wave-agentic-artifact-supply-chain, class: hero, scheme: paper-light, variant: "dark+light pair (paper-light half)", status: existing-exemplar,
+  - {id: rw-hero-governed-cube, essay: the-registry-wave-agentic-artifact-supply-chain, class: hero, template: atelier-hero, scheme: paper-light, variant: "dark+light pair (paper-light half)", status: existing-exemplar,
      path: public/assets/posts/the-registry-wave-agentic-artifact-supply-chain/hero-governed-cube.png, storyboard: the-registry-wave-agentic-artifact-supply-chain.md}
   - {id: rw-hero-night, essay: the-registry-wave-agentic-artifact-supply-chain, class: hero, template: night-twin edit of rw-hero-governed-cube, scheme: signal-dark, variant: "dark+light pair (signal-dark half)", ratio: "16:9", master_px: 2400x1350, status: required-net-new, priority: 1,
      target: "public/images/the-registry-wave-agentic-artifact-supply-chain/hero/the-registry-wave-agentic-artifact-supply-chain--hero--governed-cube--signal-dark.{avif,webp}", storyboard: the-registry-wave-agentic-artifact-supply-chain.md}

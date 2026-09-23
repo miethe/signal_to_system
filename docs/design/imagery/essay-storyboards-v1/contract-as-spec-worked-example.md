@@ -14,6 +14,14 @@ own link-preview art; standards §2 allow reuse).
 
 ---
 
+## Family constants
+
+- Template: T2 plate frame, paper-light, single. Eyebrow: `THE CONTRACT IS THE WORK · COMPANION`.
+- Corner stacks (verbatim): TL `CLAIM / CRITERIA / EVIDENCE / VERIFIER` · TR `ONE EXAMPLE / BOUND TO / ITS PROOF` · BL `SOURCE / TRACE / CHECK / DECIDE` · BR `PENDING / VERIFIED / ACCEPT / REUSE`.
+- Footer: `5 OF 6 VERIFIED · EV-01 CORROBORATING, NOT BLOCKING`.
+
+---
+
 ## worked-plate-claim-binding (optional, new)
 
 | Field | Value |

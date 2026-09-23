@@ -21,51 +21,40 @@ DECIDER` · BR `CLAIM / VERIFY / ACCEPT / REUSE`.
 
 ---
 
-## contract-hero — one sheet down the table
+## contract-hero — one binding sheet
 
 | Field | Value |
 |---|---|
 | class / surface | hero / essay |
-| template | T1 atelier-hero + §3 night twin |
+| template | T1b subject-hero + §3 night twin |
 | scheme / variant | paper-light master + signal-dark twin / dark+light pair |
 | master | 16:9, 2400x1350 |
 | exact text | none |
 | targets | `public/images/the-contract-is-the-work/hero/the-contract-is-the-work--hero--one-sheet--{paper-light,signal-dark}.{avif,webp}` |
 
-**Purpose:** specialists, verifiers, and decision-makers share one document instead of three
-separate descriptions of it.
+**Anchor:** one binding document replaces separate descriptions as work passes from intent to verification to authority.
 
-**Composition:**
-- One long drafting table crosses the lower half. A single very long sheet of drawing paper is
-  unrolled along its whole length.
-- Four people work on the **same sheet** at different points along it: one drafting at the left
-  end, one building a small model from the drawing, one inspecting a detail with a loupe, one at
-  the right end holding a stamp above a marked box on the sheet, about to decide.
-- **Overlay (focal):** a clean ink band drawn in the air, running parallel above the sheet, with
-  four dashed-circle badges spaced along it (a target, a checklist, a magnifier, a stamp as icons).
-  Dashed drop-lines tie each badge to its person's hands on the sheet. Copper waypoints along the
-  band.
-- The point is *one* sheet: no second document anywhere in the scene.
-- Crop safety: the loupe inspector and the band's midpoint sit near centre.
+**Purpose:** a subject-specific contract landscape, not an atelier: one continuous sheet holds four obligations in a single governed path.
 
-```
+**Strings:** none (hero text is live HTML).
+
+**Composition:** A single long sheet crosses a quiet warm-paper field from left to right, folded into four connected stations without becoming four documents. A target, checklist, loupe, and stamp sit as small physical marks on the same sheet. Directly above, a parallel `hero-overlay` carries four ringed reticle nodes with dotted orbits, tick marks, and waypoint rings; dashed drop-lines bind each node to its mark. The sheet’s unbroken centreline is the focal object. No people, table, room, or studio.
+
+```text
 +----------------------------------------------------------------------+
-|     (o)--o--------(o)--o--------(o)--o--------(o)    ink band        |
-|      :             :             :             :                      |
-|  [drafter]     [model-maker]  [inspector]   [decider+stamp]           |
-|  ====================== one long sheet ===========================   |
+|     (target)--o--(checklist)--o--(loupe)--o--(stamp)                |
+|        :             :              :           :                    |
+| ======= one continuous binding sheet through four stations ========= |
 +----------------------------------------------------------------------+
 ```
 
-**Prompt (after T1):** as composed; the sheet is the continuous element tying all four;
-accent-1 cobalt on the model, accent-2 copper on the stamp and waypoints.
+**Prompt (after T1b):** warm-paper editorial subject hero, one continuous binding sheet crossing a quiet field and folding through target, checklist, loupe, and stamp stations; no separate papers; crisp deep-ink ringed reticle overlay with dotted orbits, ticks, curved connectors, waypoint rings, and dashed drop-lines; sparse, precise, material paper texture; no people, room, or studio; paper-light observed Registry Wave accents only.
 
-**Negative (after T1):** handshakes, legal paperwork, signatures, gavels, multiple documents,
-people passing papers hand to hand.
+**Negative (after T1b):** studio, atelier, drafting table, people, handshakes, legal paperwork, signatures, gavels, multiple documents, legible text.
 
-**Night twin:** §3; one lamp per person, the sheet glows faintly where each lamp falls.
-**Alt:** decorative (empty). **Checks:** exactly one document in frame; four roles legible by
-action; no text.
+**Night twin:** §3; retain the sheet and all four marks exactly. The signal-dark `accent-1` value is decided by design-language package.
+
+**Acceptance:** exactly one document; four roles read through marks rather than labels; no text; no atelier staging; central crops retain the sheet midpoint; twin geometry matches master.
 
 ---
 
@@ -136,4 +125,4 @@ a strict ladder. Stages four to six are bracketed as frontier at organizational 
 
 1520x1260, signal-dark, no text, recropped from the approved `contract-hero` night twin with the
 inspector and decider in the right 60%. Target:
-`public/images/the-contract-is-the-work/social/the-contract-is-the-work--social-card--art.jpg`.
+`public/images/the-contract-is-the-work/social/the-contract-is-the-work--social-card--art.jpg`. This is an art-only plate: no baked title, mark, or other text. The later per-post-art dependency in `src/lib/og/render.ts` preserves live title composition.

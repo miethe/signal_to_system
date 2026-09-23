@@ -69,9 +69,7 @@ schemes:
 
 ### 3.1 Role slots
 
-Role names are shared by both schemes. signal-dark cites the existing Observatory token (dark
-block, `observatory.css`). paper-light names the role the Registry Wave plates actually use;
-values are for the design-language package.
+Role names are shared by both schemes. signal-dark references existing Observatory roles where they are already settled; its `accent-1` value is **decided by design-language package**. paper-light names the role the Registry Wave plates actually use; values are for the design-language package.
 
 | Role | Job in an image | signal-dark token | paper-light (observed in Registry Wave; value TBD) |
 |---|---|---|---|
@@ -79,8 +77,8 @@ values are for the design-language package.
 | surface | cards/panels inside the image | `--s2s-surface` (:114) | lifted paper, one step off ground |
 | ink | titles, node rings, primary lines | `--s2s-ink` (:125) | deep navy |
 | muted | sub-labels, secondary copy | `--s2s-ink-muted` (:127) | slate navy |
-| accent-1 | primary mark: active path, focus, governed solids | `--s2s-accent` (:131) | cobalt blue (hero cubes, lineage arrows) |
-| accent-2 | **the one semantic accent**: beat number, accent phrase, waypoint centre | `--s2s-viz-5` (:152) | copper to rust |
+| accent-1 | primary mark: active path, focus, governed solids | **decided by design-language package** | cobalt blue (current Registry Wave paper-light reference) |
+| accent-2 | **the one semantic accent**: beat number, accent phrase, waypoint centre | `--s2s-viz-5` (:152), current token reference only | copper to rust (current Registry Wave paper-light reference) |
 | accent-3..6 | categorical series only | `--s2s-viz-1..4, -6` (:148-153) | TBD |
 | rule | hairlines, dotted orbits, grid | `--s2s-viz-grid` (:154), `--s2s-rule` (:120) | navy hairline at low opacity |
 | highlight | a lit fill behind one element | `--s2s-accent-strong` (:133) | pale wash of accent-1 |
@@ -92,10 +90,7 @@ values are for the design-language package.
 
 Two corrections to the first draft, both deliberate:
 
-1. **accent-2 is not `--s2s-secondary`.** In the site, `--s2s-secondary` is sage green and means
-   "quiet structural link" (`reader.css` `--reader-link`). In an image, green already means
-   `state-ok`; a green accent would read as a verdict. The Registry Wave accent is copper, whose
-   nearest dark token is `--s2s-viz-5`.
+1. **The dark imagery `accent-1` is not selected here.** Its value is **decided by design-language package**; do not infer violet from `--s2s-accent` or copper from Registry Wave. Copper remains the current paper-light Registry Wave reference. `--s2s-secondary` is sage green and remains unsuitable for the semantic imagery accent because green already means `state-ok`.
 2. **paper-light is not an alias of the site's light mode.** The site's derived light tokens
    (`observatory.css:21-79`) are violet-on-grey UI colors; the plates are navy-and-copper on warm
    paper. Aliasing one to the other would repaint every plate the day the UI palette moves.
@@ -152,9 +147,7 @@ Naming: `<slug>--<class>--<purpose>--<scheme>.<ext>`; omit `--<scheme>` for `sin
 | spot | 1:1/3:2/natural; 512x512 raster maximum. | SVG preferred, `currentColor`, transparent, 8% breathing room. | `src/assets/icons/`, `src/assets/ornaments/`, or `public/images/.../spots/`; SVG 30 KB, raster 60 KB. | Decorative empty alt/aria-hidden; controls own functional labels. |
 | social-card (art) | **1520x1260 art plate** (the 760x630 right panel the renderer places, at 2x). | PNG/JPEG; signal-dark; focal subject in the right 60% of the plate; left 20% may be veiled to ground (`render.ts:166`). | `public/images/<slug>/social/`; 300 KB. | Renderer supplies title/description metadata. |
 
-The build renderer (`src/lib/og/render.ts:118`) currently loads one fixed image for every card;
-per-essay art needs a small renderer change (read a per-post art path, fall back to the current
-image). That change is out of scope here and is listed as a dependency in the manifest.
+Social-card assets are **art-only plates**: no baked title, mark, or other text. The site OG renderer composes the title live. The build renderer (`src/lib/og/render.ts:118`) currently loads one fixed image for every card; per-essay art needs a later small renderer change (read a per-post art path, fall back to the current image while preserving live-title composition). That change is out of scope here and is listed as a dependency in the manifest.
 
 Use lowercase kebab-case. Do not add new root `public/assets/` files. Existing oversized legacy
 inventory is current state, not prospective compliance.
@@ -223,7 +216,7 @@ brief:
   scheme: <signal-dark|paper-light>
   variant_policy: <single|dark+light pair>
   ratio_and_master: <ratio and pixels>
-  template: <atelier-hero|serial-plate|comparison-plate|thesis-plate|social-art>
+  template: <atelier-hero (Registry Wave only)|subject-hero|serial-plate|comparison-plate|thesis-plate|social-art>
   focal_subject: <subject and hierarchy>
   exact_text: <verbatim strings, or "none">
   live_html_copy: <what must not be baked>

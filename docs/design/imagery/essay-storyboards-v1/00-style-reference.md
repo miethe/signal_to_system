@@ -43,7 +43,7 @@ swaps in the SVG twins. The PNG plates are the crafted language Nick pointed at.
   ungoverned past); right, a fan of documents (the outputs).
 - **Why it works:** the metaphor is a *scene with a diagram in it*. Human craft below, the
   governing structure above, no words anywhere. The overlay is the only saturated element: ink and
-  accent-1 cobalt for governed solids, accent-2 copper on one cube and the waypoints.
+  paper-light accent-1 cobalt for governed solids, paper-light accent-2 copper on one cube and the waypoints.
 - **Density:** six focal elements. Large calm areas of paper.
 
 ### 2.2 The serial plate — threads 01-06 (template: serial-plate)
@@ -103,23 +103,15 @@ some accent-1, some accent-2. Eyebrow at the bottom. Precision-instrument feel, 
 
 ## 3. Night twin recipe (paper-light hero to signal-dark hero)
 
-Every essay hero is delivered as a pair (standards §4). The twin is **the same drawing at night**,
-not a new image:
+Every essay hero is delivered as a pair (standards §4). The twin is **the same composition at night**, not a new image. The Registry Wave atelier has windows and desk lamps; subject-specific heroes use the equivalent background and practical-light treatment described in their board.
 
-1. **Same camera, same composition, same figures, same overlay geometry.** Generate the twin by
-   editing the approved paper-light master, never from the prompt alone.
-2. **Sky:** windows and any open background show a deep violet-to-ink night sky with a light
-   scatter of stars, the Observatory register of the v2 site mockups (`01-site-mockups/*`).
-3. **Interior light:** the room drops to ground-dark; warm pools from desk lamps light each
-   worker's hands and object. Paper textures stay visible, just unlit.
-4. **Overlay:** the in-air diagram becomes pale ink linework (ink role) with a soft glow;
-   accent-1 governed solids lean toward the site accent (violet-blue); waypoints stay accent-2
-   copper, now glowing. It must stay the brightest, crispest element.
-5. **Contrast:** overlay lines >= 3:1 against the dark surround; faces and hands readable.
-6. **Nothing added, nothing removed.** If the twin needs a new element to read, the master is wrong.
+1. **Same camera, same composition, same objects, same overlay geometry.** Generate the twin by editing the approved paper-light master, never from the prompt alone.
+2. **Ground and practical light:** move the surrounding field to signal-dark and retain readable paper/material texture under the board-specific practical lights.
+3. **Overlay:** the diagram becomes pale ink linework with a soft glow. The actual dark-mode `accent-1` value is **decided by design-language package**; do not select violet or copper. Copper remains only the current paper-light Registry Wave reference.
+4. **Contrast:** overlay lines >= 3:1 against the dark surround; the focal object remains readable.
+5. **Nothing added, nothing removed.** If the twin needs a new element to read, the master is wrong.
 
-Social art (standards §5) is cut from the approved night twin: recompose to a 1520x1260 plate
-with the overlay hub or the key object in the right 60%.
+Social art (standards §5) is cut from the approved night twin: recompose to a 1520x1260 **art-only** plate with the focal object in the right 60%. No title, mark, or other text is baked; the site OG renderer composes the title live.
 
 ---
 
@@ -127,9 +119,9 @@ with the overlay hub or the key object in the right 60%.
 
 Storyboards reference a template by name and then give only what is specific to the board.
 
-### T1 atelier-hero
+### T1 atelier-hero — Registry Wave only
 
-> Editorial illustration, pencil drawing with loose watercolor wash on warm cream paper, daylit
+> **Registry Wave only.** Editorial illustration, pencil drawing with loose watercolor wash on warm cream paper, daylit
 > architectural studio, calm and spacious. People at work in the lower half, drawn with care and
 > individuality, doing real craft with physical objects. Above them, drawn in the air in crisp
 > deep-navy ink, a sparse technical diagram that explains what they are doing: thin curved lines,
@@ -142,6 +134,14 @@ Storyboards reference a template by name and then give only what is specific to 
 Negative (all heroes): text, lettering, numbers, logos, screens with UI, robots, glowing
 brains, circuit boards, stock-office clichés, neon, dark background (master), photorealism, 3D
 render, isometric blocks, more than six focal elements.
+
+
+### T1b subject-hero — non-Registry-Wave essays
+
+> Editorial illustration on warm paper with the Registry Wave family’s sparse deep-ink `hero-overlay`: ringed reticle nodes, dotted orbits with ticks, thin curved connectors, and waypoint rings. Build the **essay-specific subject and setting** from its storyboard; do not stage people at drafting tables, a studio, or the Registry Wave governed-cube scene. No text, letters, numbers, logos, UI, robots, or decorative filler. Keep the centre-third and centred-square crops meaningful. The paper-light reference may describe cobalt and copper as observed Registry Wave rendering; the signal-dark `accent-1` value is decided by design-language package.
+
+Negative (all subject heroes): text, lettering, numbers, logos, screens with UI, robots, glowing brains, circuit boards, stock-office clichés, neon, photorealism, 3D render, isometric blocks, more than six focal elements.
+
 
 ### T2 serial-plate
 
@@ -225,6 +225,4 @@ lorem ipsum.
 ## 6. Role slots
 
 Use the role names in `../graphics-standards-v1.md` §3.1 (`ground`, `surface`, `ink`, `muted`,
-`accent-1`, `accent-2`, `rule`, `highlight`, `annotation`, `state-*`). The words "navy", "cobalt",
-"copper", "cream" in prompts describe the observed Registry Wave rendering of those roles for a
-generator that cannot read tokens; final values arrive with the design-language package.
+`accent-1`, `accent-2`, `rule`, `highlight`, `annotation`, `state-*`). The words "navy", "cobalt", "copper", "cream" in prompts describe the observed **paper-light** Registry Wave rendering for a generator that cannot read tokens; final values arrive with the design-language package. The signal-dark `accent-1` value is **decided by design-language package**.

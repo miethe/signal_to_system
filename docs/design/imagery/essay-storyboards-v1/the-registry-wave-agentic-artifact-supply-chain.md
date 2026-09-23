@@ -19,6 +19,14 @@ Cut from the first draft: `registry-threaded-control-loop`. The six-thread serie
 the lifecycle, a ring restating it adds nothing, the draft's layout, text and Mermaid disagreed
 on which stage loops back, and "illustration" was the wrong class for a labelled diagram.
 
+## Family constants (Registry Wave plates)
+
+- Eyebrow: `THE REGISTRY WAVE`.
+- Corner stacks (verbatim): TL `IDEAS / SYSTEMS / EVIDENCE / OUTCOMES` · TR `A MORE / CAPABLE / TOMORROW` · BL `PEOPLE / TOOLS / POLICY / INFRASTRUCTURE` · BR `TRUST / TRANSPARENCY / COMPOUNDING / VALUE`.
+- Footer tagline: `SAME LINEAGE. BRIGHTER OUTCOMES.`
+
+---
+
 ## Existing imagery documented as exemplars
 
 ### rw-hero-governed-cube (existing, exemplar)
@@ -285,10 +293,7 @@ flowchart LR
 | exact text | none |
 | target | `public/images/the-registry-wave-agentic-artifact-supply-chain/hero/the-registry-wave-agentic-artifact-supply-chain--hero--governed-cube--signal-dark.{avif,webp}` (the existing PNG becomes the `--paper-light` half) |
 
-**Recipe specifics:** windows at left show a violet night sky with a scatter of stars; the four
-workers are lit by warm desk lamps; the hub, arcs, and four badges become pale luminous ink with
-a soft glow; cobalt cubes lean violet-blue; the copper cube and waypoints glow copper. Plants,
-shelves, and foreground table stay, unlit. No element added or removed.
+**Recipe specifics:** windows at left move to the signal-dark ground supplied by the design-language package; the four workers are lit by warm desk lamps; the hub, arcs, and four badges become pale luminous ink with a soft glow. The actual dark-mode `accent-1` value is **decided by design-language package**; do not select violet or copper. Copper remains the current paper-light Registry Wave reference. Plants, shelves, and foreground table stay, unlit. No element added or removed.
 
 **Checks:** overlay aligns with the master when the two are toggled; overlay >= 3:1 on the dark
 surround; faces and hands readable; no text.
@@ -300,7 +305,7 @@ surround; faces and hands readable; no text.
 1520x1260, signal-dark, no text, recropped from the approved `rw-hero-night`: the hub and two
 right-hand badges with their workers in the right 60%. Target:
 `public/images/the-registry-wave-agentic-artifact-supply-chain/social/the-registry-wave-agentic-artifact-supply-chain--social-card--art.jpg`.
-The renderer (`src/lib/og/render.ts`) sets title and mark.
+This is an art-only plate: no baked title, mark, or other text. The later per-post-art dependency in `src/lib/og/render.ts` preserves live title composition.
 
 ---
 

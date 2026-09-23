@@ -52,49 +52,35 @@ board's own strings below.
 | Field | Value |
 |---|---|
 | class / surface | hero / essay |
-| template | T1 atelier-hero + §3 night twin |
+| template | T1b subject-hero + §3 night twin |
 | scheme / variant | paper-light master + signal-dark twin / dark+light pair |
 | master | 16:9, 2400x1350 |
 | exact text | none |
 | targets | `public/images/agentic-operations-flow/hero/agentic-operations-flow--hero--transcript-to-graph--{paper-light,signal-dark}.{avif,webp}` |
 
-**Purpose:** the essay's opening image: "a storage bin with a conversation attached" versus work
-that leaves durable artifacts behind.
+**Anchor:** `a storage bin with a conversation attached` versus durable work that can be routed, handed on, and evidenced.
 
-**Composition:**
-- A long studio workbench runs left to right across the lower half.
-- **Left third:** one person at the end of the bench unspooling an endless paper scroll (the
-  transcript). It curls off the bench and piles on the floor, loose and unread; its end fades into
-  the paper. No writing legible on it. Nothing from the overlay touches it.
-- **Centre and right:** four people at stations along the bench, each holding or working on a
-  distinct physical artifact: a folded charter, a drafting sheet, a small stack of three boxes, a
-  stamped sheet with a check. Each hands to the next.
-- **Overlay (focal):** above the four stations, five small reticle badges drawn in ink, joined by
-  curved lines with copper-centred waypoints, one badge over each station and a fifth at the right
-  holding a document-with-check. Dashed drop-lines from badges to hands. The overlay starts where
-  the scroll ends.
-- Crop safety: the overlay's centre badge sits at frame centre; the scroll may fall out of the
-  4:3 and 1:1 crops.
+**Purpose:** a subject-specific operations-map hero, not an atelier scene: one unstructured transcript becomes a bounded five-step artifact flow.
 
-```
+**Strings:** none (hero text is live HTML).
+
+**Composition:** On a warm-paper field, an oversized loose scroll enters from the far left and dissolves into a five-stop ink route across the centre. At the first reticle, the scroll resolves into five distinct physical artifact tokens: charter, sheet, bounded work stack, gate seal, checked record. Each sits in a quiet open field rather than a room or studio. Above, the sparse `hero-overlay` repeats the route with ringed reticles, dotted orbits, tick marks, curved connectors, and waypoint rings. Keep the first reticle and middle artifact centred for crops.
+
+```text
 +----------------------------------------------------------------------+
-|                 o~~~~o~~~~o~~~~o~~~~o       (ink overlay, in the air) |
-|                 :    :    :    :    :                                 |
-|  [scroll ~~~]   [ch] [sh] [bx] [st] [ev]                              |
-|  ~~~~ floor     === long workbench, four people handing along ===    |
+|             (01)--o--(02)--o--(03)--o--(04)--o--(05)               |
+| loose scroll --> [charter] [sheet] [work] [gate] [evidence]        |
+|              unstructured            durable route                  |
 +----------------------------------------------------------------------+
 ```
 
-**Prompt (after T1):** the scene above; the scroll is plain paper, the only unstructured thing
-in the room; the overlay is a clean line of five badges; accent-1 cobalt on the stack of boxes,
-accent-2 copper on the waypoints.
+**Prompt (after T1b):** warm-paper editorial subject hero, a loose blank transcript scroll resolving into a sparse five-step durable-artifact route; charter, drafting sheet, bounded stack, gate seal, checked record; crisp deep-ink ringed reticle overlay with dotted orbits, ticks, curved connectors and waypoint rings; calm empty field, no room, no desks, no people; paper-light observed Registry Wave accents only.
 
-**Negative (after T1):** chat bubbles, speech balloons, screens, legible writing on the scroll.
+**Negative (after T1b):** studio, atelier, drafting tables, workers, chat bubbles, speech balloons, screens, legible writing on the scroll.
 
-**Night twin:** §3; the scroll stays unlit and dim, the lamps fall on the four stations only.
+**Night twin:** §3; preserve every scroll curl, token, and overlay position. The signal-dark `accent-1` value is decided by design-language package.
 
-**Alt:** decorative (empty). **Checks:** reads as "loose scroll vs a line of handed-on objects"
-in two seconds; overlay is over the stations only; no text; twin matches master geometry.
+**Acceptance:** reads as “loose transcript becomes durable route” in two seconds; five reticles only; no text; no studio staging; centred 4:3 and 1:1 crops retain the middle route; twin geometry matches master.
 
 ---
 
@@ -262,5 +248,5 @@ validation record, run intelligence, human capsule and knowledge surface."
 | target | `public/images/agentic-operations-flow/social/agentic-operations-flow--social-card--art.jpg` |
 
 Recompose so the five-badge overlay sits in the right 60% and the lamplit stations below it;
-the scroll may be lost. The renderer (`src/lib/og/render.ts`) sets title and mark.
+the scroll may be lost. This is an art-only plate: no baked title, mark, or other text. The later per-post-art dependency in `src/lib/og/render.ts` preserves live title composition.
 **Checks:** no text; reads at 760x630; under 300 KB.

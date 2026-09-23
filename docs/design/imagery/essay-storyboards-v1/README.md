@@ -17,7 +17,8 @@ All under `public/assets/posts/the-registry-wave-agentic-artifact-supply-chain/`
 
 | Template | Attach |
 |---|---|
-| T1 atelier-hero | `hero-governed-cube.png` |
+| T1 atelier-hero (Registry Wave only) | `hero-governed-cube.png` |
+| T1b subject-hero (every non-Registry-Wave essay) | a T2/T3 reference for the shared plate, reticle, and serif-title family; follow the board-specific hero concept |
 | T2 serial-plate | `registry-wave-incident-resolution-flow.png`, `registry-wave-presence-vs-behavior.png` |
 | T3 comparison-plate | `agentic-os-artifact-estate-before-and-after.png` |
 | T4 thesis-plate | `some-copies-must-change.png` |
@@ -37,6 +38,8 @@ Never attach `not-every-difference-is-drift.png` (off-family type and frame) or 
 4. **Priority 4 — optional** (`worked-plate-claim-binding`, `rw-plate-not-every-difference`).
 
 ## Exact on-image text
+
+The studio/atelier staging is exclusive to **The Registry Wave**. Every other essay uses its board-specific subject hero, while retaining the shared plate/ringed-node/serif-title family.
 
 Every string under **Exact text** is verbatim: no paraphrase, no added punctuation, no
 synonyms, no omissions. If a string does not fit, reduce size or break at a word boundary. A
@@ -64,8 +67,8 @@ append `--<width>w` for responsive derivatives. Targets in `manifest.yaml` are a
 ## Out of scope
 
 - Final palette and type values (arrive with the design-language package). Prompts describe the
-  observed Registry Wave rendering ("navy", "copper", "cream", "serif") so a generator can see it;
-  those words are not token values.
-- Site build, MDX edits, figure renumbering, and the per-post OG renderer change
-  (`manifest.yaml` → `dependencies`).
+  observed Registry Wave paper-light rendering ("navy", "copper", "cream", "serif") so a generator can see it;
+  those words are not token values. The signal-dark `accent-1` value is **decided by design-language package**; do not choose violet or copper for it.
+- Site build, MDX edits, figure renumbering, and the later per-post OG renderer change
+  (`manifest.yaml` → `dependencies`). Social assets are art-only plates; that later `src/lib/og/render.ts` work resolves per-post art with fallback while the renderer composites titles live.
 - Promotion of the `rw-v2-features` SVG twins.
