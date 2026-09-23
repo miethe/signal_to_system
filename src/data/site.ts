@@ -40,15 +40,15 @@ export const site = {
    * so the nav never 404s; `match` lists the path prefixes that light the
    * item up. Swap `href` when the real section ships:
    *   Writing   -> /writing/   (M2, shipped; owns /essays and /dev-stories)
-   *   Labs      -> /labs/      (M3b)  interim /aos/ until the first real Lab
-   *             releases; /labs/ itself ships (honest empty state) and is matched.
+   *   Labs      -> /labs/      (M3b, shipped) lands on the honest empty state
+   *             until the first real Lab releases; /aos/ stays matched.
    *   Notebooks -> /notebooks/ (M3b)  HIDDEN until the section is real
    *             (Nick, 2026-09-23): see SHOW_NOTEBOOKS_NAV above.
    *   Studio    -> /studio/    (M1b+) interim /portfolio/ui/ (component library)
    */
   nav: [
     { label: "Writing", href: "/writing/", match: ["/writing", "/essays", "/dev-stories", "/series", "/tags", "/topics", "/start-here", "/glossary"] },
-    { label: "Labs", href: "/aos/", match: ["/labs", "/aos", "/systems", "/evidence", "/workflow-showcase"] },
+    { label: "Labs", href: "/labs/", match: ["/labs", "/aos", "/systems", "/evidence", "/workflow-showcase"] },
     { label: "Projects", href: "/projects/", match: ["/projects", "/portfolio/"], exclude: ["/portfolio/ui"] },
     ...(SHOW_NOTEBOOKS_NAV ? [{ label: "Notebooks", href: "/notebooks/", match: ["/notebooks"] }] : []),
     { label: "Studio", href: "/portfolio/ui/", match: ["/portfolio/ui", "/studio"] },
