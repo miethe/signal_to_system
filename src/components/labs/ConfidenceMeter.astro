@@ -1,0 +1,42 @@
+---
+/**
+ * ConfidenceMeter — the storyboard's "High confidence ●●●○" read as three
+ * dots plus the words. Qualitative only (spec 08: never a percentage), and
+ * "Confidence not assessed" is said out loud rather than drawn as zero.
+ */
+import type { Confidence } from '../../lib/labs/types';
+import { CONFIDENCE } from './labels';
+
+interface Props { value: Confidence; class?: string }
+const { value, class: className } = Astro.props;
+const c = CONFIDENCE[value];
+---
+
+<span class:list={['lab-conf', `lab-conf--${value}`, className]}>
+  <span class="lab-conf__label">{c.label}</span>
+  {c.level > 0 && (
+    <span class="lab-conf__dots" aria-hidden="true">
+      {[1, 2, 3].map((n) => <span class:list={['lab-conf__dot', n <= c.level && 'is-on']} />)}
+    </span>
+  )}
+</span>
+
+<style>
+  .lab-conf {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font: 500 var(--type-micro) / 1.3 var(--font-sans);
+    color: var(--s2s-accent);
+    white-space: nowrap;
+  }
+  .lab-conf--not-assessed { color: var(--s2s-ink-subtle); font-style: italic; }
+  .lab-conf__dots { display: inline-flex; gap: 4px; }
+  .lab-conf__dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    border: 1px solid color-mix(in srgb, currentColor 60%, transparent);
+  }
+  .lab-conf__dot.is-on { background: currentColor; border-color: currentColor; }
+</style>

@@ -1,0 +1,290 @@
+---
+/**
+ * /labs — the Labs index (lens-index, S2S-020). Visual authority:
+ * docs/design/s2s-v2-visual/labs-storyboard/images/
+ * signal_to_system_labs_investigations.webp.
+ *
+ * Built from the shared Writing/Labs family: FilterToolbar, FeatureCard
+ * (featured investigation + grid), CollectionPanel, PathList, FacetRail,
+ * StateNotice. Every card and count comes from gate-approved releases
+ * (src/lib/labs/site.ts). With none (production today) the page renders
+ * the honest "first Lab in preparation" state and lists nothing.
+ *
+ * Deliberate differences from the storyboard (honest data): no research
+ * programs rail (no program records exist yet), no "Popular domains"
+ * beyond the released Labs' own domains, no photo thumbnails (a card's
+ * media is its featured figure drawn from its released data).
+ */
+import HubLayout from '../../layouts/templates/HubLayout.astro';
+import Button from '../../components/ui/Button.astro';
+import Icon from '../../components/brand/Icon.astro';
+import FilterToolbar from '../../components/primitives/FilterToolbar.astro';
+import FacetRail from '../../components/primitives/FacetRail.astro';
+import StateNotice from '../../components/primitives/StateNotice.astro';
+import CollectionPanel from '../../components/family/CollectionPanel.astro';
+import FeatureCard from '../../components/family/FeatureCard.astro';
+import PathList from '../../components/family/PathList.astro';
+import RailCard from '../../components/family/RailCard.astro';
+import FixtureBanner from '../../components/labs/FixtureBanner.astro';
+import FigureWithData from '../../components/labs/FigureWithData.astro';
+import DomainConstellation from '../../components/labs/DomainConstellation.astro';
+import ExploreStrip from '../../components/labs/ExploreStrip.astro';
+import { getLabCatalog } from '../../lib/labs/site';
+import type { LabView } from '../../lib/labs/types';
+import { REVIEW, methodLabel, formatIsoDate } from '../../components/labs/labels';
+import { METHOD_PROFILES } from '../../lib/labs/profiles.mjs';
+
+const catalog = await getLabCatalog();
+const { labs, tombstones } = catalog;
+const featured = labs[0];
+const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+const short = (t: string) => t.replace(/^Synthetic:\s*/, '');
+const thumbFigure = (lab: LabView) => lab.figures.find((f) => f.id === lab.investigation.featuredFigureId && f.chart && lab.figureData[f.id]) ?? lab.figures.find((f) => f.chart && lab.figureData[f.id]);
+
+const counts = (lab: LabView) => [
+  { value: lab.counts.claims, label: lab.counts.claims === 1 ? 'Claim' : 'Claims', icon: 'claims' },
+  { value: lab.counts.sources, label: lab.counts.sources === 1 ? 'Source' : 'Sources', icon: 'sources' },
+  { value: lab.counts.figures, label: lab.counts.figures === 1 ? 'Figure' : 'Figures', icon: 'figures' },
+  { value: lab.counts.artifacts, label: lab.counts.artifacts === 1 ? 'Artifact' : 'Artifacts', icon: 'artifacts' },
+];
+const pills = (lab: LabView) => [
+  lab.report.conclusion.bounded ? { label: 'Bounded conclusion', tone: 'ok' as const } : { label: 'Open question', tone: 'info' as const },
+  { label: REVIEW[lab.report.review].label, tone: 'neutral' as const },
+];
+
+const domainCounts = new Map<string, number>();
+for (const l of labs) for (const d of l.investigation.domains) domainCounts.set(d, (domainCounts.get(d) ?? 0) + 1);
+const domains = [...domainCounts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+const methods = [...new Set(labs.map((l) => l.investigation.methodProfile))];
+
+const filters = [
+  { id: 'domain', label: 'Domain', icon: 'topics', options: [{ value: '', label: 'All domains' }, ...domains.map(([d]) => ({ value: slug(d), label: d }))] },
+  { id: 'method', label: 'Method', icon: 'methods', options: [{ value: '', label: 'All methods' }, ...methods.map((m) => ({ value: m, label: METHOD_PROFILES[m].label }))] },
+  { id: 'state', label: 'Conclusion', icon: 'claims', options: [{ value: '', label: 'Any' }, { value: 'bounded', label: 'Bounded conclusion' }, { value: 'open', label: 'Open question' }] },
+  { id: 'sort', label: 'Sort', icon: 'timeline', options: [{ value: 'new', label: 'Most recent' }, { value: 'old', label: 'Oldest first' }] },
+];
+const attrs = (lab: LabView) => ({
+  'data-lab': '',
+  'data-date': lab.investigation.updatedAt,
+  'data-domains': lab.investigation.domains.map(slug).join(' '),
+  'data-method': lab.investigation.methodProfile,
+  'data-state': lab.report.conclusion.bounded ? 'bounded' : 'open',
+});
+
+const inside = [
+  { label: 'Claims', icon: 'claims', sub: 'Statements, each with a status' },
+  { label: 'Evidence', icon: 'evidence', sub: 'What supports or cuts against them' },
+  { label: 'Sources', icon: 'sources', sub: 'References and datasets' },
+  { label: 'Figures', icon: 'figures', sub: 'Charts with their data' },
+  { label: 'Artifacts', icon: 'artifacts', sub: 'Code, notebooks, packages' },
+  { label: 'Method', icon: 'methods', sub: 'One declared profile' },
+  { label: 'Timeline', icon: 'timeline', sub: 'Runs, releases, corrections' },
+];
+---
+
+<HubLayout
+  title="Labs"
+  description="Structured investigations with methods, claims, evidence, figures with data, and reproduction packages."
+  heading="Labs"
+  eyebrow={['Labs', 'Investigations']}
+  lede="Labs holds structured investigations: the question, the method, each claim with its evidence, figures with their data, and what it takes to reproduce the work. Every investigation is an inspectable record, not just an article."
+  noindex={catalog.fixtures}
+  hero={{
+    photo: 'observatory',
+    subheading: 'Investigations that turn questions into evidence.',
+    quote: { text: 'Deeper questions.\nClearer methods.\nMore useful worlds.' },
+    rail: ['Observe', 'Investigate', 'Build', 'Share', 'Repeat'],
+    railFoot: ['A quieter', 'brighter', 'tomorrow'],
+  }}
+>
+  <Fragment slot="head">{catalog.fixtures && <meta name="s2s-labs-mode" content="fixtures" />}</Fragment>
+  {catalog.fixtures && <Fragment slot="banner"><FixtureBanner rejected={catalog.rejected} /></Fragment>}
+  <Fragment slot="hero-actions">
+    <Button href={labs.length ? '#labs-all' : '#labs-inside'} variant="signal" size="lg">{labs.length ? 'Browse investigations' : 'What a Lab contains'} <span aria-hidden="true">→</span></Button>
+    <Button href="#labs-inside" variant="outline" size="lg"><Icon name="reading-paths" size={16} /> How Labs works</Button>
+  </Fragment>
+
+
+  <div class="labs-main s2s-span-major" id="labs-all">
+    {labs.length === 0 ? (
+      <StateNotice
+        kind="in-preparation"
+        title="The first Lab is in preparation."
+        body="Investigations appear here only after a release passes review and is approved for publication. Until then there is nothing to list, so nothing is listed."
+      >
+        <Fragment slot="actions">
+          <Button href="/aos/" variant="outline" size="sm">The AOS research program</Button>
+          <Button href="/writing/" variant="outline" size="sm">Read the writing</Button>
+        </Fragment>
+      </StateNotice>
+    ) : (
+      <>
+        <FilterToolbar label="Filter investigations" filters={filters} count={`${labs.length} ${labs.length === 1 ? 'investigation' : 'investigations'}`} class="labs-filters" />
+        <p class="labs-empty" data-labs-empty hidden>
+          No investigation matches these filters. <button type="button" class="labs-reset s2s-focus" data-labs-reset>Clear filters</button>
+        </p>
+
+        {featured && (
+          <div class="labs-featured">
+            <div class="labs-featured__card">
+              <FeatureCard
+                href={featured.href}
+                title={featured.investigation.title}
+                eyebrow="Featured investigation"
+                dek={featured.investigation.dek}
+                layout="wide"
+                headingLevel={2}
+                pills={pills(featured)}
+                meta={counts(featured)}
+                chips={featured.investigation.domains.slice(0, 4).map((d) => ({ label: d }))}
+              >
+                <Fragment slot="media">
+                  {thumbFigure(featured)
+                    ? <FigureWithData figure={thumbFigure(featured)!} data={featured.figureData[thumbFigure(featured)!.id]} variant="thumb" />
+                    : <span class="labs-glyph"><Icon name="labs" size={40} /></span>}
+                </Fragment>
+                <Fragment slot="actions">
+                  <Button href={featured.href} variant="signal" size="sm">Open report <span aria-hidden="true">→</span></Button>
+                  <Button href={`${featured.href}claims/`} variant="outline" size="sm"><Icon name="evidence" size={14} /> See evidence</Button>
+                  <Button href={`${featured.href}resources/#figures`} variant="outline" size="sm"><Icon name="figures" size={14} /> View figures</Button>
+                </Fragment>
+              </FeatureCard>
+            </div>
+          </div>
+        )}
+
+        <CollectionPanel
+          title="All investigations"
+          icon="labs"
+          count={labs.length}
+          countNoun={['investigation', 'investigations']}
+          description="Every released investigation, newest first. Each opens as a full record."
+        >
+          <ul class="labs-grid" data-labs-grid>
+            {labs.map((lab) => (
+              <li {...attrs(lab)}>
+                <FeatureCard
+                  href={lab.href}
+                  title={lab.investigation.title}
+                  dek={lab.investigation.dek}
+                  layout="stack"
+                  pills={pills(lab)}
+                  meta={counts(lab)}
+                  chips={[{ label: methodLabel(lab.investigation.methodProfile) }, ...lab.investigation.domains.slice(0, 2).map((d) => ({ label: d }))]}
+                >
+                  <Fragment slot="media">
+                    {thumbFigure(lab)
+                      ? <FigureWithData figure={thumbFigure(lab)!} data={lab.figureData[thumbFigure(lab)!.id]} variant="thumb" />
+                      : <span class="labs-glyph"><Icon name="labs" size={36} /></span>}
+                  </Fragment>
+                </FeatureCard>
+              </li>
+            ))}
+          </ul>
+          {tombstones.length > 0 && (
+            <div class="labs-withdrawn">
+              <p class="labs-withdrawn__h">Withdrawn releases</p>
+              <ul>
+                {tombstones.map((t) => (
+                  <li><a href={t.href}><code>{t.publicId}@{t.version}</code></a> <span>Withdrawn {formatIsoDate(t.withdrawnAt)}</span></li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </CollectionPanel>
+      </>
+    )}
+
+    <div id="labs-inside">
+      <ExploreStrip
+        heading="Inside an investigation"
+        icon="labs"
+        id="inside"
+        intro="Each report is a complete, inspectable record, not just an article."
+        tiles={inside}
+      />
+    </div>
+  </div>
+
+  <div class="labs-rail s2s-span-minor">
+    <PathList
+      heading="Start in Labs"
+      icon="labs"
+      items={[
+        ...(labs.length ? [{ title: 'Browse all investigations', href: '#labs-all', sub: 'The full catalog', icon: 'labs' }] : []),
+        { title: 'Learn how Labs works', href: '#labs-inside', sub: 'What every record contains', icon: 'reading-paths' },
+        { title: 'The AOS research program', href: '/aos/', sub: 'Where the first investigations come from', icon: 'research-programs' },
+      ]}
+    />
+    {featured && (
+      <RailCard heading="Domain constellation" icon="topics">
+        <p class="labs-const-sub">The featured investigation spans {featured.investigation.domains.length} domains.</p>
+        <DomainConstellation center={short(featured.investigation.title)} domains={featured.investigation.domains} hrefFor={(d) => `/labs/?domain=${slug(d)}#labs-all`} />
+      </RailCard>
+    )}
+    <RailCard heading="How a Lab is released" icon="claims">
+      <p>A Lab appears here only after its release passes a fail-closed gate: every record approved, digests matched, and a human release receipt. Contested and unresolved claims stay visible; withdrawn releases leave a notice.</p>
+    </RailCard>
+    {domains.length > 0 && (
+      <FacetRail
+        heading="Domains"
+        icon="topics"
+        items={domains.slice(0, 10).map(([d, n]) => ({ label: d, href: `/labs/?domain=${slug(d)}#labs-all`, count: n }))}
+      />
+    )}
+  </div>
+</HubLayout>
+
+<script>
+  const root = document.querySelector<HTMLElement>('.labs-main');
+  const grid = root?.querySelector<HTMLElement>('[data-labs-grid]');
+  if (root && grid) {
+    const selects = [...root.querySelectorAll<HTMLSelectElement>('select[data-filter]')];
+    const items = [...grid.querySelectorAll<HTMLElement>('[data-lab]')];
+    const empty = root.querySelector<HTMLElement>('[data-labs-empty]');
+    const val = (id: string) => selects.find((s) => s.dataset.filter === id)?.value ?? '';
+    const apply = () => {
+      const domain = val('domain'), method = val('method'), state = val('state'), old = val('sort') === 'old';
+      let shown = 0;
+      for (const el of items) {
+        const ok = (!domain || (el.dataset.domains ?? '').split(' ').includes(domain)) && (!method || el.dataset.method === method) && (!state || el.dataset.state === state);
+        el.hidden = !ok;
+        if (ok) shown++;
+      }
+      items.sort((a, b) => ((a.dataset.date ?? '') < (b.dataset.date ?? '') ? 1 : -1) * (old ? -1 : 1)).forEach((el) => grid.appendChild(el));
+      if (empty) empty.hidden = shown > 0;
+    };
+    const preset = new URLSearchParams(location.search).get('domain');
+    const domainSelect = selects.find((s) => s.dataset.filter === 'domain');
+    if (preset && domainSelect && [...domainSelect.options].some((o) => o.value === preset)) { domainSelect.value = preset; apply(); }
+    selects.forEach((s) => s.addEventListener('change', apply));
+    root.querySelector('[data-labs-reset]')?.addEventListener('click', () => { selects.forEach((s) => { s.selectedIndex = 0; }); apply(); });
+  }
+</script>
+
+<style>
+  .labs-main, .labs-rail { min-width: 0; }
+  .labs-main { display: flex; flex-direction: column; gap: 18px; }
+  .labs-rail { display: flex; flex-direction: column; gap: 16px; }
+  .labs-main :global(.labs-filters .s2s-filter) { flex: 1 1 140px; min-width: 0; }
+  .labs-main :global(.labs-filters .s2s-filters__count) { flex: 0 0 auto; margin-left: auto; }
+  .labs-empty { margin: 0; font: 400 var(--type-body-s) / 1.5 var(--font-sans); color: var(--s2s-ink-muted); }
+  .labs-reset { margin-left: 8px; padding: 0; border: 0; background: none; font: inherit; color: var(--s2s-accent); cursor: pointer; }
+
+  .labs-featured { min-width: 0; }
+  .labs-featured__card :global(.s2s-feature) { height: 100%; }
+  .labs-const-sub { margin: -4px 0 6px !important; font-size: var(--type-meta); color: var(--s2s-ink-subtle); }
+  .labs-glyph { position: absolute; inset: 0; display: grid; place-items: center; color: var(--s2s-ink-faint); }
+
+  .labs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr)); gap: 14px; margin: 0; padding: 0; list-style: none; }
+  .labs-grid [hidden] { display: none; }
+  .labs-grid > li { min-width: 0; }
+  .labs-grid :global(.s2s-feature) { height: 100%; }
+
+  .labs-withdrawn { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--s2s-rule); }
+  .labs-withdrawn__h { margin: 0 0 6px; font: 600 var(--type-micro) / 1.2 var(--font-sans); letter-spacing: 0.14em; text-transform: uppercase; color: var(--s2s-status-warn); }
+  .labs-withdrawn ul { margin: 0; padding: 0; list-style: none; }
+  .labs-withdrawn li { display: flex; flex-wrap: wrap; gap: 4px 12px; font: 400 var(--type-meta) / 1.5 var(--font-sans); color: var(--s2s-ink-subtle); }
+  .labs-withdrawn code { font-family: var(--font-mono); color: var(--s2s-ink-soft); }
+  .labs-withdrawn a { text-decoration: none; }
+</style>

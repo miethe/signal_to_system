@@ -1,0 +1,140 @@
+---
+/**
+ * /labs/<id>/claims/<label>/<version>/ — a claim's exact-version record
+ * (lens-claims AC: "claim resolution pages exist per exact version").
+ * A ClaimRef anywhere on the site resolves here; the page shows that one
+ * version only. A later version gets its own page, so an essay that cites
+ * v1.0.0 keeps pointing at what it cited.
+ *
+ * Everything is server-rendered: statement, status, confidence, scope,
+ * uncertainty, limitations, dated receipts, the evidence split by what it
+ * does to the claim (supports / contradicts / qualifies), its figures and
+ * its network.
+ */
+import LabShell from '../../../../../../components/labs/LabShell.astro';
+import ClaimCard from '../../../../../../components/labs/ClaimCard.astro';
+import EvidenceCard from '../../../../../../components/labs/EvidenceCard.astro';
+import ClaimNetwork from '../../../../../../components/labs/ClaimNetwork.astro';
+import FigureWithData from '../../../../../../components/labs/FigureWithData.astro';
+import LabSection from '../../../../../../components/labs/LabSection.astro';
+import RailCard from '../../../../../../components/family/RailCard.astro';
+import StateNotice from '../../../../../../components/primitives/StateNotice.astro';
+import Button from '../../../../../../components/ui/Button.astro';
+import { getLabCatalog } from '../../../../../../lib/labs/site';
+import type { Claim, LabView, EvidenceRelation } from '../../../../../../lib/labs/types';
+import { RELATION, STATUS, reportTabs } from '../../../../../../components/labs/labels';
+
+export async function getStaticPaths() {
+  const { labs } = await getLabCatalog();
+  return labs.flatMap((lab) => lab.claims.map((claim) => ({
+    params: { slug: lab.investigation.publicId, claim: claim.label.toLowerCase(), version: claim.version },
+    props: { lab, claim },
+  })));
+}
+
+interface Props { lab: LabView; claim: Claim }
+const { lab, claim } = Astro.props;
+const byRelation = (['supports', 'contradicts', 'qualifies'] as EvidenceRelation[]).map((relation) => ({
+  relation,
+  items: claim.evidence.filter((e) => e.relation === relation).map((e) => lab.evidence.find((x) => x.id === e.evidenceId)).filter((x) => x !== undefined),
+})).filter((g) => g.items.length > 0);
+const figures = claim.figureIds.map((id) => lab.figures.find((f) => f.id === id)).filter((f) => f !== undefined);
+const s = STATUS[claim.status];
+const others = lab.claims.filter((c) => c !== claim);
+---
+
+<LabShell
+  title={`${claim.label} · ${s.label} · ${lab.investigation.title}`}
+  description={claim.statement}
+  heading={`Claim ${claim.label}`}
+  subheading={lab.investigation.title}
+  eyebrow={['Labs', 'Claims', `${claim.label} v${claim.version}`]}
+  tabs={reportTabs(lab.href, 'claims')}
+  synthetic={lab.synthetic}
+>
+  <div slot="hero-meta" class="lab-rec-actions">
+    <Button href={`${lab.href}claims/`} variant="signal" size="md">All claims & evidence <span aria-hidden="true">→</span></Button>
+    <Button href={lab.href} variant="outline" size="md">Full report</Button>
+  </div>
+
+  <ClaimCard claim={claim} labHref={lab.href} evidence={lab.evidence} variant="record" headingLevel={2} />
+
+  <LabSection id="claim-evidence" title="Evidence for this claim" icon="evidence" description="Grouped by what each item does to the claim.">
+    {byRelation.length === 0 ? (
+      <StateNotice kind="empty" compact title="No evidence is cited for this claim." body="It is stated as a claim without support; read it as such." />
+    ) : (
+      <div class="lab-rec-groups">
+        {byRelation.map((g) => (
+          <div class="lab-rec-group">
+            <p class={`lab-rec-group__h lab-rec-group__h--${RELATION[g.relation].tone}`}>{RELATION[g.relation].label} <span>{g.items.length}</span></p>
+            <div class="lab-rec-group__list">
+              {g.items.map((item) => <EvidenceCard item={item} lab={lab} relations={[{ claim, relation: g.relation }]} />)}
+            </div>
+          </div>
+        ))}
+      </div>
+    )}
+  </LabSection>
+
+  {figures.length > 0 && (
+    <LabSection id="claim-figures" title={figures.length === 1 ? 'Figure' : 'Figures'} icon="figures">
+      <div class="lab-rec-figs">
+        {figures.map((f) => (
+          <FigureWithData
+            figure={f}
+            data={lab.figureData[f.id]}
+            code={lab.artifacts.find((a) => a.id === f.codeArtifactId) ?? null}
+            href={`${lab.href}resources/#figure-${f.id.toLowerCase()}`}
+          />
+        ))}
+      </div>
+    </LabSection>
+  )}
+
+  <Fragment slot="rail">
+    <RailCard heading="Claim network" icon="topics">
+      <ClaimNetwork claim={claim} lab={lab} />
+    </RailCard>
+    <RailCard heading="This record" icon="claims">
+      <p>This page resolves exactly <code>{claim.publicId}@{claim.version}</code>. A later version of the claim is published at its own address; this one does not change.</p>
+      <p><a href={`${lab.href}capsule/evidence.json`}>Evidence capsule (JSON)</a> · <a href={`${lab.href}capsule/evidence.md`}>Markdown</a></p>
+    </RailCard>
+    {others.length > 0 && (
+      <RailCard heading="Other claims" icon="claims">
+        <ul class="lab-rec-others">
+          {others.map((c) => (
+            <li>
+              <a href={`${lab.href}claims/${c.label.toLowerCase()}/${c.version}/`}><span class="lab-rec-others__l">{c.label}</span> {c.statement}</a>
+              <span class={`lab-rec-others__s lab-rec-others__s--${STATUS[c.status].tone}`}>{STATUS[c.status].label}</span>
+            </li>
+          ))}
+        </ul>
+      </RailCard>
+    )}
+  </Fragment>
+</LabShell>
+
+<style>
+  .lab-rec-actions { display: flex; flex-wrap: wrap; gap: 10px 12px; }
+  .lab-rec-groups { display: grid; gap: 20px; }
+  .lab-rec-group__h { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; font: 600 var(--type-meta) / 1 var(--font-sans); letter-spacing: 0.1em; text-transform: uppercase; }
+  .lab-rec-group__h span { font-family: var(--font-mono); color: var(--s2s-ink-subtle); letter-spacing: 0; }
+  .lab-rec-group__h--ok { color: var(--s2s-status-ok); }
+  .lab-rec-group__h--danger { color: var(--s2s-status-danger); }
+  .lab-rec-group__h--warn { color: var(--s2s-status-warn); }
+  .lab-rec-group__list { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  @media (min-width: 1240px) { .lab-rec-group__list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .lab-rec-figs { display: grid; gap: 16px; }
+  .lab-rec-others { margin: 0; padding: 0; list-style: none; }
+  .lab-rec-others li { padding: 8px 0; border-top: 1px solid var(--s2s-rule); }
+  .lab-rec-others li:first-child { border-top: 0; padding-top: 0; }
+  .lab-rec-others a { display: block; color: var(--s2s-ink-soft); text-decoration: none; font: 400 var(--type-meta) / 1.45 var(--font-sans); }
+  .lab-rec-others a:hover { color: var(--s2s-accent); }
+  .lab-rec-others__l { font: 600 var(--type-micro) / 1 var(--font-mono); color: var(--s2s-ink); margin-right: 4px; }
+  .lab-rec-others__s { display: block; margin-top: 3px; font: 500 var(--type-micro) / 1 var(--font-sans); color: var(--s2s-ink-subtle); }
+  .lab-rec-others__s--ok { color: var(--s2s-status-ok); }
+  .lab-rec-others__s--warn { color: var(--s2s-status-warn); }
+  .lab-rec-others__s--danger { color: var(--s2s-status-danger); }
+  .lab-rec-others__s--info { color: var(--s2s-status-info); }
+  code { font: 400 var(--type-micro) / 1.4 var(--font-mono); overflow-wrap: anywhere; }
+</style>

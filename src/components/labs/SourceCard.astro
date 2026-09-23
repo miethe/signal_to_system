@@ -1,0 +1,96 @@
+---
+/**
+ * SourceCard — a source record on the report's resources page
+ * (storyboard: sources_figures_artifacts). Kind tag, title, publisher and
+ * period, summary, access level when not public, and a no-JS "Cite"
+ * disclosure. Denied sources render the fixed access token only.
+ */
+import Icon from '../brand/Icon.astro';
+import Pill from '../family/Pill.astro';
+import type { Source } from '../../lib/labs/types';
+import { SOURCE_KIND, ACCESS } from './labels';
+
+interface Props { source: Source; citeAs?: string; class?: string }
+const { source, citeAs, class: className } = Astro.props;
+const denied = source.access === 'denied';
+const icon = source.kind === 'dataset' ? 'datasets' : source.kind === 'software' ? 'artifacts' : 'sources';
+const citation = [source.publisher, source.title, source.period, source.version && `version ${source.version}`, source.href].filter(Boolean).join('. ');
+---
+
+{denied ? (
+  <article class:list={['lab-src', 'lab-src--denied', className]} aria-label="Source withheld">
+    <span class="lab-src__token">{ACCESS.denied}</span>
+    <p>Withheld from the public record. Nothing about this source is published.</p>
+  </article>
+) : (
+  <article class:list={['lab-src', className]} id={`source-${source.id.toLowerCase()}`}>
+    <div class="lab-src__well" aria-hidden="true"><Icon name={icon} size={30} /></div>
+    <div class="lab-src__body">
+      <p class="lab-src__tags">
+        <span class="lab-src__tag">{SOURCE_KIND[source.kind]}</span>
+        <span class="lab-src__id">{source.id}</span>
+        {source.access !== 'public' && <Pill label={ACCESS[source.access]} tone="neutral" />}
+      </p>
+      <h3 class="lab-src__title">{source.title}</h3>
+      {(source.publisher || source.period) && <p class="lab-src__origin">{[source.publisher, source.period].filter(Boolean).join(' · ')}</p>}
+      {source.summary && <p class="lab-src__summary">{source.summary}</p>}
+      <div class="lab-src__actions">
+        <details class="lab-src__cite">
+          <summary class="s2s-focus">Cite</summary>
+          <p><code>{citeAs ?? citation}</code></p>
+        </details>
+        {source.href && <a class="lab-src__view s2s-focus" href={source.href} rel="noopener">View source{" "}<span aria-hidden="true">↗</span></a>}
+        {source.license && <span class="lab-src__license">{source.license}</span>}
+      </div>
+    </div>
+  </article>
+)}
+
+<style>
+  .lab-src {
+    display: grid;
+    grid-template-columns: 64px minmax(0, 1fr);
+    gap: 14px;
+    min-width: 0;
+    padding: 14px;
+    border: 1px solid var(--s2s-rule);
+    border-radius: var(--s2s-radius-card);
+    background: var(--s2s-surface);
+  }
+  .lab-src__well { display: grid; place-items: center; height: 76px; border-radius: 8px; background: var(--s2s-inset); color: var(--s2s-secondary); }
+  .lab-src__tags { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin: 0; }
+  .lab-src__tag {
+    padding: 1px 8px;
+    border: 1px solid color-mix(in srgb, var(--s2s-secondary) 55%, var(--s2s-rule));
+    border-radius: var(--s2s-radius-pill);
+    font: 600 0.625rem / 1.6 var(--font-sans);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--s2s-secondary);
+  }
+  .lab-src__id { font: 500 var(--type-micro) / 1 var(--font-mono); color: var(--s2s-ink-subtle); }
+  .lab-src__title { margin: 8px 0 0; font: 400 var(--type-card) / 1.3 var(--font-display); color: var(--s2s-ink); }
+  .lab-src__origin { margin: 3px 0 0; font: 400 var(--type-meta) / 1.4 var(--font-sans); color: var(--s2s-ink-subtle); }
+  .lab-src__summary { margin: 8px 0 0; font: 400 var(--type-body-s) / 1.5 var(--font-sans); color: var(--s2s-ink-muted); }
+  .lab-src__actions { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px 14px; margin-top: 12px; }
+  .lab-src__cite summary, .lab-src__view {
+    display: inline-flex;
+    padding: 4px 11px;
+    border: 1px solid var(--s2s-rule-emphasis);
+    border-radius: var(--s2s-radius-control);
+    font: 500 var(--type-ui) / 1.2 var(--font-sans);
+    color: var(--s2s-ink-soft);
+    text-decoration: none;
+    cursor: pointer;
+    list-style: none;
+  }
+  .lab-src__cite summary::-webkit-details-marker { display: none; }
+  .lab-src__cite[open] { flex-basis: 100%; order: 3; }
+  .lab-src__cite p { margin: 8px 0 0; padding: 8px 10px; border-radius: var(--s2s-radius-control); background: var(--s2s-inset); }
+  .lab-src__cite code { font: 400 var(--type-micro) / 1.5 var(--font-mono); color: var(--s2s-ink-soft); overflow-wrap: anywhere; }
+  .lab-src__view:hover, .lab-src__cite summary:hover { border-color: var(--s2s-accent); color: var(--s2s-ink); }
+  .lab-src__license { align-self: center; font: 400 var(--type-micro) / 1 var(--font-mono); color: var(--s2s-ink-subtle); }
+  .lab-src--denied { display: block; border-style: dashed; background: transparent; }
+  .lab-src__token { font: 600 var(--type-micro) / 1.4 var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--s2s-ink-subtle); }
+  .lab-src--denied p { margin: 4px 0 0; font: 400 var(--type-meta) / 1.5 var(--font-sans); color: var(--s2s-ink-subtle); }
+</style>

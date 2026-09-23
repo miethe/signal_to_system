@@ -1,0 +1,98 @@
+---
+/**
+ * ClaimNetwork — the storyboard's "Claim network": one claim, the evidence
+ * it cites (edge tone = Supports / Contradicts / Qualifies), and the
+ * sources and figures under that evidence. Server-rendered SVG with every
+ * node a link to its record; denied evidence and sources are left out
+ * entirely (no placeholder node, so no count leaks).
+ */
+import type { Claim, LabView } from '../../lib/labs/types';
+import { RELATION, claimHref } from './labels';
+
+interface Props { claim: Claim; lab: LabView; class?: string }
+const { claim, lab, class: className } = Astro.props;
+
+const ev = claim.evidence
+  .map((e) => ({ rel: e.relation, item: lab.evidence.find((x) => x.id === e.evidenceId) }))
+  .filter((e): e is { rel: typeof e.rel; item: NonNullable<typeof e.item> } => Boolean(e.item && e.item.access !== 'denied'));
+const sourceIds = [...new Set(ev.flatMap((e) => e.item.sourceIds))].filter((id) => lab.sources.find((s) => s.id === id && s.access !== 'denied'));
+const figureIds = [...new Set([...claim.figureIds, ...ev.flatMap((e) => e.item.figureIds)])];
+const leaves = [...sourceIds.map((id) => ({ id, kind: 'source' as const })), ...figureIds.map((id) => ({ id, kind: 'figure' as const }))];
+
+const W = 400;
+const rowY = [30, 112, 194];
+const H = leaves.length ? 222 : 140;
+const spread = (n: number, i: number) => (n <= 1 ? W / 2 : 34 + (i * (W - 68)) / (n - 1));
+const cNode = { x: W / 2, y: rowY[0] };
+const eNodes = ev.map((e, i) => ({ ...e, x: spread(ev.length, i), y: rowY[1] }));
+const lNodes = leaves.map((l, i) => ({ ...l, x: spread(leaves.length, i), y: rowY[2] }));
+const toneVar: Record<string, string> = { ok: '--s2s-status-ok', danger: '--s2s-status-danger', warn: '--s2s-status-warn' };
+const curve = (x1: number, y1: number, x2: number, y2: number) => {
+  const my = (y1 + y2) / 2;
+  return `M${x1.toFixed(1)} ${y1} C${x1.toFixed(1)} ${my} ${x2.toFixed(1)} ${my} ${x2.toFixed(1)} ${y2}`;
+};
+const hrefLeaf = (l: { id: string; kind: 'source' | 'figure' }) => `${lab.href}resources/#${l.kind}-${l.id.toLowerCase()}`;
+---
+
+<figure class:list={['lab-net', className]}>
+  <svg viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`${claim.label} cites ${eNodes.length} evidence items, over ${sourceIds.length} sources and ${figureIds.length} figures.`}>
+    {eNodes.map((e) => (
+      <path class="lab-net__edge" d={curve(cNode.x, cNode.y + 14, e.x, e.y - 13)} style={`stroke: var(${toneVar[RELATION[e.rel].tone]})`} />
+    ))}
+    {eNodes.flatMap((e) => lNodes
+      .filter((l) => (l.kind === 'source' ? e.item.sourceIds : e.item.figureIds).includes(l.id))
+      .map((l) => <path class="lab-net__edge lab-net__edge--quiet" d={curve(e.x, e.y + 13, l.x, l.y - 13)} />))}
+    {lNodes.filter((l) => l.kind === 'figure' && claim.figureIds.includes(l.id) && !eNodes.some((e) => e.item.figureIds.includes(l.id)))
+      .map((l) => <path class="lab-net__edge lab-net__edge--quiet" d={curve(cNode.x, cNode.y + 14, l.x, l.y - 13)} />)}
+
+    <a href={claimHref(lab.href, claim.label, claim.version)}>
+      <rect class="lab-net__node lab-net__node--claim" x={cNode.x - 28} y={cNode.y - 14} width="56" height="28" rx="8" />
+      <text class="lab-net__label" x={cNode.x} y={cNode.y + 4.5} text-anchor="middle">{claim.label}</text>
+    </a>
+    {eNodes.map((e) => (
+      <a href={`${lab.href}claims/#evidence-${e.item.id.toLowerCase()}`}>
+        <rect class="lab-net__node lab-net__node--evidence" x={e.x - 22} y={e.y - 13} width="44" height="26" rx="13" />
+        <text class="lab-net__label" x={e.x} y={e.y + 4} text-anchor="middle">{e.item.id}</text>
+      </a>
+    ))}
+    {lNodes.map((l) => (
+      <a href={hrefLeaf(l)}>
+        <rect class={`lab-net__node lab-net__node--${l.kind}`} x={l.x - 20} y={l.y - 13} width="40" height="26" rx="8" />
+        <text class="lab-net__label" x={l.x} y={l.y + 4} text-anchor="middle">{l.id}</text>
+      </a>
+    ))}
+  </svg>
+  <figcaption class="lab-net__legend">
+    <span><i class="lab-net__key lab-net__key--claim" />Claim</span>
+    <span><i class="lab-net__key lab-net__key--evidence" />Evidence</span>
+    <span><i class="lab-net__key lab-net__key--source" />Source</span>
+    <span><i class="lab-net__key lab-net__key--figure" />Figure</span>
+    <span class="lab-net__rels">
+      {(['supports', 'contradicts', 'qualifies'] as const).map((r) => <span><i class="lab-net__line" style={`background: var(${toneVar[RELATION[r].tone]})`} />{RELATION[r].label}</span>)}
+    </span>
+  </figcaption>
+</figure>
+
+<style>
+  .lab-net { margin: 0; min-width: 0; }
+  .lab-net svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .lab-net__edge { fill: none; stroke-width: 1.6; opacity: 0.85; }
+  .lab-net__edge--quiet { stroke: var(--s2s-rule-emphasis); stroke-width: 1.2; opacity: 1; }
+  .lab-net__node { fill: var(--s2s-canvas); stroke-width: 1.5; }
+  .lab-net__node--claim { stroke: var(--s2s-viz-1); fill: color-mix(in srgb, var(--s2s-viz-1) 14%, var(--s2s-canvas)); }
+  .lab-net__node--evidence { stroke: var(--s2s-viz-2); }
+  .lab-net__node--source { stroke: var(--s2s-viz-3); }
+  .lab-net__node--figure { stroke: var(--s2s-viz-6); }
+  .lab-net__label { font: 600 12px var(--font-mono); fill: var(--s2s-ink); pointer-events: none; }
+  .lab-net a:hover .lab-net__node, .lab-net a:focus-visible .lab-net__node { stroke-width: 2.5; }
+  .lab-net__legend { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 10px; font: 400 var(--type-micro) / 1.4 var(--font-sans); color: var(--s2s-ink-subtle); }
+  .lab-net__legend > span { display: inline-flex; align-items: center; gap: 6px; }
+  .lab-net__key { width: 9px; height: 9px; border-radius: 50%; }
+  .lab-net__key--claim { background: var(--s2s-viz-1); }
+  .lab-net__key--evidence { background: var(--s2s-viz-2); }
+  .lab-net__key--source { background: var(--s2s-viz-3); }
+  .lab-net__key--figure { background: var(--s2s-viz-6); }
+  .lab-net__rels { gap: 12px !important; flex-basis: 100%; }
+  .lab-net__rels span { display: inline-flex; align-items: center; gap: 5px; }
+  .lab-net__line { width: 14px; height: 2px; border-radius: 1px; }
+</style>

@@ -1,0 +1,44 @@
+---
+/**
+ * ReportTabs — the report's underline section tabs (storyboard: Overview ·
+ * Claims · Evidence · Sources · Figures · Artifacts · Methods · Timeline).
+ * Plain links (to #anchors on the report, or to its subpages), so they work
+ * with JS disabled (lens-detail AC). Scrolls sideways on a phone rather
+ * than wrapping into a wall of links.
+ */
+interface Item { label: string; href: string; current?: boolean }
+interface Props { items: Item[]; label?: string; class?: string }
+const { items, label = 'Report sections', class: className } = Astro.props;
+---
+
+<nav class:list={['lab-tabs', className]} aria-label={label}>
+  <ul>
+    {items.map((it) => (
+      <li><a class="lab-tabs__link s2s-focus" href={it.href} aria-current={it.current ? 'page' : undefined}>{it.label}</a></li>
+    ))}
+  </ul>
+</nav>
+
+<style>
+  .lab-tabs {
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+    border-bottom: 1px solid var(--s2s-rule-strong);
+  }
+  .lab-tabs::-webkit-scrollbar { display: none; }
+  .lab-tabs ul { display: flex; gap: 4px; margin: 0; padding: 0; list-style: none; min-width: max-content; }
+  .lab-tabs__link {
+    display: block;
+    padding: 12px 14px 11px;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    font: 450 var(--type-body-s) / 1 var(--font-sans);
+    color: var(--s2s-ink-muted);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .lab-tabs__link:hover { color: var(--s2s-ink); }
+  .lab-tabs__link[aria-current='page'] { color: var(--s2s-accent); border-bottom-color: var(--s2s-accent); }
+  @media (min-width: 1024px) { .lab-tabs__link { padding: 13px 22px 12px; } }
+</style>

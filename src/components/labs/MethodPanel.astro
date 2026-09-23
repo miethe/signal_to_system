@@ -1,0 +1,73 @@
+---
+/**
+ * MethodPanel (rec-method, S2S-023) — the Lab's one declared method
+ * profile and its required method record, in profile order, plus
+ * deviations and failures ("What did not work?"), which are never hidden
+ * in an appendix.
+ */
+import Pill from '../family/Pill.astro';
+import type { MethodRecord, Contribution } from '../../lib/labs/types';
+import { CONTRIBUTION, methodLabel } from './labels';
+
+interface Props { method: MethodRecord; contribution: Contribution; class?: string }
+const { method, contribution, class: className } = Astro.props;
+---
+
+<div class:list={['lab-method', className]}>
+  <p class="lab-method__profile">
+    <span class="lab-method__kicker">Method profile</span>
+    <Pill label={methodLabel(method.profile)} tone="accent" />
+    <span class="lab-method__kicker">Contribution</span>
+    <Pill label={CONTRIBUTION[contribution]} tone="neutral" />
+  </p>
+  <dl class="lab-method__fields">
+    {method.fields.map((f) => <div><dt>{f.label}</dt><dd>{f.value}</dd></div>)}
+  </dl>
+  {(method.deviations.length > 0 || method.failures.length > 0) && (
+    <div class="lab-method__notes">
+      {method.deviations.length > 0 && (
+        <div class="lab-method__note">
+          <p class="lab-method__note-title">Deviations from the protocol</p>
+          <ul>{method.deviations.map((d) => <li>{d}</li>)}</ul>
+        </div>
+      )}
+      {method.failures.length > 0 && (
+        <div class="lab-method__note lab-method__note--fail">
+          <p class="lab-method__note-title">What did not work</p>
+          <ul>{method.failures.map((d) => <li>{d}</li>)}</ul>
+        </div>
+      )}
+    </div>
+  )}
+</div>
+
+<style>
+  .lab-method { min-width: 0; }
+  .lab-method__profile { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; margin: 0 0 14px; }
+  .lab-method__kicker { font: 500 var(--type-micro) / 1 var(--font-sans); letter-spacing: 0.1em; text-transform: uppercase; color: var(--s2s-ink-subtle); }
+  .lab-method__kicker:not(:first-child) { margin-left: 8px; }
+  .lab-method__fields {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    margin: 0;
+    border: 1px solid var(--s2s-rule);
+    border-radius: var(--s2s-radius-card);
+    background: var(--s2s-surface);
+    overflow: hidden;
+  }
+  @media (min-width: 720px) { .lab-method__fields { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .lab-method__fields div { padding: 11px 14px; border-top: 1px solid var(--s2s-rule); }
+  .lab-method__fields div:first-child { border-top: 0; }
+  @media (min-width: 720px) {
+    .lab-method__fields div:nth-child(2) { border-top: 0; }
+    .lab-method__fields div:nth-child(even) { border-left: 1px solid var(--s2s-rule); }
+  }
+  .lab-method__fields dt { font: 600 var(--type-micro) / 1.4 var(--font-sans); letter-spacing: 0.04em; color: var(--s2s-ink-subtle); }
+  .lab-method__fields dd { overflow-wrap: anywhere; margin: 3px 0 0; font: 400 var(--type-body-s) / 1.5 var(--font-sans); color: var(--s2s-ink-soft); }
+  .lab-method__notes { display: grid; gap: 12px; margin-top: 14px; }
+  @media (min-width: 720px) { .lab-method__notes { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .lab-method__note { padding: 12px 14px; border-left: 2px solid var(--s2s-status-info); border-radius: 0 6px 6px 0; background: color-mix(in srgb, var(--s2s-status-info) 6%, transparent); }
+  .lab-method__note--fail { border-left-color: var(--s2s-status-warn); background: color-mix(in srgb, var(--s2s-status-warn) 6%, transparent); }
+  .lab-method__note-title { margin: 0; font: 600 var(--type-meta) / 1.3 var(--font-sans); color: var(--s2s-ink); }
+  .lab-method__note ul { list-style: disc; margin: 6px 0 0; padding-left: 18px; font: 400 var(--type-body-s) / 1.5 var(--font-sans); color: var(--s2s-ink-muted); }
+</style>

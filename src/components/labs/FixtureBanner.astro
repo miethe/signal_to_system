@@ -1,0 +1,53 @@
+---
+/**
+ * FixtureBanner — shown on every Labs page while synthetic fixtures are
+ * loaded (astro dev or S2S_LABS_FIXTURES=1). Production never renders it
+ * because production never loads fixtures; `data-lab-fixture` is what
+ * scripts/check-labs-production.mjs looks for in dist/.
+ */
+interface Props { rejected?: { releaseId: string; errors: string[] }[] }
+const { rejected = [] } = Astro.props;
+---
+
+<aside class="lab-fixture" data-lab-fixture role="note" aria-label="Synthetic fixture notice">
+  <span class="lab-fixture__tag">Synthetic fixture</span>
+  <p>
+    Preview mode. Every investigation on this page is invented test data that exercises the Labs
+    templates. None of it is a real finding, and none of it ships in the production build.
+  </p>
+  {rejected.length > 0 && (
+    <details class="lab-fixture__gate">
+      <summary>{rejected.length} release{rejected.length === 1 ? '' : 's'} refused by the release gate</summary>
+      <ul>{rejected.map((r) => <li><code>{r.releaseId}</code>: {r.errors.join(', ')}</li>)}</ul>
+    </details>
+  )}
+</aside>
+
+<style>
+  .lab-fixture {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 6px 14px;
+    margin: 0;
+    padding: 10px 16px;
+    border-bottom: 1px dashed color-mix(in srgb, var(--s2s-status-warn) 55%, var(--s2s-rule));
+    background:
+      repeating-linear-gradient(-45deg, color-mix(in srgb, var(--s2s-status-warn) 7%, transparent) 0 8px, transparent 8px 16px),
+      var(--s2s-canvas-raised);
+    font: 400 var(--type-meta) / 1.5 var(--font-sans);
+    color: var(--s2s-ink-muted);
+  }
+  .lab-fixture p { margin: 0; flex: 1 1 360px; }
+  .lab-fixture__tag {
+    font: 600 var(--type-micro) / 1 var(--font-mono);
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--s2s-status-warn);
+  }
+  .lab-fixture__gate { flex-basis: 100%; }
+  .lab-fixture__gate summary { cursor: pointer; color: var(--s2s-ink-soft); }
+  .lab-fixture__gate ul { margin: 6px 0 0; padding-left: 18px; }
+  .lab-fixture__gate code { font-family: var(--font-mono); }
+  @media (min-width: 1024px) { .lab-fixture { padding: 10px var(--s2s-frame-gutter); } }
+</style>

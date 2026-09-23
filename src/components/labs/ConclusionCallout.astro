@@ -1,0 +1,71 @@
+---
+/**
+ * ConclusionCallout (lens-detail) — the report's bounded conclusion, or its
+ * present uncertainty when there is no conclusion yet. The storyboard's
+ * italic pull-quote panel, with the rigor attached: confidence, the stated
+ * uncertainty (always shown; the schema requires it) and the scope, inline.
+ */
+import type { Report } from '../../lib/labs/types';
+import ConfidenceMeter from './ConfidenceMeter.astro';
+
+interface Props { conclusion: Report['conclusion']; class?: string }
+const { conclusion, class: className } = Astro.props;
+---
+
+<aside class:list={['lab-concl', !conclusion.bounded && 'lab-concl--open', className]} aria-label={conclusion.bounded ? 'Bounded conclusion' : 'Present uncertainty'}>
+  <p class="lab-concl__label">{conclusion.bounded ? 'Bounded conclusion' : 'No conclusion yet · present uncertainty'}</p>
+  <blockquote class="lab-concl__statement"><p>{conclusion.statement}</p></blockquote>
+  <dl class="lab-concl__facts">
+    <div><dt>Uncertainty</dt><dd>{conclusion.uncertainty}</dd></div>
+    <div><dt>Scope</dt><dd>{conclusion.scope}</dd></div>
+  </dl>
+  <ConfidenceMeter value={conclusion.confidence} class="lab-concl__conf" />
+</aside>
+
+<style>
+  .lab-concl {
+    position: relative;
+    min-width: 0;
+    padding: 20px 20px 18px;
+    border: 1px solid color-mix(in srgb, var(--s2s-accent) 32%, var(--s2s-rule));
+    border-radius: var(--s2s-radius-card);
+    background:
+      radial-gradient(120% 90% at 100% 0%, var(--s2s-accent-soft), transparent 60%),
+      var(--s2s-surface);
+    overflow: hidden;
+  }
+  .lab-concl::before {
+    content: '“';
+    position: absolute;
+    top: 6px;
+    right: 16px;
+    font: 400 4.5rem / 1 var(--font-serif);
+    color: color-mix(in srgb, var(--s2s-accent) 30%, transparent);
+    pointer-events: none;
+  }
+  .lab-concl--open { border-color: color-mix(in srgb, var(--s2s-status-info) 35%, var(--s2s-rule)); }
+  .lab-concl__label {
+    margin: 0 0 10px;
+    font: 600 var(--type-micro) / 1.2 var(--font-sans);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--s2s-accent-label);
+  }
+  .lab-concl--open .lab-concl__label { color: var(--s2s-status-info); }
+  .lab-concl__statement { margin: 0; }
+  .lab-concl__statement p {
+    margin: 0;
+    font: italic 380 1.3125rem / 1.36 var(--font-serif);
+    color: var(--s2s-ink);
+    text-wrap: pretty;
+  }
+  .lab-concl__facts { display: grid; gap: 8px; margin: 16px 0 14px; padding-top: 14px; border-top: 1px solid var(--s2s-rule); }
+  .lab-concl__facts div { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: 10px; }
+  .lab-concl__facts dt {
+    font: 600 var(--type-micro) / 1.6 var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--s2s-ink-subtle);
+  }
+  .lab-concl__facts dd { margin: 0; font: 400 var(--type-body-s) / 1.5 var(--font-sans); color: var(--s2s-ink-soft); }
+</style>

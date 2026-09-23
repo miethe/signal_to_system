@@ -5,6 +5,8 @@
  * a two-column grid.
  *
  * Slot contract
+ *   banner        optional  a full-bleed notice above the hero (the Labs
+ *                           synthetic-fixture banner in dev/preview)
  *   hero-actions  optional  CTA Buttons under the lede
  *   hero-aside    optional  right side of the hero (quote, MethodRail)
  *   subnav        optional  a row between the hero and the grid, outside
@@ -50,6 +52,7 @@ const { title, description, heading, accent, eyebrow, lede, noindex, hero = {}, 
 
 <BaseLayout title={title} description={description} noindex={noindex} ogImage={ogImage}>
   {Astro.slots.has('head') && <Fragment slot="head"><slot name="head" /></Fragment>}
+  {Astro.slots.has('banner') && <slot name="banner" />}
   <PageHero heading={heading} accent={accent} eyebrow={eyebrow} lede={lede} {...hero}>
     {Astro.slots.has('hero-actions') && <Fragment slot="actions"><slot name="hero-actions" /></Fragment>}
     {Astro.slots.has('hero-aside') && <Fragment slot="aside"><slot name="hero-aside" /></Fragment>}

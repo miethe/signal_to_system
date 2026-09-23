@@ -69,6 +69,15 @@
   --s2s-status-danger: #b3261e;
   --s2s-status-info: #3d5fc4;
 
+  /* Data viz (Labs charts, domain constellation). Categorical, AA on surface. */
+  --s2s-viz-1: #6d55d6;
+  --s2s-viz-2: #2f7d5c;
+  --s2s-viz-3: #3d5fc4;
+  --s2s-viz-4: #b0437a;
+  --s2s-viz-5: #b8612a;
+  --s2s-viz-6: #8a6400;
+  --s2s-viz-grid: rgb(23 21 29 / 0.08);
+
   /* Controls */
   --s2s-focus: #5b3fc4;
   --s2s-toggle-knob: #5b3fc4;
@@ -134,6 +143,15 @@
   --s2s-status-warn: #e9c46a;
   --s2s-status-danger: #f28b82;
   --s2s-status-info: #9bb8f5;
+
+  /* Data viz: hues sampled from the Labs storyboard constellation dots. */
+  --s2s-viz-1: #bba0f4;
+  --s2s-viz-2: #8fdea4;
+  --s2s-viz-3: #9bb8f5;
+  --s2s-viz-4: #f2a5c8;
+  --s2s-viz-5: #f0b27a;
+  --s2s-viz-6: #e9c46a;
+  --s2s-viz-grid: rgb(255 255 255 / 0.06);
 
   --s2s-focus: #c9b1fb;
   --s2s-toggle-knob: #ebdcd3;

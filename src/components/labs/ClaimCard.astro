@@ -1,0 +1,185 @@
+---
+/**
+ * ClaimCard (lens-claims, S2S-021) — one claim, its status, its confidence
+ * and what it rests on. Storyboard: urban_heat_claims_evidence_dashboard.
+ *
+ * Caveat labeling contract (never collapsed into a "verified" badge):
+ *  - status pill: Supported within scope / Mixed evidence / Contradicted /
+ *    Unresolved / Not reviewed, each its own tone;
+ *  - claim type is always named (Run claim, Source assertion, Inference,
+ *    Speculation, Claim group), so an inference never reads as a finding;
+ *  - receipts are specific ("Source pointer resolved · Author reviewed");
+ *    with no receipt the card says "Not reviewed · illustrative only".
+ *
+ * variant card    list item (claims page, report key claims)
+ *         record  the resolution page: + scope, uncertainty, limitations,
+ *                 receipts with dates, identity and version
+ */
+import Pill from '../family/Pill.astro';
+import Icon from '../brand/Icon.astro';
+import ConfidenceMeter from './ConfidenceMeter.astro';
+import type { Claim, EvidenceItem } from '../../lib/labs/types';
+import { STATUS, CLAIM_TYPE, RECEIPT, claimHref, formatIsoDate } from './labels';
+
+interface Props {
+  claim: Claim;
+  labHref: string;
+  evidence: EvidenceItem[];
+  variant?: 'card' | 'record';
+  selected?: boolean;
+  headingLevel?: 2 | 3 | 4;
+  class?: string;
+}
+const { claim, labHref, evidence, variant = 'card', selected = false, headingLevel = 3, class: className } = Astro.props;
+const H = `h${headingLevel}` as 'h2' | 'h3' | 'h4';
+const s = STATUS[claim.status];
+const href = claimHref(labHref, claim.label, claim.version);
+const cited = claim.evidence.map((e) => evidence.find((x) => x.id === e.evidenceId)).filter(Boolean) as EvidenceItem[];
+const sourceCount = new Set(cited.flatMap((e) => e.sourceIds)).size;
+const reviewed = claim.receipts.length > 0;
+const guarded = claim.type === 'inference' || claim.type === 'speculation';
+---
+
+<article class:list={['lab-claim', `lab-claim--${variant}`, `lab-claim--${s.tone}`, selected && 'is-selected', className]} id={variant === 'card' ? `claim-${claim.label.toLowerCase()}` : undefined}>
+  <header class="lab-claim__head">
+    <span class="lab-claim__label">{claim.label}</span>
+    <Pill label={s.label} tone={s.tone === 'info' ? 'info' : s.tone} dot title={s.note} />
+    <span class:list={['lab-claim__type', guarded && 'is-guarded']}>{CLAIM_TYPE[claim.type]}</span>
+    <ConfidenceMeter value={claim.confidence} class="lab-claim__conf" />
+  </header>
+
+  <H class="lab-claim__statement">
+    {variant === 'card'
+      ? <a class="lab-claim__link s2s-focus" href={href}>“{claim.statement}”</a>
+      : <>“{claim.statement}”</>}
+  </H>
+
+  {variant === 'record' && (
+    <dl class="lab-claim__facts">
+      <div><dt>Scope</dt><dd>{claim.scope}</dd></div>
+      <div><dt>Uncertainty</dt><dd>{claim.uncertainty ?? 'Not stated for this claim.'}</dd></div>
+      <div><dt>Checked</dt><dd><time datetime={claim.checkedAt}>{formatIsoDate(claim.checkedAt)}</time></dd></div>
+      <div><dt>Version</dt><dd><code>{claim.publicId}@{claim.version}</code></dd></div>
+    </dl>
+  )}
+
+  {variant === 'card' && claim.domains.length > 0 && (
+    <ul class="lab-claim__chips">{claim.domains.map((d) => <li>{d}</li>)}</ul>
+  )}
+
+  {variant === 'record' && claim.limitations.length > 0 && (
+    <div class="lab-claim__limits">
+      <p class="lab-claim__sub">Limitations</p>
+      <ul>{claim.limitations.map((l) => <li>{l}</li>)}</ul>
+    </div>
+  )}
+
+  <footer class="lab-claim__foot">
+    <ul class="lab-claim__counts">
+      <li><Icon name="evidence" size={14} />{claim.evidence.length} evidence {claim.evidence.length === 1 ? 'item' : 'items'}</li>
+      <li><Icon name="sources" size={14} />{sourceCount} {sourceCount === 1 ? 'source' : 'sources'}</li>
+      {claim.figureIds.length > 0 && <li><Icon name="figures" size={14} />{claim.figureIds.length === 1 ? `Figure ${claim.figureIds[0].replace(/^F/, '')}` : `Figures ${claim.figureIds.map((f) => f.replace(/^F/, '')).join(', ')}`}</li>}
+    </ul>
+    <p class:list={['lab-claim__receipts', !reviewed && 'is-unreviewed']}>
+      {reviewed
+        ? claim.receipts.map((r, i) => <span>{i > 0 && <span aria-hidden="true"> · </span>}{RECEIPT[r.kind]}{variant === 'record' && <> <time datetime={r.date}>({formatIsoDate(r.date)})</time></>}</span>)
+        : 'Not reviewed · illustrative only'}
+    </p>
+  </footer>
+  {variant === 'card' && <span class="lab-claim__arrow" aria-hidden="true">→</span>}
+</article>
+
+<style>
+  .lab-claim {
+    --tone: var(--s2s-ink-subtle);
+    position: relative;
+    min-width: 0;
+    padding: 16px 18px 14px;
+    border: 1px solid var(--s2s-rule);
+    border-radius: var(--s2s-radius-card);
+    background: var(--s2s-surface);
+    transition: border-color var(--s2s-dur) ease, background var(--s2s-dur) ease;
+  }
+  .lab-claim--ok { --tone: var(--s2s-status-ok); }
+  .lab-claim--warn { --tone: var(--s2s-status-warn); }
+  .lab-claim--danger { --tone: var(--s2s-status-danger); }
+  .lab-claim--info { --tone: var(--s2s-status-info); }
+  .lab-claim--card:hover { border-color: var(--s2s-rule-emphasis); background: var(--s2s-surface-hover); }
+  .lab-claim.is-selected, .lab-claim--card:target {
+    border-color: color-mix(in srgb, var(--s2s-accent) 70%, transparent);
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--s2s-accent) 30%, transparent), 0 16px 40px -28px var(--s2s-accent);
+  }
+  .lab-claim__head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; }
+  .lab-claim__label {
+    display: inline-grid;
+    place-items: center;
+    min-width: 30px;
+    height: 24px;
+    padding: 0 6px;
+    border: 1px solid var(--s2s-rule-emphasis);
+    border-radius: var(--s2s-radius-control);
+    font: 600 var(--type-meta) / 1 var(--font-mono);
+    color: var(--s2s-ink);
+  }
+  .lab-claim__type {
+    font: 500 var(--type-micro) / 1.3 var(--font-sans);
+    letter-spacing: 0.04em;
+    color: var(--s2s-ink-subtle);
+  }
+  .lab-claim__type.is-guarded { color: var(--s2s-status-warn); font-style: italic; }
+  .lab-claim__head :global(.lab-claim__conf) { margin-left: auto; }
+
+  .lab-claim__statement {
+    margin: 12px 0 0;
+    padding-right: 22px;
+    font: 380 1.3rem / 1.32 var(--font-serif);
+    color: var(--s2s-ink);
+    text-wrap: pretty;
+  }
+  .lab-claim--record .lab-claim__statement { font-size: 1.625rem; padding-right: 0; }
+  .lab-claim__link { color: inherit; text-decoration: none; }
+  .lab-claim__link::after { content: ''; position: absolute; inset: 0; border-radius: inherit; }
+  .lab-claim__link:hover { color: var(--s2s-accent-hover); }
+
+  .lab-claim__chips { display: flex; flex-wrap: wrap; gap: 6px; margin: 12px 0 0; padding: 0; list-style: none; }
+  .lab-claim__chips li {
+    padding: 2px 9px;
+    border: 1px solid var(--s2s-rule-strong);
+    border-radius: var(--s2s-radius-pill);
+    font: 400 var(--type-micro) / 1.5 var(--font-sans);
+    color: var(--s2s-ink-muted);
+  }
+
+  .lab-claim__facts { display: grid; gap: 8px; margin: 16px 0 0; }
+  .lab-claim__facts div { display: grid; grid-template-columns: 110px minmax(0, 1fr); gap: 12px; }
+  .lab-claim__facts dt, .lab-claim__sub {
+    margin: 0;
+    font: 600 var(--type-micro) / 1.6 var(--font-mono);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--s2s-ink-subtle);
+  }
+  .lab-claim__facts dd { margin: 0; font: 400 var(--type-body-s) / 1.5 var(--font-sans); color: var(--s2s-ink-soft); }
+  .lab-claim__facts code { font: 400 var(--type-meta) / 1.4 var(--font-mono); overflow-wrap: anywhere; }
+  .lab-claim__limits { margin-top: 16px; padding: 12px 14px; border-left: 2px solid var(--s2s-status-warn); background: color-mix(in srgb, var(--s2s-status-warn) 6%, transparent); border-radius: 0 6px 6px 0; }
+  .lab-claim__limits ul { list-style: disc; margin: 6px 0 0; padding-left: 18px; font: 400 var(--type-body-s) / 1.5 var(--font-sans); color: var(--s2s-ink-soft); }
+
+  .lab-claim__foot {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .lab-claim__counts { display: flex; flex-wrap: wrap; gap: 6px 16px; margin: 0; padding: 0; list-style: none; font: 400 var(--type-meta) / 1.4 var(--font-sans); color: var(--s2s-ink-subtle); }
+  .lab-claim__counts li { display: inline-flex; align-items: center; gap: 6px; }
+  .lab-claim__receipts { margin: 0; font: 500 var(--type-micro) / 1.4 var(--font-sans); color: var(--s2s-secondary); }
+  .lab-claim__receipts.is-unreviewed { color: var(--s2s-status-warn); font-style: italic; }
+  .lab-claim__arrow { position: absolute; top: 50%; right: 16px; transform: translateY(-50%); font-size: 1.1rem; color: var(--s2s-ink-subtle); }
+  @media (max-width: 560px) {
+    .lab-claim__head :global(.lab-claim__conf) { margin-left: 0; flex-basis: 100%; }
+    .lab-claim__arrow { display: none; }
+    .lab-claim__statement { padding-right: 0; font-size: 1.15rem; }
+    .lab-claim__facts div { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  }
+</style>

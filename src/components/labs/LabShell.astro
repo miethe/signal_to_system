@@ -1,0 +1,82 @@
+---
+/**
+ * LabShell — the frame every per-Lab page shares (report, claims, claim
+ * record, resources): the Observatory photo hero from the storyboard, the
+ * report's section tabs, then a reading column with a contextual evidence
+ * rail (spec 04: "approved reading column and contextual evidence rail").
+ * Below 1100px the rail drops under the column, in reading order.
+ *
+ * Slot contract
+ *   hero-meta  optional  facts row + CTAs under the lede
+ *   default    required  the main column
+ *   rail       optional  the right rail
+ *   after      optional  full-width band after both
+ * Fixture mode (synthetic data) adds the fixture banner and noindex.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../primitives/PageHero.astro';
+import ReportTabs from './ReportTabs.astro';
+import FixtureBanner from './FixtureBanner.astro';
+import { getLabCatalog } from '../../lib/labs/site';
+
+interface Props {
+  title: string;
+  description?: string;
+  heading: string;
+  subheading?: string;
+  eyebrow?: string[];
+  lede?: string;
+  tabs?: { label: string; href: string; current?: boolean }[];
+  synthetic?: boolean;
+  quote?: { text: string };
+}
+const { title, description, heading, subheading, eyebrow = ['Labs', 'Investigations'], lede, tabs, synthetic = false, quote } = Astro.props;
+const catalog = await getLabCatalog();
+---
+
+<BaseLayout title={title} description={description} noindex={catalog.fixtures || synthetic}>
+  {catalog.fixtures && <FixtureBanner rejected={catalog.rejected} />}
+  <PageHero
+    heading={heading}
+    subheading={subheading}
+    eyebrow={eyebrow}
+    lede={lede}
+    photo="observatory"
+    quote={quote}
+    rail={['Observe', 'Investigate', 'Build', 'Share', 'Repeat']}
+    railFoot={['A quieter', 'brighter', 'tomorrow']}
+    class="lab-hero"
+  >
+    {Astro.slots.has('hero-meta') && <Fragment slot="actions"><slot name="hero-meta" /></Fragment>}
+  </PageHero>
+  {tabs && <div class="lab-shell__tabs"><ReportTabs items={tabs} /></div>}
+  <div class:list={['lab-shell', Astro.slots.has('rail') && 'lab-shell--rail']}>
+    <div class="lab-shell__main"><slot /></div>
+    {Astro.slots.has('rail') && <aside class="lab-shell__rail" aria-label="About this investigation"><slot name="rail" /></aside>}
+  </div>
+  {Astro.slots.has('after') && <div class="lab-shell__after"><slot name="after" /></div>}
+</BaseLayout>
+
+<style>
+  :global(.lab-hero .s2s-hero__title) { max-width: 22ch; }
+  /* No pull quote on Lab pages (no invented quotes): keep the tracked rail at the far right, by the dome. */
+  :global(.lab-hero:not(:has(.s2s-hero__quote)) .s2s-hero__rail) { grid-column: 2; }
+  .lab-shell__tabs { padding: 4px 16px 0; }
+  .lab-shell {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+    padding: 24px 16px 0;
+  }
+  .lab-shell__main { min-width: 0; display: flex; flex-direction: column; gap: 36px; }
+  .lab-shell__rail { min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+  .lab-shell__after { padding: 28px 16px 0; }
+  @media (min-width: 1024px) {
+    .lab-shell__tabs { padding: 4px var(--s2s-frame-gutter) 0; }
+    .lab-shell { padding: 28px var(--s2s-frame-gutter) 0; }
+    .lab-shell__after { padding: 32px var(--s2s-frame-gutter) 0; }
+  }
+  @media (min-width: 1100px) {
+    .lab-shell--rail { grid-template-columns: minmax(0, 1fr) 300px; gap: 32px; }
+  }
+</style>

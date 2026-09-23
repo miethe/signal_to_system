@@ -1,0 +1,268 @@
+---
+/**
+ * /labs/<id>/ — the investigation report (lens-detail, S2S-020). The
+ * canonical Labs object. Visual authority: docs/design/s2s-v2-visual/
+ * labs-storyboard/images/urban_heat_mapped_research_dashboard.webp.
+ *
+ * Above the fold (spec 04): the question, the bounded conclusion (or the
+ * present uncertainty) with confidence, uncertainty and scope inline, the
+ * largest limitation, method, contributors, identifier, dates, and the
+ * review and reproduction states as separate facts.
+ * Every section is server-rendered HTML; the tabs are #anchor links.
+ *
+ * Only gate-approved releases reach here (src/lib/labs/load.mjs). A
+ * withdrawn release renders its withdrawal notice and nothing else.
+ */
+import LabShell from '../../../components/labs/LabShell.astro';
+import ReportMeta from '../../../components/labs/ReportMeta.astro';
+import LabSection from '../../../components/labs/LabSection.astro';
+import ConclusionCallout from '../../../components/labs/ConclusionCallout.astro';
+import ClaimCard from '../../../components/labs/ClaimCard.astro';
+import FigureWithData from '../../../components/labs/FigureWithData.astro';
+import GlanceCard from '../../../components/labs/GlanceCard.astro';
+import DomainConstellation from '../../../components/labs/DomainConstellation.astro';
+import MethodPanel from '../../../components/labs/MethodPanel.astro';
+import ReproducePanel from '../../../components/labs/ReproducePanel.astro';
+import ProvenanceTimeline from '../../../components/labs/ProvenanceTimeline.astro';
+import ExploreStrip from '../../../components/labs/ExploreStrip.astro';
+import Callout from '../../../components/content/Callout.astro';
+import StateNotice from '../../../components/primitives/StateNotice.astro';
+import RailCard from '../../../components/family/RailCard.astro';
+import Button from '../../../components/ui/Button.astro';
+import Icon from '../../../components/brand/Icon.astro';
+import { getLabCatalog } from '../../../lib/labs/site';
+import type { LabView, LabTombstone } from '../../../lib/labs/types';
+import { EVIDENCE_KIND, REVIEW, formatIsoDate, reportTabs } from '../../../components/labs/labels';
+
+export async function getStaticPaths() {
+  const catalog = await getLabCatalog();
+  return [
+    ...catalog.labs.map((lab) => ({ params: { slug: lab.investigation.publicId }, props: { lab, tombstone: null } })),
+    ...catalog.tombstones
+      .filter((t) => !catalog.labs.some((l) => l.investigation.publicId === t.publicId))
+      .map((t) => ({ params: { slug: t.publicId }, props: { lab: null, tombstone: t } })),
+  ];
+}
+
+interface Props { lab: LabView | null; tombstone: LabTombstone | null }
+const { lab, tombstone } = Astro.props;
+
+const plural = (n: number, noun: string) => (n === 1 ? noun : `${noun}s`);
+const displayTitle = (t: string) => t.replace(/^Synthetic:\s*/, '');
+let view: null | {
+  featured: LabView['figures'][number] | undefined;
+  keyClaims: LabView['claims'];
+  inContext: LabView['evidence'];
+  pkg: LabView['artifacts'][number] | null;
+} = null;
+if (lab) {
+  const featured = lab.figures.find((f) => f.id === lab.investigation.featuredFigureId) ?? lab.figures.find((f) => f.chart && lab.figureData[f.id]) ?? lab.figures[0];
+  view = {
+    featured,
+    keyClaims: lab.claims.slice(0, 4),
+    inContext: lab.evidence.filter((e) => e.access !== 'denied').slice(0, 4),
+    pkg: lab.artifacts.find((a) => a.id === lab.reproduce.packageArtifactId) ?? null,
+  };
+}
+---
+
+{tombstone ? (
+  <LabShell
+    title="Withdrawn investigation"
+    heading="Withdrawn investigation"
+    lede="This investigation's public release was withdrawn. Its content is no longer published."
+    synthetic={tombstone.synthetic}
+  >
+    <StateNotice
+      kind="withdrawn"
+      title="This release was withdrawn."
+      body={tombstone.reason ?? 'The release was withdrawn by its approver. A corrected release, if any, will be published under its own version.'}
+      meta={formatIsoDate(tombstone.withdrawnAt)}
+    >
+      <Fragment slot="actions"><Button href="/labs/" variant="outline" size="sm">Back to Labs</Button></Fragment>
+    </StateNotice>
+    <p class="lab-tomb__id">Withdrawn record: <code>{tombstone.publicId}@{tombstone.version}</code></p>
+  </LabShell>
+) : lab && view ? (
+  <LabShell
+    title={lab.investigation.title}
+    description={lab.investigation.dek}
+    heading={lab.investigation.title}
+    lede={lab.investigation.question}
+    tabs={reportTabs(lab.href, 'overview')}
+    synthetic={lab.synthetic}
+  >
+    <ReportMeta lab={lab} slot="hero-meta">
+      <Button href="#overview" variant="signal" size="md">Read summary <span aria-hidden="true">→</span></Button>
+      <Button href={`${lab.href}claims/`} variant="outline" size="md"><Icon name="evidence" size={16} /> Explore evidence</Button>
+      <Button href="#reproduce" variant="outline" size="md"><Icon name="reproduce" size={16} /> Reproduce</Button>
+    </ReportMeta>
+
+    <LabSection id="overview" title="Executive summary" icon="essays">
+      <div class="lab-overview">
+        <div class="lab-overview__text">
+          {lab.report.summary.map((p) => <p>{p}</p>)}
+          <p class="lab-overview__why"><span>Why it matters</span> {lab.investigation.whyItMatters}</p>
+        </div>
+        <ConclusionCallout conclusion={lab.report.conclusion} />
+      </div>
+      <Callout type="warning" title="Largest limitation">
+        <p>{lab.report.largestLimitation}</p>
+        {lab.report.limitations.length > 0 && (
+          <details class="lab-limits">
+            <summary>All {lab.report.limitations.length} stated limitations</summary>
+            <ul>{lab.report.limitations.map((l) => <li>{l}</li>)}</ul>
+          </details>
+        )}
+      </Callout>
+    </LabSection>
+
+    <LabSection
+      id="claims"
+      title="Key claims"
+      icon="claims"
+      description="Each claim carries its own status, confidence and receipts."
+      action={{ label: `All ${lab.counts.claims} claims and their evidence`, href: `${lab.href}claims/` }}
+    >
+      <div class="lab-claims-grid">
+        {view.keyClaims.map((c) => <ClaimCard claim={c} labHref={lab.href} evidence={lab.evidence} />)}
+      </div>
+    </LabSection>
+
+    <LabSection
+      id="evidence"
+      title="Evidence in context"
+      icon="evidence"
+      action={{ label: 'Sources, figures and artifacts', href: `${lab.href}resources/` }}
+    >
+      <div class="lab-evidence">
+        {view.featured && (
+          <FigureWithData
+            figure={view.featured}
+            data={lab.figureData[view.featured.id]}
+            code={lab.artifacts.find((a) => a.id === view.featured?.codeArtifactId) ?? null}
+            href={`${lab.href}resources/#figure-${view.featured.id.toLowerCase()}`}
+            featured
+          />
+        )}
+        {view.inContext.length > 0 && (
+          <div class="lab-context">
+            <p class="lab-context__title">What the evidence is</p>
+            <ul>
+              {view.inContext.map((e) => (
+                <li>
+                  <span class="lab-context__icon"><Icon name={EVIDENCE_KIND[e.kind].icon} size={20} /></span>
+                  <span>
+                    <a class="s2s-focus" href={`${lab.href}claims/#evidence-${e.id.toLowerCase()}`}>{e.title}</a>
+                    <span class="lab-context__meta">{EVIDENCE_KIND[e.kind].label} · {REVIEW[e.review].label}</span>
+                  </span>
+                </li>
+              ))}
+            </ul>
+            <a class="lab-context__all s2s-focus" href={`${lab.href}claims/#evidence`}>All {lab.counts.evidence} evidence items <span aria-hidden="true">→</span></a>
+          </div>
+        )}
+      </div>
+    </LabSection>
+
+    <LabSection id="method" title="Method" icon="methods" description="The declared method profile and its required record.">
+      <MethodPanel method={lab.method} contribution={lab.investigation.contribution} />
+    </LabSection>
+
+    <LabSection id="reproduce" title="Reproduce" icon="reproduce" description="Three different things, stated separately.">
+      <ReproducePanel reproduce={lab.reproduce} pkg={view.pkg} />
+    </LabSection>
+
+    <LabSection id="timeline" title="Timeline" icon="timeline" description="Runs, reviews, corrections and releases.">
+      <ProvenanceTimeline events={lab.timeline} />
+    </LabSection>
+
+    <ExploreStrip
+      heading="Explore the research"
+      icon="labs"
+      id="explore"
+      tiles={[
+        { label: 'Claims', icon: 'claims', count: lab.counts.claims, sub: plural(lab.counts.claims, 'claim'), href: `${lab.href}claims/` },
+        { label: 'Evidence', icon: 'evidence', count: lab.counts.evidence, sub: plural(lab.counts.evidence, 'item'), href: `${lab.href}claims/#evidence` },
+        { label: 'Sources', icon: 'sources', count: lab.counts.sources, sub: plural(lab.counts.sources, 'source'), href: `${lab.href}resources/#sources` },
+        { label: 'Figures', icon: 'figures', count: lab.counts.figures, sub: plural(lab.counts.figures, 'figure'), href: `${lab.href}resources/#figures` },
+        { label: 'Artifacts', icon: 'artifacts', count: lab.counts.artifacts, sub: 'released', href: `${lab.href}resources/#artifacts` },
+        { label: 'Method', icon: 'methods', sub: 'Profile and record', href: '#method' },
+        { label: 'Timeline', icon: 'timeline', count: lab.timeline.length, sub: plural(lab.timeline.length, 'event'), href: '#timeline' },
+      ]}
+    />
+
+    <Fragment slot="rail">
+      <GlanceCard lab={lab} />
+      <RailCard heading="Domain constellation" icon="topics">
+        <DomainConstellation center={displayTitle(lab.investigation.title)} domains={lab.investigation.domains} compact />
+      </RailCard>
+      <RailCard heading="On this page" icon="reading-paths">
+        <ol class="lab-toc">
+          <li><a href="#overview">Executive summary</a></li>
+          <li><a href="#claims">Key claims</a></li>
+          <li><a href="#evidence">Evidence in context</a></li>
+          <li><a href="#method">Method</a></li>
+          <li><a href="#reproduce">Reproduce</a></li>
+          <li><a href="#timeline">Timeline</a></li>
+        </ol>
+      </RailCard>
+      <RailCard heading="Use with your agent" icon="sparkle">
+        <p>Read-only context capsules of this release. They cannot execute, install or publish anything; this page stays canonical.</p>
+        <ul class="lab-capsules">
+          {(['orientation', 'evidence', 'reproduction'] as const).map((s) => (
+            <li><span>{s[0].toUpperCase() + s.slice(1)}</span> <a href={`${lab.href}capsule/${s}.json`}>JSON</a> <a href={`${lab.href}capsule/${s}.md`}>Markdown</a></li>
+          ))}
+        </ul>
+      </RailCard>
+    </Fragment>
+  </LabShell>
+) : null}
+
+<style>
+  .lab-tomb__id { margin: 0; font: 400 var(--type-meta) / 1.5 var(--font-sans); color: var(--s2s-ink-subtle); }
+  .lab-tomb__id code { font-family: var(--font-mono); }
+
+  .lab-overview { display: grid; grid-template-columns: minmax(0, 1fr); gap: 20px; }
+  @media (min-width: 900px) { .lab-overview { grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 28px; } }
+  .lab-overview__text p { margin: 0 0 14px; font: 400 var(--type-body) / var(--type-leading-body) var(--font-sans); color: var(--s2s-ink-muted); }
+  .lab-overview__why { padding-top: 12px; border-top: 1px solid var(--s2s-rule); font-size: var(--type-body-s) !important; }
+  .lab-overview__why span {
+    display: block;
+    margin-bottom: 4px;
+    font: 600 var(--type-micro) / 1.2 var(--font-sans);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--s2s-accent-label);
+  }
+  #overview :global(.callout-v2) { margin: 20px 0 0; }
+  #overview :global(.callout-v2 p) { margin: 0; }
+  .lab-limits { margin-top: 8px; }
+  .lab-limits summary { cursor: pointer; font: 500 var(--type-meta) / 1.4 var(--font-sans); color: var(--s2s-ink-soft); }
+  .lab-limits ul { margin: 6px 0 0; padding-left: 18px; font: 400 var(--type-body-s) / 1.5 var(--font-sans); }
+
+  .lab-claims-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  @media (min-width: 900px) { .lab-claims-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+  .lab-evidence { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; align-items: start; }
+  @media (min-width: 1240px) { .lab-evidence { grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); } }
+  .lab-context { padding: 16px; border: 1px solid var(--s2s-rule); border-radius: var(--s2s-radius-card); background: var(--s2s-surface); }
+  .lab-context__title { margin: 0 0 8px; font: 400 1.125rem / 1.3 var(--font-display); color: var(--s2s-ink); }
+  .lab-context ul { margin: 0; padding: 0; list-style: none; }
+  .lab-context li { display: flex; gap: 12px; padding: 11px 0; border-top: 1px solid var(--s2s-rule); }
+  .lab-context li:first-child { border-top: 0; }
+  .lab-context__icon { flex: none; color: var(--s2s-secondary); }
+  .lab-context a { display: block; font: 400 var(--type-body-s) / 1.4 var(--font-sans); color: var(--s2s-ink-soft); text-decoration: none; }
+  .lab-context a:hover { color: var(--s2s-accent); }
+  .lab-context__meta { display: block; margin-top: 2px; font: 400 var(--type-micro) / 1.4 var(--font-sans); color: var(--s2s-ink-subtle); }
+  .lab-context__all { margin-top: 8px; font: 450 var(--type-meta) / 1 var(--font-sans) !important; color: var(--s2s-accent) !important; }
+
+  .lab-toc { margin: 0; padding-left: 18px; }
+  .lab-toc li { padding: 3px 0; }
+  .lab-toc a { color: var(--s2s-ink-soft); text-decoration: none; }
+  .lab-toc a:hover { color: var(--s2s-accent); }
+  .lab-capsules { margin: 0; padding: 0; list-style: none; }
+  .lab-capsules li { display: flex; gap: 10px; padding: 5px 0; border-top: 1px solid var(--s2s-rule); }
+  .lab-capsules li span { flex: 1; color: var(--s2s-ink-soft); }
+  .lab-capsules a { color: var(--s2s-accent); text-decoration: none; font-family: var(--font-mono); font-size: var(--type-micro); }
+</style>
