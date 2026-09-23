@@ -20,6 +20,7 @@
  * frontmatter may have no entry in the `series` collection, and linking to a
  * 404 is worse than plain text.
  */
+import { seriesKey } from '../../lib/series.mjs';
 import { getCollection } from 'astro:content';
 import pathsData from '../../data/reading-paths.json';
 
@@ -66,17 +67,8 @@ const arc = arcPath
 
 // --- Mini-series ------------------------------------------------------------
 
-/**
- * `series` frontmatter is authored inconsistently — some entries use the
- * series-collection id ("governed-agentic-sdlc"), some the display title
- * ("AI Workflows"). Compare on a normalised slug so both group correctly.
- */
-const normalize = (value: string) =>
-  value
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '');
+// Series identity is resolved by src/lib/series.mjs (id or legacy title).
+const normalize = seriesKey;
 
 let miniSeries: {
   name: string;

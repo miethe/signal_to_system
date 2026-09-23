@@ -1,4 +1,5 @@
 import type { CollectionEntry } from "astro:content";
+import { inSeries } from "./series.mjs";
 import { TOPIC_HUBS } from "../data/taxonomy";
 
 // ---------------------------------------------------------------------------
@@ -42,7 +43,7 @@ export function getSeriesNav(
   const seriesEntries = allEntries
     .filter(
       (e) =>
-        e.data.series === seriesSlug && e.data.status !== "draft"
+        inSeries(e, seriesSlug) && e.data.status !== "draft"
     )
     .sort((a, b) => {
       const orderA = a.data.seriesOrder ?? Infinity;

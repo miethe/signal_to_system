@@ -921,6 +921,14 @@
       "family": "site",
       "action": "preserve",
       "target": "/workflow-showcase/stage-2/step-2-8.terminal.html"
+    },
+    {
+      "path": "/series/i-let-claude-build-my-app/",
+      "output": "series/i-let-claude-build-my-app/index.html",
+      "family": "series",
+      "action": "add",
+      "target": "/series/i-let-claude-build-my-app/",
+      "milestone": "M2"
     }
   ]
 }

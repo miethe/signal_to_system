@@ -14,6 +14,7 @@ import PageHero from '../../components/primitives/PageHero.astro';
 import Card from '../../components/primitives/Card.astro';
 import SectionHeading from '../../components/primitives/SectionHeading.astro';
 import { hrefFor } from '../../lib/content';
+import { inSeries } from '../../lib/series.mjs';
 import pathsData from '../../data/reading-paths.json';
 
 const allSeries = await getCollection('series');
@@ -22,8 +23,8 @@ const allStories = await getCollection('stories');
 
 /** Published posts + stories belonging to a series, ordered by seriesOrder. */
 function entriesFor(seriesId: string) {
-  const posts = allPosts.filter((p) => p.data.status !== 'draft' && p.data.series === seriesId);
-  const stories = allStories.filter((s) => s.data.status !== 'draft' && s.data.series === seriesId);
+  const posts = allPosts.filter((p) => p.data.status !== 'draft' && inSeries(p, seriesId));
+  const stories = allStories.filter((s) => s.data.status !== 'draft' && inSeries(s, seriesId));
   return [...posts, ...stories].sort((a, b) => (a.data.seriesOrder ?? 999) - (b.data.seriesOrder ?? 999));
 }
 
