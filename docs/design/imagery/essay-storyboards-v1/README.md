@@ -3,6 +3,8 @@
 For an **external image-generation agent**. No site build or code change is asked of you.
 Revised by the Opus taste pass (2026-09-23); `../REVIEW-opus-taste-pass.md` explains the changes.
 
+> **Distribution entry point:** use the two-recipient [S2S imagery handoff guide](../HANDOFF-GUIDE.md). Its Pack A → Pack B sequence and role-slot join contract govern external delivery; this directory is Pack B's storyboard family.
+
 ## Read first
 
 1. `00-style-reference.md`, all of it. §2 says what the Registry Wave images actually do, §3 is
