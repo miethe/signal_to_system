@@ -1,0 +1,29 @@
+Permission allow rule (../../../ibm-agentic-tools/ica/settings/ica-settings-ccx.json): Write(.claude/reports/**) is not matched by file permission checks — only Edit(path) rules are. Use Edit(.claude/reports/**) instead (Edit rules cover all file-editing tools).
+Permission allow rule (../../../ibm-agentic-tools/ica/settings/ica-settings-ccx.json): Write(~/.claude/reports/**) is not matched by file permission checks — only Edit(path) rules are. Use Edit(~/.claude/reports/**) instead (Edit rules cover all file-editing tools).
+⚠ claude.ai connectors are disabled because ANTHROPIC_API_KEY or another auth source is set and takes precedence over your claude.ai login · Unset it to load your organization's connectors
+Report complete.
+
+## Files changed
+
+Only new files, all under the atlas directory. **Zero changes to `src/`** (`git status --porcelain -- src/` is empty, `git diff HEAD -- src/` is empty).
+
+- `docs/blog-work/.../reading-experience-v2/atlas/p0bc-review/FIX-LIST.md`
+- 60 PNGs + `capture-log-2.txt` in the same directory (35 MB)
+
+## Screenshots captured
+
+All seven requested states at desktop 1440×900 and mobile 390×844, light and dark: entry/hero, first scroll into a ThreadScene (plus the `pane` variant), Thread Focus (both in-place overlay and standalone route, plus full-page), Evidence Focus (index and record routes, plus full-page), Figure Viewer (overlay and route), conclusion/WhereThisSits, and the mobile Contents state. Added: a fair-dark re-capture set, an A/B pair proving finding A1, and a V13 regression spot-check (two other essays + one dev story). Full index is the last table in FIX-LIST.md.
+
+## Top 3 must-fix
+
+1. **Tailwind's `dark:` variant is bound to the OS media query, not the site's `.dark` class.** No `@custom-variant dark` exists anywhere; the built CSS puts all `dark:` utilities inside one `@media(prefers-color-scheme:dark)` block. Same element, site theme dark both times: OS-light → `bg-blue-50` (near-white), OS-dark → `dark:bg-blue-950/30`. 370 `dark:` utilities are affected; six Callouts on this essay render light-grey text on a white panel. One line fixes it.
+2. **`--accent` never paints.** `global.css:116/:170` set the real violet, then `:1770/:1792` (leftover shadcn) override it with bare HSL triples at equal specificity. Measured on `.reading-companion__header`: token = `217.2 32.6% 17.5%`, computed colour = `--text-primary`. 19 live elements plus the reading-progress bar, which paints nothing.
+3. **`ReadingCompanion` never sticks.** `xl:self-start` (`PostLayout.astro:211`) caps the grid item at content height, so the sticky child has no travel. Measured: rect top 457 → −402 across 859px of scroll (1:1, no pinning), off-screen by `scrollY ≈ 2462` while the article is 23306px tall. Violates V5 and §7 item 3 directly.
+
+A4 (Evidence Focus unreachable — 0 evidence links outside `<template>`, verified statically and in the live DOM) is close behind and arguably the worst *functional* gap.
+
+## What I could not verify
+
+No-JS behaviour, keyboard focus containment/restoration, and the two distinct return semantics — all read in source but not driven, so they are listed unverified rather than passed. Tier A 03's split composition and Tier A 07's managed-variation comparison had nothing rendered to photograph. Section E of the report lists these plus four smaller gaps.
+
+Two scope corrections worth your attention: the mobile Contents sheet and the unwired `PullQuote`/`ContextualNote`/`ReceiptDisclosure` are **P0-D and V12 work per DIRECTION.md**, not P0-B/C defects, so I put them in a separate section rather than the must-fix list. The dark nav-in-light-theme and the React #418 error reproduce on other essays and are pre-existing site-wide. I also corrected my own draft mid-way: I initially read thread/evidence overlays as unwired, but `focus-host.ts` intercepts by pathname, so they work — and A1 meant my first dark screenshots were unfair, which is why I re-captured.

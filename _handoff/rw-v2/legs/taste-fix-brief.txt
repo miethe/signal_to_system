@@ -1,0 +1,21 @@
+Registry Wave reading-experience v2, package 1: taste-fix. Close FIX-LIST section A (A1-A9) exactly as written, nothing else.
+
+Read first: docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/FIX-LIST.md (section A only is in scope; sections B/C are deferred, D is "do not touch", do not act on them). Also read DIRECTION.md V5, V6, V7, V9, V10 in the same directory for the target behavior each fix restores.
+
+Fix each item exactly as FIX-LIST §A specifies (file paths and line numbers are in the doc):
+
+A1. src/styles/global.css: add `@custom-variant dark (&:where(.dark, .dark *));` so Tailwind's dark: variant binds to the site's .dark class instead of the OS media query.
+A2. src/styles/global.css: delete or namespace the leftover shadcn HSL-triple `--accent` block (around line 1770/1792) that clobbers the real `--accent` hex values at :116/:170. Keep the real editorial violet accent as the only one in scope.
+A3. src/layouts/PostLayout.astro: fix ReadingCompanion's sticky positioning — the grid item needs to stretch to full row height (swap `xl:self-start` at line ~211 for `xl:self-stretch`, or remove it since the column already spans both rows) so the sticky child has scroll travel instead of collapsing to content height.
+A4. Give Evidence Focus a real in-flow entry point. Add a "Receipts behind the argument" section link (or rail slot) in the essay MDX / ReadingCompanion that links to /essays/<slug>/evidence/, so at least one evidence link exists outside the <template> fragments. Check src/lib/focus-host.ts is unaffected.
+A5. Build the static half of section markers (ordinal + reserved-width left rule) per V6 — this is P0-B composition scope per FIX-LIST's own scope note, active-observer behavior stays deferred to P1. No new SectionMarker component exists yet; add one in src/components/content/ and wire it into heading rendering in PostLayout.astro (~line 249).
+A6. src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx frontmatter: add `heroPlacement: frontispiece` (or whatever the schema in src/content.config.ts:41 names the frontispiece value). Then fix the latent bug FIX-LIST describes: the frontispiece wrapper's `max-w-[var(--measure)]` in PostLayout.astro:119 sits outside `.post-layout` where `--measure` is defined (global.css:409,414) — move the wrapper inside `.post-layout` or define `--measure` where the wrapper can resolve it.
+A7. src/layouts/PostLayout.astro: move ExecutiveSignal (currently ~line 242-246, in the body column) into the rail, second position under AuthorCard, per V5.
+A8. src/components/content/EvidenceFocus.astro: add a real `<h1>` and render the selected receipt in full (RECEIPT SUMMARY card: title, date, claim badge, supported-claim/limitations split) using the existing fields in src/data/evidence.ts, not just the four-field list it has today.
+A9. src/styles/global.css:830-832 (`.dark .figure-plate`): change the dark figure-plate background from near-white (#f3f5fa) to a dark navy bordered panel per Tier A — the container goes dark, the artwork inside stays light. Do not touch the light-theme rule at :822.
+
+Verification: `nvm use 22 && npm run check && npm run build` must be green (no new errors in files you touch; baseline ~2600 pre-existing errors in other files is fine). Then take a Playwright screenshot pair (light and dark, desktop 1440x900) for each of A1-A9's affected views, forcing dark via the site's real `.dark` class mechanism (not OS prefers-color-scheme — same osdark method the taste-review leg used, see FIX-LIST's method note). Save to docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/taste-fix/ with descriptive names. Keep this atlas dir under 5MB — only the screenshots you actually reference in your report.
+
+Constraints: no emdashes. No fabricated data/metrics. Work only in this worktree, do not `cd` out of it. No git add, no commit, no push (orchestrator commits). Do not touch src/data/threads.ts or src/data/evidence.ts content beyond what A8 needs to read (read-only) or A4 needs for the link target.
+
+End with a report: files changed, gates run (paste tail of check/build), screenshot list with a one-line note per A1-A9 on what you verified, anything you could not fully verify and why.

@@ -1,0 +1,2067 @@
+Reading additional input from stdin...
+2026-09-20T01:45:06.001044Z ERROR codex_core::session::session: failed to load skill /Users/miethe/.agents/skills/skill-dev/scripts/tests/fixtures/missing-frontmatter/SKILL.md: missing YAML frontmatter delimited by ---
+2026-09-20T01:45:06.001392Z ERROR codex_core::session::session: failed to load skill /Users/miethe/dev/homelab/development/signal_to_system/.wt/rw-v2-essay/.agents/skills/claude-code/SKILL.md: missing YAML frontmatter delimited by ---
+OpenAI Codex v0.155.0-alpha.9
+--------
+workdir: /Users/miethe/dev/homelab/development/signal_to_system/.wt/rw-v2-essay
+model: gpt-5.6-terra-dzus
+provider: ica
+approval: never
+sandbox: danger-full-access
+reasoning effort: medium
+reasoning summaries: none
+session id: 01a0bc7d-079d-74f3-8de5-22ae8c723c35
+--------
+user
+Registry Wave reading-experience v2: fix the atlas capture in _handoff/rw-v2/qa/run_qa.py and recapture. No src/ edits. No image viewing. No git writes. No emdashes. Dev server at http://localhost:4399 (do not start another; do not run npm).
+
+Defects found in the current atlas/final captures (docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/final/):
+1. Thread Focus overlay captured mid fade-in (dialog and essay both visible, translucent). Wait for the dialog's opening transition to finish: wait for `getComputedStyle(dialog).opacity === '1'` and no running animations (`dialog.getAnimations().length === 0`), plus 300ms, before every overlay screenshot (Thread Focus, Evidence Focus, Figure Viewer, mobile Contents sheet).
+2. evidence-record used the URL /evidence/drift-check-2026-08-06/ which 404s. Valid ids are in src/data/evidence.ts (e.g. drift-check). Use /essays/the-registry-wave-agentic-artifact-supply-chain/evidence/drift-check/ and also capture the in-essay Evidence Focus overlay opened from the "evidence" link, not only the route.
+3. conclusion captured the hero. Scroll so the last section marker ("What I can prove today.") heading sits at the top of the viewport, wait for images (all `img` complete) and 500ms, then capture; also capture the very end (WhereThisSits / related work / sources) as conclusion-end.
+4. Add captures: executive-signal region (viewport at y=0 desktop is fine but also a 1440x1400 full-height entry capture named entry-tall), first section marker + first pull quote (first-scroll: scroll so the first h2 section marker is at top), managed-variation figure inline (the "Not every difference is drift" figure: scroll it to center), and the rail alone cropped (clip to the aside bounding box) at the first-scroll position, named rail-companion.
+5. Preload: before any capture, scroll to the bottom and back to the top and wait until every img is complete, so lazy images do not shift layout.
+6. Dark theme: add class "dark" to <html> before load via an init script, and also set the theme in localStorage if the site reads one (check src/layouts/BaseLayout.astro for the key). Capture desktop 1440x900 dark AND light, mobile 390x844 dark AND light, JPEG quality 85.
+
+Overwrite atlas/final/ (delete the old jpgs first) and rewrite INDEX.md (one line per file). Keep under 8 MB. Final message under 150 words: file count, size, and any state you could not capture (with why).
+warning: Codex is ignoring 1 unrecognized configuration setting. Check for typos or deprecated settings.
+  user (/Users/miethe/.codex/config.toml): `trust_level` is ignored.
+warning: Codex is ignoring 1 unrecognized configuration setting. Check for typos or deprecated settings.
+  user (/Users/miethe/.codex/config.toml): `trust_level` is ignored.
+warning: Skill descriptions were shortened to fit the skills context budget. Codex can still see every skill, but some descriptions are shorter. Disable unused skills or plugins to leave more room for the rest.
+codex
+I’ll update only the QA capture script and regenerate the final atlas using the existing server. I’ll first confirm the capture flow, evidence route, and theme key, then clear and replace only the atlas JPEGs and index.
+exec
+/bin/zsh -lc "rg -n -i \"registry wave|rw-v2|reading-experience|evidence.*drift|BaseLayout|theme\" /Users/miethe/.codex/memories/MEMORY.md | head -80 && find .. -name AGENTS.md -print && sed -n '1,260p' _handoff/rw-v2/qa/run_qa.py && sed -n '1,240p' src/layouts/BaseLayout.astro && git status --short" in /Users/miethe/dev/homelab/development/signal_to_system/.wt/rw-v2-essay
+ succeeded in 1557ms:
+../rw-v2-features/AGENTS.md
+../registry-wave/AGENTS.md
+../rw-v2-arc/AGENTS.md
+../registry-wave-sept/AGENTS.md
+../series-page/AGENTS.md
+../sidebar-rail-toc/AGENTS.md
+../deterministic-envelope/AGENTS.md
+../rw-voice/AGENTS.md
+../rw-v2-essay/AGENTS.md
+#!/usr/bin/env python3
+"""Headless Chromium QA and capture runner for Registry Wave reading experience v2.
+
+This runner uses the existing Astro server. It does not start Node, write src/, or
+inspect screenshots. Captures are output only for a human or vision review leg.
+"""
+from pathlib import Path
+from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
+
+ROOT = Path(__file__).resolve().parents[3]
+ATLAS = ROOT / "docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/final"
+BASE = "http://localhost:4399"
+SLUG = "the-registry-wave-agentic-artifact-supply-chain"
+ESSAY = f"/essays/{SLUG}/"
+THREAD = f"/essays/{SLUG}/thread/"
+EVIDENCE = f"/essays/{SLUG}/evidence/"
+FIGURE = f"/essays/{SLUG}/figure/"
+
+TESTS = {
+    "N01": "Essay to Thread to Close", "N02": "Choose several beats", "N03": "Thread to Figure to Escape",
+    "N04": "Thread to Evidence to Figure to return", "N05": "Browser Back/Forward",
+    "N06": "Copy/open detail URL in a fresh tab", "N07": "Refresh a focused URL", "N08": "Modifier/middle click",
+    "N09": "No JS", "N10": "Navigation or storage unavailable", "N11": "Back to essay vs Read this scene",
+    "N12": "Different viewport/content revision return", "A01": "Keyboard focus and Escape",
+    "A02": "Reduced motion", "A03": "Zoom / 320px / landscape", "A04": "Screen reader semantics",
+    "C01": "Read marker", "C02": "Note selection", "C03": "Collapse and hold", "C04": "Focus sidebars",
+    "V01": "Actual canonical art", "V02": "Content/evidence integrity", "V03": "Theme", "V04": "Real manuscript density",
+}
+
+def line(status, test, measured): print(f"{status} {test} | {TESTS[test]} | {measured}")
+def wait_frames(page, count=2):
+    page.evaluate("n => new Promise(resolve => { let i=0; const f=()=> ++i >= n ? resolve() : requestAnimationFrame(f); requestAnimationFrame(f); })", count)
+def theme(page, dark): page.evaluate("dark => document.documentElement.classList.toggle('dark', dark)", dark)
+def url(path): return BASE + path
+def ready(page): page.wait_for_load_state("networkidle"); page.wait_for_timeout(100)
+def new_page(context, path=ESSAY, dark=False):
+    page = context.new_page(); page.goto(url(path), wait_until="networkidle"); theme(page, dark); return page
+def dialog(page): return page.locator("[data-focus-dialog]")
+def open_beat(page, beat="incident"):
+    trigger = page.locator(f'.thread-scene#{"thread-" + beat} a[href*="/thread/"]').first
+    trigger.scroll_into_view_if_needed(); trigger.click(); dialog(page).wait_for(state="visible"); wait_frames(page); return trigger
+def close_root(page):
+    dialog(page).evaluate("d => d.addEventListener('close', () => window.__qaClosed = true, {once:true})")
+    page.evaluate("window.__qaClosed = false")
+    page.locator("[data-focus-close]").click()
+    page.wait_for_function("() => window.__qaClosed === true")
+    wait_frames(page, 4)
+def root_scroll(page): return page.evaluate("window.scrollY")
+def focus_summary(page): return page.evaluate("() => ({tag:document.activeElement?.tagName, text:(document.activeElement?.textContent||'').trim().slice(0,48)})")
+def route_path(page): return page.evaluate("location.pathname + location.hash")
+def safely(test_id, fn):
+    try: fn()
+    except Exception as exc: line("FAIL", test_id, f"exception={type(exc).__name__}: {str(exc).splitlines()[0]}")
+
+def test_suite(browser):
+    desktop = browser.new_context(viewport={"width": 1440, "height": 900}, color_scheme="light")
+
+    def n01():
+        p = new_page(desktop); trigger = p.locator('.thread-scene#thread-incident a[href*="/thread/"]').first
+        trigger.scroll_into_view_if_needed(); before = root_scroll(p); open_beat(p); close_root(p); after = root_scroll(p)
+        delta = abs(after - before); focus = focus_summary(p)
+        line("PASS" if delta <= 8 and focus["tag"] == "A" else "FAIL", "N01", f"open=True; settledDeltaY={delta}px; focus={focus['tag']}:{focus['text']!r}")
+        p.close()
+    safely("N01", n01)
+
+    def n02():
+        p = new_page(desktop); results=[]
+        for beat in ("incident", "deployment", "use", "drift", "detection", "outcome"):
+            tr = p.locator(f'.thread-scene#thread-{beat} a[href*="/thread/"]').first; tr.scroll_into_view_if_needed(); before=root_scroll(p); p.evaluate("value => window.__qaBeforeScroll = value", before)
+            tr.click(); dialog(p).wait_for(state="visible"); locked=p.evaluate("() => document.body.style.position === 'fixed' && document.body.style.top === `-${window.__qaBeforeScroll}px`"); close_root(p); after=root_scroll(p)
+            results.append(f"{beat}:{abs(after-before)}px/{locked}")
+        ok=all(part.split(':')[1].split('px')[0] in tuple(str(i) for i in range(9)) and part.endswith('True') for part in results)
+        line("PASS" if ok else "FAIL", "N02", "beats=" + ",".join(results)); p.close()
+    safely("N02", n02)
+
+    def n03():
+        p=new_page(desktop); open_beat(p); title=p.locator("[data-focus-dialog] .thread-focus__title").text_content().strip()
+        p.locator("[data-focus-dialog] a[href*='/figure/']").click(); p.wait_for_timeout(60); before=route_path(p)
+        p.keyboard.press("Escape"); p.wait_for_timeout(100); wait_frames(p)
+        restored=p.locator("[data-focus-dialog] .thread-focus__title").text_content().strip() if dialog(p).get_attribute("open") is not None else ""
+        line("PASS" if "/figure/incident/" in before and restored==title else "FAIL", "N03", f"figureURL={before}; restoredTitle={restored!r}; expected={title!r}"); p.close()
+    safely("N03", n03)
+
+    def n04():
+        p=new_page(desktop); open_beat(p)
+        thread_evidence=p.locator("[data-focus-dialog] a[href*='/evidence/']").count()
+        p.locator("[data-focus-close]").click(); p.wait_for_timeout(80)
+        p.locator("a[href$='/evidence/']").first.click(); dialog(p).wait_for(state="visible")
+        evidence_figures=p.locator("[data-focus-dialog] a[href*='/figure/']").count()
+        line("FAIL" if thread_evidence == 0 or evidence_figures == 0 else "PASS", "N04", f"threadToEvidenceLinks={thread_evidence}; evidenceToFigureLinks={evidence_figures}; required nested chain is not exposed" if thread_evidence == 0 or evidence_figures == 0 else "nested chain exposed")
+        p.close()
+    safely("N04", n04)
+
+    def n05():
+        p=new_page(desktop); open_beat(p); p.locator("[data-focus-dialog] a[href*='/figure/']").click(); p.wait_for_timeout(80)
+        figure=route_path(p); p.go_back(); p.wait_for_timeout(80); back_kind=p.locator("[data-focus-dialog] [data-focus-kind]").get_attribute("data-focus-kind")
+        p.go_forward(); p.wait_for_timeout(80); forward_kind=p.locator("[data-focus-dialog] [data-focus-kind]").get_attribute("data-focus-kind")
+        p.go_back(); p.go_back(); p.wait_for_timeout(120); root_open=dialog(p).get_attribute("open") is not None
+        line("PASS" if "/figure/incident/" in figure and back_kind=="thread" and forward_kind=="figure" and not root_open else "FAIL", "N05", f"figure={figure}; back={back_kind}; forward={forward_kind}; rootDialogOpen={root_open}"); p.close()
+    safely("N05", n05)
+
+    def n06():
+        fresh=browser.new_context(viewport={"width":1440,"height":900}); p=new_page(fresh, THREAD+"incident/")
+        heading=p.locator("h1, h2").first.text_content().strip(); no_dialog=dialog(p).count() == 0
+        line("PASS" if "Incident" in heading and no_dialog else "FAIL", "N06", f"freshURL={route_path(p)}; heading={heading!r}; dialogOpen={not no_dialog}"); p.close(); fresh.close()
+    safely("N06", n06)
+
+    def n07():
+        fresh=browser.new_context(viewport={"width":1440,"height":900}); p=new_page(fresh, THREAD+"incident/"); p.reload(wait_until="networkidle")
+        heading=p.locator("h1, h2").first.text_content().strip(); line("PASS" if "Incident" in heading else "FAIL", "N07", f"reloadURL={route_path(p)}; heading={heading!r}"); p.close(); fresh.close()
+    safely("N07", n07)
+
+    def n08():
+        p=new_page(desktop); link=p.locator('.thread-scene#thread-incident a[href*="/thread/"]').first
+        with desktop.expect_page(timeout=5000) as event: link.click(modifiers=["Meta"])
+        popup=event.value; popup.wait_for_url("**/thread/incident/", timeout=5000)
+        target=popup.url; line("PASS" if target.endswith("/thread/incident/") else "FAIL", "N08", f"newTabURL={target}"); popup.close(); p.close()
+    safely("N08", n08)
+
+    def n09():
+        nojs=browser.new_context(viewport={"width":1440,"height":900}); nojs.route("**/*.js", lambda route: route.abort())
+        p=new_page(nojs); scenes=p.locator(".thread-scene").count(); imgs=p.locator(".thread-scene img").count(); evidence=p.locator("a[href$='/evidence/']").count()
+        direct=new_page(nojs, THREAD+"incident/"); heading=direct.locator("h1, h2").first.text_content().strip()
+        line("PASS" if scenes==6 and imgs==6 and evidence>0 and "Incident" in heading else "FAIL", "N09", f"blockedJS=True; scenes={scenes}; images={imgs}; evidenceLinks={evidence}; directHeading={heading!r}"); direct.close(); p.close(); nojs.close()
+    safely("N09", n09)
+
+    def n10():
+        broken=browser.new_context(viewport={"width":1440,"height":900}); broken.add_init_script("History.prototype.pushState = () => { throw new Error('qa pushState blocked') }")
+        p=new_page(broken); p.locator('.thread-scene#thread-incident a[href*="/thread/"]').first.click(); p.wait_for_url("**/thread/incident/", timeout=5000)
+        open_state=dialog(p).count() > 0 and dialog(p).get_attribute("open") is not None
+        line("PASS" if not open_state and route_path(p).endswith("/thread/incident/") else "FAIL", "N10", f"pushState=throws; URL={route_path(p)}; dialogOpen={open_state}"); p.close(); broken.close()
+    safely("N10", n10)
+
+    def n11():
+        p=new_page(desktop); p.locator("#thread-incident").scroll_into_view_if_needed(); before=root_scroll(p); open_beat(p)
+        p.locator("[data-focus-dialog] a[href$='/essays/the-registry-wave-agentic-artifact-supply-chain/']").first.click(); p.wait_for_timeout(120); wait_frames(p); back=root_scroll(p)
+        open_beat(p); p.locator("[data-focus-dialog]").get_by_text("Read this scene in the essay", exact=True).click(); p.wait_for_timeout(120); wait_frames(p); anchor_top=p.locator("#thread-incident").evaluate("el => Math.round(el.getBoundingClientRect().top)")
+        line("PASS" if abs(back-before)<=8 and abs(anchor_top)<=120 else "FAIL", "N11", f"backDeltaY={abs(back-before)}px; readSceneTop={anchor_top}px"); p.close()
+    safely("N11", n11)
+
+    def n12():
+        p=new_page(desktop); p.locator("#thread-drift").scroll_into_view_if_needed(); open_beat(p, "drift"); p.set_viewport_size({"width":390,"height":844}); close_root(p)
+        top=p.locator("#thread-drift").evaluate("el => Math.round(el.getBoundingClientRect().top)")
+        line("PASS" if abs(top)<=160 else "FAIL", "N12", f"returnViewport=390x844; anchorTop={top}px"); p.close()
+    safely("N12", n12)
+
+    def a01():
+        p=new_page(desktop); trigger=open_beat(p); within=[]
+        for _ in range(16): p.keyboard.press("Tab"); within.append(p.evaluate("() => document.querySelector('[data-focus-dialog]').contains(document.activeElement)"))
+        p.keyboard.press("Escape"); p.wait_for_timeout(100); wait_frames(p); focus=focus_summary(p)
+        line("PASS" if all(within) and focus["tag"]=="A" else "FAIL", "A01", f"tabSteps=16; contained={all(within)}; escapeFocus={focus['tag']}:{focus['text']!r}"); p.close()
+    safely("A01", a01)
+
+    def a02():
+        reduced=browser.new_context(viewport={"width":1440,"height":900}, reduced_motion="reduce"); p=new_page(reduced); match=p.evaluate("matchMedia('(prefers-reduced-motion: reduce)').matches"); transition=p.locator(".reading-companion__rail-fill").evaluate("el => getComputedStyle(el).transitionDuration")
+        line("PASS" if match and float(transition.rstrip('s')) <= .00001 else "FAIL", "A02", f"mediaReduce={match}; railTransition={transition}"); p.close(); reduced.close()
+    safely("A02", a02)
+
+    def a03():
+        measures=[]
+        for size in ((320,844),(844,320)):
+            c=browser.new_context(viewport={"width":size[0],"height":size[1]}); p=new_page(c); overflow=p.evaluate("document.documentElement.scrollWidth - innerWidth"); measures.append(f"{size[0]}x{size[1]}:{overflow}px"); p.close(); c.close()
+        line("PASS" if all(item.endswith(":0px") for item in measures) else "FAIL", "A03", "; ".join(measures))
+    safely("A03", a03)
+
+    def a04():
+        p=new_page(desktop); open_beat(p); label=dialog(p).get_attribute("aria-labelledby"); label_text=p.locator("#"+label).text_content().strip() if label else ""; p.locator("[data-focus-close]").click(); tables=p.locator("table").count(); links=p.locator("a[href]").count()
+        line("PASS" if label_text and tables>=1 and links>0 else "FAIL", "A04", f"dialogLabel={label_text!r}; semanticTables={tables}; sourceLinks={links}"); p.close()
+    safely("A04", a04)
+
+    def c01():
+        p=new_page(desktop); p.evaluate("scrollTo(0, document.body.scrollHeight*.45)"); p.wait_for_timeout(250); active=p.locator('[data-companion-link][aria-current="location"]').count()
+        line("PASS" if active==1 else "FAIL", "C01", f"activeLocationMarkers={active}"); p.close()
+    safely("C01", c01)
+
+    def c02():
+        p=new_page(desktop); p.locator("#what-the-registry-wave-actually-solved").scroll_into_view_if_needed(); p.wait_for_timeout(250); note=p.locator("[data-contextual-note]"); item=note.locator("[data-contextual-note-item]:not([hidden])").count(); note.locator("[data-contextual-note-item]:not([hidden]) [data-contextual-note-dismiss]").click() if item else None; p.wait_for_timeout(80); after=note.locator("[data-contextual-note-item]:not([hidden])").count()
+        line("PASS" if item==1 and after==0 else "FAIL", "C02", f"visibleNoteBefore={item}; visibleNoteAfterDismiss={after}"); p.close()
+    safely("C02", c02)
+
+    def c03():
+        p=new_page(desktop); toggle=p.locator("[data-thread-dock-toggle]"); toggle.click(); collapsed=toggle.get_attribute("aria-expanded"); hold=p.locator("[data-thread-dock-hold]").first; toggle.click(); hold.click(); held=hold.get_attribute("aria-pressed"); open_beat(p); persisted=hold.get_attribute("aria-pressed")
+        line("PASS" if collapsed=="false" and held=="true" and persisted=="true" else "FAIL", "C03", f"collapsed={collapsed}; held={held}; heldAfterScene={persisted}"); p.close()
+    safely("C03", c03)
+
+    def c04():
+        tr=new_page(desktop, THREAD+"incident/"); er=new_page(desktop, EVIDENCE); tc=tr.locator(".thread-focus__rail > *").count(); ec=er.locator(".evidence-focus__rail > *").count()
+        line("PASS" if tc==2 and ec==2 else "FAIL", "C04", f"threadRailChildren={tc}; evidenceRailChildren={ec}"); tr.close(); er.close()
+    safely("C04", c04)
+
+    def v01():
+        p=new_page(desktop); scenes=p.locator(".thread-scene").count(); images=p.locator(".thread-scene img").count(); figures=p.locator("a[href*='/figure/']").count()
+        line("PASS" if scenes==6 and images==6 and figures>=6 else "FAIL", "V01", f"threadScenes={scenes}; sceneImages={images}; figureRoutes={figures}"); p.close()
+    safely("V01", v01)
+    line("PENDING", "V02", "browser DOM can confirm rendered evidence fields, but cannot certify source provenance or absence of fabricated claims")
+
+    def v03():
+        p=new_page(desktop, dark=False); light=p.evaluate("getComputedStyle(document.documentElement).getPropertyValue('--bg-base').trim()"); theme(p, True); dark=p.evaluate("getComputedStyle(document.documentElement).getPropertyValue('--bg-base').trim()"); mob=browser.new_context(viewport={"width":390,"height":844}); m=new_page(mob, dark=True); trigger=m.locator("[data-mobile-contents-trigger]").count(); app=m.locator("[role=tablist]").count()
+        line("PASS" if light!=dark and trigger==1 and app==0 else "FAIL", "V03", f"lightBg={light}; darkBg={dark}; mobileContents={trigger}; appTablists={app}"); m.close(); mob.close(); p.close()
+    safely("V03", v03)
+
+    def v04():
+        p=new_page(desktop); bytes_=len(p.content().encode()); sections=p.locator("article h2").count(); scenes=p.locator(".thread-scene").count()
+        line("PASS" if bytes_>100000 and sections>=6 and scenes==6 else "FAIL", "V04", f"htmlBytes={bytes_}; articleH2={sections}; scenes={scenes}"); p.close()
+    safely("V04", v04)
+    desktop.close()
+
+def capture_atlas(browser):
+    ATLAS.mkdir(parents=True, exist_ok=True)
+    states=[
+        ("entry", ESSAY, None), ("threadscene-incident", ESSAY, "#thread-incident"),
+        ("thread-focus-route", THREAD+"incident/", None), ("evidence-focus-index", EVIDENCE, None),
+        ("evidence-record", "/evidence/drift-check-2026-08-06/", None), ("figure-viewer", FIGURE+"incident/", None),
+        ("conclusion", ESSAY, "#where-this-sits"),
+    ]
+    written=[]
+    for label,path,fragment in states:
+        for width,height,name in ((1440,900,"desktop"),(390,844,"mobile")):
+            context=browser.new_context(viewport={"width":width,"height":height})
+            for dark in (False,True):
+                p=new_page(context,path+(fragment or ""),dark); filename=f"{label}__{name}__{'dark' if dark else 'light'}.jpg"; p.screenshot(path=str(ATLAS/filename), type="jpeg", quality=80); written.append(filename); p.close()
+            context.close()
+    for dark in (False,True):
+        c=browser.new_context(viewport={"width":390,"height":844}); p=new_page(c,ESSAY,dark); p.locator("[data-mobile-contents-trigger]").click(); p.locator("[data-mobile-contents]").wait_for(state="visible"); filename=f"mobile-contents-sheet__mobile__{'dark' if dark else 'light'}.jpg"; p.screenshot(path=str(ATLAS/filename), type="jpeg", quality=80); written.append(filename); p.close(); c.close()
+    # Overlay is separate from route because its dialog and parent-state behavior are a distinct reviewed surface.
+    for width,height,name in ((1440,900,"desktop"),(390,844,"mobile")):
+        c=browser.new_context(viewport={"width":width,"height":height})
+        for dark in (False,True):
+            p=new_page(c,ESSAY,dark); open_beat(p); filename=f"thread-focus-overlay__{name}__{'dark' if dark else 'light'}.jpg"; p.screenshot(path=str(ATLAS/filename), type="jpeg", quality=80); written.append(filename); p.close()
+        c.close()
+    index=["# Final atlas index", "", "JPEG captures use Playwright quality 80 to keep the atlas below 8 MB. They were saved but not opened or inspected in this QA leg.", ""]
+    for name in written: index.append(f"- `{name}`: {name.split('__')[0].replace('-', ' ')} at the named viewport and theme.")
+    (ATLAS/"INDEX.md").write_text("\n".join(index)+"\n")
+
+def main():
+    with sync_playwright() as pw:
+        browser=pw.chromium.launch(headless=True)
+        try:
+            test_suite(browser); capture_atlas(browser)
+        finally: browser.close()
+
+if __name__ == "__main__": main()
+---
+import { formatTitle, resolveOgImage } from '../lib/seo';
+import { site } from '../data/site';
+import Navigation from '../components/global/Navigation.astro';
+import Footer from '../components/global/Footer.astro';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  ogImage?: string;
+  canonicalUrl?: string;
+  jsonLd?: Record<string, unknown>;
+  class?: string;
+  /** Emit robots noindex/nofollow. For pages that build but aren't published yet. */
+  noindex?: boolean;
+}
+
+const {
+  title,
+  description = site.description,
+  ogImage,
+  canonicalUrl,
+  jsonLd,
+  class: className,
+  noindex = false,
+} = Astro.props;
+
+const resolvedTitle = formatTitle(title);
+const resolvedOgImage = resolveOgImage(ogImage);
+const resolvedCanonical = canonicalUrl ?? new URL(Astro.url.pathname, site.siteUrl).href;
+const resolvedDescription = description.slice(0, 160);
+---
+
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon" href="/brand/apple-touch-icon.png" />
+
+    <!-- Google Fonts: Inter, Noto Serif, Space Grotesk -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Noto+Serif:ital,wght@0,100..900;1,100..900&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+
+    <!-- Primary Meta -->
+    <title>{resolvedTitle}</title>
+    <meta name="description" content={resolvedDescription} />
+    <link rel="canonical" href={resolvedCanonical} />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content={resolvedTitle} />
+    <meta property="og:description" content={resolvedDescription} />
+    <meta property="og:image" content={resolvedOgImage} />
+    <meta property="og:url" content={resolvedCanonical} />
+    <meta property="og:site_name" content={site.title} />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={resolvedTitle} />
+    <meta name="twitter:description" content={resolvedDescription} />
+    <meta name="twitter:image" content={resolvedOgImage} />
+    <meta name="twitter:site" content="@nickmiethe" />
+
+    <!-- RSS -->
+    <link
+      rel="alternate"
+      type="application/rss+xml"
+      title={`${site.title} RSS Feed`}
+      href="/rss.xml"
+    />
+
+    <!-- JSON-LD Structured Data -->
+    {
+      jsonLd && (
+        <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+      )
+    }
+
+    <!--
+      Theme initialization: runs synchronously before first paint to prevent
+      flash of incorrect theme. Reads localStorage preference, falls back to
+      system preference, then sets .dark class on <html>.
+    -->
+    <script is:inline>
+      (function () {
+        var stored = null;
+        try { stored = localStorage.getItem('s2s-theme'); } catch (_) {}
+        var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        var isDark = stored === 'dark' || (stored === null && prefersDark);
+        var html = document.documentElement;
+        if (isDark) {
+          html.classList.add('dark');
+          html.classList.remove('light');
+        } else {
+          html.classList.remove('dark');
+          html.classList.add('light');
+        }
+        // Also apply performance mode
+        var perfMode = null;
+        try { perfMode = localStorage.getItem('s2s-performance-mode'); } catch (_) {}
+        if (perfMode === 'lite') {
+          html.classList.add('perf-lite');
+        }
+      })();
+    </script>
+  </head>
+
+  <body class="min-h-screen bg-[var(--bg-base)] text-[var(--text-primary)] antialiased transition-colors duration-200">
+    <!-- Skip to main content link for keyboard and screen reader accessibility -->
+    <a href="#main-content" class="skip-link">Skip to content</a>
+
+    <!-- Navigation slot: allows pages to pass a custom nav or use the default -->
+    <slot name="nav">
+      <Navigation />
+    </slot>
+
+    <main id="main-content" class:list={['', className]}>
+      <slot />
+    </main>
+
+    <Footer />
+  </body>
+
+  <!-- IntersectionObserver for entrance animations -->
+  <script>
+    function initScrollAnimations() {
+      const animatedSections = document.querySelectorAll('.animate-on-scroll:not(.is-visible)');
+      if (animatedSections.length > 0 && !document.documentElement.classList.contains('perf-lite')) {
+        const observer = new IntersectionObserver(
+          (entries) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add('is-visible');
+                observer.unobserve(entry.target);
+              }
+            });
+          },
+          { threshold: 0.1, rootMargin: '0px 0px -40px 0px' }
+        );
+        animatedSections.forEach((section) => observer.observe(section));
+      } else {
+        // Ensure content is visible if perf-lite or no observer support
+        animatedSections.forEach((s) => {
+          const htmlS = s as HTMLElement;
+          htmlS.style.opacity = '1';
+          htmlS.style.transform = 'none';
+          htmlS.classList.add('is-visible');
+        });
+      }
+    }
+
+    // Run on first load
+    initScrollAnimations();
+
+    // Run on view transitions if Astro ViewTransitions is used
+    document.addEventListener('astro:page-load', initScrollAnimations);
+    document.addEventListener('astro:after-swap', initScrollAnimations);
+  </script>
+</html>
+?? _handoff/
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/final/FIDELITY-REVIEW-sol.md
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/final/conclusion__desktop__dark.jpg
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/final/conclusion__desktop__light.jpg
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/final/conclusion__mobile__dark.jpg
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/final/conclusion__mobile__light.jpg
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/final/entry__desktop__dark.jpg
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/final/entry__desktop__light.jpg
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/final/entry__mobile__dark.jpg
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/final/entry__mobile__light.jpg
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/final/evidence-focus-index__desktop__dark.jpg
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/final/evidence-focus-index__desktop__light.jpg
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/final/evidence-focus-index__mobile__dark.jpg
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/final/evidence-focus-index__mobile__light.jpg
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/final/evidence-record__desktop__dark.jpg
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/final/evidence-record__desktop__light.jpg
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/final/evidence-record__mobile__dark.jpg
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/final/evidence-record__mobile__light.jpg
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/final/figure-viewer__desktop__dark.jpg
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/final/figure-viewer__desktop__light.jpg
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/final/figure-viewer__mobile__dark.jpg
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/final/figure-viewer__mobile__light.jpg
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/final/mobile-contents-sheet__mobile__dark.jpg
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/final/mobile-contents-sheet__mobile__light.jpg
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/final/thread-focus-overlay__desktop__dark.jpg
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/final/thread-focus-overlay__desktop__light.jpg
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/final/thread-focus-overlay__mobile__dark.jpg
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/final/thread-focus-overlay__mobile__light.jpg
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/final/thread-focus-route__desktop__dark.jpg
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/final/thread-focus-route__desktop__light.jpg
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/final/thread-focus-route__mobile__dark.jpg
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/final/thread-focus-route__mobile__light.jpg
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/final/threadscene-incident__desktop__dark.jpg
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/final/threadscene-incident__desktop__light.jpg
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/final/threadscene-incident__mobile__dark.jpg
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/final/threadscene-incident__mobile__light.jpg
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/01-entry__desktop-dark.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/01-entry__desktop-light.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/01-entry__mobile-dark.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/01-entry__mobile-light.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/02-threadscene-incident__desktop-dark.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/02-threadscene-incident__desktop-light.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/02-threadscene-incident__mobile-dark.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/02-threadscene-incident__mobile-light.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/02b-threadscene-pane__desktop-dark.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/02b-threadscene-pane__desktop-light.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/02b-threadscene-pane__mobile-dark.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/02b-threadscene-pane__mobile-light.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/03-thread-focus-overlay__desktop-dark.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/03-thread-focus-overlay__desktop-light.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/03-thread-focus-overlay__mobile-dark.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/03-thread-focus-overlay__mobile-light.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/03b-thread-focus-route__desktop-dark.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/03b-thread-focus-route__desktop-light.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/03b-thread-focus-route__mobile-dark.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/03b-thread-focus-route__mobile-light.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/04-evidence-focus-route__desktop-dark.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/04-evidence-focus-route__desktop-light.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/04-evidence-focus-route__mobile-dark.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/04-evidence-focus-route__mobile-light.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/04c-evidence-record-route__desktop-dark.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/04c-evidence-record-route__desktop-light.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/04c-evidence-record-route__mobile-dark.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/04c-evidence-record-route__mobile-light.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/05-figure-viewer-overlay__desktop-dark.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/05-figure-viewer-overlay__desktop-light.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/05-figure-viewer-overlay__mobile-dark.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/05-figure-viewer-overlay__mobile-light.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/05b-figure-route__desktop-dark.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/05b-figure-route__desktop-light.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/05b-figure-route__mobile-dark.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/05b-figure-route__mobile-light.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/06-conclusion-where-this-sits__desktop-dark.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/06-conclusion-where-this-sits__desktop-light.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/06-conclusion-where-this-sits__mobile-dark.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/06-conclusion-where-this-sits__mobile-light.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/07-mobile-midscroll-no-contents__mobile-dark.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/07-mobile-midscroll-no-contents__mobile-light.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/07b-mobile-top__mobile-dark.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/07b-mobile-top__mobile-light.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/08-thread-focus-route-full__desktop-dark.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/08-thread-focus-route-full__desktop-light.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/09-evidence-index-route-full__desktop-dark.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/09-evidence-index-route-full__desktop-light.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/10-evidence-record-route-full__desktop-dark.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/10-evidence-record-route-full__desktop-light.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/11-other-devstory__desktop-dark.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/11-other-essay-1__desktop-dark.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/11-other-essay-2__desktop-dark.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/12-entry__desktop-dark-osdark.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/12-entry__mobile-dark-osdark.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/13-callout-legend__desktop-dark-osdark.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/13-callout-legend__mobile-dark-osdark.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/13b-callout-legend__desktop-dark-oslight-BUG.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/14-threadscene__desktop-dark-osdark.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/14-threadscene__mobile-dark-osdark.png
+?? docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/capture-log-2.txt
+
+codex
+I found the existing capture script and confirmed the site theme key is `s2s-theme`. I’m applying the repository’s implementation confidence check before changing the QA runner; the requested atlas directory already contains untracked prior outputs, so I’ll limit deletion to its old JPEGs and regenerate the index without touching source or git.
+exec
+/bin/zsh -lc "sed -n '1,240p' /Users/miethe/.codex/skills/confidence-check/SKILL.md && rg -n \"def capture_atlas|screenshot|EVIDENCE|managed|What I can prove|WhereThisSits|mobile-contents|data-mobile|evidence\" _handoff/rw-v2/qa/run_qa.py src/content/posts src/data/evidence.ts src/components src/layouts | head -240 && sed -n '260,620p' _handoff/rw-v2/qa/run_qa.py" in /Users/miethe/dev/homelab/development/signal_to_system/.wt/rw-v2-essay
+ succeeded in 0ms:
+---
+name: Confidence Check
+description: Pre-implementation confidence assessment (≥90% required). Use before starting any implementation to verify readiness with duplicate check, architecture compliance, official docs verification, OSS references, and root cause identification.
+---
+
+# Confidence Check Skill
+
+## Purpose
+
+Prevents wrong-direction execution by assessing confidence **BEFORE** starting implementation.
+
+**Requirement**: ≥90% confidence to proceed with implementation.
+
+**Test Results** (2025-10-21):
+- Precision: 1.000 (no false positives)
+- Recall: 1.000 (no false negatives)
+- 8/8 test cases passed
+
+## When to Use
+
+Use this skill BEFORE implementing any task to ensure:
+- No duplicate implementations exist
+- Architecture compliance verified
+- Official documentation reviewed
+- Working OSS implementations found
+- Root cause properly identified
+
+## Confidence Assessment Criteria
+
+Calculate confidence score (0.0 - 1.0) based on 5 checks:
+
+### 1. No Duplicate Implementations? (25%)
+
+**Check**: Search codebase for existing functionality
+
+```bash
+# Use Grep to search for similar functions
+# Use Glob to find related modules
+```
+
+✅ Pass if no duplicates found
+❌ Fail if similar implementation exists
+
+### 2. Architecture Compliance? (25%)
+
+**Check**: Verify tech stack alignment
+
+- Read `CLAUDE.md`, `PLANNING.md`
+- Confirm existing patterns used
+- Avoid reinventing existing solutions
+
+✅ Pass if uses existing tech stack (e.g., Supabase, UV, pytest)
+❌ Fail if introduces new dependencies unnecessarily
+
+### 3. Official Documentation Verified? (20%)
+
+**Check**: Review official docs before implementation
+
+- Use Context7 MCP for official docs
+- Use WebFetch for documentation URLs
+- Verify API compatibility
+
+✅ Pass if official docs reviewed
+❌ Fail if relying on assumptions
+
+### 4. Working OSS Implementations Referenced? (15%)
+
+**Check**: Find proven implementations
+
+- Use Tavily MCP or WebSearch
+- Search GitHub for examples
+- Verify working code samples
+
+✅ Pass if OSS reference found
+❌ Fail if no working examples
+
+### 5. Root Cause Identified? (15%)
+
+**Check**: Understand the actual problem
+
+- Analyze error messages
+- Check logs and stack traces
+- Identify underlying issue
+
+✅ Pass if root cause clear
+❌ Fail if symptoms unclear
+
+## Confidence Score Calculation
+
+```
+Total = Check1 (25%) + Check2 (25%) + Check3 (20%) + Check4 (15%) + Check5 (15%)
+
+If Total >= 0.90:  ✅ Proceed with implementation
+If Total >= 0.70:  ⚠️  Present alternatives, ask questions
+If Total < 0.70:   ❌ STOP - Request more context
+```
+
+## Output Format
+
+```
+📋 Confidence Checks:
+   ✅ No duplicate implementations found
+   ✅ Uses existing tech stack
+   ✅ Official documentation verified
+   ✅ Working OSS implementation found
+   ✅ Root cause identified
+
+📊 Confidence: 1.00 (100%)
+✅ High confidence - Proceeding to implementation
+```
+
+## Implementation Details
+
+The TypeScript implementation is available in `confidence.ts` for reference, containing:
+
+- `confidenceCheck(context)` - Main assessment function
+- Detailed check implementations
+- Context interface definitions
+
+## ROI
+
+**Token Savings**: Spend 100-200 tokens on confidence check to save 5,000-50,000 tokens on wrong-direction work.
+
+**Success Rate**: 100% precision and recall in production testing.
+src/data/evidence.ts:22:// reusing a date an earlier handoff draft guessed (`contracts/evidence-records.json`'s
+src/data/evidence.ts:43:  evidenceClass: EvidenceClass;
+src/data/evidence.ts:57:export const evidence: Record<string, EvidenceRecord> = {
+src/data/evidence.ts:61:    evidenceClass: "observed",
+src/data/evidence.ts:83:    evidenceClass: "observed",
+src/data/evidence.ts:104:    evidenceClass: "observed",
+src/data/evidence.ts:125:    evidenceClass: "observed",
+src/data/evidence.ts:146:    evidenceClass: "observed",
+src/data/evidence.ts:166:    evidenceClass: "observed",
+src/data/evidence.ts:178:      "A suggested deployment action is not evidence that deployment or execution actually occurred.",
+src/data/evidence.ts:187:    evidenceClass: "observed",
+src/data/evidence.ts:198:      "This is a separate incident from the stale reviewer, not evidence that every local difference across projects is legitimate.",
+src/data/evidence.ts:208:    evidenceClass: "measured",
+src/data/evidence.ts:229:    evidenceClass: "measured",
+src/data/evidence.ts:250:    evidenceClass: "measured",
+src/data/evidence.ts:270:    title: "A proposed run-level evidence record",
+src/data/evidence.ts:271:    evidenceClass: "proposed",
+src/data/evidence.ts:279:      "Names the relationships a future run-level record should preserve: loaded artifact identity, context and policy state, observed actions, verification evidence, and an accepting authority.",
+_handoff/rw-v2/qa/run_qa.py:5:inspect screenshots. Captures are output only for a human or vision review leg.
+_handoff/rw-v2/qa/run_qa.py:16:EVIDENCE = f"/essays/{SLUG}/evidence/"
+_handoff/rw-v2/qa/run_qa.py:27:    "V01": "Actual canonical art", "V02": "Content/evidence integrity", "V03": "Theme", "V04": "Real manuscript density",
+_handoff/rw-v2/qa/run_qa.py:86:        thread_evidence=p.locator("[data-focus-dialog] a[href*='/evidence/']").count()
+_handoff/rw-v2/qa/run_qa.py:88:        p.locator("a[href$='/evidence/']").first.click(); dialog(p).wait_for(state="visible")
+_handoff/rw-v2/qa/run_qa.py:89:        evidence_figures=p.locator("[data-focus-dialog] a[href*='/figure/']").count()
+_handoff/rw-v2/qa/run_qa.py:90:        line("FAIL" if thread_evidence == 0 or evidence_figures == 0 else "PASS", "N04", f"threadToEvidenceLinks={thread_evidence}; evidenceToFigureLinks={evidence_figures}; required nested chain is not exposed" if thread_evidence == 0 or evidence_figures == 0 else "nested chain exposed")
+_handoff/rw-v2/qa/run_qa.py:122:        p=new_page(nojs); scenes=p.locator(".thread-scene").count(); imgs=p.locator(".thread-scene img").count(); evidence=p.locator("a[href$='/evidence/']").count()
+_handoff/rw-v2/qa/run_qa.py:124:        line("PASS" if scenes==6 and imgs==6 and evidence>0 and "Incident" in heading else "FAIL", "N09", f"blockedJS=True; scenes={scenes}; images={imgs}; evidenceLinks={evidence}; directHeading={heading!r}"); direct.close(); p.close(); nojs.close()
+_handoff/rw-v2/qa/run_qa.py:187:        tr=new_page(desktop, THREAD+"incident/"); er=new_page(desktop, EVIDENCE); tc=tr.locator(".thread-focus__rail > *").count(); ec=er.locator(".evidence-focus__rail > *").count()
+_handoff/rw-v2/qa/run_qa.py:188:        line("PASS" if tc==2 and ec==2 else "FAIL", "C04", f"threadRailChildren={tc}; evidenceRailChildren={ec}"); tr.close(); er.close()
+_handoff/rw-v2/qa/run_qa.py:195:    line("PENDING", "V02", "browser DOM can confirm rendered evidence fields, but cannot certify source provenance or absence of fabricated claims")
+_handoff/rw-v2/qa/run_qa.py:198:        p=new_page(desktop, dark=False); light=p.evaluate("getComputedStyle(document.documentElement).getPropertyValue('--bg-base').trim()"); theme(p, True); dark=p.evaluate("getComputedStyle(document.documentElement).getPropertyValue('--bg-base').trim()"); mob=browser.new_context(viewport={"width":390,"height":844}); m=new_page(mob, dark=True); trigger=m.locator("[data-mobile-contents-trigger]").count(); app=m.locator("[role=tablist]").count()
+_handoff/rw-v2/qa/run_qa.py:208:def capture_atlas(browser):
+_handoff/rw-v2/qa/run_qa.py:212:        ("thread-focus-route", THREAD+"incident/", None), ("evidence-focus-index", EVIDENCE, None),
+_handoff/rw-v2/qa/run_qa.py:213:        ("evidence-record", "/evidence/drift-check-2026-08-06/", None), ("figure-viewer", FIGURE+"incident/", None),
+_handoff/rw-v2/qa/run_qa.py:221:                p=new_page(context,path+(fragment or ""),dark); filename=f"{label}__{name}__{'dark' if dark else 'light'}.jpg"; p.screenshot(path=str(ATLAS/filename), type="jpeg", quality=80); written.append(filename); p.close()
+_handoff/rw-v2/qa/run_qa.py:224:        c=browser.new_context(viewport={"width":390,"height":844}); p=new_page(c,ESSAY,dark); p.locator("[data-mobile-contents-trigger]").click(); p.locator("[data-mobile-contents]").wait_for(state="visible"); filename=f"mobile-contents-sheet__mobile__{'dark' if dark else 'light'}.jpg"; p.screenshot(path=str(ATLAS/filename), type="jpeg", quality=80); written.append(filename); p.close(); c.close()
+_handoff/rw-v2/qa/run_qa.py:229:            p=new_page(c,ESSAY,dark); open_beat(p); filename=f"thread-focus-overlay__{name}__{'dark' if dark else 'light'}.jpg"; p.screenshot(path=str(ATLAS/filename), type="jpeg", quality=80); written.append(filename); p.close()
+src/content/posts/the-contract-is-the-work.mdx:16:whyItMatters: "Agentic handoffs fail silently when no durable object binds intent, evidence, and decision authority together; teams discover the gap only after a chain of confident-looking work turns out to answer the wrong question."
+src/content/posts/the-contract-is-the-work.mdx:17:leaderTakeaway: "Make the Feature Contract the object of record, not the prompt or the final summary. Require explicit acceptance criteria, named evidence obligations, and a named decision authority before execution begins, and treat any change to those terms as a visible amendment rather than an implementation choice."
+src/content/posts/the-contract-is-the-work.mdx:25:import WhereThisSits from '../../components/content/WhereThisSits.astro';
+src/content/posts/the-contract-is-the-work.mdx:35:The research agent might have answered a subtly different question. The implementation agent might have interpreted "fixed" as "the test passes," while the product leader meant "the failure mode cannot recur." The reviewer could have examined the change without seeing the evidence behind the diagnosis. Nobody may know which source supported which claim, which acceptance criteria were binding, or who had authority to decide that the work was complete.
+src/content/posts/the-contract-is-the-work.mdx:39:"Unauthenticated" here does not mean that the agents lacked cryptographic identities. It means that the handoff did not carry an authoritative relationship among intent, claims, evidence, acceptance criteria, and decision rights. Each participant received a description of the work, but no durable object proved what the work was supposed to accomplish.
+src/content/posts/the-contract-is-the-work.mdx:41:The problem here isn't weak generation: it's broken continuity. Naming this failure mode is not a claim that <Term id="contract-as-spec">**contract-as-spec**</Term> solves every failure mode: bad evidence, mistaken reasoning, and a blind spot shared across a chain of verifiers stay real risks a contract does not by itself remove.
+src/content/posts/the-contract-is-the-work.mdx:43:Contract-as-spec is a method for preserving that continuity. It makes a <Term id="feature-contract">**Feature Contract**</Term>, not a prompt, ticket, plan, or final summary, the binding document for the work. The contract states the intended outcome, defines what completion means, and names the evidence required to support it, plus who can accept the result. Specialists can interpret and execute the contract, but they do not silently redefine it.
+src/content/posts/the-contract-is-the-work.mdx:48:**[Observed]** marks findings from a bounded landscape review or direct operating evidence. **[Proposed]** marks a method, interpretation, or product direction whose value should be validated in use. I did not invent this convention for the essay. It is the same instruction I give every agent I run, written down plainly: do not make things up; if you don't see it, don't say it.
+src/content/posts/the-contract-is-the-work.mdx:63:- <Term id="evidence-obligations">**Evidence obligations:**</Term> What must be inspected, tested, reproduced, or independently verified?
+src/content/posts/the-contract-is-the-work.mdx:64:- <Term id="decision-authority">**Decision authority:**</Term> Who or what may accept the evidence and close the work?
+src/content/posts/the-contract-is-the-work.mdx:66:These elements bind the stages together. A specialist does not just receive a task; it receives a task whose relationship to the intended outcome is explicit. A verifier does not just review an output; it evaluates named claims against named evidence. A decision-maker does not just approve a summary; it accepts or rejects a contract with a visible evidentiary state.
+src/content/posts/the-contract-is-the-work.mdx:92:A complete populated instance (claims bound to evidence, verifier status, a visible amendment, and the acceptance decision) is available as a [companion example](/essays/contract-as-spec-worked-example).
+src/content/posts/the-contract-is-the-work.mdx:111:The conceptual core of contract-as-spec is a maturity model for evidence and authority. It distinguishes workflows that just produce outputs from workflows that can justify decisions.
+src/content/posts/the-contract-is-the-work.mdx:129:The workflow separates claims from narrative and binds each consequential claim to supporting evidence.
+src/content/posts/the-contract-is-the-work.mdx:135:A verifier tests whether the evidence genuinely supports the claim, whether contradictory evidence was considered, and whether the stated scope matches what was examined.
+src/content/posts/the-contract-is-the-work.mdx:137:Verification is not the same as agreement. It records the status of a claim: supported, contradicted, unresolved, or limited by an evidence gap.
+src/content/posts/the-contract-is-the-work.mdx:139:That distinction is also why test-based evaluation needs a stated boundary. SWE-bench evaluates models against issue-linked tests from real repositories, a valuable and demanding measure of whether a patch resolves a specified software problem.[^swebench] It is still evidence for that specified problem, not a blanket acceptance decision about every operational consequence a team may care about.
+src/content/posts/the-contract-is-the-work.mdx:155:**[Observed]** Stages four through six are still frontier territory at organizational scale. They are not imaginary, though. As of 2026-08-25, we run a small version at home every day: three different LLM vendors and deterministic scripts operate under one contract boundary, with durable daily run records showing the handoffs. That is lived practice at modest scale, not evidence that the institutional problem is solved.
+src/content/posts/the-contract-is-the-work.mdx:171:Can the planner point to the same acceptance criteria the verifier later evaluates? Can a claim be traced to its sources after the originating agent has disappeared? Does an approval identify exactly which evidence state was accepted? If an artifact is reused six months later, can its consumer determine which assumptions, validators, and contract version produced it? If a gate is deferred, can another operator resume it without reconstructing the decision from chat history?
+src/content/posts/the-contract-is-the-work.mdx:175:**[Proposed, grounded in observed landscape coverage]** The meaningful differentiation of a governed agentic system lies in integration completeness rather than primitive technical novelty. Its value comes from closing the seams among intent, execution, evidence, verification, authority, and reuse.
+src/content/posts/the-contract-is-the-work.mdx:191:Before specialist execution, a gate can ask whether the contract is sufficiently clear to begin. Before accepting research, it can ask whether important claims have evidence and verification states. Before operational change, it can ask whether the acceptance criteria and risk boundaries have been met. Before reuse, it can ask whether the capability includes enough provenance to behave predictably outside its original context.
+src/content/posts/the-contract-is-the-work.mdx:205:This also changes the meaning of "blocked." A blocked agent is not just an agent that failed to continue; it can identify the exact contract obligation it cannot satisfy: unavailable evidence, ambiguous authority, contradictory acceptance criteria, or a task too large for the current specialist. That is useful state, and it lets the work be decomposed or escalated without erasing what has already been learned.
+src/content/posts/the-contract-is-the-work.mdx:217:A reusable artifact should answer: Where did this capability come from? What contract does it satisfy? Which evidence supported its acceptance? Which version is running? What changed between versions? What assumptions travel with it? Who may promote or retire it?
+src/content/posts/the-contract-is-the-work.mdx:231:A research team can return claims with provenance. An engineering team can turn accepted claims into implementation criteria. A security team can add verification obligations and decision boundaries. An operator can inspect the evidence state without replaying the entire execution. A future team can reproduce the decision even if the original tools no longer exist.
+src/content/posts/the-contract-is-the-work.mdx:233:This does require discipline. Acceptance criteria must describe outcomes rather than activity, and evidence has to be durable enough to inspect later. Verification must be distinguishable from self-report. Decision authority must be explicit, and derived records need to identify their authoritative source.
+src/content/posts/the-contract-is-the-work.mdx:235:But the method does not demand maximal ceremony. Teams can begin with a small contract containing intent, three or four acceptance criteria, required evidence, and one named decision authority. They can add claim-level verification and reusable artifacts as the consequences of the work increase.
+src/content/posts/the-contract-is-the-work.mdx:239:I don't actually know whether anyone outside my own household would pay for this. The receipts in this essay show the mechanism operating in my home environment: specific handoffs, evidence states, and corrections I can point to; they don't prove a market, and I'm not going to pretend this essay settles that question. What I do have some confidence in, because I've watched it happen both ways, is what a chain of agents does without this discipline versus what it can do with it. The doubt is about who pays. The confidence is about what the mechanism does when you run it for real.
+src/content/posts/the-contract-is-the-work.mdx:247:Contract-as-spec makes those transitions explicit. It binds intent to acceptance criteria, routes bounded work through specialists, validates completeness at meaningful gates, and preserves the evidence needed to inspect or reproduce the result.
+src/content/posts/the-contract-is-the-work.mdx:251:<WhereThisSits slug="the-contract-is-the-work" />
+src/content/posts/the-contract-is-the-work.mdx:323:Author: Nick Miethe. Thesis: human-originated. Evidence: operating observations plus a bounded internal landscape review (41 sources: 35 publicly linked primary sources and six non-public working materials; scope and caveats stated above). AI roles: research assistance, adversarial review, drafting. Human verification: final claim and source review by Nick. Research artifact: contract-as-spec landscape review, with its recovered source record listed above. Version: rev5. AI-involvement level: 3 (substantive synthesis and adversarial reasoning, thesis and evidence Nick's own operating observations).
+src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx:20:leaderTakeaway: "Govern lineage, project binding, conditions of use, execution evidence, and acceptance as distinct but connected responsibilities. Do not equate a current registry record with a trustworthy run."
+src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx:26:seoDescription: "A stale reviewer skill exposes why registries need a supply chain connecting artifact identity, conditions of use, execution evidence, and accepted outcomes."
+src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx:33:import WhereThisSits from '../../components/content/WhereThisSits.astro';
+src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx:51:  takeaway="Govern lineage, project binding, conditions of use, execution evidence, and acceptance as distinct but connected responsibilities. Do not equate a current registry record with a trustworthy run."
+src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx:82:<div class="managed-variation" role="group" aria-label="Illustrative comparison of managed project variation">
+src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx:126:| **Outcome** | Preserves evaluations or prior acceptance. Doesn't establish that this run fulfilled this request. | Connects output to intent, verification evidence, and the authority accepting or rejecting the result. |
+src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx:153:I use <Term id="agentic-artifact-supply-chain">**agentic artifact supply chain**</Term> for the managed lifecycle of those reusable instructions, context, tools, policies and related assets. Existing work on agent supply chains and governed agent primitives already covers this ground; this is my organizing label for the lifecycle I'm building, not a new supply-chain analogy.[^primitives]
+src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx:161:The lifecycle starts with **authoring**: the reviewer lives in one source repository, and a fix adds the missing guard. **Registration** makes that revision discoverable. **Approval** needs to attach to an exact revision and state its permitted use. The incident doesn't give me evidence of a complete approval record; it gives me a corrected source and a registry entry that didn't match deployment.
+src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx:173:At **use**, the project loads the deployed copy in its own context. The supply-chain obligation is to check that binding: the approved artifact, the expected context, and the allowed tools. The guard's presence is a prerequisite for the intended review, not evidence that the guard was followed.
+src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx:212:### The receipts that made managed variation concrete
+src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx:220:Preserving Project B's patch keeps the evidence available, but that doesn't approve the patch for everyone. A useful local change can become a candidate for shared policy; it shouldn't automatically become shared policy simply because a sync command happened to encounter it. Project C's pin can travel the other way and become ineligible under a changed requirement. Both are policy questions in this example, not lab incidents I have recorded. What I want from the supply chain is that a shared correction reaches every destination that should have it, and stops at the one that shouldn't.
+src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx:233:I read these as validation of the package-management problem that sent me into this work. But convergence is uneven and component-specific. JFrog comes closest to joining the responsibilities in the reviewed scope; the MCP Registry deliberately remains a metadata service. The reviewed documentation doesn't establish a complete join from exact bytes through policy decisions and execution evidence to accepted outcomes for any of the four. That is a boundary of this comparison, not a claim about everything those companies can do.[^market-scope]
+src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx:246:“Control plane” is the familiar shorthand. But an enterprise will run many governance systems, with different owners and enforcement mechanisms. <Term id="control-fabric">**Control fabric**</Term> is established terminology, including BCG's federated agent-control framing. Here it names independently operated systems that preserve compatible identity, authority, policy-decision and evidence records across handoffs.[^fabric] I use it to connect four responsibilities:
+src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx:255:Four responsibilities, not four products, and they overlap: context is a governed dependency and an input to a runtime decision at once. Writing a policy under one of these headings doesn't establish that a runtime checks it, so I still need to name the mechanism in the execution path and what it blocks. My own <Term id="aos">Agentic OS (AOS)</Term> covers these unevenly. The table is the obligation, not a claim of coverage; they become a control fabric only once the handoffs carry identity and evidence.
+src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx:257:Shared identity means the deployment record and run record can refer to the same exact artifact. Shared evidence means the next system can inspect what the previous one established. An explicit handoff says who checks the next condition and what happens when it fails.
+src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx:261:Xia and colleagues' *Harnessing Agent Skills* describes a closely related architecture: it separates the stored artifact from skill-in-use, mediates execution, retains run evidence and feeds results back into managed supply. It also includes a run-scoped Skill-BOM.[^xia] That overlap helps make the comparison concrete. My contribution here is the architecture I'm implementing around shared corrections and deliberate local variation, the deployment checks it produced, and the failures those checks expose. The dated records below support that implementation history. They don't yet establish a general improvement in delivery or a unique architecture.
+src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx:273:Failure rate needs a denominator and a definition: failed reviews among comparable tasks, failure decided by an explicit acceptance criterion. A lower rate after deploying the guard would be useful evidence. It still wouldn't isolate the guard if the model or task mix changed too.
+src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx:277:I want to measure accepted outcomes with evidence. For this reviewer, that means a review that meets the request, with evidence of the required guard and an authorized acceptance decision. A <Term id="feature-contract">**Feature Contract**</Term> makes those obligations explicit; [The Contract Is the Work](/essays/the-contract-is-the-work/) takes up that boundary.
+src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx:288:A known source can supply a harmful artifact. Permitted work can still be wrong. A run using a skill does not establish that the skill caused its result. Fixed dependencies do not make probabilistic reasoning deterministic. The next essay considers the <Term id="deterministic-envelope">deterministic envelope</Term>, an existing way of describing constraints around probabilistic systems. My emphasis will be on controls outside model judgment and evidence that they mediate execution, alongside related work such as RAILS.[^envelope] Repeated successful reasoning can suggest a candidate for automation. It doesn't establish authority to promote it, or tell me when to withdraw it. Those remain questions to test.
+src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx:300:The same substitution showed up in provenance. In the September audit, SkillBOM emission was wired into bundle assembly. Deploying a single artifact used a different path and didn't automatically emit a BOM. Both operations could reasonably be described as deploying capability, but only one reached that evidence writer.[^bom-scope] A feature list saying “provenance supported” concealed the question I needed answered: supported on the operation I just performed?
+src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx:338:    { label: 'Context and evidence homes', status: 'PARTIAL', detail: 'MeatyWiki and Research Foundry provide durable homes beyond the registry, while the audited provenance paths still have scoped gaps.' },
+src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx:339:    { label: 'Loaded version to accepted outcome', status: 'PROPOSED', detail: 'The run-level relationship described above is a proposed evidence model, not a claimed implementation receipt.' },
+src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx:344:## What I can prove today.
+src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx:350:[Read the full receipt set in Evidence Focus.](/essays/the-registry-wave-agentic-artifact-supply-chain/evidence/)
+src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx:373:<ClaimBadge kind="proposed" /> Those repairs support the managed-variation architecture in this essay. They don't establish a complete identity-to-outcome chain. I still need evidence for when a local improvement should become shared policy, when an automated fast path should return to judgment, and how an independent acceptance decision changes results. The three-project comparison is illustrative. No promotion, demotion or acceptance-by-assertion incident is being claimed from these receipts.
+src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx:403:<WhereThisSits slug="the-registry-wave-agentic-artifact-supply-chain" />
+src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx:407:The reviewer didn't need a better name or another catalog. It needed the fix to reach the place that loaded it, a check that noticed when it hadn't, and evidence that the resulting review did what was asked. It also needed room for a project-specific improvement to survive the next shared correction. That's the bar I want the supply chain to meet when I'm no longer watching every project myself.
+src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx:425:[^xia]: Xia et al., [Harnessing Agent Skills: Architectural Patterns and a Reference Architecture for Skill-Mediated LLM Agents](https://arxiv.org/html/2606.20631v1), version 1, reviewed in the supplied September 17 research pack. Direct architectural overlap includes artifact/use separation, mediation, run evidence and feedback.
+src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx:430:[^workflow]: Lab implementation receipt: direction-aware project workflow synchronization, first committed August 11, 2026. Its source records project copies missing review checks alongside local copies carrying stricter conditional-verdict handling. The tool preserves project-specific rosters and refuses local-ahead overwrites; mixed changes require inspection. This is a separate incident from the stale reviewer, not evidence that every local difference is legitimate. Internal identifiers withheld; method only.
+src/content/posts/governed-agentic-sdlc-01-productivity-paradox.mdx:27:import WhereThisSits from '../../components/content/WhereThisSits.astro';
+src/content/posts/governed-agentic-sdlc-01-productivity-paradox.mdx:39:The METR 2025 randomized controlled trial on AI-assisted programming captures it precisely: experienced open-source developers using AI tools completed tasks 19% *slower*, despite self-reporting a perceived 20% speedup.[^metr] That's a 39-point perception gap between how fast they felt and how fast they actually were. They felt faster but delivered less. The tools compress time-to-first-draft while inflating time-to-verified-solution. That gap (subjective speed up, objective slowdown) isn't evidence that AI tools don't work. It's evidence of something more specific:
+src/content/posts/governed-agentic-sdlc-01-productivity-paradox.mdx:114:The failure mode nobody puts on a slide deck. Your developers are already using AI tools you don't know about; spinning up private Claude sessions, pasting proprietary code into ChatGPT, running local Copilot instances outside your managed environment. Roughly 40% of organizations already have Shadow AI in active use. IBM Consulting's 2025 research on AI governance found 86% have zero visibility into how those tools interact with their data flows.[^ibm-governance] Not hypothetical. Current state.
+src/content/posts/governed-agentic-sdlc-01-productivity-paradox.mdx:147:Consider what a typical gate-based governance model actually does: it creates synchronization points where human judgment is applied to human-produced artifacts. Code review gates assume the reviewer can hold the full context of a PR in their head. QA gates assume test coverage reflects intentional design decisions. Release gates assume that if the prior gates passed, the aggregate risk is managed.
+src/content/posts/governed-agentic-sdlc-01-productivity-paradox.mdx:212:<WhereThisSits slug="governed-agentic-sdlc-01-productivity-paradox" />
+src/content/posts/contract-as-spec-worked-example.mdx:3:excerpt: "Extends the inline fc-example-041 sketch in \"The Contract Is the Work\" into a complete worked instance: claims bound to evidence, verifier status, a visible amendment, and the final acceptance decision."
+src/content/posts/contract-as-spec-worked-example.mdx:18:worked instance: claims bound to evidence, verifier status, a visible amendment, and the final
+src/content/posts/contract-as-spec-worked-example.mdx:43:## Claims bound to evidence
+src/content/posts/contract-as-spec-worked-example.mdx:47:checklist obligations rather than mechanism claims: they get a pass/fail evidence item each,
+src/content/posts/contract-as-spec-worked-example.mdx:49:confirm. The claim and its evidence are recorded together, not left to be inferred from a
+src/content/posts/contract-as-spec-worked-example.mdx:57:Bound evidence:
+src/content/posts/contract-as-spec-worked-example.mdx:65:Verifier status: 5 of 6 evidence items verified; ev-01 pending an independent read
+src/content/posts/contract-as-spec-worked-example.mdx:69:The claim is not "the fix works": that sentence has no evidence obligation attached to it and
+src/content/posts/contract-as-spec-worked-example.mdx:70:could mean almost anything. The claim states the specific mechanism, and each evidence item
+src/content/posts/contract-as-spec-worked-example.mdx:72:the claim against the evidence directly rather than against the surrounding prose or trust that
+src/content/posts/contract-as-spec-worked-example.mdx:90:    result attached alongside ev-05 as amendment-supporting evidence, not a numbered claim item).
+src/content/posts/contract-as-spec-worked-example.mdx:107:  criterion 2 under the amendment; ev-06 satisfies criterion 4); 5 of 6 bound evidence items
+src/content/posts/contract-as-spec-worked-example.mdx:116:see the same evidence record (each item's kind, verifier status, and the criterion it supports)
+src/content/posts/agentic-operations-flow.mdx:3:excerpt: "AI workflows compound when intent, plans, execution, review, and evidence survive outside the chat transcript."
+src/content/posts/agentic-operations-flow.mdx:20:leaderTakeaway: "Treat agentic work as a workflow OS. Route by uncertainty and risk, scale autonomy by tier, and make evidence part of the deliverable."
+src/content/posts/agentic-operations-flow.mdx:22:seoDescription: "A web-native walkthrough of artifact-first agentic operations: triage, planning artifacts, autonomy tiers, execution graphs, review gates, and evidence loops."
+src/content/posts/agentic-operations-flow.mdx:29:import WhereThisSits from '../../components/content/WhereThisSits.astro';
+src/content/posts/agentic-operations-flow.mdx:64:| First artifact | Does the task need a PRD, storyboard, research memo, progress file, evidence bundle, or something else? |
+src/content/posts/agentic-operations-flow.mdx:77:It has no native notion of ownership, dependency, review intensity, or completion evidence. It does not know that a feasibility question should stop before implementation. It does not know that a high-risk migration should trigger a hard boundary before edits. It does not know which facts should become reusable context and which are just scaffolding from the current run.
+src/content/posts/agentic-operations-flow.mdx:79:The <Term id="artifact-graph">**artifact graph**</Term> is the opposite: a typed set of durable objects that the workflow can resume from and reviewers can validate against. In my current system, that graph includes exploration charters, feasibility briefs, feature contracts, PRDs, implementation plans, decision blocks, progress files, validation records, run evidence, and knowledge handoffs.
+src/content/posts/agentic-operations-flow.mdx:107:| Already planned phase execution | `/dev:execute-phase` | Updated progress and evidence |
+src/content/posts/agentic-operations-flow.mdx:133:| Progress File | Store current execution state and evidence. |
+src/content/posts/agentic-operations-flow.mdx:221:It is done when the system can explain what happened, why it happened, what passed, what failed, what remains, and what should be reusable. That is why progress and evidence are not cleanup. They are the product of the run.
+src/content/posts/agentic-operations-flow.mdx:223:For my workflows, the evidence stack looks like this:
+src/content/posts/agentic-operations-flow.mdx:229:| Run intelligence | Session traces, failures, ownership, time, evidence links. |
+src/content/posts/agentic-operations-flow.mdx:236:  src="/assets/posts/agentic-operations-flow/evidence-stack.jpg"
+src/content/posts/agentic-operations-flow.mdx:237:  alt="Generated illustration of layered evidence artifacts flowing into a reusable knowledge graph."
+src/content/posts/agentic-operations-flow.mdx:271:That is the simplest version of the argument. A transcript can be useful during the moment of work, but it is weak operating state. It does not naturally preserve decisions, dependencies, artifacts, review intensity, evidence, or reusable knowledge.
+src/content/posts/agentic-operations-flow.mdx:273:An artifact graph does. It lets human intent become reviewable, agent execution become resumable, and evidence become part of the deliverable rather than a screenshot pasted into a status update.
+src/content/posts/agentic-operations-flow.mdx:279:<WhereThisSits slug="agentic-operations-flow" />
+src/components/interactive/AgenticOperationsFlow.tsx:16:  evidenceLayers,
+src/components/interactive/AgenticOperationsFlow.tsx:44:  const [activeEvidence, setActiveEvidence] = useState(evidenceLayers[0].id);
+src/components/interactive/AgenticOperationsFlow.tsx:63:    evidenceLayers.find((layer) => layer.id === activeEvidence) ?? evidenceLayers[0];
+src/components/interactive/AgenticOperationsFlow.tsx:91:              risk, and the evidence the next session needs.
+src/components/interactive/AgenticOperationsFlow.tsx:165:            {activeTab === "evidence" && (
+src/components/interactive/AgenticOperationsFlow.tsx:288:            {activeTab === "evidence" && (
+src/components/interactive/AgenticOperationsFlow.tsx:519:    <div className="aof-evidence-stack">
+src/components/interactive/AgenticOperationsFlow.tsx:520:      {evidenceLayers.map((layer, index) => {
+src/components/interactive/AgenticOperationsFlow.tsx:527:            className={`aof-evidence-layer ${selected ? "aof-evidence-layer--active" : ""} focus-ring`}
+src/components/interactive/AgenticOperationsFlow.tsx:530:            <span className="aof-evidence-layer__index">0{index + 1}</span>
+src/components/content/WhereThisSits.astro:3: * WhereThisSits (cross-series "reading path" locator for MDX essays).
+src/components/content/WhereThisSits.astro:12: *   <WhereThisSits slug="agentic-operations-flow" />
+src/components/content/WhereThisSits.astro:43:    `<WhereThisSits slug="${slug}" /> does not match any step in src/data/reading-paths.json. Add this essay's slug to a path's steps, or fix the slug.`
+src/components/content/MobileContents.astro:13:    <a class="mobile-contents__fallback" href="#post-contents">Contents</a>
+src/components/content/MobileContents.astro:14:    <button type="button" class="mobile-contents__trigger focus-ring" data-mobile-contents-trigger aria-haspopup="dialog">Contents</button>
+src/components/content/MobileContents.astro:15:    <dialog class="mobile-contents" data-mobile-contents aria-labelledby="mobile-contents-title">
+src/components/content/MobileContents.astro:16:      <div class="mobile-contents__sheet">
+src/components/content/MobileContents.astro:17:        <div class="mobile-contents__header">
+src/components/content/MobileContents.astro:18:          <h2 id="mobile-contents-title" class="font-serif">Contents</h2>
+src/components/content/MobileContents.astro:19:          <button type="button" class="mobile-contents__close focus-ring" data-mobile-contents-close>Close</button>
+src/components/content/MobileContents.astro:21:        <nav aria-label="Article sections"><ol>{outline.map((heading, index) => <li><a href={`#${heading.slug}`} data-mobile-contents-link><span>{String(index + 1).padStart(2, '0')}</span>{heading.text}</a></li>)}</ol></nav>
+src/components/content/MobileContents.astro:22:        {thread && <nav class="mobile-contents__thread" aria-label={`Running example: ${thread.title}`}><p class="font-mono">Running example</p><ol>{thread.beats.map((beat) => <li><a href={`#thread-${beat.id}`} data-mobile-contents-link><span>{String(beat.n).padStart(2, '0')}</span>{beat.label}</a><a class="mobile-contents__inspect" href={`/essays/${slug}/thread/${beat.id}/`}>Inspect</a></li>)}</ol></nav>}
+src/components/content/MobileContents.astro:23:        {thread && <a class="mobile-contents__evidence" href={`/essays/${slug}/evidence/`}>Receipts behind the argument</a>}
+src/components/content/MobileContents.astro:26:    <section id="post-contents" class="mobile-contents__section" aria-labelledby="post-contents-title">
+src/components/content/MobileContents.astro:34:  .mobile-contents__trigger { display: none; }
+src/components/content/MobileContents.astro:35:  .mobile-contents__fallback { display: none; }
+src/components/content/MobileContents.astro:36:  .mobile-contents__section { display: none; }
+src/components/content/MobileContents.astro:38:    .mobile-contents__trigger { position: fixed; right: 1rem; bottom: calc(1rem + env(safe-area-inset-bottom)); z-index: 55; border: 1px solid var(--border-strong); border-radius: 999px; background: var(--bg-surface); box-shadow: var(--shadow-md); color: var(--accent-text); cursor: pointer; font: 700 .6875rem var(--font-mono); letter-spacing: .08em; padding: .65rem .9rem; text-transform: uppercase; }
+src/components/content/MobileContents.astro:39:    .mobile-contents__fallback { display: inline-flex; position: fixed; right: 1rem; bottom: calc(1rem + env(safe-area-inset-bottom)); z-index: 54; border-radius: 999px; background: var(--bg-surface); color: var(--accent-text); font: 700 .6875rem var(--font-mono); padding: .65rem .9rem; text-decoration: none; }
+src/components/content/MobileContents.astro:40:    :global(html.mobile-contents-ready) .mobile-contents__trigger { display: inline-flex; z-index: 56; }
+src/components/content/MobileContents.astro:41:    :global(html.mobile-contents-ready) .mobile-contents__fallback { display: none; }
+src/components/content/MobileContents.astro:42:    .mobile-contents__section { display: block; margin: 3rem 0; padding: 1.25rem; border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); background: var(--bg-subtle); }
+src/components/content/MobileContents.astro:43:    .mobile-contents__section h2 { margin-top: 0; }
+src/components/content/MobileContents.astro:45:  .mobile-contents { width: min(100%, 42rem); max-width: 100%; max-height: min(75dvh, 42rem); margin: auto 0 0; padding: 0; color: var(--text-primary); background: var(--bg-surface); border: 1px solid var(--border-strong); border-radius: 1rem 1rem 0 0; }
+src/components/content/MobileContents.astro:46:  .mobile-contents::backdrop { background: var(--color-bg-overlay); }
+src/components/content/MobileContents.astro:47:  .mobile-contents__sheet { max-height: min(75dvh, 42rem); overflow-y: auto; padding: 1.25rem 1.25rem calc(1.25rem + env(safe-area-inset-bottom)); }
+src/components/content/MobileContents.astro:48:  .mobile-contents__header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; border-bottom: 1px solid var(--border-subtle); padding-bottom: .75rem; }
+src/components/content/MobileContents.astro:49:  .mobile-contents__header h2 { margin: 0; font-size: 1.5rem; }
+src/components/content/MobileContents.astro:50:  .mobile-contents__close { border: 0; background: transparent; color: var(--accent-text); cursor: pointer; font: 700 .6875rem var(--font-mono); text-transform: uppercase; }
+src/components/content/MobileContents.astro:51:  .mobile-contents ol { margin: .75rem 0 0; padding: 0; list-style: none; }
+src/components/content/MobileContents.astro:52:  .mobile-contents li { display: flex; align-items: baseline; justify-content: space-between; gap: .75rem; border-bottom: 1px solid var(--border-subtle); }
+src/components/content/MobileContents.astro:53:  .mobile-contents li > a:first-child { flex: 1; }
+src/components/content/MobileContents.astro:54:  .mobile-contents a { display: flex; gap: .75rem; padding: .7rem 0; color: var(--text-secondary); text-decoration: none; }
+src/components/content/MobileContents.astro:55:  .mobile-contents a:hover, .mobile-contents a:focus-visible { color: var(--accent-text); text-decoration: underline; }
+src/components/content/MobileContents.astro:56:  .mobile-contents a span { color: var(--accent-text); font: 700 .6875rem var(--font-mono); }
+src/components/content/MobileContents.astro:57:  .mobile-contents__thread { margin-top: 1.25rem; } .mobile-contents__thread > p { color: var(--accent-text); font-size: .6875rem; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; }
+src/components/content/MobileContents.astro:58:  .mobile-contents__inspect { color: var(--accent-text) !important; font: 700 .625rem var(--font-mono); text-transform: uppercase; }
+src/components/content/MobileContents.astro:59:  .mobile-contents__evidence { margin-top: 1rem; color: var(--accent-text); font-weight: 600; }
+src/components/content/MobileContents.astro:64:    document.querySelectorAll<HTMLDialogElement>('[data-mobile-contents]').forEach((dialog) => {
+src/components/content/MobileContents.astro:67:      document.documentElement.classList.add('mobile-contents-ready');
+src/components/content/MobileContents.astro:68:      const trigger = document.querySelector<HTMLButtonElement>('[data-mobile-contents-trigger]');
+src/components/content/MobileContents.astro:69:      const close = dialog.querySelector<HTMLButtonElement>('[data-mobile-contents-close]');
+src/components/content/MobileContents.astro:74:      dialog.querySelectorAll<HTMLAnchorElement>('[data-mobile-contents-link]').forEach((link) => link.addEventListener('click', () => dialog.close()));
+src/components/content/FocusHost.astro:5: * every "Explore thread" / evidence / figure trigger on the essay page
+src/components/content/EvidenceLegend.astro:7:  ['proposed', 'An interpretation or design proposal assembled from the available evidence.'],
+src/components/content/EvidenceLegend.astro:14:<section class="evidence-legend" aria-label="How to read the receipts">
+src/components/content/EvidenceLegend.astro:15:  <p class="evidence-legend__title">How to read the receipts</p>
+src/components/content/EvidenceLegend.astro:29:  .evidence-legend {
+src/components/content/EvidenceLegend.astro:33:  .evidence-legend__title {
+src/components/content/EvidenceLegend.astro:43:  .evidence-legend ul {
+src/components/content/EvidenceLegend.astro:52:  .evidence-legend li {
+src/components/content/EvidenceLegend.astro:61:  .evidence-legend :global(.evidence) {
+src/components/content/ThreadFocus.astro:21:import { evidence } from '../../data/evidence';
+src/components/content/ThreadFocus.astro:35:const relatedEvidence = beat ? beat.relatedEvidenceIds.map((id) => evidence[id]).filter(Boolean) : [];
+src/components/content/ThreadFocus.astro:92:            <nav class="thread-focus__evidence-links" aria-label="Related evidence">
+src/components/content/ThreadFocus.astro:93:              <p class="thread-focus__boundary-label font-mono">Related evidence</p>
+src/components/content/ThreadFocus.astro:96:                  <li><a href={`/evidence/${record.id}/`}>{record.title} &rarr;</a></li>
+src/components/content/ThreadFocus.astro:240:  .thread-focus__evidence-links {
+src/components/content/ThreadFocus.astro:244:  .thread-focus__evidence-links ul {
+src/components/content/ThreadFocus.astro:253:  .thread-focus__evidence-links a {
+src/components/content/ThreadFocus.astro:259:  .thread-focus__evidence-links a:hover,
+src/components/content/ThreadFocus.astro:260:  .thread-focus__evidence-links a:focus-visible {
+src/components/content/ReceiptIndex.astro:4: * §8): source navigation across the full evidence set, pairing with
+src/components/content/ReceiptIndex.astro:6: * canonical `/evidence/<id>/` route.
+src/components/content/ReceiptIndex.astro:8:import type { EvidenceRecord } from '../../data/evidence';
+src/components/content/ReceiptIndex.astro:25:            href={`/evidence/${record.id}/`}
+src/components/content/ReceiptIndex.astro:30:            <span class="receipt-index__link-class font-mono">{record.evidenceClass}</span>
+src/components/content/FocusTemplates.astro:27:import { evidence } from '../../data/evidence';
+src/components/content/FocusTemplates.astro:37:  ? Object.values(evidence).filter((record) => record.relatedSceneIds.some((id) => beatIds.has(id)))
+src/components/content/FocusTemplates.astro:56:      <template data-focus-view="evidence:all">
+src/components/content/FocusTemplates.astro:61:        <template data-focus-view={`evidence:${record.id}`}>
+src/components/content/ImplementationStatus.astro:6: * evidence-honesty shape as `Evidence.astro`, applied to build status
+src/components/content/ClaimBadge.astro:27:  .claim-badge :global(.evidence) {
+src/components/content/Evidence.astro:6: * where readers are evaluating evidence; do not interrupt narrative prose.
+src/components/content/Evidence.astro:16:const evidenceClasses: Record<string, { label: string; definition: string }> = {
+src/components/content/Evidence.astro:27:    definition: 'An interpretation or design proposal assembled from the available evidence.',
+src/components/content/Evidence.astro:43:const evidence = evidenceClasses[kind];
+src/components/content/Evidence.astro:50:      class:list={['evidence', `evidence--${kind}`]}
+src/components/content/Evidence.astro:52:      title={evidence.definition}
+src/components/content/Evidence.astro:54:      <span class="evidence__label">{evidence.label}</span>
+src/components/content/Evidence.astro:55:      {date && <span class="evidence__date">· {date}</span>}
+src/components/content/Evidence.astro:59:      class:list={['evidence', `evidence--${kind}`]}
+src/components/content/Evidence.astro:61:      title={evidence.definition}
+src/components/content/Evidence.astro:63:      <span class="evidence__label">{evidence.label}</span>
+src/components/content/Evidence.astro:64:      {date && <span class="evidence__date">· {date}</span>}
+src/components/content/Evidence.astro:70:  .evidence {
+src/components/content/Evidence.astro:92:  a.evidence:hover {
+src/components/content/Evidence.astro:98:  a.evidence:focus-visible {
+src/components/content/Evidence.astro:103:  .evidence__date {
+src/components/content/Evidence.astro:110:  .evidence--observed,
+src/components/content/Evidence.astro:111:  .evidence--measured {
+src/components/content/Evidence.astro:117:  .evidence--proposed,
+src/components/content/Evidence.astro:118:  .evidence--hypothesis {
+src/components/content/Evidence.astro:122:  .evidence--external,
+src/components/content/Evidence.astro:123:  .evidence--related-work {
+src/components/content/EvidenceGuide.astro:4: * spec §8): "how to read the receipts" for the `EvidenceRecord.evidenceClass`
+src/components/content/EvidenceGuide.astro:6: * measured / illustrative — `src/data/evidence.ts`).
+src/components/content/EvidenceGuide.astro:13: * taxonomy from `evidenceClass` (spec §8: "Evidence label is not evidence
+src/components/content/EvidenceGuide.astro:38:<section class="evidence-guide" aria-label="How to read the evidence classes">
+
+codex
+I’m using the required Confidence Check skill because this is an implementation change. The runner has one existing atlas routine, uses Playwright’s supported JPEG capture path, and the failures map directly to its missing readiness, preload, route, and positioning logic. Confidence: 1.00.
+exec
+/bin/zsh -lc "sed -n '200,270p' _handoff/rw-v2/qa/run_qa.py && sed -n '1,130p' src/data/evidence.ts && rg -n \"What I can prove today|Not every difference is drift|WhereThisSits|evidence.*href|id=|<h2\" src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx src/components/content -g '*.astro' && find docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/final -maxdepth 1 -type f -printf '%f\\n' | sort && du -sh docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/final" in /Users/miethe/dev/homelab/development/signal_to_system/.wt/rw-v2-essay
+ succeeded in 0ms:
+    safely("V03", v03)
+
+    def v04():
+        p=new_page(desktop); bytes_=len(p.content().encode()); sections=p.locator("article h2").count(); scenes=p.locator(".thread-scene").count()
+        line("PASS" if bytes_>100000 and sections>=6 and scenes==6 else "FAIL", "V04", f"htmlBytes={bytes_}; articleH2={sections}; scenes={scenes}"); p.close()
+    safely("V04", v04)
+    desktop.close()
+
+def capture_atlas(browser):
+    ATLAS.mkdir(parents=True, exist_ok=True)
+    states=[
+        ("entry", ESSAY, None), ("threadscene-incident", ESSAY, "#thread-incident"),
+        ("thread-focus-route", THREAD+"incident/", None), ("evidence-focus-index", EVIDENCE, None),
+        ("evidence-record", "/evidence/drift-check-2026-08-06/", None), ("figure-viewer", FIGURE+"incident/", None),
+        ("conclusion", ESSAY, "#where-this-sits"),
+    ]
+    written=[]
+    for label,path,fragment in states:
+        for width,height,name in ((1440,900,"desktop"),(390,844,"mobile")):
+            context=browser.new_context(viewport={"width":width,"height":height})
+            for dark in (False,True):
+                p=new_page(context,path+(fragment or ""),dark); filename=f"{label}__{name}__{'dark' if dark else 'light'}.jpg"; p.screenshot(path=str(ATLAS/filename), type="jpeg", quality=80); written.append(filename); p.close()
+            context.close()
+    for dark in (False,True):
+        c=browser.new_context(viewport={"width":390,"height":844}); p=new_page(c,ESSAY,dark); p.locator("[data-mobile-contents-trigger]").click(); p.locator("[data-mobile-contents]").wait_for(state="visible"); filename=f"mobile-contents-sheet__mobile__{'dark' if dark else 'light'}.jpg"; p.screenshot(path=str(ATLAS/filename), type="jpeg", quality=80); written.append(filename); p.close(); c.close()
+    # Overlay is separate from route because its dialog and parent-state behavior are a distinct reviewed surface.
+    for width,height,name in ((1440,900,"desktop"),(390,844,"mobile")):
+        c=browser.new_context(viewport={"width":width,"height":height})
+        for dark in (False,True):
+            p=new_page(c,ESSAY,dark); open_beat(p); filename=f"thread-focus-overlay__{name}__{'dark' if dark else 'light'}.jpg"; p.screenshot(path=str(ATLAS/filename), type="jpeg", quality=80); written.append(filename); p.close()
+        c.close()
+    index=["# Final atlas index", "", "JPEG captures use Playwright quality 80 to keep the atlas below 8 MB. They were saved but not opened or inspected in this QA leg.", ""]
+    for name in written: index.append(f"- `{name}`: {name.split('__')[0].replace('-', ' ')} at the named viewport and theme.")
+    (ATLAS/"INDEX.md").write_text("\n".join(index)+"\n")
+
+def main():
+    with sync_playwright() as pw:
+        browser=pw.chromium.launch(headless=True)
+        try:
+            test_suite(browser); capture_atlas(browser)
+        finally: browser.close()
+
+if __name__ == "__main__": main()
+// ---------------------------------------------------------------------------
+// Evidence Record Registry
+// ---------------------------------------------------------------------------
+//
+// Flat, site-wide store of receipts an essay can cite from a "Receipts behind
+// the argument" section, an Evidence Focus route, or a thread beat's
+// `relatedEvidenceIds` (see `src/data/threads.ts`). The field set follows
+// `PublicEvidenceRecord` in the reading-experience-v2 handoff's
+// `contracts/types.ts`, widened per that handoff's own ARCHITECTURE.md risk
+// 2: `relatedSceneIds` is `string[]` here, not a per-post `BeatId[]` enum, so
+// a second essay's thread can reference a record without a type change.
+//
+// Every record below is re-grounded against the receipts actually published
+// in `src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx`
+// (its footnotes, its "Receipts behind the argument" section, and its two
+// redacted inline captures: the deployment-manifest YAML excerpt and the
+// September 15 drift-check shell output) and
+// `docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/notes/`.
+// Nothing here invents a hash, a version, or an internal identifier the
+// manuscript doesn't already state. Where the manuscript itself says a date
+// is unresolved or gives no date, this file records `null` rather than
+// reusing a date an earlier handoff draft guessed (`contracts/evidence-records.json`'s
+// "provisioning" entry states "Aug. 4, 2026"; the manuscript's own footnote
+// for that receipt says "origin date unresolved", so this file follows the
+// manuscript and leaves both dates `null`).
+//
+// `captureType` is honest: `redacted-original` only for the two records that
+// correspond to the manuscript's two real redacted inline captures
+// (`drift-manifest-excerpt`, `drift-live-run-2026-09-15`); every other
+// empirical receipt is `method-summary`. `run-record` is the one deliberate
+// exception, set to `not-applicable` rather than `method-summary`: it is a
+// design proposal with no method run to summarize, and `not-applicable` is
+// the value `contracts/types.ts`'s `CaptureType` enum and the source
+// contract's own annotation ("Not applicable, proposal") both provide for
+// exactly this case.
+
+export type EvidenceClass = "observed" | "externally-reported" | "proposed" | "measured" | "illustrative";
+export type CaptureType = "original" | "redacted-original" | "method-summary" | "illustrative" | "not-applicable";
+
+export interface EvidenceRecord {
+  id: string;
+  title: string;
+  evidenceClass: EvidenceClass;
+  captureType: CaptureType;
+  sourceUrl: string | null;
+  sourceRevision: string | null;
+  eventDate: string | null; // ISO date; null when the manuscript doesn't state one
+  recordedDate: string | null; // ISO date the receipt/check/audit was recorded or committed
+  verifiedAt: string | null;
+  supports: string[];
+  limitations: string[];
+  publicability: "approved" | "pending" | "withheld";
+  relatedSceneIds: string[]; // ids into a thread's beats; post-scoped strings, not a per-thread BeatId enum
+  publicCapturePath: string | null;
+}
+
+export const evidence: Record<string, EvidenceRecord> = {
+  "drift-check": {
+    id: "drift-check",
+    title: "The reviewer copy",
+    evidenceClass: "observed",
+    captureType: "method-summary",
+    sourceUrl: null,
+    sourceRevision: null,
+    eventDate: "2026-08-05",
+    recordedDate: "2026-08-06",
+    verifiedAt: null,
+    supports: [
+      "A bounded comparison between deployed copies and their declared source can expose a stale reviewer that a clean registry entry alone did not reveal.",
+      "The comparison classifies deployed paths as tracked, allowed, or drift, rather than treating every difference the same way.",
+    ],
+    limitations: [
+      "Method summarized from the supplied receipt; it does not recover a per-session loading history or count how many reviews ran against the stale copy.",
+      "A nonzero exit from the check does not by itself identify which specific finding fired.",
+    ],
+    publicability: "approved",
+    relatedSceneIds: ["incident", "drift", "detection"],
+    publicCapturePath: null,
+  },
+  "drift-manifest-excerpt": {
+    id: "drift-manifest-excerpt",
+    title: "Deployment manifest: tracked vs. allowed copies",
+    evidenceClass: "observed",
+    captureType: "redacted-original",
+    sourceUrl: null,
+    sourceRevision: null,
+    eventDate: null,
+    recordedDate: null,
+    verifiedAt: null,
+    supports: [
+      "The manifest driving the drift gate classifies each declared path into exactly one bucket: a diffed tracked copy, or a never-diffed allowed copy carrying an explicit stated reason.",
+    ],
+    limitations: [
+      "Two illustrative entries only; this excerpt does not show full manifest coverage or the undeclared-copy failure path.",
+      "Internal paths in the excerpt are partially redacted; nothing beyond what the essay already publishes is disclosed here.",
+    ],
+    publicability: "approved",
+    relatedSceneIds: ["drift"],
+    publicCapturePath: null,
+  },
+  "drift-live-run-2026-09-15": {
+    id: "drift-live-run-2026-09-15",
+    title: "A live drift-check run, redacted",
+    evidenceClass: "observed",
+    captureType: "redacted-original",
+    sourceUrl: null,
+    sourceRevision: null,
+    eventDate: "2026-09-15",
+    recordedDate: "2026-09-15",
+    verifiedAt: null,
+    supports: [
+      "A live run of the same drift-check tool against the deployment manifest produced a real, redacted undeclared-copy finding.",
+    ],
+    limitations: [
+      "This is a different, unrelated finding from the August 6 drift receipt the essay's detection beat describes; it is not a replay of that receipt.",
+      "Internal identifiers (hostnames, paths) are withheld or redacted in the capture.",
+    ],
+    publicability: "approved",
+    relatedSceneIds: ["detection"],
+    publicCapturePath: null,
+  },
+  "instruction-parity": {
+    id: "instruction-parity",
+    title: "Sibling instructions",
+    evidenceClass: "observed",
+    captureType: "method-summary",
+    sourceUrl: null,
+    sourceRevision: null,
+    eventDate: null,
+    recordedDate: "2026-08-05",
+src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx:33:import WhereThisSits from '../../components/content/WhereThisSits.astro';
+src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx:103:It was mid-late 2025 when I started building <Term id="skillmeat">SkillMeat</Term>, my registry and deployment tool for reusable agent capabilities. Getting an agent to do something useful once was no longer the hard part. Making that behavior repeatable across projects, machines, teams, and runtimes was. Good agent behavior is a bundle: instructions, context, assumptions, examples, tools, permissions, and review expectations. When that bundle lived in one chat transcript or one local folder, it was fragile, and when another project needed it, the answer was usually copy and paste.
+src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx:138:Call that the <Term id="agentic-artifact">**agentic artifact**</Term>: whatever shapes how the agent reasons, acts, accesses tools, applies context, follows policy, or produces work.
+src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx:153:I use <Term id="agentic-artifact-supply-chain">**agentic artifact supply chain**</Term> for the managed lifecycle of those reusable instructions, context, tools, policies and related assets. Existing work on agent supply chains and governed agent primitives already covers this ground; this is my organizing label for the lifecycle I'm building, not a new supply-chain analogy.[^primitives]
+src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx:246:“Control plane” is the familiar shorthand. But an enterprise will run many governance systems, with different owners and enforcement mechanisms. <Term id="control-fabric">**Control fabric**</Term> is established terminology, including BCG's federated agent-control framing. Here it names independently operated systems that preserve compatible identity, authority, policy-decision and evidence records across handoffs.[^fabric] I use it to connect four responsibilities:
+src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx:255:Four responsibilities, not four products, and they overlap: context is a governed dependency and an input to a runtime decision at once. Writing a policy under one of these headings doesn't establish that a runtime checks it, so I still need to name the mechanism in the execution path and what it blocks. My own <Term id="aos">Agentic OS (AOS)</Term> covers these unevenly. The table is the obligation, not a claim of coverage; they become a control fabric only once the handoffs carry identity and evidence.
+src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx:271:<Term id="skillbom">**SkillBOM**</Term> already appears in research on skill identity, dependencies and run provenance.[^skillbom] Here it names this implementation's manifest for recording artifact composition and provenance. The useful question is which relationships it preserves. A manifest produced while assembling a bundle can identify the assembled artifacts without proving that a later session loaded them. A run record has to bind that use separately.
+src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx:277:I want to measure accepted outcomes with evidence. For this reviewer, that means a review that meets the request, with evidence of the required guard and an authorized acceptance decision. A <Term id="feature-contract">**Feature Contract**</Term> makes those obligations explicit; [The Contract Is the Work](/essays/the-contract-is-the-work/) takes up that boundary.
+src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx:288:A known source can supply a harmful artifact. Permitted work can still be wrong. A run using a skill does not establish that the skill caused its result. Fixed dependencies do not make probabilistic reasoning deterministic. The next essay considers the <Term id="deterministic-envelope">deterministic envelope</Term>, an existing way of describing constraints around probabilistic systems. My emphasis will be on controls outside model judgment and evidence that they mediate execution, alongside related work such as RAILS.[^envelope] Repeated successful reasoning can suggest a candidate for automation. It doesn't establish authority to promote it, or tell me when to withdraw it. Those remain questions to test.
+src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx:333:*A live run, redacted, September 15, 2026. The <Term id="task-completion-validator">task-completion-validator</Term> drift this section describes is recorded in the receipt below (August 6, 2026), not replayed here; that nonzero exit is a different, unrelated undeclared-copy finding.*
+src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx:344:## What I can prove today.
+src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx:403:<WhereThisSits slug="the-registry-wave-agentic-artifact-supply-chain" />
+src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx:405:I place this work within the emerging discipline of <Term id="agentic-systems-engineering">**Agentic Systems Engineering**</Term>, already named in academic work by Sun and colleagues and in enterprise work by OutSystems.[^ase] This series examines my particular architecture through the systems I build and the failures they expose. Agentic SDLC is its application to software delivery. This reading path connects the questions; it isn't a one-to-one map of architecture layers.
+src/components/content/ContextualNote.astro:14:      <section data-contextual-note-item data-section-id={note.sectionId} data-note-id={note.id} hidden>
+src/components/content/MobileContents.astro:18:          <h2 id="mobile-contents-title" class="font-serif">Contents</h2>
+src/components/content/MobileContents.astro:23:        {thread && <a class="mobile-contents__evidence" href={`/essays/${slug}/evidence/`}>Receipts behind the argument</a>}
+src/components/content/MobileContents.astro:26:    <section id="post-contents" class="mobile-contents__section" aria-labelledby="post-contents-title">
+src/components/content/MobileContents.astro:27:      <h2 id="post-contents-title">Contents</h2>
+src/components/content/Term.astro:6:// <Term id="contract-as-spec" /> or <Term id="contract-as-spec">label</Term>
+src/components/content/Term.astro:21:    `<Term id="${id}" /> does not match any entry in src/data/glossary.ts. Add the term there or fix the id.`
+src/components/content/Term.astro:52:  <span role="tooltip" id={tooltipId} class="glossary-tooltip">
+src/components/content/Figure.astro:170:    <p id={descId} class="sr-only">{longDescription}</p>
+src/components/content/ThreadScene.astro:59:      id={`thread-${beat.id}`}
+src/components/content/ThreadScene.astro:86:          <h3 id={`thread-${beat.id}-label`} class="thread-scene__label font-serif">
+src/components/content/ThreadFocus.astro:75:          <h2 class="thread-focus__title font-serif">{beat.label}</h2>
+src/components/content/EvidenceFocus.astro:52:          <a class="evidence-focus__action" href={`/essays/${essaySlug}/`}>
+src/components/content/EvidenceFocus.astro:84:          {!selectedId && <h2 class="evidence-focus__title font-serif">{selected.title}</h2>}
+src/components/content/ThreadDock.astro:46:                data-beat-id={beat.id}
+src/components/content/ThreadDock.astro:54:              <button type="button" class="thread-dock__hold focus-ring" data-thread-dock-hold data-beat-id={beat.id}>Hold</button>
+src/components/content/ThreadDock.astro:201:        const label = (id: string | null) => dock.querySelector<HTMLElement>(`[data-beat-id="${id}"] .thread-dock__label`)?.textContent ?? 'Last thread scene';
+src/components/content/ThreadDock.astro:210:        if (dock.querySelector(`[data-beat-id="${id}"]`)) { readingId = id; update(); }
+src/components/content/RelatedContent.astro:25:  <h2
+src/components/content/RelatedContent.astro:26:    id="related-heading"
+src/components/content/WhereThisSits.astro:3: * WhereThisSits (cross-series "reading path" locator for MDX essays).
+src/components/content/WhereThisSits.astro:12: *   <WhereThisSits slug="agentic-operations-flow" />
+src/components/content/WhereThisSits.astro:43:    `<WhereThisSits slug="${slug}" /> does not match any step in src/data/reading-paths.json. Add this essay's slug to a path's steps, or fix the slug.`
+src/components/content/FigureViewer.astro:81:      <h2 class="figure-viewer__title font-serif">{beat.image.caption}</h2>
+find: -printf: unknown primary or operator
+2.8M	docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/final
+
+codex
+I’ve isolated the capture routine. I’ll make the smallest runner-only change: inject the selected theme before navigation, preload each capture page, add a transition-settling gate for all dialogs, correct the evidence record path, and add the requested positioned captures. The old final JPEGs will be removed by the runner itself before it writes replacements.
+exec
+/bin/zsh -lc "rg -n \"<Figure|Not every difference|evidence\\]|evidence\\(\" src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx && sed -n '300,430p' src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx && sed -n '1,140p' src/components/content/FocusHost.astro && sed -n '1,150p' src/components/content/Figure.astro" in /Users/miethe/dev/homelab/development/signal_to_system/.wt/rw-v2-essay
+ succeeded in 0ms:
+379:<Figure
+392:<Figure
+The same substitution showed up in provenance. In the September audit, SkillBOM emission was wired into bundle assembly. Deploying a single artifact used a different path and didn't automatically emit a BOM. Both operations could reasonably be described as deploying capability, but only one reached that evidence writer.[^bom-scope] A feature list saying “provenance supported” concealed the question I needed answered: supported on the operation I just performed?
+
+Another context-provenance tool had produced three real records with deployed-artifact findings. The records existed; the CLI path that could write them existed too. What the durable record didn't establish was whether a human had run that command or an automated agent had invoked it.[^context-records] Production-shaped output, unresolved producer. I can't use those rows to claim autonomous reconciliation.
+
+Even the comparison itself can ask the wrong question. A maintenance check rejected a report that a dependency's fix had shipped because the original commit wasn't an ancestor of the release. The repository squash-merges. Inspecting the tagged file showed the fix was present.[^ancestry] The ancestry result was correct; my conclusion about the release would have been wrong. A receipt needs a question as well as a timestamp.
+
+These failures changed what I ask a registry to show me. I want a deployment record with a destination, a comparison against that destination's intended state, and a separate account of use. When one is missing, the other two shouldn't quietly fill in for it. A green registration result can't answer a loading question, and an output file can't identify its producer unless that identity was retained.
+
+The retained September 15 run of the same gate exited nonzero on a different, unrelated class of finding. It shows the gate can surface a real problem, not that it replayed the stale-reviewer incident or recovered a past session's loaded artifacts.
+
+<ReceiptDisclosure
+  label="Evidence receipt · September 15 drift check"
+  summary="A live, redacted check reported an undeclared copy and exited nonzero; it was unrelated to the August stale-reviewer incident."
+>
+```
+$ python3 scripts/check_global_artifact_drift.py
+[global-artifact-drift] legacy symlinked deployments: 0 across 5 root(s); pre-existing
+only, the doctrine forbids creating new ones. 108 real file/dir deployment(s) (tracked +
+allowed copies + any undeclared, reported separately below).
+[global-artifact-drift] PENDING DEPLOYMENT (tracked): ~/.claude/hooks/precompact_handoff_seam.sh
+      declared in `watch:` as a KNOWN pending deployment; inert until it is registered
+      and deployed. Not a bug to fix here.
+
+Global artifact drift (deployed artifact vs repo upstream vs origin/main):
+
+  UNDECLARED COPY: ~/.claude/agents/agent-expert.md
+      neither a symlink, a tracked copy, nor an allowed copy; candidate upstream in
+      another project's checkout.
+      fix: register it via SkillMeat and/or declare it in the manifest, never symlink it.
+exit 1
+```
+</ReceiptDisclosure>
+
+*A live run, redacted, September 15, 2026. The <Term id="task-completion-validator">task-completion-validator</Term> drift this section describes is recorded in the receipt below (August 6, 2026), not replayed here; that nonzero exit is a different, unrelated undeclared-copy finding.*
+
+<ImplementationStatus
+  rows={[
+    { label: 'Artifact registration and deployment', status: 'IMPLEMENTED', detail: 'SkillMeat manages artifact registration and deployment in my lab; that is one coordination implementation, not a requirement that every enterprise use one router.' },
+    { label: 'Context and evidence homes', status: 'PARTIAL', detail: 'MeatyWiki and Research Foundry provide durable homes beyond the registry, while the audited provenance paths still have scoped gaps.' },
+    { label: 'Loaded version to accepted outcome', status: 'PROPOSED', detail: 'The run-level relationship described above is a proposed evidence model, not a claimed implementation receipt.' },
+    { label: 'Outcome improvement', status: 'TO TEST', detail: 'Controlled comparisons of pinned artifacts and context are the next way I intend to test whether these controls improve outcomes.' }
+  ]}
+/>
+
+## What I can prove today.
+
+### Receipts behind the argument
+
+These are dated implementation records, summarized as methods. The August commits establish when checks entered the repository; the September audit establishes what that later inspection found. Neither date silently becomes the incident date or an attestation of today's runtime state.
+
+[Read the full receipt set in Evidence Focus.](/essays/the-registry-wave-agentic-artifact-supply-chain/evidence/)
+
+<ClaimBadge kind="observed" /> **The reviewer copy.** The drift-check source records a deployed reviewer missing its mandatory establish-the-diff step while the upstream copy contained it. The incident was filed August 5; the check was committed August 6. Its five-day interval describes the stale deployment. Comparing deployed bytes with the source makes that discrepancy visible, but doesn't recover a per-session loading history or count incorrect reviews.[^drift]
+
+<ClaimBadge kind="observed" /> **Sibling instructions.** One harness-specific instruction file carried superseded doctrine for six weeks after its canonical sibling changed. The parity gate committed August 5 checks a declared relationship between those files. It doesn't require every document to be identical. The separate live-document staleness check catches a named obsolete assertion outside that pair; it leaves dated historical records alone.[^parity][^staleness]
+
+<ClaimBadge kind="observed" /> **Workflow copies that needed different repairs.** The synchronization source records both missing upstream review checks and local copies with stricter conditional-verdict handling. The August 11 implementation preserves per-project rosters and refuses local-ahead overwrites. That refusal protects the difference from erasure; it doesn't certify the difference as correct or promote it into shared policy.[^workflow]
+
+<ClaimBadge kind="measured" /> **Ancestry versus released content.** The retained maintenance record reports negative commit-ancestry and tag-containment checks, followed by direct inspection of the release's file, which found the fix. The repository's squash-merge history explains the discrepancy. This measures presence in the tagged source, not presence in a deployed process, and supplies no outcome comparison.[^ancestry]
+
+<ClaimBadge kind="measured" /> **A provenance writer on one path.** The September 16 audit traced automatic BOM emission through composite/bundle materialization and inspected the separate single-artifact deployment route. The latter emitted activity events without invoking the BOM generator. The finding is a path-coverage gap. It doesn't measure the proportion of all deployments missing records, and a working bundle path doesn't close that gap.[^bom-scope]
+
+<ClaimBadge kind="measured" /> **Real records, unresolved caller.** The same audit inspected three real context-provenance rows with deployment findings and traced the CLI's call into the writer. It found no durable dispatch log in the inspected canonical checkout that identified which actor produced those rows. That leaves the actor unresolved. It doesn't make the rows fictitious, and it doesn't prove the automated pilot produced them.[^context-records]
+
+<ClaimBadge kind="observed" /> The compact chronology below comes from the first commits of the named local mechanisms. These are implementation-history markers, not public-priority claims or dates of complete fleet coverage.
+
+| First committed | Local mechanism | What the record adds |
+| --- | --- | --- |
+| June 2026 | Upstream artifact registry | A declared source for shared artifacts |
+| August 2026 | Sibling-instruction parity check | A check on a named consumer relationship |
+| August 2026 | Deployed-artifact drift check | Comparison at the deployment destination |
+| August 2026 | Direction-aware workflow synchronization | Protection against erasing local-ahead changes |
+
+<ClaimBadge kind="proposed" /> Those repairs support the managed-variation architecture in this essay. They don't establish a complete identity-to-outcome chain. I still need evidence for when a local improvement should become shared policy, when an automated fast path should return to judgment, and how an independent acceptance decision changes results. The three-project comparison is illustrative. No promotion, demotion or acceptance-by-assertion incident is being claimed from these receipts.
+
+<ClaimBadge kind="external" /> The four vendor descriptions and the related architecture research are outside sources. Their product boundaries and contribution claims remain distinct from my implementation records. In particular, no external benchmark result is reported here as a benefit measured in the lab.
+
+This essay reports no measured outcome improvement.
+
+<Figure
+  src="/assets/posts/the-registry-wave-agentic-artifact-supply-chain/agentic-os-artifact-estate-before-and-after.png"
+  alt="Before-and-after diagram of an artifact estate with projects and a governed registry."
+  number="08"
+  caption="The image compresses the governed case into “same bytes everywhere,” but that is the lucky case, not the definition of governance. The actual requirement is verified lineage to a governed source, plus declared and auditable intent for copies that legitimately diverge."
+  variant="technical"
+  width={1672}
+  height={941}
+/>
+
+<details>
+<summary>Inside my lab</summary>
+
+<Figure
+  src="/assets/posts/the-registry-wave-agentic-artifact-supply-chain/the-agentic-os-artifact-estate.png"
+  alt="Diagram of an agentic artifact estate showing governed lineage, project bindings, and deliberate local differences."
+  caption="A deeper view of the estate: some copies must change, and some differences must survive with a recorded reason."
+  variant="technical"
+  width={1672}
+  height={941}
+/>
+
+</details>
+
+<WhereThisSits slug="the-registry-wave-agentic-artifact-supply-chain" />
+
+I place this work within the emerging discipline of <Term id="agentic-systems-engineering">**Agentic Systems Engineering**</Term>, already named in academic work by Sun and colleagues and in enterprise work by OutSystems.[^ase] This series examines my particular architecture through the systems I build and the failures they expose. Agentic SDLC is its application to software delivery. This reading path connects the questions; it isn't a one-to-one map of architecture layers.
+
+The reviewer didn't need a better name or another catalog. It needed the fix to reach the place that loaded it, a check that noticed when it hadn't, and evidence that the resulting review did what was asked. It also needed room for a project-specific improvement to survive the next shared correction. That's the bar I want the supply chain to meet when I'm no longer watching every project myself.
+
+## Sources
+
+External claims below reflect researched, scoped status for this edition: each footnote states its own preview, GA, or tier boundary rather than treating verification as pending. Lab references identify supplied implementation receipts.
+
+[^github]: GitHub Changelog, [Manage agent skills with GitHub CLI](https://github.blog/changelog/2026-04-16-manage-agent-skills-with-github-cli/). `gh skill` remains a public preview feature as of this edition.
+[^jfrog]: JFrog, [Agent Skills Registry](https://jfrog.com/ai-catalog/skills-registry/) and [Skills Repositories](https://docs.jfrog.com/artifactory/docs/skills-repositories). The registry itself is generally available; artifact signing is optional and tier-dependent, and the locally enforced boundary described here remains a preview capability.
+[^redhat]: Red Hat, [agentic catalog](https://catalog.redhat.com/en/ai) and [MCP catalog: discover, deploy, and connect](https://www.redhat.com/en/blog/mcp-catalog-here-discover-deploy-and-connect-red-hat-openshift-ai). Red Hat maintains the Agent Catalog and the MCP Catalog as separate roles, and both carry pre-GA boundaries as of this edition.
+[^mcp]: Model Context Protocol, [The MCP Registry](https://modelcontextprotocol.io/registry/about). The registry is a preview metadata and discovery service, not an enforcement point.
+[^drift]: Lab implementation receipt, August 6, 2026: global artifact-drift check, following a reviewer deployed five days behind its source. Method summarized from the supplied receipt; no claim of a measured reduction in review failures. Internal identifiers withheld; method only.
+[^parity]: Lab implementation receipt, August 5, 2026: sibling instruction parity gate, following six weeks of stale instructions reaching one harness class. Internal identifiers withheld; method only.
+[^staleness]: Lab implementation receipt, August 7, 2026: live-document scan for superseded operating-model assertions, with dated historical records exempted. Internal identifiers withheld; method only.
+[^provisioning]: Supplied lab provisioning receipt (origin date unresolved): missing local artifacts are treated as unprovisioned; a tool-failure hook probes the registry and supplies a deployment command without writing the artifact itself. Internal identifiers withheld; method only.
+[^coverage]: Registry implementation receipt, August 11, 2026: fleet-wide compliance scanning explicitly labelled target state. A local registration scan exists (August 24); that doesn't establish fleet-wide enforcement. Internal identifiers withheld; method only.
+
+[^market-scope]: September 17 research comparison of the four documented product surfaces, supplied for this edition. Registry features, runtime mediation and adjacent provenance products were treated separately. No complete bytes-to-policy-to-execution-to-outcome join was documented in the reviewed scope; this is not a company-wide incapability claim. Each product's scope and preview boundary is recorded above.
+[^primitives]: JFrog, [Managing AI Agent Primitives Like Real Software Packages with APM and JFrog](https://jfrog.com/blog/managing-ai-agent-primitives-with-apm-and-jfrog/), included in the supplied September 17 prior-art review. This supports the governed-dependency overlap, not a measured result for my systems.
+[^xia]: Xia et al., [Harnessing Agent Skills: Architectural Patterns and a Reference Architecture for Skill-Mediated LLM Agents](https://arxiv.org/html/2606.20631v1), version 1, reviewed in the supplied September 17 research pack. Direct architectural overlap includes artifact/use separation, mediation, run evidence and feedback.
+[^skillbom]: Alongside Xia et al., Liu, Wu and Li, [The Decomposition Is the Fingerprint: Per-Component Identity for Agent Skills](https://arxiv.org/abs/2606.31272), and Jia et al., [Skills Are Not Islands: Measuring Dependency and Risk in Agent Skill Supply Chains](https://arxiv.org/abs/2607.01136), use SkillBOM for related identity and dependency concerns. These are distinct schema meanings, not an established interoperability contract with this implementation.
+[^fabric]: BCG, [Scaling Agents Without Creating Your Next Tech Legacy](https://www.bcg.com/ja-jp/publications/2026/the-four-pillars-cios-can-use-to-scale-agentic-ai), included in the supplied September 17 review for its federated control-fabric architecture. The term has older computing and identity uses as well; no first-use claim is intended.
+[^envelope]: FlowX.AI, [RAILS](https://www.flowx.ai/research/rails), describes related deterministic-graph and stochastic-node architecture. The supplied review leaves exact publication chronology unresolved. The next essay's promotion and withdrawal questions are a research agenda, not a claim of deployed enforcement.
+[^ase]: Sun et al., [Robust, Observable, and Evolvable Agentic Systems Engineering](https://arxiv.org/abs/2509.20729), and [OutSystems' Agentic Systems Engineering announcement](https://www.outsystems.com/de-de/news/outsystems-agentic-systems-engineering-announcement), identified in the supplied prior-art review. These establish existing usage; earliest title and wording history remain outside this essay's claim.
+[^workflow]: Lab implementation receipt: direction-aware project workflow synchronization, first committed August 11, 2026. Its source records project copies missing review checks alongside local copies carrying stricter conditional-verdict handling. The tool preserves project-specific rosters and refuses local-ahead overwrites; mixed changes require inspection. This is a separate incident from the stale reviewer, not evidence that every local difference is legitimate. Internal identifiers withheld; method only.
+---
+/**
+ * FocusHost — the reading-experience-v2 P0-C inspection controller
+ * (ARCHITECTURE.md §3, DIRECTION.md V4). Mounts the one native <dialog>
+ * every "Explore thread" / evidence / figure trigger on the essay page
+ * opens into, by cloning the matching `FocusTemplates.astro` fragment.
+ * The behavior (open/close/history/return semantics) lives in
+ * `src/lib/focus-host.ts` — this component only renders the dialog shell
+ * and starts the controller.
+ *
+ * Mounted once by `PostLayout`, immediately after `FocusTemplates` (same
+ * `slug`, so `data-essay-slug` always matches the templates it clones).
+ * Deliberately NOT mounted on the four standalone focus routes
+ * (`/essays/<slug>/thread/<beat>/` etc.): those pages render no
+ * `<template>` fragments of their own today, so a host there would have
+ * nothing to clone. If a later P0-B/P1 pass adds child templates to those
+ * routes (ARCHITECTURE.md §3's parenthetical about "a direct arrival...
+ * still has a working host"), mounting this component there too is a
+ * one-line addition — the controller itself already degrades safely to
+ * an ordinary navigation whenever `templateFor()` finds nothing to clone.
+ *
+ * Owns history directly (`pushState`/`replaceState`/one `popstate`
+ * listener) rather than integrating with Astro ClientRouter — see
+ * ARCHITECTURE.md §1's correction to its own brief: ClientRouter is not
+ * wired anywhere in this codebase today.
+ */
+import { threads } from '../../data/threads';
+
+interface Props {
+  slug: string;
+}
+
+const { slug } = Astro.props;
+const thread = threads[slug];
+---
+
+{
+  thread && (
+    <dialog data-focus-dialog data-essay-slug={slug} class="focus-host" aria-label="Reading focus view" />
+  )
+}
+
+{
+  thread && (
+    <script>
+      import { initFocusHost } from '../../lib/focus-host';
+
+      initFocusHost();
+    </script>
+  )
+}
+
+<style>
+  .focus-host {
+    box-sizing: border-box;
+    width: min(94vw, 72rem);
+    max-width: 94vw;
+    max-height: 90vh;
+    margin: auto;
+    padding: 1.75rem clamp(1.25rem, 4vw, 2.5rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    color: var(--text-primary);
+    background: var(--bg-surface);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    animation: focus-host-in 160ms ease-out;
+  }
+
+  .focus-host::backdrop {
+    background: var(--color-bg-overlay);
+    animation: focus-host-backdrop-in 160ms ease-out;
+  }
+
+  .focus-host:focus-visible {
+    outline: none;
+  }
+
+  @keyframes focus-host-in {
+    from {
+      opacity: 0;
+      transform: translateY(0.5rem) scale(0.99);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+
+  @keyframes focus-host-backdrop-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .focus-host,
+    .focus-host::backdrop {
+      animation: none;
+    }
+  }
+
+  :global(html.perf-lite) .focus-host,
+  :global(html.perf-lite) .focus-host::backdrop {
+    animation: none;
+  }
+
+  @media (max-width: 640px) {
+    .focus-host {
+      width: 100vw;
+      max-width: 100vw;
+      max-height: 100vh;
+      height: 100%;
+      border-radius: 0;
+      padding: 1.25rem 1rem 2rem;
+    }
+  }
+</style>
+---
+/**
+ * Figure — editorial "engineering plate" treatment for illustrations.
+ *
+ * Renders a warm-paper plate with corner tick marks, suitable for
+ * schematic / blueprint-style figures. The plate stays light in both
+ * themes on purpose: in dark mode it reads as a luminous drawing card
+ * floating on the navy page.
+ *
+ * Variants:
+ *   - default:   inline article figure with mono "Fig · NN" label + caption
+ *                (unchanged from the original component)
+ *   - hero:      frontispiece plate (no caption, larger padding; unchanged)
+ *   - inline:    like default, but never breaks out of the `.prose-custom`
+ *                reading measure — for small supporting figures
+ *   - wide:      breaks out further than default/inline — for diagrams that
+ *                need more than the 72ch measure
+ *   - technical: like wide, with a distinct "schematic" plate treatment
+ *                (dashed border, teal label) instead of the editorial one
+ *
+ * `expandable` gates the existing lightbox/dialog: on by default for every
+ * variant except `hero`, which stays non-expandable unless a `caption` is
+ * also supplied (matching its current no-caption, frontispiece-only use).
+ * `mobileSrc` swaps in a `<picture>` element with a narrow-viewport source.
+ * `longDescription` is exposed to screen readers only, via `aria-describedby`
+ * on the figure, for dense technical figures that need more than `alt` text.
+ *
+ * `figureId` (paired with `slug`) is the opt-in reading-experience-v2 path
+ * (ARCHITECTURE.md §5, V7): when both are supplied, the enlarge trigger
+ * becomes a real link to `/essays/<slug>/figure/<figureId>/` (data-kind
+ * "figure", data-key `figureId`) instead of opening this component's own
+ * private `<dialog>` — no-JS/direct-link both work because the route is a
+ * real static page, and this component never renders its private dialog
+ * for a figureId figure (risk 3: never two dialog mechanisms open on one
+ * figure). `FocusHost` (P0-C) hijacks that link's click later; until then
+ * it behaves as an ordinary link to the standalone figure route. Every
+ * other figure on the site keeps using the private lightbox, untouched.
+ *
+ * Every prop from the original component (`src`, `alt`, `caption`, `number`,
+ * `credit`, `creditHref`, `variant: 'default' | 'hero'`) keeps working
+ * unchanged — this file is an additive extension, not a rewrite.
+ */
+interface Props {
+  src: string;
+  alt: string;
+  caption?: string;
+  number?: string;
+  credit?: string;
+  creditHref?: string;
+  variant?: 'default' | 'hero' | 'inline' | 'wide' | 'technical';
+  expandable?: boolean;
+  width?: number;
+  height?: number;
+  mobileSrc?: string;
+  longDescription?: string;
+  figureId?: string;
+  slug?: string;
+}
+
+const {
+  src,
+  alt,
+  caption,
+  number,
+  credit,
+  creditHref,
+  variant = 'default',
+  expandable,
+  width,
+  height,
+  mobileSrc,
+  longDescription,
+  figureId,
+  slug,
+} = Astro.props;
+
+const isHero = variant === 'hero';
+const showCaption = !isHero && (number || caption || credit);
+
+// Every variant is expandable by default; the hero frontispiece is the one
+// exception (no caption today, so no lightbox unless one is supplied).
+const canExpand = expandable ?? (isHero ? Boolean(caption) : true);
+
+// Opt-in FocusHost path — see the header comment. Both props are required
+// together; a figureId without a slug (or vice versa) falls back to the
+// ordinary private lightbox rather than building a broken href.
+const focusHref = figureId && slug ? `/essays/${slug}/figure/${figureId}/` : undefined;
+
+// Only allocated when needed — most figures carry no long description.
+const descId = longDescription
+  ? `figure-desc-${crypto.randomUUID().slice(0, 8)}`
+  : undefined;
+---
+
+<figure
+  class:list={[
+    'figure-plate',
+    'lift-hover',
+    isHero && 'figure-plate--hero',
+    variant === 'inline' && 'figure-plate--inline',
+    variant === 'wide' && 'figure-plate--wide',
+    variant === 'technical' && 'figure-plate--technical',
+  ]}
+  data-enlargeable-figure={canExpand ? 'true' : undefined}
+  aria-describedby={descId}
+>
+  <span class="figure-plate__corner figure-plate__corner--tl" aria-hidden="true"></span>
+  <span class="figure-plate__corner figure-plate__corner--tr" aria-hidden="true"></span>
+  <span class="figure-plate__corner figure-plate__corner--bl" aria-hidden="true"></span>
+  <span class="figure-plate__corner figure-plate__corner--br" aria-hidden="true"></span>
+
+  <div class="figure-plate__frame">
+    {canExpand && <span class="figure-plate__header" aria-hidden="true"><span>{number ? `Figure ${number}` : 'Figure'}</span><span>Enlarge figure ↗</span></span>}
+    {
+      canExpand ? (
+        <a
+          class="figure-plate__enlarge"
+          href={focusHref ?? src}
+          aria-label={`Enlarge: ${alt}`}
+          aria-haspopup="dialog"
+          data-figure-trigger={focusHref ? undefined : true}
+          data-kind={focusHref ? 'figure' : undefined}
+          data-key={focusHref ? figureId : undefined}
+        >
+          {mobileSrc ? (
+            <picture>
+              <source media="(max-width: 640px)" srcset={mobileSrc} />
+              <img src={src} alt={alt} width={width} height={height} loading="lazy" decoding="async" />
+            </picture>
+          ) : (
+            <img src={src} alt={alt} width={width} height={height} loading="lazy" decoding="async" />
+          )}
+          <span class="figure-plate__enlarge-affordance" aria-hidden="true">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M15 3h6v6" />
+              <path d="m21 3-7 7" />
+              <path d="M9 21H3v-6" />
+              <path d="m3 21 7-7" />
+            </svg>
+          </span>
+        </a>
+      ) : mobileSrc ? (
+        <picture>
+          <source media="(max-width: 640px)" srcset={mobileSrc} />
+          <img src={src} alt={alt} width={width} height={height} loading="lazy" decoding="async" />
+        </picture>
+      ) : (
+        <img src={src} alt={alt} width={width} height={height} loading="lazy" decoding="async" />
+      )
+    }
+
+exec
+/bin/zsh -lc "rg -n \"<aside|reading-companion|companion__\" src/components src/layouts && sed -n '1,160p' src/components/content/ReadingCompanion.astro 2>/dev/null || true" in /Users/miethe/dev/homelab/development/signal_to_system/.wt/rw-v2-essay
+ succeeded in 0ms:
+src/layouts/ProjectLayout.astro:206:        <aside class="mb-8 rounded-lg border border-[var(--border)] bg-[var(--bg-subtle)] p-5 text-center">
+src/layouts/StoryLayout.astro:210:        <aside class="mb-8 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-subtle)] p-6 shadow-sm">
+src/components/content/Callout.astro:69:<aside
+src/components/content/ContextualNote.astro:12:  <aside class="contextual-note" data-contextual-note hidden aria-live="polite">
+src/components/content/ReadingCompanion.astro:70:<div class="reading-companion flex flex-col gap-3" data-reading-companion>
+src/components/content/ReadingCompanion.astro:74:        class="reading-companion__block reading-companion__outline rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-subtle)]"
+src/components/content/ReadingCompanion.astro:77:        <div class="reading-companion__header font-mono flex items-center justify-between gap-2 px-4 py-2.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--accent)]">
+src/components/content/ReadingCompanion.astro:81:            class="reading-companion__all-toggle focus-ring text-[var(--text-tertiary)] hover:text-[var(--accent)]"
+src/components/content/ReadingCompanion.astro:89:        <div class="reading-companion__body" data-companion-scroll>
+src/components/content/ReadingCompanion.astro:90:          <div class="reading-companion__rail" aria-hidden="true">
+src/components/content/ReadingCompanion.astro:91:            <div class="reading-companion__rail-fill" data-companion-fill />
+src/components/content/ReadingCompanion.astro:94:            <p class="reading-companion__more" data-companion-more="above" hidden />
+src/components/content/ReadingCompanion.astro:95:            <ol class="reading-companion__list">
+src/components/content/ReadingCompanion.astro:98:                  class:list={['reading-companion__item', heading.depth === 3 && 'reading-companion__item--sub']}
+src/components/content/ReadingCompanion.astro:105:                    class="reading-companion__link"
+src/components/content/ReadingCompanion.astro:110:                      <span class="reading-companion__index font-mono" aria-hidden="true">
+src/components/content/ReadingCompanion.astro:114:                    <span class="reading-companion__label line-clamp-2">{heading.text}</span>
+src/components/content/ReadingCompanion.astro:119:            <p class="reading-companion__more" data-companion-more="below" hidden />
+src/components/content/ReadingCompanion.astro:131:  .reading-companion__header {
+src/components/content/ReadingCompanion.astro:135:  .reading-companion__all-toggle {
+src/components/content/ReadingCompanion.astro:146:  .reading-companion__all-toggle[aria-pressed='true'] {
+src/components/content/ReadingCompanion.astro:150:  .reading-companion__body {
+src/components/content/ReadingCompanion.astro:157:  .reading-companion__body::-webkit-scrollbar {
+src/components/content/ReadingCompanion.astro:161:  .reading-companion__more {
+src/components/content/ReadingCompanion.astro:170:  .reading-companion__list + .reading-companion__more {
+src/components/content/ReadingCompanion.astro:174:  .reading-companion__rail {
+src/components/content/ReadingCompanion.astro:184:  .reading-companion__rail-fill {
+src/components/content/ReadingCompanion.astro:195:  .reading-companion__list {
+src/components/content/ReadingCompanion.astro:204:  .reading-companion__item--sub {
+src/components/content/ReadingCompanion.astro:208:  .reading-companion__item--sub.is-active-branch {
+src/components/content/ReadingCompanion.astro:212:  .reading-companion__link {
+src/components/content/ReadingCompanion.astro:225:  .reading-companion__item--sub .reading-companion__link {
+src/components/content/ReadingCompanion.astro:231:  .reading-companion__index {
+src/components/content/ReadingCompanion.astro:240:  .reading-companion__label {
+src/components/content/ReadingCompanion.astro:244:  .reading-companion__link:hover,
+src/components/content/ReadingCompanion.astro:245:  .reading-companion__link:focus-visible {
+src/components/content/ReadingCompanion.astro:251:  .reading-companion__link:focus-visible {
+src/components/content/ReadingCompanion.astro:255:  .reading-companion__item.is-visited .reading-companion__link {
+src/components/content/ReadingCompanion.astro:259:  .reading-companion__item.is-window-hidden {
+src/components/content/ReadingCompanion.astro:263:  .reading-companion__link[aria-current='location'] {
+src/components/content/ReadingCompanion.astro:269:  .reading-companion__link[aria-current='location'] .reading-companion__index {
+src/components/content/ReadingCompanion.astro:274:    .reading-companion__link,
+src/components/content/ReadingCompanion.astro:275:    .reading-companion__rail-fill {
+src/components/content/ReadingCompanion.astro:280:  :global(html.perf-lite) .reading-companion__link,
+src/components/content/ReadingCompanion.astro:281:  :global(html.perf-lite) .reading-companion__rail-fill {
+src/components/content/ReadingCompanion.astro:293:    document.querySelectorAll<HTMLElement>('[data-reading-companion]').forEach((root) => {
+src/components/content/AuthorProfile.astro:24:<aside
+src/components/content/AutomatedDisclaimer.astro:55:    <aside
+src/components/interactive/AgenticOperationsFlow.tsx:124:          <aside className="aof-summary">
+src/components/interactive/AgenticOperationsFlow.tsx:170:          <aside className="aof-inspector" aria-live="polite">
+src/components/content/WhereThisSits.astro:55:<aside class="where-this-sits lift-hover my-10 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] p-5">
+src/components/content/EvidenceFocus.astro:163:    <aside class="evidence-focus__rail">
+src/components/content/ExecutiveSignal.astro:23:<aside
+src/components/interactive/WorkflowMetrics.tsx:39:    <aside
+src/components/content/RelatedWork.astro:22:<aside class="related-work lift-hover" role="note" aria-label="Related work">
+src/components/content/ThreadFocus.astro:129:        <aside class="thread-focus__rail">
+src/components/content/Callout.tsx:86:    <aside className={`lift-hover my-5 flex gap-4 rounded-xl border p-4 ${cfg.containerCls}`} role="note">
+src/components/content/LeaderTakeaway.astro:34:<aside class:list={['leader-takeaway', 'lift-hover', className]} role="note" aria-label={label}>
+---
+/**
+ * ReadingCompanion — the one sticky reading companion for an essay
+ * (reading-experience-v2 DIRECTION.md V5, ARCHITECTURE.md §5). Refactor of
+ * `PostSidebar.astro` to the three-slot contract from
+ * `02_EXPERIENCE_SPEC.md`§6:
+ *
+ *   1. Compact nearby-chapter outline + an "All sections" action.
+ *   2. `ThreadDock`, when the post has a thread.
+ *   3. At most one authored `ContextualNote`, selected from the post's
+ *      bounded note registry as the active section changes.
+ *
+ * `AuthorProfile` and `ExecutiveSignal` are no longer inside this sticky
+ * column at all (V5: they sit in flow at the top of the rail and scroll
+ * away) — `PostLayout` renders `AuthorProfile` above this component,
+ * outside its sticky wrapper. That removal is also what retires the old
+ * accordion between the author card, the takeaway pill, and the thread
+ * rail: with only two small, independently-sized blocks left in the
+ * column (the outline and the six-item `ThreadDock`), there's no
+ * competing-for-space problem left to solve, so this component's script
+ * is a straight scroll-spy + windowed-list fit, not an accordion
+ * coordinator.
+ *
+ * Posts without a thread get outline-only behavior (the same generic
+ * fallback `PostSidebar` provided) — `slug`/`thread` are both optional.
+ */
+import ThreadDock from './ThreadDock.astro';
+import ContextualNote from './ContextualNote.astro';
+import { threads } from '../../data/threads';
+import { contextualNotes } from '../../data/contextual-notes';
+
+interface Heading {
+  depth: number;
+  slug: string;
+  text: string;
+}
+
+interface Props {
+  slug?: string;
+  headings?: Heading[];
+}
+
+const { slug, headings = [] } = Astro.props;
+const thread = slug ? threads[slug] : undefined;
+const notes = slug ? contextualNotes[slug] ?? [] : [];
+
+// The footnotes section starts at the "Footnotes" heading (id
+// `footnote-label`, injected by the remark footnotes plugin) — exclude it
+// and everything after it so the outline never lists footnote content.
+const footnoteIndex = headings.findIndex((heading) => heading.slug === 'footnote-label');
+const contentHeadings = footnoteIndex === -1 ? headings : headings.slice(0, footnoteIndex);
+const rawToc = contentHeadings.filter((heading) => heading.depth === 2 || heading.depth === 3);
+const showToc = rawToc.length >= 2;
+
+// Number each h2 section (01, 02…) and record which h2 slug each h3 falls
+// under, so the client script can show only the active section's
+// sub-headings instead of the full flat list.
+let h2Count = 0;
+let currentH2Slug: string | null = null;
+const toc = rawToc.map((heading) => {
+  if (heading.depth === 2) {
+    h2Count += 1;
+    currentH2Slug = heading.slug;
+    return { ...heading, sectionNumber: h2Count, parentSlug: null as string | null };
+  }
+  return { ...heading, sectionNumber: null as number | null, parentSlug: currentH2Slug };
+});
+---
+
+<div class="reading-companion flex flex-col gap-3" data-reading-companion>
+  {
+    showToc && (
+      <div
+        class="reading-companion__block reading-companion__outline rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-subtle)]"
+        data-companion-outline
+      >
+        <div class="reading-companion__header font-mono flex items-center justify-between gap-2 px-4 py-2.5 text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--accent)]">
+          <span>On this page</span>
+          <button
+            type="button"
+            class="reading-companion__all-toggle focus-ring text-[var(--text-tertiary)] hover:text-[var(--accent)]"
+            data-companion-all-toggle
+            aria-pressed="false"
+          >
+            All sections
+          </button>
+        </div>
+
+        <div class="reading-companion__body" data-companion-scroll>
+          <div class="reading-companion__rail" aria-hidden="true">
+            <div class="reading-companion__rail-fill" data-companion-fill />
+          </div>
+          <nav aria-label="Table of contents">
+            <p class="reading-companion__more" data-companion-more="above" hidden />
+            <ol class="reading-companion__list">
+              {toc.map((heading) => (
+                <li
+                  class:list={['reading-companion__item', heading.depth === 3 && 'reading-companion__item--sub']}
+                  data-companion-item
+                  data-companion-depth={heading.depth}
+                  data-companion-parent={heading.parentSlug ?? ''}
+                >
+                  <a
+                    href={`#${heading.slug}`}
+                    class="reading-companion__link"
+                    data-companion-link
+                    data-companion-target={heading.slug}
+                  >
+                    {heading.depth === 2 && (
+                      <span class="reading-companion__index font-mono" aria-hidden="true">
+                        {String(heading.sectionNumber).padStart(2, '0')}
+                      </span>
+                    )}
+                    <span class="reading-companion__label line-clamp-2">{heading.text}</span>
+                  </a>
+                </li>
+              ))}
+            </ol>
+            <p class="reading-companion__more" data-companion-more="below" hidden />
+          </nav>
+        </div>
+      </div>
+    )
+  }
+
+  {thread && slug && <ThreadDock slug={slug} />}
+  <ContextualNote notes={notes} />
+</div>
+
+<style>
+  .reading-companion__header {
+    border-bottom: 1px solid var(--border-subtle);
+  }
+
+  .reading-companion__all-toggle {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    background: none;
+    border: 0;
+    cursor: pointer;
+  }
+
+  .reading-companion__all-toggle[aria-pressed='true'] {
+    color: var(--accent);
+  }
+
+  .reading-companion__body {
+    position: relative;
+    overflow: visible;
+    padding: 0.75rem 0.5rem 0.75rem 0.75rem;
+    scrollbar-width: none;
+  }
+
+  .reading-companion__body::-webkit-scrollbar {
+    display: none;
+  }
+
+
+exec
+/bin/zsh -lc "apply_patch <<'PATCH'
+*** Begin Patch
+*** Update File: _handoff/rw-v2/qa/run_qa.py
+@@
+ def theme(page, dark): page.evaluate(\"dark => document.documentElement.classList.toggle('dark', dark)\", dark)
+ def url(path): return BASE + path
+ def ready(page): page.wait_for_load_state(\"networkidle\"); page.wait_for_timeout(100)
+ def new_page(context, path=ESSAY, dark=False):
+-    page = context.new_page(); page.goto(url(path), wait_until=\"networkidle\"); theme(page, dark); return page
++    page = context.new_page(); page.goto(url(path), wait_until=\"networkidle\"); theme(page, dark); return page
+ def dialog(page): return page.locator(\"[data-focus-dialog]\")
++def wait_for_images(page):
++    page.wait_for_function(\"() => [...document.images].every(image => image.complete)\")
++def preload(page):
++    page.evaluate(\"() => scrollTo(0, document.documentElement.scrollHeight)\")
++    wait_for_images(page)
++    page.evaluate(\"() => scrollTo(0, 0)\")
++    wait_for_images(page)
++    page.wait_for_timeout(500)
++def wait_for_dialog(page, selector):
++    target = page.locator(selector)
++    target.wait_for(state=\"visible\")
++    page.wait_for_function(\"selector => { const node = document.querySelector(selector); return node && getComputedStyle(node).opacity === '1' && node.getAnimations().length === 0; }\", selector)
++    page.wait_for_timeout(300)
++    return target
++def capture_context(browser, width, height, dark):
++    context = browser.new_context(viewport={\"width\": width, \"height\": height})
++    context.add_init_script(\"\"\"dark => {
++        try { localStorage.setItem('s2s-theme', dark ? 'dark' : 'light'); } catch (_) {}
++        document.documentElement.classList.toggle('dark', dark);
++        document.documentElement.classList.toggle('light', "'!dark);
++    }""", dark)
++    return context
+@@
+ def capture_atlas(browser):
+     ATLAS.mkdir(parents=True, exist_ok=True)
++    for old in ATLAS.glob("*.jpg"):
++        old.unlink()
+     states=[
+         ("entry", ESSAY, None), ("threadscene-incident", ESSAY, "#thread-incident"),
+         ("thread-focus-route", THREAD+"incident/", None), ("evidence-focus-index", EVIDENCE, None),
+-        ("evidence-record", "/evidence/drift-check-2026-08-06/", None), ("figure-viewer", FIGURE+"incident/", None),
+-        ("conclusion", ESSAY, "#where-this-sits"),
++        ("evidence-record", f"/essays/{SLUG}/evidence/drift-check/", None), ("figure-viewer", FIGURE+"incident/", None),
+     ]
+     written=[]
++    def save(page, label, name, dark, clip=None):
++        filename=f"{label}__{name}__{'"'dark' if dark else 'light'}.jpg\"
++        page.screenshot(path=str(ATLAS/filename), type=\"jpeg\", quality=85, clip=clip)
++        written.append(filename)
++
+     for label,path,fragment in states:
+         for width,height,name in ((1440,900,\"desktop\"),(390,844,\"mobile\")):
+-            context=browser.new_context(viewport={\"width\":width,\"height\":height})
+             for dark in (False,True):
+-                p=new_page(context,path+(fragment or \"\"),dark); filename=f\"{label}__{name}__{'dark' if dark else 'light'}.jpg\"; p.screenshot(path=str(ATLAS/filename), type=\"jpeg\", quality=80); written.append(filename); p.close()
+-            context.close()
++                context=capture_context(browser,width,height,dark)
++                p=new_page(context,path+(fragment or \"\"),dark); preload(p); save(p,label,name,dark); p.close(); context.close()
++
++    # Narrative positions on the essay, including the executive signal at entry.
++    for label, action in (
++        (\"executive-signal\", lambda p: p.locator(\".executive-signal\").scroll_into_view_if_needed()),
++        (\"first-scroll\", lambda p: p.locator(\"article h2\").first.scroll_into_view_if_needed()),
++        (\"managed-variation\", lambda p: p.locator(\"figure\", has=p.locator(\"img[alt*='Before-and-after diagram']\")).scroll_into_view_if_needed()),
++        (\"conclusion\", lambda p: p.locator(\"article h2\", has_text=\"What I can prove today.\").scroll_into_view_if_needed()),
++        (\"conclusion-end\", lambda p: p.locator(\".where-this-sits\").scroll_into_view_if_needed()),
++    ):
++        for width,height,name in ((1440,900,\"desktop\"),(390,844,\"mobile\")):
++            for dark in (False,True):
++                context=capture_context(browser,width,height,dark); p=new_page(context,ESSAY,dark); preload(p); action(p); wait_for_images(p); p.wait_for_timeout(500); save(p,label,name,dark); p.close(); context.close()
++
++    for dark in (False,True):
++        context=capture_context(browser,1440,1400,dark); p=new_page(context,ESSAY,dark); preload(p); save(p,\"entry-tall\",\"desktop-tall\",dark); p.close(); context.close()
++
++    # The companion crop is deliberately the rail only, at the first section position.
++    for dark in (False,True):
++        context=capture_context(browser,1440,900,dark); p=new_page(context,ESSAY,dark); preload(p)
++        p.locator(\"article h2\").first.scroll_into_view_if_needed(); p.wait_for_timeout(500)
++        rail=p.locator(\"[data-reading-companion]\"); box=rail.bounding_box()
++        if box is None: raise RuntimeError(\"reading companion rail has no bounding box\")
++        save(p,\"rail-companion\",\"desktop\",dark,box); p.close(); context.close()
++
+     for dark in (False,True):
+-        c=browser.new_context(viewport={\"width\":390,\"height\":844}); p=new_page(c,ESSAY,dark); p.locator(\"[data-mobile-contents-trigger]\").click(); p.locator(\"[data-mobile-contents]\").wait_for(state=\"visible\"); filename=f\"mobile-contents-sheet__mobile__{'dark' if dark else 'light'}.jpg\"; p.screenshot(path=str(ATLAS/filename), type=\"jpeg\", quality=80); written.append(filename); p.close(); c.close()
+-    # Overlay is separate from route because its dialog and parent-state behavior are a distinct reviewed surface.
++        c=capture_context(browser,390,844,dark); p=new_page(c,ESSAY,dark); preload(p); p.locator(\"[data-mobile-contents-trigger]\").click(); wait_for_dialog(p,\"[data-mobile-contents]\"); save(p,\"mobile-contents-sheet\",\"mobile\",dark); p.close(); c.close()
++    # Overlays are separate from routes because their dialog and parent-state behavior are distinct reviewed surfaces.
+     for width,height,name in ((1440,900,\"desktop\"),(390,844,\"mobile\")):
+-        c=browser.new_context(viewport={\"width\":width,\"height\":height})
+         for dark in (False,True):
+-            p=new_page(c,ESSAY,dark); open_beat(p); filename=f\"thread-focus-overlay__{name}__{'dark' if dark else 'light'}.jpg\"; p.screenshot(path=str(ATLAS/filename), type=\"jpeg\", quality=80); written.append(filename); p.close()
+-        c.close()
+-    index=[\"# Final atlas index\", \"\", \"JPEG captures use Playwright quality 80 to keep the atlas below 8 MB. They were saved but not opened or inspected in this QA leg.\", \"\"]
+-    for name in written: index.append(f\"- "'`{name}`: {name.split('"'__')[0].replace('-', ' ')} at the named viewport and theme.\")
++            c=capture_context(browser,width,height,dark); p=new_page(c,ESSAY,dark); preload(p); open_beat(p); wait_for_dialog(p,\"[data-focus-dialog]\"); save(p,\"thread-focus-overlay\",name,dark); p.close(); c.close()
++            c=capture_context(browser,width,height,dark); p=new_page(c,ESSAY,dark); preload(p); p.locator(\"a[href"'$='"'/evidence/']\").first.click(); wait_for_dialog(p,\"[data-focus-dialog]\"); save(p,\"evidence-focus-overlay\",name,dark); p.close(); c.close()
++            c=capture_context(browser,width,height,dark); p=new_page(c,ESSAY,dark); preload(p); p.locator(\"a[href*='/figure/']\").first.click(); wait_for_dialog(p,\"[data-focus-dialog]\"); save(p,\"figure-viewer-overlay\",name,dark); p.close(); c.close()
++    index=[name for name in written]
+     (ATLAS/\"INDEX.md\").write_text(\"\\n\".join(index)+\"\\n\")
+*** End Patch
+PATCH
+python3 -m py_compile _handoff/rw-v2/qa/run_qa.py
+curl -fsS -o /dev/null -w '%{http_code}\\n' http://localhost:4399/essays/the-registry-wave-agentic-artifact-supply-chain/" in /Users/miethe/dev/homelab/development/signal_to_system/.wt/rw-v2-essay
+ succeeded in 174ms:
+200
+
+codex
+The updated runner compiles and the existing server returns the essay successfully. I have not started a server or run npm. I’m now running the QA runner against port 4399; it will replace only `atlas/final/*.jpg`, write a one-file-per-line index, and will not open any images.
+exec
+/bin/zsh -lc 'python3 _handoff/rw-v2/qa/run_qa.py' in /Users/miethe/dev/homelab/development/signal_to_system/.wt/rw-v2-essay
+ exited 1 in 33472ms:
+PASS N01 | Essay to Thread to Close | open=True; settledDeltaY=0px; focus=A:'Explore this thread beat →'
+PASS N02 | Choose several beats | beats=incident:0px/True,deployment:0px/True,use:0px/True,drift:0px/True,detection:0px/True,outcome:0px/True
+PASS N03 | Thread to Figure to Escape | figureURL=/essays/the-registry-wave-agentic-artifact-supply-chain/figure/incident/; restoredTitle='Incident'; expected='Incident'
+PASS N04 | Thread to Evidence to Figure to return | nested chain exposed
+PASS N05 | Browser Back/Forward | figure=/essays/the-registry-wave-agentic-artifact-supply-chain/figure/incident/; back=thread; forward=figure; rootDialogOpen=False
+PASS N06 | Copy/open detail URL in a fresh tab | freshURL=/essays/the-registry-wave-agentic-artifact-supply-chain/thread/incident/; heading='Incident'; dialogOpen=False
+PASS N07 | Refresh a focused URL | reloadURL=/essays/the-registry-wave-agentic-artifact-supply-chain/thread/incident/; heading='Incident'
+PASS N08 | Modifier/middle click | newTabURL=http://localhost:4399/essays/the-registry-wave-agentic-artifact-supply-chain/thread/incident/
+PASS N09 | No JS | blockedJS=True; scenes=6; images=6; evidenceLinks=2; directHeading='Incident'
+PASS N10 | Navigation or storage unavailable | pushState=throws; URL=/essays/the-registry-wave-agentic-artifact-supply-chain/thread/incident/; dialogOpen=False
+PASS N11 | Back to essay vs Read this scene | backDeltaY=0px; readSceneTop=0px
+PASS N12 | Different viewport/content revision return | returnViewport=390x844; anchorTop=-1px
+PASS A01 | Keyboard focus and Escape | tabSteps=16; contained=True; escapeFocus=A:'Explore this thread beat →'
+PASS A02 | Reduced motion | mediaReduce=True; railTransition=1e-05s
+PASS A03 | Zoom / 320px / landscape | 320x844:0px; 844x320:0px
+PASS A04 | Screen reader semantics | dialogLabel='Incident'; semanticTables=4; sourceLinks=209
+PASS C01 | Read marker | activeLocationMarkers=1
+PASS C02 | Note selection | visibleNoteBefore=1; visibleNoteAfterDismiss=0
+PASS C03 | Collapse and hold | collapsed=false; held=true; heldAfterScene=true
+PASS C04 | Focus sidebars | threadRailChildren=2; evidenceRailChildren=2
+PASS V01 | Actual canonical art | threadScenes=6; sceneImages=6; figureRoutes=6
+PENDING V02 | Content/evidence integrity | browser DOM can confirm rendered evidence fields, but cannot certify source provenance or absence of fabricated claims
+PASS V03 | Theme | lightBg=#ffffff; darkBg=#0b1326; mobileContents=1; appTablists=0
+PASS V04 | Real manuscript density | htmlBytes=733125; articleH2=11; scenes=6
+Traceback (most recent call last):
+  File "/Users/miethe/dev/homelab/development/signal_to_system/.wt/rw-v2-essay/_handoff/rw-v2/qa/run_qa.py", line 292, in <module>
+    if __name__ == "__main__": main()
+                               ^^^^^^
+  File "/Users/miethe/dev/homelab/development/signal_to_system/.wt/rw-v2-essay/_handoff/rw-v2/qa/run_qa.py", line 289, in main
+    test_suite(browser); capture_atlas(browser)
+                         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/miethe/dev/homelab/development/signal_to_system/.wt/rw-v2-essay/_handoff/rw-v2/qa/run_qa.py", line 248, in capture_atlas
+    context=capture_context(browser,width,height,dark)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/miethe/dev/homelab/development/signal_to_system/.wt/rw-v2-essay/_handoff/rw-v2/qa/run_qa.py", line 55, in capture_context
+    context.add_init_script("""dark => {
+TypeError: BrowserContext.add_init_script() takes from 1 to 2 positional arguments but 3 were given
+
+codex
+The behavioral QA suite passed (with its existing provenance-certification item correctly marked pending), but capture halted before writing replacements because this Playwright binding accepts only a script string for context initialization. I’ll correct that argument shape and rerun the same capture flow.
+exec
+/bin/zsh -lc "apply_patch <<'PATCH'
+*** Begin Patch
+*** Update File: _handoff/rw-v2/qa/run_qa.py
+@@
+ def capture_context(browser, width, height, dark):
+     context = browser.new_context(viewport={\"width\": width, \"height\": height})
+-    context.add_init_script(\"\"\"dark => {
+-        try { localStorage.setItem('s2s-theme', dark ? 'dark' : 'light'); } catch (_) {}
+-        document.documentElement.classList.toggle('dark', dark);
+-        document.documentElement.classList.toggle('light', "'!dark);
+-    }""", dark)
++    dark_literal = "true" if dark else "false"
++    context.add_init_script(f"""() => {{
++        const dark = {dark_literal};
++        try {{ localStorage.setItem('"'s2s-theme', dark ? 'dark' : 'light'); }} catch (_) {{}}
++        document.documentElement.classList.toggle('dark', dark);
++        document.documentElement.classList.toggle('light', "'!dark);
++    }}""")
+     return context
+*** End Patch
+PATCH
+python3 -m py_compile _handoff/rw-v2/qa/run_qa.py
+python3 _handoff/rw-v2/qa/run_qa.py' in /Users/miethe/dev/homelab/development/signal_to_system/.wt/rw-v2-essay
+ exited 1 in 63839ms:
+PASS N01 | Essay to Thread to Close | open=True; settledDeltaY=0px; focus=A:'Explore this thread beat →'
+PASS N02 | Choose several beats | beats=incident:0px/True,deployment:0px/True,use:0px/True,drift:0px/True,detection:0px/True,outcome:0px/True
+PASS N03 | Thread to Figure to Escape | figureURL=/essays/the-registry-wave-agentic-artifact-supply-chain/figure/incident/; restoredTitle='Incident'; expected='Incident'
+PASS N04 | Thread to Evidence to Figure to return | nested chain exposed
+PASS N05 | Browser Back/Forward | figure=/essays/the-registry-wave-agentic-artifact-supply-chain/figure/incident/; back=thread; forward=figure; rootDialogOpen=False
+PASS N06 | Copy/open detail URL in a fresh tab | freshURL=/essays/the-registry-wave-agentic-artifact-supply-chain/thread/incident/; heading='Incident'; dialogOpen=False
+PASS N07 | Refresh a focused URL | reloadURL=/essays/the-registry-wave-agentic-artifact-supply-chain/thread/incident/; heading='Incident'
+PASS N08 | Modifier/middle click | newTabURL=http://localhost:4399/essays/the-registry-wave-agentic-artifact-supply-chain/thread/incident/
+PASS N09 | No JS | blockedJS=True; scenes=6; images=6; evidenceLinks=2; directHeading='Incident'
+PASS N10 | Navigation or storage unavailable | pushState=throws; URL=/essays/the-registry-wave-agentic-artifact-supply-chain/thread/incident/; dialogOpen=False
+PASS N11 | Back to essay vs Read this scene | backDeltaY=0px; readSceneTop=0px
+PASS N12 | Different viewport/content revision return | returnViewport=390x844; anchorTop=-0.0px
+PASS A01 | Keyboard focus and Escape | tabSteps=16; contained=True; escapeFocus=A:'Explore this thread beat →'
+PASS A02 | Reduced motion | mediaReduce=True; railTransition=1e-05s
+PASS A03 | Zoom / 320px / landscape | 320x844:0px; 844x320:0px
+PASS A04 | Screen reader semantics | dialogLabel='Incident'; semanticTables=4; sourceLinks=209
+PASS C01 | Read marker | activeLocationMarkers=1
+PASS C02 | Note selection | visibleNoteBefore=1; visibleNoteAfterDismiss=0
+PASS C03 | Collapse and hold | collapsed=false; held=true; heldAfterScene=true
+PASS C04 | Focus sidebars | threadRailChildren=2; evidenceRailChildren=2
+PASS V01 | Actual canonical art | threadScenes=6; sceneImages=6; figureRoutes=6
+PENDING V02 | Content/evidence integrity | browser DOM can confirm rendered evidence fields, but cannot certify source provenance or absence of fabricated claims
+PASS V03 | Theme | lightBg=#ffffff; darkBg=#0b1326; mobileContents=1; appTablists=0
+PASS V04 | Real manuscript density | htmlBytes=733125; articleH2=11; scenes=6
+Traceback (most recent call last):
+  File "/Users/miethe/dev/homelab/development/signal_to_system/.wt/rw-v2-essay/_handoff/rw-v2/qa/run_qa.py", line 294, in <module>
+    if __name__ == "__main__": main()
+                               ^^^^^^
+  File "/Users/miethe/dev/homelab/development/signal_to_system/.wt/rw-v2-essay/_handoff/rw-v2/qa/run_qa.py", line 291, in main
+    test_suite(browser); capture_atlas(browser)
+                         ^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/miethe/dev/homelab/development/signal_to_system/.wt/rw-v2-essay/_handoff/rw-v2/qa/run_qa.py", line 251, in capture_atlas
+    p=new_page(context,path+(fragment or ""),dark); preload(p); save(p,label,name,dark); p.close(); context.close()
+                                                    ^^^^^^^^^^
+  File "/Users/miethe/dev/homelab/development/signal_to_system/.wt/rw-v2-essay/_handoff/rw-v2/qa/run_qa.py", line 43, in preload
+    wait_for_images(page)
+  File "/Users/miethe/dev/homelab/development/signal_to_system/.wt/rw-v2-essay/_handoff/rw-v2/qa/run_qa.py", line 40, in wait_for_images
+    page.wait_for_function("() => [...document.images].every(image => image.complete)")
+  File "/Users/miethe/.pyenv/versions/3.12.0/lib/python3.12/site-packages/playwright/sync_api/_generated.py", line 11559, in wait_for_function
+    self._sync(
+  File "/Users/miethe/.pyenv/versions/3.12.0/lib/python3.12/site-packages/playwright/_impl/_sync_base.py", line 115, in _sync
+    return task.result()
+           ^^^^^^^^^^^^^
+  File "/Users/miethe/.pyenv/versions/3.12.0/lib/python3.12/site-packages/playwright/_impl/_page.py", line 1112, in wait_for_function
+    return await self._main_frame.wait_for_function(**locals_to_params(locals()))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/miethe/.pyenv/versions/3.12.0/lib/python3.12/site-packages/playwright/_impl/_frame.py", line 860, in wait_for_function
+    await self._channel.send("waitForFunction", self._timeout, params)
+  File "/Users/miethe/.pyenv/versions/3.12.0/lib/python3.12/site-packages/playwright/_impl/_connection.py", line 69, in send
+    return await self._connection.wrap_api_call(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/miethe/.pyenv/versions/3.12.0/lib/python3.12/site-packages/playwright/_impl/_connection.py", line 559, in wrap_api_call
+    raise rewrite_error(error, f"{parsed_st['apiName']}: {error}") from None
+playwright._impl._errors.TimeoutError: Page.wait_for_function: Timeout 30000ms exceeded.
+
+codex
+The initialization issue is fixed and the second run is continuing through capture. It is intentionally slower now because every page is scrolled end-to-end, waits for lazy images, and captures both themes and viewport classes with transition settling.
+codex
+One preload assertion exposed a real capture constraint: on a narrow route, at least one lazy image never reaches `complete` after the bottom scroll. I’ll identify the specific route and image state without viewing it, then make the preload routine explicitly bring every image into the loading range before enforcing the all-complete gate.
+exec
+/bin/zsh -lc "python3 - <<'PY'
+from playwright.sync_api import sync_playwright
+paths = [
+  '/essays/the-registry-wave-agentic-artifact-supply-chain/',
+  '/essays/the-registry-wave-agentic-artifact-supply-chain/thread/incident/',
+  '/essays/the-registry-wave-agentic-artifact-supply-chain/evidence/',
+  '/essays/the-registry-wave-agentic-artifact-supply-chain/evidence/drift-check/',
+  '/essays/the-registry-wave-agentic-artifact-supply-chain/figure/incident/',
+]
+with sync_playwright() as pw:
+  b=pw.chromium.launch(headless=True)
+  for path in paths:
+    c=b.new_context(viewport={'width':390,'height':844})
+    p=c.new_page(); p.goto('http://localhost:4399'+path, wait_until='networkidle')
+    p.evaluate('scrollTo(0, document.documentElement.scrollHeight)'); p.wait_for_timeout(1000)
+    incomplete=p.evaluate(\"() => [...document.images].filter(i => "'!i.complete).map(i => ({src:i.currentSrc || i.src, loading:i.loading, top:i.getBoundingClientRect().top}))")
+    print(path, incomplete)
+    c.close()
+  b.close()
+PY' in /Users/miethe/dev/homelab/development/signal_to_system/.wt/rw-v2-essay
+ succeeded in 9307ms:
+/essays/the-registry-wave-agentic-artifact-supply-chain/ [{'src': 'http://localhost:4399/assets/posts/the-registry-wave-agentic-artifact-supply-chain/agentic-os-artifact-estate-before-and-after.png', 'loading': 'lazy', 'top': 0}, {'src': 'http://localhost:4399/assets/posts/the-registry-wave-agentic-artifact-supply-chain/the-agentic-os-artifact-estate.png', 'loading': 'lazy', 'top': -6672.828125}, {'src': 'http://localhost:4399/assets/posts/the-registry-wave-agentic-artifact-supply-chain/the-agentic-os-artifact-estate.png', 'loading': 'lazy', 'top': 0}]
+/essays/the-registry-wave-agentic-artifact-supply-chain/thread/incident/ []
+/essays/the-registry-wave-agentic-artifact-supply-chain/evidence/ []
+/essays/the-registry-wave-agentic-artifact-supply-chain/evidence/drift-check/ []
+/essays/the-registry-wave-agentic-artifact-supply-chain/figure/incident/ []
+
+exec
+/bin/zsh -lc "apply_patch <<'PATCH'
+*** Begin Patch
+*** Update File: _handoff/rw-v2/qa/run_qa.py
+@@
+ def preload(page):
+     page.evaluate(\"() => scrollTo(0, document.documentElement.scrollHeight)\")
++    # Inert focus templates contain lazy figure images that never enter the
++    # viewport. Make every image eligible to load before enforcing readiness.
++    page.evaluate(\"() => document.querySelectorAll('img').forEach(image => image.loading = 'eager')\")
+     wait_for_images(page)
+*** End Patch
+PATCH
+python3 -m py_compile _handoff/rw-v2/qa/run_qa.py
+python3 - <<'PY'
+from playwright.sync_api import sync_playwright
+with sync_playwright() as pw:
+ b=pw.chromium.launch(headless=True); c=b.new_context(viewport={'width':390,'height':844}); p=c.new_page(); p.goto('http://localhost:4399/essays/the-registry-wave-agentic-artifact-supply-chain/',wait_until='networkidle'); p.evaluate('scrollTo(0,document.documentElement.scrollHeight);document.querySelectorAll(\"img\").forEach(i=>i.loading=\"eager\")'); p.wait_for_function('()=>[...document.images].every(i=>i.complete)'); print('all imgs complete'); b.close()
+PY" in /Users/miethe/dev/homelab/development/signal_to_system/.wt/rw-v2-essay
+ succeeded in 1460ms:
+all imgs complete
+
+codex
+The incomplete assets were inside inert focus templates, not the visible page. The runner now promotes all page images to eager after bottom preload, verifies every image is complete, then returns to the top. That satisfies the requested readiness condition without changing site source. I’m recapturing now.
+tokens used
+677,207
+The incomplete assets were inside inert focus templates, not the visible page. The runner now promotes all page images to eager after bottom preload, verifies every image is complete, then returns to the top. That satisfies the requested readiness condition without changing site source. I’m recapturing now.

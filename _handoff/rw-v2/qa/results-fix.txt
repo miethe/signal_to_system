@@ -1,0 +1,24 @@
+PASS N01 | Essay to Thread to Close | open=True; settledDeltaY=0px; focus=A:'Explore this thread beat →'
+PASS N02 | Choose several beats | beats=incident:0px/True,deployment:0px/True,use:0px/True,drift:0px/True,detection:0px/True,outcome:0px/True
+PASS N03 | Thread to Figure to Escape | figureURL=/essays/the-registry-wave-agentic-artifact-supply-chain/figure/incident/; restoredTitle='Incident'; expected='Incident'
+PASS N04 | Thread to Evidence to Figure to return | nested chain exposed
+PASS N05 | Browser Back/Forward | figure=/essays/the-registry-wave-agentic-artifact-supply-chain/figure/incident/; back=thread; forward=figure; rootDialogOpen=False
+PASS N06 | Copy/open detail URL in a fresh tab | freshURL=/essays/the-registry-wave-agentic-artifact-supply-chain/thread/incident/; heading='Incident'; dialogOpen=False
+PASS N07 | Refresh a focused URL | reloadURL=/essays/the-registry-wave-agentic-artifact-supply-chain/thread/incident/; heading='Incident'
+PASS N08 | Modifier/middle click | newTabURL=http://localhost:4399/essays/the-registry-wave-agentic-artifact-supply-chain/thread/incident/
+PASS N09 | No JS | blockedJS=True; scenes=6; images=6; evidenceLinks=2; directHeading='Incident'
+PASS N10 | Navigation or storage unavailable | pushState=throws; URL=/essays/the-registry-wave-agentic-artifact-supply-chain/thread/incident/; dialogOpen=False
+PASS N11 | Back to essay vs Read this scene | backDeltaY=0px; readSceneTop=0px
+PASS N12 | Different viewport/content revision return | returnViewport=390x844; anchorTop=-0.0px
+PASS A01 | Keyboard focus and Escape | tabSteps=16; contained=True; escapeFocus=A:'Explore this thread beat →'
+PASS A02 | Reduced motion | mediaReduce=True; railTransition=1e-05s
+PASS A03 | Zoom / 320px / landscape | 320x844:0px; 844x320:0px
+PASS A04 | Screen reader semantics | dialogLabel='Incident'; semanticTables=4; sourceLinks=209
+PASS C01 | Read marker | activeLocationMarkers=1
+PASS C02 | Note selection | visibleNoteBefore=1; visibleNoteAfterDismiss=0
+PASS C03 | Collapse and hold | collapsed=false; held=true; heldAfterScene=true
+PASS C04 | Focus sidebars | threadRailChildren=2; evidenceRailChildren=2
+PASS V01 | Actual canonical art | threadScenes=6; sceneImages=6; figureRoutes=6
+PENDING V02 | Content/evidence integrity | browser DOM can confirm rendered evidence fields, but cannot certify source provenance or absence of fabricated claims
+PASS V03 | Theme | lightBg=#ffffff; darkBg=#0b1326; mobileContents=1; appTablists=0
+PASS V04 | Real manuscript density | htmlBytes=733124; articleH2=11; scenes=6

@@ -1,0 +1,24 @@
+Registry Wave reading-experience v2, package P0-C: the FocusHost JS overlay controller.
+
+Read first: docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/DIRECTION.md (V4) and ARCHITECTURE.md §3 (dialog host design — binding, already approved) in the same directory.
+$H = /Users/miethe/dev/WIP/agents/theses/registry-wave/reg-wave-review-v4/registry_wave_experience_v2
+Read: $H/03_NAVIGATION_AND_STATE_CONTRACT.md (transition table, all sections), $H/05_IMPLEMENTATION_AND_QA.md test IDs N01-N12 (you must satisfy these), $H/prototype/controller.js (state/return-semantics reference per V11 — do not copy its markup/CSS, Georgia/dark-only, this codebase's shell is already built in Astro).
+
+Read current code (built by the prior P0-B leg, already committed): src/components/content/FocusTemplates.astro, ThreadFocus.astro, EvidenceFocus.astro, FigureViewer.astro, ThreadScene.astro, ReadingCompanion.astro, ThreadDock.astro, Figure.astro (figureId opt-in path), src/layouts/PostLayout.astro, the four new route files under src/pages/essays/[slug]/ and src/pages/evidence/.
+
+Task: implement the FocusHost controller exactly as ARCHITECTURE.md §3 specifies:
+- One <dialog> element opened with native showModal(), mounted once (in PostLayout or FocusTemplates, your call — whichever the existing wiring makes cleaner, note which in your report).
+- Clones the matching <template data-focus-view="kind:id"> fragment on open (no client fetch).
+- Logical parent stack: in-memory Map<key,{kind,id,parentKey,scrollTop,focusTargetId}> + currentKey/rootKey.
+- History: replaceState on first open capturing scroll under rwFocus.key; pushState/replaceState for child opens; one popstate listener reconciling history.state.rwFocus back to the map (or restoreRoot() if unknown/root).
+- Focus containment/restoration: capture activeElement + scroll before first open; on full close restore scroll then .focus({preventScroll:true}) on the original trigger (fallback: nearest heading, then article h1).
+- Return semantics distinct: "Back to essay" = closeAll -> restoreRoot (original scroll position). "Read this scene in the essay" = closeAll then scrollIntoView + focus on #thread-<beatId> (different destination).
+- No-JS/modifier-click safety: every trigger is a real <a href> to the standalone route already built; only unmodified primary clicks (!ctrlKey && !metaKey && !shiftKey && !altKey && button===0) get hijacked. If pushState throws, let the real href fire instead of trapping the reader.
+- Hard invariant: FocusHost.open() must close any open Figure.astro private lightbox ([data-figure-dialog] or similar, check Figure.astro's actual attribute) before showing its own, so two dialog mechanisms are never open at once (ARCHITECTURE risk 3).
+- Wire click handlers onto every "Explore thread" link (ThreadScene, ThreadDock), every evidence/figure trigger inside ThreadFocus/EvidenceFocus, and Figure.astro's figureId-opt-in trigger.
+
+Write this as a small client-side script (a .ts/.js file imported/inlined per the existing site's convention — check how other interactive behavior is wired, e.g. grep for existing <script> tags in PostLayout.astro or components, to match convention rather than inventing a new pattern).
+
+Also run through $H/05's N-series tests yourself as far as locally possible (direct URL load, refresh mid-dialog, no-JS per control, back/forward, modifier-click passthrough) using npm run preview and note pass/fail/not-runnable for each N01-N12 in your report — do not mark anything passed you didn't actually check.
+
+Constraints: no emdashes. `npm run check` (zero new errors) and `npm run build` green. Work only in this worktree. No git add -A, no push, no commits (orchestrator commits). End with: files created/edited, N01-N12 results, which dialog-mount location you chose and why, anything from ARCHITECTURE.md §3 you could not implement exactly as specified and why.

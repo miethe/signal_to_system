@@ -1,0 +1,5 @@
+Permission allow rule (../../../ibm-agentic-tools/ica/settings/ica-settings-ccx.json): Write(.claude/reports/**) is not matched by file permission checks — only Edit(path) rules are. Use Edit(.claude/reports/**) instead (Edit rules cover all file-editing tools).
+Permission allow rule (../../../ibm-agentic-tools/ica/settings/ica-settings-ccx.json): Write(~/.claude/reports/**) is not matched by file permission checks — only Edit(path) rules are. Use Edit(~/.claude/reports/**) instead (Edit rules cover all file-editing tools).
+⚠ claude.ai connectors are disabled because ANTHROPIC_API_KEY or another auth source is set and takes precedence over your claude.ai login · Unset it to load your organization's connectors
+Failed to authenticate. API Error: 403 {"message":"The security token included in the request is invalid."}. Received Model Group=claude-sonnet-5
+Available Model Group Fallbacks=None

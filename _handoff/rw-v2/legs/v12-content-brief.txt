@@ -1,0 +1,29 @@
+Registry Wave reading-experience v2, package V12: content integration. You are editing Nick Miethe's essay in his voice; this is prose work first, wiring second.
+
+Read in this order, fully, before touching anything:
+1. .claude/skills/voice-writer/SKILL.md and every file it references (voice rules; binding).
+2. notes/do-not-disclose.md (binding for any new prose).
+3. docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/DIRECTION.md, V12 paragraph and "Reconciliation" table.
+4. docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/v2-research-integrated/REVIEW-V4-DIRECTION.md D1, D6, D9 (prose direction that still binds) and COMPONENT-API.md, ASSET-MAP.md beside it.
+5. /Users/miethe/dev/WIP/agents/theses/registry-wave/reg-wave-review-v4/registry_wave_current_draft_multipass_review_2026-09-18.md: Scan 2 (six movements), Scan 3 (keep/tighten/remove lists), P0.1, P0.2, P0.5, P0.8, and the pull-quote shortlist.
+6. `git show 7c4fc4c` : Nick's hand edits. Lines he wrote are preserved verbatim unless the review names them.
+7. src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx (current), src/data/threads.ts, src/data/evidence.ts, src/components/content/{ThreadScene,PullQuote,ReceiptDisclosure,ContextualNote,RelatedWork,ExecutiveSignal,Figure}.astro.
+8. Prior-art sources, the ONLY allowed citations: /Users/miethe/dev/WIP/agents/theses/registry-wave/registry_wave_research_handoff_2026-09-17_v2/03_prior_art_and_attribution.md and 09_sources.md. Never invent a citation; if one is missing, leave it out and list it in your report.
+
+Do, in the MDX and threads.ts only (plus component imports as needed):
+- Restructure to the review's six movements; remove the recap triplication (P0.2): the prose does not restate what a ThreadScene's data record says.
+- Write the P0.1 managed-variation movement in Nick's voice (the review's paragraph is direction, not copy); the comparison is inline HTML per DIRECTION V8, not the not-every-difference-is-drift PNG.
+- Move "Where the system lied to us" forward as the four-lies motif. Refresh excerpt / whyItMatters / leaderTakeaway per the review's frontmatter section. At most 4 PullQuotes from the shortlist; "Trusted artifact ≠ trusted use." as a thesis marker.
+- RelatedWork: one sentence + disclosure, 2-4 citations from the two source files only.
+- Wrap raw YAML / shell output in ReceiptDisclosure; the finding stays in prose. Wire ContextualNote where a rail note earns it (≤1 per section).
+- Per-beat data-record prose in src/data/threads.ts (title, one real paragraph, what this establishes / what it does not, limits) written once so inline scenes and Thread Focus share it. Place the six ThreadScenes adjacent to their prose in canonical order: Incident, Deployment, Use, Drift, Detection, Outcome.
+- Remove every reference to diagram-thread-0*.svg, diagram-market-wave.svg, diagram-estate-before-after.svg from the MDX. Then, only if `grep -rn <name> src/` is clean, delete the file from public/assets/posts/the-registry-wave-agentic-artifact-supply-chain/.
+- Closing figure caption for agentic-os-artifact-estate-before-and-after.png must correct its baked-in "SAME BYTES EVERYWHERE" text (see ASSET-MAP.md).
+
+SCOPE GUARD (attempt 1 was rejected for violating this): this is a RESTRUCTURE and TIGHTEN, not a rewrite. The current MDX is ~6500 words; the result must stay at or above 5500 words. Cut only what the review's Scan 3 "remove" list names and the recap triplication (P0.2); every other paragraph moves or tightens, it does not vanish. Every line in _handoff/rw-v2/legs/hand-edit-lines.txt (Nick's hand-written lines) must still be present verbatim in the final MDX; before you finish, run `while IFS= read -r l; do grep -qF -- "$l" src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx || echo "MISSING: $l"; done < _handoff/rw-v2/legs/hand-edit-lines.txt` and fix every MISSING line (a hand-edited line may be relocated, never reworded or dropped). Work in small edits, not a wholesale file replacement. Your attempt-1 output is at _handoff/rw-v2/legs/v12-attempt1-REJECTED.mdx; you may reuse its managed-variation movement and pull-quote choices, nothing else wholesale.
+
+Hard rules: no emdashes anywhere (parentheses, colons, semicolons, commas). No fabricated dates, numbers, or receipts; evidence prose comes only from src/data/evidence.ts records. Keep Nick's hand-edited lines. Do not touch src/content.config.ts, layouts, or global.css. Work only inside this worktree. No git add/commit/push.
+
+Gate: `source ~/.nvm/nvm.sh && nvm use 22 && npm run build` green (93 pages expected; check is pre-broken repo-wide, only ensure no new errors in files you touch). Then `grep -n '—' ` on the MDX and threads.ts must return nothing.
+
+Report at the end (keep it under 300 words, write it as your FINAL message, do not run out of turns before it): word count before/after; hand-edit check output; movements as headings; hand-edited lines preserved (count); pull quotes chosen; citations used and any left out; assets deleted; build tail; anything you could not complete and why.

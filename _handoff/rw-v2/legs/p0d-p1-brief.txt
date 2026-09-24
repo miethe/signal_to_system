@@ -1,0 +1,23 @@
+Registry Wave reading-experience v2, packages P0-D (mobile + a11y) and P1 (polish), one leg. Build code; do not rewrite prose.
+
+Read first: docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/DIRECTION.md (V4-V10, "Lanes", "Constraints"), ARCHITECTURE.md beside it (§3 for FocusHost), atlas/p0bc-review/FIX-LIST.md §B, §C and §E. Spec: $H = /Users/miethe/dev/WIP/agents/theses/registry-wave/reg-wave-review-v4/registry_wave_experience_v2 ; read $H/03_NAVIGATION_AND_STATE_CONTRACT.md (anchor-relative restore algorithm), $H/02_EXPERIENCE_SPEC.md §12 (Contents bottom sheet), $H/04_COMPONENTS_AND_ASSETS.md, and $H/registry_wave_visual_source_of_truth_2026-09-18/IMAGE-GUIDE.md §7. DO NOT open or view any PNG/image file in this session (the gateway rejects image input and kills the run); take the Tier A visual target from IMAGE-GUIDE.md and 02_EXPERIENCE_SPEC.md text only.
+
+Code to know: src/layouts/PostLayout.astro, src/components/content/{ReadingCompanion,ThreadDock,ThreadScene,ContextualNote,SectionMarker,EvidenceFocus}.astro, src/lib/focus-host.ts, src/styles/global.css, src/data/threads.ts.
+
+P0-D:
+1. Mobile Contents bottom sheet below ~1000px (DIRECTION V5, spec §12): a "Contents" affordance that opens a native <dialog> sheet with the outline + thread beats + evidence link; no JS -> it is an in-page anchor to a Contents section. Reuse FocusHost's dialog patterns (Escape, backdrop, return focus to trigger); do not add a second history owner.
+2. N12: anchor-relative scroll restore on Focus close per $H/03_NAVIGATION (nearest heading/scene anchor + offset), replacing the x/y restore in focus-host.ts. Keep the two return semantics distinct ("Back to essay" vs "Read this scene in the essay").
+3. Keyboard/focus: verify and fix showModal focus containment, Escape, trigger restoration for Thread/Evidence/Figure overlays; figure-viewer__metadata must be reachable in the overlay at 1440x900 (scroll inside the panel, not clipped).
+4. a11y from REVIEW-V4-DIRECTION D10 if still open: ArtifactTaxonomy/ArtifactControlPlane use plain buttons + aria-pressed (no role="tab"/"listitem" misuse); one scroll owner in the rail.
+
+P1:
+5. ContextualNote: render authored notes in the ReadingCompanion (≤1 visible, tied to the active section); the essay MDX already has the components wired by V12, do not add prose.
+6. ThreadDock hold/collapse behaviour per DIRECTION and Tier A 02.
+7. Active-section styling: SectionMarker gets the active-observer half (exactly one active violet rule; IntersectionObserver; prefers-reduced-motion honored; no-JS = no active state).
+8. FIX-LIST §B items that are cheap and clearly in scope; list what you skipped.
+
+Gates: `source ~/.nvm/nvm.sh && nvm use 22 && npm run build` must be green (93 pages). If the build cannot run in your sandbox (Node 22 keychain crash seen before), say so explicitly and do not claim green. `npm run check`: no new errors in files you touch. Other essays and dev stories must render unchanged (V13): spot-check dist/ for one other essay.
+
+Constraints: worktree only; no git add/commit/push; no emdashes in any user-visible string; do not touch src/content/**; do not delete files in atlas/.
+
+Final message (write it before you run out of turns; under 300 words): files changed; each numbered item done / partial / skipped with one line why; build result verbatim tail; what you could not verify.

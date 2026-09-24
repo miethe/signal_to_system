@@ -1,0 +1,19 @@
+Registry Wave reading-experience v2, package 1 continuation: taste-fix, remaining items A3-A9. A1 and A2 are ALREADY DONE in src/styles/global.css (the @custom-variant dark line near the top, and the --shadcn-accent namespacing near line 1751-1808) — do not redo them, just don't break them.
+
+Read first: docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/p0bc-review/FIX-LIST.md section A (items A3-A9 only; B/C deferred, D is "do not touch"). Read DIRECTION.md V5, V6, V7, V9, V10 in the same directory for target behavior.
+
+Fix each exactly as FIX-LIST §A specifies:
+
+A3. src/layouts/PostLayout.astro: fix ReadingCompanion's sticky positioning — swap `xl:self-start` (~line 211) for `xl:self-stretch` (or remove it) so the sticky rail child has scroll travel instead of collapsing to content height.
+A4. Give Evidence Focus a real in-flow entry point: add a "Receipts behind the argument" link/section in the essay MDX or ReadingCompanion rail linking to /essays/<slug>/evidence/, so at least one evidence link exists outside the <template> fragments. Check src/lib/focus-host.ts is unaffected.
+A5. Build the static half of section markers (ordinal + reserved-width left rule) per V6 — active-observer behavior stays deferred to P1. Add a SectionMarker component in src/components/content/ and wire into heading rendering in PostLayout.astro (~line 249).
+A6. src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx frontmatter: add the frontispiece hero placement field (check src/content.config.ts:41 for the exact schema value name). Fix the latent bug: the frontispiece wrapper's `max-w-[var(--measure)]` (PostLayout.astro:119) sits outside `.post-layout` where `--measure` is defined (global.css ~409,414) — move the wrapper inside `.post-layout` or make `--measure` resolvable where the wrapper is.
+A7. src/layouts/PostLayout.astro: move ExecutiveSignal (currently ~line 242-246, body column) into the rail, second position under AuthorCard, per V5.
+A8. src/components/content/EvidenceFocus.astro: add a real `<h1>` and render the selected receipt in full (title, date, claim badge, supported-claim/limitations split) using existing fields in src/data/evidence.ts.
+A9. src/styles/global.css ~830-832 (`.dark .figure-plate`): change dark figure-plate background from near-white (#f3f5fa) to a dark navy bordered panel per Tier A — container goes dark, artwork stays light. Do not touch the light-theme rule.
+
+Verification: `nvm use 22 && npm run check && npm run build` green (no new errors in files you touch). Then Playwright screenshot pairs (light/dark, desktop 1440x900) for A3-A9's affected views, forcing dark via the site's real `.dark` class (not OS prefers-color-scheme). Save to docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/atlas/taste-fix/ (append to existing dir, do not delete anything there). Keep total dir under 5MB.
+
+Constraints: no emdashes. No fabricated data/metrics. Work only in this worktree, do not `cd` out of it. No git add, no commit, no push. Do not touch src/data/threads.ts or src/data/evidence.ts content beyond read-only for A8, or a link target for A4.
+
+End with a report: files changed, gates run (paste tail of check/build), screenshot list with a one-line note per A3-A9, anything you could not fully verify and why.

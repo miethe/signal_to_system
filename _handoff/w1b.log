@@ -1,0 +1,21 @@
+Permission allow rule (../../../ibm-agentic-tools/ica/settings/ica-settings-ccx.json): Write(.claude/reports/**) is not matched by file permission checks — only Edit(path) rules are. Use Edit(.claude/reports/**) instead (Edit rules cover all file-editing tools).
+Permission allow rule (../../../ibm-agentic-tools/ica/settings/ica-settings-ccx.json): Write(~/.claude/reports/**) is not matched by file permission checks — only Edit(path) rules are. Use Edit(~/.claude/reports/**) instead (Edit rules cover all file-editing tools).
+⚠ claude.ai connectors are disabled because ANTHROPIC_API_KEY or another auth source is set and takes precedence over your claude.ai login · Unset it to load your organization's connectors
+All 8 new, nothing else touched. Not committing per constraints — that's for the phase owner/W4.
+
+**Done** — Created all 8 components in `src/components/content/`, each with a house-style header doc-comment, CSS-var scoped styles, and the `.figure-plate`/`thread-beat` corner-tick / `lift-hover` vocabulary where the spec called for a boxed treatment:
+- `ExecutiveSignal.astro`, `RevisionNote.astro`, `BoundaryGrid.astro`, `ImplementationStatus.astro`, `ReceiptDisclosure.astro`, `ClaimBadge.astro`, `RelatedWork.astro`, `PullQuote.astro`
+
+**Prop interfaces** match COMPONENT-API.md §5-12 exactly — no deviations.
+
+**Design calls not fully pinned by the API doc** (documented in each file's header):
+- `ClaimBadge` wraps `<Evidence kind={kind} />` internally (per the doc's explicit option) rather than re-exporting the map — zero duplication.
+- `RevisionNote`'s "thin single line" is achieved by collapsing the note text itself behind the `<details>` trigger (only "Revised {date} · What's changed?" shows at rest) — the doc didn't specify exactly what stays visible vs. collapsed, and a always-visible full note would risk wrapping past one line.
+- `ImplementationStatus` chips reuse `Callout.astro`'s existing 4-color Tailwind semantic palette (emerald/amber/violet/sky) rather than CSS vars, since that's the established precedent for multi-state semantic chips in this codebase; status text is always rendered so color is never the sole cue.
+- `PullQuote` deliberately has no `lift-hover` (noted inline) since it's typographic, not a card; `thesis-marker` renders a `<p>`, not a `<blockquote>`, since it's a stated claim.
+- `BoundaryGrid` reused the corner-tick language per the doc's explicit "leg's call" option.
+
+**Verified:** `nvm use 22 && npm run check` — 2637 pre-existing baseline errors, zero in any of the 8 new files (grepped by filename).
+
+**Left for other legs:** wiring these into `PostLayout.astro`/`PostSidebar.astro`/the MDX manuscript — out of my scope by design.
+W1B_EXIT:0

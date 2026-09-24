@@ -1,0 +1,31 @@
+FAIL N01 | Essay to Thread to Close | open=True; deltaY=50px; focus=A
+PENDING N02 | Choose several beats | requires manual confirmation of root-return behavior across all six beats
+PENDING N03 | Thread to Figure to Escape | requires nested Thread to Figure Escape state capture
+PENDING N04 | Thread to Evidence to Figure to return | requires relevant thread-to-evidence-to-figure parent chain
+PENDING N05 | Browser Back/Forward | requires history traversal trace across owned entries
+PASS N06 | Copy/open detail URL fresh tab | threadHref=/essays/the-registry-wave-agentic-artifact-supply-chain/thread/incident/
+PASS N07 | Refresh focused URL | static route contract is exercised by direct navigation
+PENDING N01 | Essay to Thread to Close | Playwright Chromium unavailable: TimeoutError: Timeout 1000ms exceeded while waiting for event "page"
+PENDING N02 | Choose several beats | Playwright Chromium unavailable: TimeoutError: Timeout 1000ms exceeded while waiting for event "page"
+PENDING N03 | Thread to Figure to Escape | Playwright Chromium unavailable: TimeoutError: Timeout 1000ms exceeded while waiting for event "page"
+PENDING N04 | Thread to Evidence to Figure to return | Playwright Chromium unavailable: TimeoutError: Timeout 1000ms exceeded while waiting for event "page"
+PENDING N05 | Browser Back/Forward | Playwright Chromium unavailable: TimeoutError: Timeout 1000ms exceeded while waiting for event "page"
+PENDING N06 | Copy/open detail URL fresh tab | Playwright Chromium unavailable: TimeoutError: Timeout 1000ms exceeded while waiting for event "page"
+PENDING N07 | Refresh focused URL | Playwright Chromium unavailable: TimeoutError: Timeout 1000ms exceeded while waiting for event "page"
+PENDING N08 | Modifier/middle click | Playwright Chromium unavailable: TimeoutError: Timeout 1000ms exceeded while waiting for event "page"
+PENDING N09 | No JS | Playwright Chromium unavailable: TimeoutError: Timeout 1000ms exceeded while waiting for event "page"
+PENDING N10 | Navigation or storage unavailable | Playwright Chromium unavailable: TimeoutError: Timeout 1000ms exceeded while waiting for event "page"
+PENDING N11 | Back vs Read this scene | Playwright Chromium unavailable: TimeoutError: Timeout 1000ms exceeded while waiting for event "page"
+PENDING N12 | Different viewport/content revision return | Playwright Chromium unavailable: TimeoutError: Timeout 1000ms exceeded while waiting for event "page"
+PENDING A01 | Keyboard focus and Escape | Playwright Chromium unavailable: TimeoutError: Timeout 1000ms exceeded while waiting for event "page"
+PENDING A02 | Reduced motion | Playwright Chromium unavailable: TimeoutError: Timeout 1000ms exceeded while waiting for event "page"
+PENDING A03 | Zoom / 320px / landscape | Playwright Chromium unavailable: TimeoutError: Timeout 1000ms exceeded while waiting for event "page"
+PENDING A04 | Screen reader semantics | Playwright Chromium unavailable: TimeoutError: Timeout 1000ms exceeded while waiting for event "page"
+PENDING C01 | Read marker | Playwright Chromium unavailable: TimeoutError: Timeout 1000ms exceeded while waiting for event "page"
+PENDING C02 | Note selection | Playwright Chromium unavailable: TimeoutError: Timeout 1000ms exceeded while waiting for event "page"
+PENDING C03 | Collapse and hold | Playwright Chromium unavailable: TimeoutError: Timeout 1000ms exceeded while waiting for event "page"
+PENDING C04 | Focus sidebars | Playwright Chromium unavailable: TimeoutError: Timeout 1000ms exceeded while waiting for event "page"
+PENDING V01 | Actual canonical art | Playwright Chromium unavailable: TimeoutError: Timeout 1000ms exceeded while waiting for event "page"
+PENDING V02 | Content/evidence integrity | Playwright Chromium unavailable: TimeoutError: Timeout 1000ms exceeded while waiting for event "page"
+PENDING V03 | Theme and mobile surface | Playwright Chromium unavailable: TimeoutError: Timeout 1000ms exceeded while waiting for event "page"
+PENDING V04 | Real manuscript density | Playwright Chromium unavailable: TimeoutError: Timeout 1000ms exceeded while waiting for event "page"

@@ -1,0 +1,138 @@
+schema_version: '0.2'
+id: rw-generated-assets-20260917
+type: asset_manifest
+project: Signal to System
+status: candidate_artifact
+created_at: '2026-09-17'
+updated_at: '2026-09-17'
+review_rule: Two conceptual candidates and three held technical compositions. No asset is human-approved by
+  this review.
+assets:
+- id: A01
+  file: governed_cube_supply_chain_studio.png
+  job: Illustrative blog hero
+  status: concept_candidate
+  public_use_approved: false
+  kind: generated_illustration
+  alt: A shared capability pattern connects several project workbenches, each retaining a distinct adaptation.
+  caption: Editorial illustration of shared capability and local adaptation; not a photograph or system screenshot.
+  corrections: []
+  conditions:
+  - Human art approval
+  - Keep separate from implementation evidence
+  - Use responsive crops without burying the article title
+  width: 1672
+  height: 941
+  path: assets/originals/governed_cube_supply_chain_studio.png
+  sha256: 9e864e4b53d81b663516e63cd15fb94edde1d8bc9d3fe94954cebf725a4504dc
+  bytes: 2417756
+  original_preserved: true
+  reviewed_on: '2026-09-17'
+  evidence_of_runtime: false
+- id: A02
+  file: not_every_difference_is_drift.png
+  job: Managed-variation technical explanation
+  status: hold_for_revision
+  public_use_approved: false
+  kind: generated_concept_diagram
+  alt: Illustrative source-to-project lineage comparing an outdated deployment, a local modification and a
+    deliberate pin.
+  caption: Three deployments may require different decisions. Example identifiers are illustrative; runtime
+    loading is not measured.
+  corrections:
+  - Remove invented 2024-05-10 date
+  - Replace arbitrary versions with explicitly synthetic identifiers and explicit ancestry
+  - Replace unsupported observed runtime labels with Not captured
+  - 'Change useful local improvement/keep it to Local change: review before retaining'
+  - Make older pin conditional on current policy and revocation
+  - Distinguish intended target, observed on-disk state, ancestry and authorization
+  conditions:
+  - Rebuild technical text from approved structured data
+  - Do not imply native UI or actual production evidence
+  width: 1448
+  height: 1086
+  path: assets/originals/not_every_difference_is_drift.png
+  sha256: c667bb970a91075b27dfafc77f9ca7f871d3515f7c5330f47609ad86607cb0d3
+  bytes: 1495011
+  original_preserved: true
+  reviewed_on: '2026-09-17'
+  evidence_of_runtime: false
+- id: A03
+  file: from_capability_to_trusted_outcome.png
+  job: Late-essay assurance handoff
+  status: hold_for_revision
+  public_use_approved: false
+  kind: generated_concept_diagram
+  alt: Four separate questions link artifact identity, permitted use, execution observations and acceptance
+    evidence.
+  caption: Related assurance obligations, not a claim that one product enforces the whole chain or guarantees
+    the outcome.
+  corrections:
+  - Add explicit acceptance criteria and accepting authority
+  - Remove unmeasured Safer agents / Brighter outcomes claim
+  - Identify relationships as conceptual rather than a completed implementation
+  - Do not imply a signature, policy permit or trace establishes the next assurance
+  conditions:
+  - Named source/authority for factual fields
+  - Optional conceptual use only after semantic correction
+  width: 1672
+  height: 941
+  path: assets/originals/from_capability_to_trusted_outcome.png
+  sha256: 3cffdc67435ccfae89a1b3b7e2ee973fcc2b14d12c794243c254b64165c7a890
+  bytes: 1205390
+  original_preserved: true
+  reviewed_on: '2026-09-17'
+  evidence_of_runtime: false
+- id: A04
+  file: from_probabilistic_cognition_to_capability.png
+  job: Five-essay guided reading path
+  status: hold_for_rebuild
+  public_use_approved: false
+  kind: generated_concept_infographic
+  alt: Proposed reading path connecting productivity, durable work, reusable capability, completion authority
+    and bounded judgment.
+  caption: One guided reading path through parallel sub-series. The fifth essay is planned; supporting projects
+    have separate owners and evidence states.
+  corrections:
+  - 'Replace Artifact Development Flow: ADF means Agentic Delivery Factory; omit it from this sanitized public
+    graphic unless approved'
+  - Remove task decomposition from SkillMeat description; it belongs to IntentTree
+  - Label E5 Planned and preserve parallel sub-series
+  - Remove unsupported market claims about costs, regulation, investment and universal convergence
+  - Remove one-project-per-essay alignment and unqualified Evidence-backed outcomes
+  - Correct thesis descriptions; do not show guaranteed deterministic outcomes
+  - Treat AOSBench as evaluation work, not evidence that this complete program is validated
+  conditions:
+  - Use text-first HTML/SVG for semantic content
+  - Use source-backed optional related-work rail only
+  - No market data invented from decorative icons
+  width: 1672
+  height: 941
+  path: assets/originals/from_probabilistic_cognition_to_capability.png
+  sha256: 8abb5ab251b82b1d03fcb014d751f9f54140b4c55c89beeaf5fc5e9341a0ee94
+  bytes: 1588344
+  original_preserved: true
+  reviewed_on: '2026-09-17'
+  evidence_of_runtime: false
+- id: A05
+  file: some_copies_must_change.png
+  job: Social-card concept
+  status: concept_candidate
+  public_use_approved: false
+  kind: generated_editorial_card
+  alt: Some copies must change. Some differences must survive. The Registry Wave.
+  caption: Editorial proposition about managed variation, not a quantified effectiveness or first-use claim.
+  corrections: []
+  conditions:
+  - Human art approval
+  - Supply accessible text alongside the card
+  - Link to reviewed canonical article
+  - Do not add unsourced claims or corporate endorsement
+  width: 1254
+  height: 1254
+  path: assets/originals/some_copies_must_change.png
+  sha256: a4f52508842b9fd05fd1c8b86898edb43ea31eea9e745bd4f880c3974bc79301
+  bytes: 1519859
+  original_preserved: true
+  reviewed_on: '2026-09-17'
+  evidence_of_runtime: false

@@ -1,0 +1,15 @@
+Permission allow rule (../../../ibm-agentic-tools/ica/settings/ica-settings-ccx.json): Write(.claude/reports/**) is not matched by file permission checks — only Edit(path) rules are. Use Edit(.claude/reports/**) instead (Edit rules cover all file-editing tools).
+Permission allow rule (../../../ibm-agentic-tools/ica/settings/ica-settings-ccx.json): Write(~/.claude/reports/**) is not matched by file permission checks — only Edit(path) rules are. Use Edit(~/.claude/reports/**) instead (Edit rules cover all file-editing tools).
+⚠ claude.ai connectors are disabled because ANTHROPIC_API_KEY or another auth source is set and takes precedence over your claude.ai login · Unset it to load your organization's connectors
+Good — `Figure.astro` and `global.css` are modified by W1 (not me), scripts/ dir is clean (temp script removed). My changes are exactly the nine PNGs plus ASSET-MAP.md, matching scope.
+
+**Done** — Copied and optimized all nine PNGs into `public/assets/posts/the-registry-wave-agentic-artifact-supply-chain/` with kebab-case names, all ≤400KB (via `sharp`, quality-stepped, no resize). Wrote `docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/v2-research-integrated/ASSET-MAP.md` with beat→filename→dimensions→text-defect notes.
+
+**You should know:**
+- **D5 confirmed clean** — `not-every-difference-is-drift.png` is exactly the three-project A/B/C story (behind→update, local-ahead→reconcile+preserve, pinned→preserve). No fallback SVG needed.
+- **D4 text defect found** — `agentic-os-artifact-estate-before-and-after.png` bakes in "One source of authority. Verified deployments of the same bytes." / "SAME BYTES EVERYWHERE" — exactly the framing D4 forbids. I did not silently place it; ASSET-MAP.md spells out a corrective caption direction for whoever writes the movement-6 caption (W3).
+
+**See it:** `docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/v2-research-integrated/ASSET-MAP.md`
+
+**Left/next:** Nothing left in my scope (W2). W3 needs the ASSET-MAP's caption guidance for the before/after figure; SVG retirement (D4) still waits on W3 confirming zero references via `grep -rn`, per the constraint.
+W2_EXIT:0

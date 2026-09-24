@@ -1,0 +1,4 @@
+Permission allow rule (../../../ibm-agentic-tools/ica/settings/ica-settings.json): Write(.claude/reports/**) is not matched by file permission checks — only Edit(path) rules are. Use Edit(.claude/reports/**) instead (Edit rules cover all file-editing tools).
+Permission allow rule (../../../ibm-agentic-tools/ica/settings/ica-settings.json): Write(~/.claude/reports/**) is not matched by file permission checks — only Edit(path) rules are. Use Edit(~/.claude/reports/**) instead (Edit rules cover all file-editing tools).
+⚠ claude.ai connectors are disabled because ANTHROPIC_API_KEY or another auth source is set and takes precedence over your claude.ai login · Unset it to load your organization's connectors
+API Error: Request rejected (429) · Budget has been exceeded! Team=6a0b5e319902e17d56f78bdf Current cost: 51.15257399999997, Max budget: 50.0

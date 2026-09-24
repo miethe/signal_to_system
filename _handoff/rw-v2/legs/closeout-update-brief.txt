@@ -1,0 +1,32 @@
+Task: rewrite docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/CLOSEOUT.md so it reflects the final state of the Registry Wave reading-experience v2 work (PR #145, branch post/registry-wave-v2-research-integrated). Edit ONLY that file. No git commands beyond read-only. No emdashes anywhere (use parentheses, colons, semicolons, commas). Keep the existing house style (tables, terse rows). Keep every section that is still true; update the ones that are stale. Read the current file first, then the sources listed below, then write.
+
+Facts (authoritative; do not soften or embellish):
+
+1. QA harness (_handoff/rw-v2/qa/run_qa.py, 24 tests N01-N12, A01-A04, C01-C04, V01-V04). History: initial QA leg 15 PASS / 8 FAIL / 1 PENDING (results.txt); QA fix round 23/0/1 (results-fix.txt, commit 54b9849); visual round 1 regressed to 15/8/1 (results-visual-1.txt) because the leg edited src/lib/focus-host.ts unrequested; that file was reverted and a fix-forward leg restored 23/0/1 (results-visual-1b.txt, commit 5855b3f); visual rounds 2-3 held 23/0/1 (results-visual-2/3.txt, commit 9b48ae0); Astra polish held 23/0/1 (results-astra.txt, commit eec442d); the orchestrator independently re-ran the suite on 2026-09-20 after Astra: 23/0/1 (results-astra-verify.txt). V02 stays PENDING by design (provenance cannot be certified from the DOM). Replace the stale per-test table with the CURRENT statuses from results-astra-verify.txt (all PASS except V02 PENDING), and keep a short history line.
+
+2. Build gate: npm run build green on 2026-09-20 after Astra (92 HTML pages + search.json; the "projects collection empty" warning is pre-existing). Glossary Term rendering verified in all four essays that use it after Term.astro changed from set:html to a slot.
+
+3. Two-theme check on 2026-09-20 (headless Playwright, 1440x900, 1440x1400, 390x844, light and dark): rail ExecutiveSignal visible and body copy hidden at xl in both themes; body copy visible and rail hidden on mobile; hero, 7 section markers, 6 thread scenes present; no horizontal overflow; frontispiece caption present.
+
+4. Package commits to add after P0-D/P1 (68c0f0d): 54b9849 QA fixes (root restore after focus close, dialog tab loop, 320px overflow, contextual note, nested evidence/figure links); 5855b3f visual fidelity round 1 (entry shell, rail stack, section markers, plates; instant jump honoring scroll-margin-top); 9b48ae0 visual rounds 2-3 (rail signal variant, revision strip, section marker tiles, light theme parity, dark-override bug in ExecutiveSignal fixed); eec442d Astra visual polish (src/styles/registry-wave-v2.css essay-scoped visual system; Figure.astro reserves real aspect ratio for this essay's images via sharp; FigureViewer path resolution; ReadingCompanion no longer scrolls the document; RevisionNote p->div; Term slot rendering; registry-wave-focus class on Thread/Evidence/Figure focus surfaces; frontispiece caption; plus atlas/astra captures and INDEX.md).
+
+5. Tier A fidelity (Sol with vision on ICA ccx, script scores 1-10 per state; states 01 entry, 02 first scroll, 04 thread focus, 05 evidence focus, 06 figure viewer, 07 managed variation, 08 conclusion, 09 mobile):
+   round0 (after QA fixes): 4,2,5,3,4,2,4,3
+   round1 (after visual round 1): 6,3,4,4,3,2,4,4
+   rounds 2-3: 6,3,5,4,4,3,3,3
+   after Astra: 6.5,4,4,5,4,4,4,4 (atlas/astra/FIDELITY-REVIEW-sol.md)
+   Astra's own self-scores were 7-8 per state (atlas/astra/INDEX.md). Note plainly that Sol grades largely on component order and manuscript structure matching the mock (out of scope for a CSS pass) and that ICA Terra could not view the targets, which is why fidelity plateaued on ICA and the Astra pass was sanctioned. The gap to the composites remains open; list it as the top carried item (Nick's bar: "everything around the Title page, the hero, the executive takeaway, the section lines, the sections").
+
+6. Direction delivery table updates: V4 done (root and anchor return semantics pass N01/N02/N11/N12 since 54b9849); V6 done (320px and landscape overflow pass A03); V7 done (nested Evidence->Figure links exposed, N04 pass); V10 partial (both themes verified; fidelity to Tier A composites still short, see item 5); V12 partial unchanged (Opus voice pass deferred; ICA Claude Bedrock-auth broken on 2026-09-19/20); V13 partial -> done for scoping (v2 furniture is gated by .post-layout--registry-wave and essay slug checks; build and Term check confirm other essays render) but cross-essay visual spot checks were not run, say so.
+
+7. Open items: drop O05/O06 (resolved). Keep the others. Add: O13 Tier A visual fidelity gap (item 5); O14 the atlas/astra commit tracked 4.8 MB of JPEG captures despite the earlier decision to keep captures untracked (markdown only); a follow-up may drop them from history before merge; O15 ccx Codex shim drops tool calls and lacks input_image translation (agentic legs stayed on beta; Nick is fixing the shim in another session).
+
+8. Harness notes to record: there is no per-record evidence route by design (records are anchors within /evidence/); the first-scroll mobile capture needs a settle wait (a blank lower half in a capture is a capture artifact, not a render hole); the browser pane tab is document.hidden so rAF-dependent restore tests must run in headless Playwright.
+
+9. Lanes used (replace the table): Taste-fix A3-A9: Nick's personal Codex gpt-5.6-terra. QA legs, visual rounds 1-3, this closeout update: ICA beta gateway gpt-5.6-terra-dzus (CC2 key). Sol fidelity scoring (4 rounds): ICA ccx gpt-5.6-sol with vision (CCx3 key), direct chat completions. Astra visual polish: Nick's personal Codex gpt-6-astra (sanctioned by Nick: "ICA first, Astra after"), 326,873 tokens, session 01a0bcfe-f3b2-7370-9147-ed003c0b55ef. Astra closeout commit eec442d was made by a separate session, not this orchestrator.
+
+10. Atlas section: atlas/final/INDEX.md (34 JPEGs, tracked as of eec442d? no: final/*.jpg are untracked, only INDEX.md and the three FIDELITY-REVIEW-sol*.md are to be committed) and atlas/astra/INDEX.md (35 JPEGs, 4.84 MB, tracked in eec442d) plus atlas/astra/FIDELITY-REVIEW-sol.md.
+
+11. The SAME BYTES EVERYWHERE caption flag stays binding; keep that bullet.
+
+Update the Date line to 2026-09-20. Final message: under 120 words, list what sections changed.

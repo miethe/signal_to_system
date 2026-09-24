@@ -1,0 +1,36 @@
+[mobile-light] start
+  saved 01-entry__mobile-light.png
+  saved 02-threadscene-incident__mobile-light.png
+  saved 02b-threadscene-pane__mobile-light.png
+[mobile-light] facts = {"threadLinks_live": 12, "threadLinks_visible": 6, "evidenceLinks_live": 0, "evidenceLinks_visible": 0, "figureTriggers_live": 6, "figureTriggers_visible": 6, "readingCompanion_visible": false, "threadDock_visible": false, "anyContentsButton": 0, "docHeight": 42644}
+[mobile-light] thread overlay OPENED (clicked)
+  saved 03-thread-focus-overlay__mobile-light.png
+  saved 03b-thread-focus-route__mobile-light.png
+  saved 04-evidence-focus-route__mobile-light.png
+  saved 04c-evidence-record-route__mobile-light.png
+  saved 05b-figure-route__mobile-light.png
+[mobile-light] figure viewer OPENED
+  saved 05-figure-viewer-overlay__mobile-light.png
+  saved 06-conclusion-where-this-sits__mobile-light.png
+[mobile-light] contents candidates = [{"tag": "BUTTON", "text": "All sections", "aria": null, "visible": false}]
+[mobile-light] NO visible contents affordance on mobile
+  saved 07-mobile-midscroll-no-contents__mobile-light.png
+  saved 07b-mobile-top__mobile-light.png
+[mobile-dark] start
+[mobile-dark] facts = {"threadLinks_live": 12, "threadLinks_visible": 6, "evidenceLinks_live": 0, "evidenceLinks_visible": 0, "figureTriggers_live": 6, "figureTriggers_visible": 6, "readingCompanion_visible": false, "threadDock_visible": false, "anyContentsButton": 0, "docHeight": 42644}
+[mobile-dark] thread overlay OPENED (clicked)
+  saved 03-thread-focus-overlay__mobile-dark.png
+  saved 04c-evidence-record-route__mobile-dark.png
+  saved 05b-figure-route__mobile-dark.png
+[mobile-dark] contents candidates = [{"tag": "BUTTON", "text": "All sections", "aria": null, "visible": false}]
+[mobile-dark] NO visible contents affordance on mobile
+  saved 07-mobile-midscroll-no-contents__mobile-dark.png
+  saved 07b-mobile-top__mobile-dark.png
+[desktop-dark] start
+[desktop-dark] facts = {"threadLinks_live": 12, "threadLinks_visible": 12, "evidenceLinks_live": 0, "evidenceLinks_visible": 0, "figureTriggers_live": 6, "figureTriggers_visible": 6, "readingCompanion_visible": true, "threadDock_visible": true, "anyContentsButton": 0, "docHeight": 24046}
+  saved 04c-evidence-record-route__desktop-dark.png
+  saved 05b-figure-route__desktop-dark.png
+[desktop-light] start
+[desktop-light] facts = {"threadLinks_live": 12, "threadLinks_visible": 12, "evidenceLinks_live": 0, "evidenceLinks_visible": 0, "figureTriggers_live": 6, "figureTriggers_visible": 6, "readingCompanion_visible": true, "threadDock_visible": true, "anyContentsButton": 0, "docHeight": 24046}
+  saved 04c-evidence-record-route__desktop-light.png
+  saved 05b-figure-route__desktop-light.png

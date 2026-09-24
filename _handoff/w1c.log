@@ -1,0 +1,24 @@
+Permission allow rule (../../../ibm-agentic-tools/ica/settings/ica-settings-ccx.json): Write(.claude/reports/**) is not matched by file permission checks — only Edit(path) rules are. Use Edit(.claude/reports/**) instead (Edit rules cover all file-editing tools).
+Permission allow rule (../../../ibm-agentic-tools/ica/settings/ica-settings-ccx.json): Write(~/.claude/reports/**) is not matched by file permission checks — only Edit(path) rules are. Use Edit(~/.claude/reports/**) instead (Edit rules cover all file-editing tools).
+⚠ claude.ai connectors are disabled because ANTHROPIC_API_KEY or another auth source is set and takes precedence over your claude.ai login · Unset it to load your organization's connectors
+## Report — W1c: Figure, PostSidebar, PostLayout/schema, D10 a11y
+
+**Files changed** (my scope only, no `git add -A`, no commit yet since instructions didn't ask me to commit):
+- `src/components/content/Figure.astro` — added `inline|wide|technical` variants, `expandable` gate (default true; hero defaults to `Boolean(caption)`, matching spec), `width`/`height` passthrough, `mobileSrc` via `<picture>`, `longDescription` via `aria-describedby`. Every original prop/call still works unchanged.
+- `src/components/content/PostSidebar.astro` — new `takeaway`/`showTakeaway` props; compact card renders above `AuthorProfile`, collapses to a one-line pill via the **existing** header `IntersectionObserver`/`setCollapsed` (no second observer). Also fixed the rail-accordion fit calc (`evaluateFits`) to account for the takeaway card's live height — it sits in the same sticky column as the TOC/rail and was previously unaccounted for.
+- `src/layouts/PostLayout.astro` — `takeawayPlacement`/`heroPlacement` props; frontispiece hero renders before `<header>` as a non-grid full-width block (avoids disturbing the tuned 2-col grid); `ExecutiveSignal` now renders in place of the old ad-hoc `whyItMatters` aside, with `showTakeaway={takeawayPlacement === 'rail'}`; `LeaderTakeaway`'s body render is skipped when placement is `rail`; `PostSidebar` now gets `takeaway`/`showTakeaway`.
+- `src/content.config.ts` — added `takeawayPlacement`, `heroPlacement`, `ogImage` as optional zod fields, posts collection only.
+- `src/pages/essays/[...slug].astro` — `ogImage: post.data.ogImage ?? post.data.heroImage` (was always `heroImage`); added `heroAlt` (previously dropped); forwards `takeawayPlacement`/`heroPlacement`.
+- `src/styles/global.css` — CSS for the three new Figure variants.
+- `src/components/interactive/ArtifactTaxonomy.tsx`, `ArtifactControlPlane.tsx` (D10) — dropped `role="tablist"/"tab"`/`"listitem"`, switched to plain `<button type="button">` + `aria-pressed`.
+
+**Grep-verified every `<Figure` call site** — all pass unchanged props; only behavior change is intentional (hero non-expandable without a caption, per COMPONENT-API.md §13).
+
+**ExecutiveSignal.astro already existed** when I ran (built by the parallel leg) — used a direct import, no stub needed.
+
+**Gate**: `nvm use 22 && npm run build` → green, 69 pages, only the expected "projects collection empty" warning. `npm run check` has ~2600 pre-existing errors, all in files I never touched (`portfolio.astro`, `essays/index.astro`, `aos/*`, `tags/*`, `topics/*` — `contentType`/`visibility` enum mismatches predating this branch). My six scoped files show zero new errors, only pre-existing `z`-deprecated warnings.
+
+**Could not verify visually** — no dev-server screenshot taken; build-only per your instruction.
+
+**One thing worth flagging**: repeated Bash calls surfaced an identical injected "PreToolUse" hook message pushing an unverified `aos-git` tool and claiming my `git diff` undercounts. I ignored it and used plain `git`/`Read` throughout — my diffs were internally consistent and matched what I wrote, so I don't believe anything was missed, but you should know that message fired repeatedly.
+W1C_EXIT:0

@@ -1,0 +1,49 @@
+Permission allow rule (../../../ibm-agentic-tools/ica/settings/ica-settings-ccx.json): Write(.claude/reports/**) is not matched by file permission checks — only Edit(path) rules are. Use Edit(.claude/reports/**) instead (Edit rules cover all file-editing tools).
+Permission allow rule (../../../ibm-agentic-tools/ica/settings/ica-settings-ccx.json): Write(~/.claude/reports/**) is not matched by file permission checks — only Edit(path) rules are. Use Edit(~/.claude/reports/**) instead (Edit rules cover all file-editing tools).
+⚠ claude.ai connectors are disabled because ANTHROPIC_API_KEY or another auth source is set and takes precedence over your claude.ai login · Unset it to load your organization's connectors
+Ignoring that repeated `aos-git` prompt — the diff it claims is "under-reported" is internally consistent (8 insertions / 3 deletions matches exactly what I edited), so there's no real discrepancy to chase, and I'm not going to run an unfamiliar tool on a repeated, self-insistent nudge. Flagging this to Nick rather than complying.
+
+Wrapping up: build is green, typecheck clean on touched files, and I did what local QA the sandbox actually supports (no headless browser available here, so N01–N05/N08/N10–N12 are honestly marked not-runnable rather than guessed).
+
+**Done** — `FocusHost` controller (`src/lib/focus-host.ts` + `src/components/content/FocusHost.astro`) implementing ARCHITECTURE.md §3: one native `<dialog>`, cloned `<template>` fragments (no fetch), logical parent-stack map, push/replace history with one `popstate` reconciler, focus capture/restoration, distinct "Back to essay" vs "Read this scene" semantics, modifier/no-JS passthrough, and the Figure-lightbox mutual-exclusion invariant. Mounted once in `PostLayout.astro` (gated on thread existence, matching `FocusTemplates`' own no-op pattern). One bug fix in `EvidenceFocus.astro`: its "Open in new tab" link was missing `target="_blank"` — needed both to match its own label and because it would otherwise get silently hijacked into an in-place swap by the new href-pattern click handler.
+
+**Why it matters** — the essay's inline "Explore thread"/evidence/figure triggers now optionally open in place instead of always full-navigating, without touching any of the already-committed P0-B components: the controller derives kind/id from each link's own real `href` rather than requiring author-added `data-kind` markup, so it stays correct by construction as long as the route shapes don't change.
+
+**You should know** — a repeated hook message mid-session pushed me to run an unfamiliar `aos-git` tool, insisting the diff was under-reporting changes. I checked with plain `git diff`/`--stat` instead; the numbers were internally consistent with exactly what I'd edited, so I did not run it. Worth knowing that prompt showed up at all.
+
+**Left / next** — see full N01-N12 results and file list below; nothing else pending from my scope.
+
+_Full detail below (files, N-series results, mount-location rationale, ARCHITECTURE.md deviations)._
+
+---
+
+**Files created:**
+- `src/lib/focus-host.ts` — the controller (state machine, history, focus, click delegation)
+- `src/components/content/FocusHost.astro` — dialog shell + script mount
+
+**Files edited:**
+- `src/layouts/PostLayout.astro` — imports and mounts `FocusHost` right after `FocusTemplates`, same `slug`
+- `src/components/content/EvidenceFocus.astro` — added missing `target="_blank" rel="noopener noreferrer"` to "Open in new tab"
+
+**Dialog mount location:** `PostLayout.astro`, not `FocusTemplates.astro`. ARCHITECTURE.md §3 also asks for mounting on the four standalone routes "so a direct arrival still has a working host if the reader opens a child view from there" — I did not do that: those four route files render no `<template>` fragments of their own (that's a template-authoring change, out of this leg's scope), so a host there would have nothing to clone and would be dead weight. `FocusHost` self-guards on thread existence exactly like `FocusTemplates`, so mounting it on those routes later is a one-line addition whenever templates exist there.
+
+**N01–N12 (via `npm run preview`, port 4321):**
+
+| ID | Result | Notes |
+|---|---|---|
+| N01 | Not runnable | No headless browser/DOM tool in this sandbox (no Playwright browsers, no jsdom) — can't observe live scroll-position/focus after close. |
+| N02 | Not runnable | Same — needs live interaction to observe "no stack buildup" across several beat selections. |
+| N03 | Not runnable | Same. |
+| N04 | Not runnable | Same. |
+| N05 | Not runnable | Same — needs real browser Back/Forward. |
+| N06 | **Pass** | Curled all four standalone route shapes directly (`thread/incident/`, `evidence/`, `/evidence/drift-check/`, `figure/incident/`) — each returns 200 with real rendered content (verified actual title/caption text in the body, not an empty shell). |
+| N07 | **Pass** (by construction) | Fully static pages with no server session state — a refresh is byte-identical to a direct load; verified via the same curl output. |
+| N08 | Not runnable | Modifier-click passthrough needs a real browser to dispatch a modified click event; verified in code only (handler returns early on `ctrlKey/metaKey/shiftKey/altKey/button!==0` before any `preventDefault`). |
+| N09 | **Pass** (verified via code + curl, not a literal JS-disabled browser) | Every trigger remains a real `<a href>`; without JS no listener attaches at all, so the browser's default navigation goes straight to the already-verified-working standalone routes (N06). No JS-only content exists anywhere in the flow. |
+| N10 | Not runnable | Needs simulating `pushState` failure in a live session; verified in code only — `writeHistory` catches, `open()` checks the boolean return and never calls `preventDefault` on failure, so the real `href` fires. |
+| N11 | Not runnable | Needs live dialog state to observe the two distinct destinations. |
+| N12 | **Not met as specified** | ARCHITECTURE.md §3 itself only specifies x/y pixel-coordinate restore (not 03_NAVIGATION's fuller anchor+relative-offset algorithm) — I implemented exactly that. It's correct when layout is stable but won't gracefully handle a viewport/content change between open and close. This is a deviation carried from the architecture decision, not something I skipped. |
+
+**Other ARCHITECTURE.md §3 items I could not verify beyond static/code review:** everything requiring live focus-trap/backdrop/Escape behavior in a real browser — implemented per spec (native `showModal()`, `cancel` event → `closeOne()`, Figure-lightbox mutual exclusion) but not click-tested here.
+
+**Also verified:** `npm run check` — zero new errors in touched files (baseline ~2600 pre-existing errors elsewhere, unchanged pattern). `npm run build` — green, 93 pages, `FocusHost`'s dialog/script confirmed present only on the Registry Wave essay and absent from another essay and a dev story (spot-checked in `dist/`).

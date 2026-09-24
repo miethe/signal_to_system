@@ -1,0 +1,12 @@
+Permission allow rule (../../../ibm-agentic-tools/ica/settings/ica-settings-ccx.json): Write(.claude/reports/**) is not matched by file permission checks — only Edit(path) rules are. Use Edit(.claude/reports/**) instead (Edit rules cover all file-editing tools).
+Permission allow rule (../../../ibm-agentic-tools/ica/settings/ica-settings-ccx.json): Write(~/.claude/reports/**) is not matched by file permission checks — only Edit(path) rules are. Use Edit(~/.claude/reports/**) instead (Edit rules cover all file-editing tools).
+⚠ claude.ai connectors are disabled because ANTHROPIC_API_KEY or another auth source is set and takes precedence over your claude.ai login · Unset it to load your organization's connectors
+**Done** — `docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/reading-experience-v2/ARCHITECTURE.md` written (only file touched, no git commands run).
+
+**Decision:** own history directly for the reading routes; don't integrate with Astro ClientRouter.
+
+**You should know** — the brief's premise was wrong and I called it out in the doc rather than silently working around it: `BaseLayout.astro` does **not** actually use ClientRouter (`grep -r ClientRouter src` = zero hits). The `astro:page-load` listeners scattered across `Figure`/`PostSidebar`/`ThreadRail` etc. fire on plain first-load too, ClientRouter or not — they aren't evidence of it being wired. That doesn't flip the decision (both handoff docs recommend option (b) as the default regardless), it just means there's no live lifecycle to integrate with in the first place.
+
+The doc covers all six requested parts: route tree (4 new static page files + `getStaticPaths` sources), a `FocusHost` dialog design that clones pre-rendered `<template>` fragments of the same components backing the standalone routes (no client fetch, no server needed), data contracts for `threads.ts`/new `evidence.ts`, a component disposition table (confirmed `ThreadStoryboard`/`ThreadBeat` are dead/single-use via grep, not assumed), and 6 risks for P0-B/C — most notably an unchecked route-collision and `BeatId[]` being typed too narrowly for V13's site-wide claim.
+
+**Left/next**: P0-B should resolve the route-collision risk before writing page files.
