@@ -3,24 +3,32 @@ import { fileURLToPath } from 'node:url';
 import { evaluateReleaseGate } from '../projection/gate.mjs';
 import { labBundleSchema } from './schema.mjs';
 
-const root = new URL('../../data/labs/releases/', import.meta.url);
+/** The committed release store; each complete four-file directory is one public release. */
+export const releaseStoreRoot = new URL('../../data/labs/releases/', import.meta.url);
+export const releaseFiles = ['manifest.json', 'receipts.json', 'records.json', 'lab.json'];
 const isApproved = (records, kind, publicId, version) => records.some((record) => record.kind === kind && record.publicId === publicId && record.version === version && record.lifecycle === 'approved');
-async function readStore() {
-  try {
-    const entries = await readdir(fileURLToPath(root), { withFileTypes: true });
-    const sources = await Promise.all(entries.filter((entry) => entry.isDirectory()).map(async ({ name }) => {
-      try {
-        const dir = new URL(`${name}/`, root);
-        const values = await Promise.all(['manifest.json', 'receipts.json', 'records.json', 'lab.json'].map(async (file) => JSON.parse(await readFile(new URL(file, dir), 'utf8'))));
-        return { manifest: values[0], receipts: values[1], records: values[2], bundle: values[3], fixture: false };
-      } catch { return null; }
+/**
+ * Read every release directory. The renderer skips an incomplete or unreadable directory; a caller
+ * that passes `problems` also receives one `{ releaseId, errors }` entry per skipped directory, so a
+ * build check can fail on it instead of silently publishing nothing.
+ */
+export async function readReleaseStore({ root = releaseStoreRoot, problems } = {}) {
+  let entries;
+  try { entries = await readdir(fileURLToPath(root), { withFileTypes: true }); } catch { return []; }
+  const sources = await Promise.all(entries.filter((entry) => entry.isDirectory()).map(async ({ name }) => {
+    const dir = new URL(`${name}/`, root);
+    const values = await Promise.all(releaseFiles.map(async (file) => {
+      try { return { value: JSON.parse(await readFile(new URL(file, dir), 'utf8')) }; } catch { return { error: `unreadable-release-file:${file}` }; }
     }));
-    return sources.filter(Boolean);
-  } catch { return []; }
+    const errors = values.filter((item) => item.error).map((item) => item.error);
+    if (errors.length) { problems?.push({ releaseId: name, errors }); return null; }
+    return { manifest: values[0].value, receipts: values[1].value, records: values[2].value, bundle: values[3].value, fixture: false };
+  }));
+  return sources.filter(Boolean);
 }
 export async function loadLabCatalog({ includeFixtures = false, sources } = {}) {
   const inputs = sources ?? [
-    ...await readStore(),
+    ...await readReleaseStore(),
     ...(includeFixtures
       ? (await import('../../data/labs/fixtures/index.mjs')).releases.map((source) => ({ ...source, fixture: true }))
       : []),
