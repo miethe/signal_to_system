@@ -4,7 +4,21 @@ import { digestProjection, evaluateReleaseGate } from '../../src/lib/projection/
 import { manifest, receipts, records } from '../../src/lib/projection/fixtures/synthetic-approved.mjs';
 
 const gate = (m = manifest, r = receipts, p = records, options = {}) => evaluateReleaseGate(structuredClone(m), structuredClone(r), structuredClone(p), options);
-const assertClosed = (m = manifest, r = receipts, p = records, options = {}) => assert.deepEqual(gate(m, r, p, options).publishable, []);
+/** Fail closed AND for the named reason: a closed gate alone cannot tell which check fired. */
+const assertClosedWith = (expected, m = manifest, r = receipts, p = records, options = {}) => {
+  const result = gate(m, r, p, options);
+  assert.deepEqual(result.publishable, []);
+  assert.deepEqual(result.errors, expected);
+};
+/** Mutate the record, then re-digest and re-bind manifest and receipt so only the mutation's own check can fire. */
+function rebound(mutate) {
+  const altered = structuredClone(records); mutate(altered[0]);
+  altered[0].digest = digestProjection({ ...altered[0], digest: undefined });
+  const alteredManifest = structuredClone(manifest); alteredManifest.records[0].digest = altered[0].digest;
+  const alteredReceipts = structuredClone(receipts); alteredReceipts[0].digest = altered[0].digest;
+  return [alteredManifest, alteredReceipts, altered];
+}
+const ID = 'synthetic-claim-001';
 
 function labFixture() {
   // Lab producers must use this schema insertion order before digestProjection().
@@ -22,13 +36,24 @@ function labFixture() {
   return { record, labManifest, labReceipts };
 }
 test('publishes the synthetic approved projection', () => assert.equal(gate().publishable.length, 1));
-test('fails closed without a receipt', () => assert.deepEqual(gate(manifest, [], records).publishable, []));
-test('fails closed for a withdrawn record', () => assert.deepEqual(gate(manifest, [...receipts, { ...receipts[0], action: 'withdraw' }], records).publishable, []));
-test('fails closed for a digest mismatch', () => { const altered = structuredClone(records); altered[0].summary = 'altered'; assert.deepEqual(gate(manifest, receipts, altered).publishable, []); });
-test('fails closed for a dangling dependency', () => { const altered = structuredClone(records); altered[0].dependencies = ['missing-record']; assert.deepEqual(gate(manifest, receipts, altered).publishable, []); });
-test('fails closed for the wrong release approver', () => { const altered = structuredClone(receipts); altered[0].approver = 'agent:metis'; assert.deepEqual(gate(manifest, altered, records).publishable, []); });
-test('requires reason and follow-up report for a Metis withdrawal', () => { const altered = [...receipts, { ...receipts[0], action: 'withdraw', approver: 'agent:metis' }]; assert.deepEqual(gate(manifest, altered, records).publishable, []); });
-test('fails closed for schema-invalid input and private identifiers', () => { assertClosed({}); const altered = structuredClone(records); altered[0].summary = 'node_01SECRET'; assertClosed(manifest, receipts, altered); });
+test('fails closed without a receipt', () => assertClosedWith([`unapproved:${ID}`], manifest, []));
+test('fails closed for a withdrawn record', () => assertClosedWith([`withdrawn:${ID}`], manifest, [...receipts, { ...receipts[0], action: 'withdraw' }]));
+test('fails closed for a digest mismatch', () => { const altered = structuredClone(records); altered[0].summary = 'altered'; assertClosedWith([`digest-mismatch:${ID}`], manifest, receipts, altered); });
+test('a re-digested record no longer matches its manifest entry or approval receipt', () => {
+  const altered = structuredClone(records); altered[0].summary = 'altered'; altered[0].digest = digestProjection({ ...altered[0], digest: undefined });
+  assertClosedWith([`manifest-mismatch:${ID}`, `unapproved:${ID}`], manifest, receipts, altered);
+});
+test('fails closed for a dangling dependency', () => assertClosedWith([`dangling-reference:${ID}`], ...rebound((record) => { record.dependencies = ['missing-record']; })));
+test('fails closed for the wrong release approver', () => { const altered = structuredClone(receipts); altered[0].approver = 'agent:metis'; assertClosedWith(['schema-invalid'], manifest, altered); });
+test('requires reason and follow-up report for a Metis withdrawal', () => {
+  const withdrawal = { ...receipts[0], action: 'withdraw', approver: 'agent:metis' };
+  // Without both fields the receipt itself is invalid (schema), not merely a withdrawal.
+  assertClosedWith(['schema-invalid'], manifest, [...receipts, withdrawal]);
+  assertClosedWith(['schema-invalid'], manifest, [...receipts, { ...withdrawal, reason: 'Rights withdrawn.' }]);
+  // Positive control: a complete Metis withdrawal is accepted as a withdrawal.
+  assertClosedWith([`withdrawn:${ID}`], manifest, [...receipts, { ...withdrawal, reason: 'Rights withdrawn.', followUpReport: 'reports/withdrawal.md' }]);
+});
+test('fails closed for schema-invalid input and private identifiers', () => { assertClosedWith(['schema-invalid'], {}); const altered = structuredClone(records); altered[0].summary = 'node_01SECRET'; assertClosedWith(['private-material'], manifest, receipts, altered); });
 test('publishes an approved Lab record for every additive Lab kind', () => {
   for (const kind of ['lab-investigation', 'lab-report', 'lab-experiment', 'lab-artifact', 'lab-film']) {
     const { record, labManifest, labReceipts } = labFixture();
@@ -39,7 +64,7 @@ test('publishes an approved Lab record for every additive Lab kind', () => {
     assert.equal(gate(labManifest, labReceipts, [record]).publishable.length, 1);
   }
 });
-test('fails closed for an unapproved Lab record', () => { const { record, labManifest } = labFixture(); assertClosed(labManifest, [], [record]); });
+test('fails closed for an unapproved Lab record', () => { const { record, labManifest } = labFixture(); assertClosedWith(['unapproved:lab-report-001'], labManifest, [], [record]); });
 test('keeps canonical Lab digests stable only for the required fixed key order', () => {
   const { record } = labFixture();
   const canonical = { publicId: record.publicId, kind: record.kind, version: record.version, lifecycle: record.lifecycle, sourceRefs: record.sourceRefs, dependencies: record.dependencies, destinations: record.destinations, summary: record.summary, digest: undefined };
@@ -52,7 +77,7 @@ test('fails closed for bounded private IPv4 addresses and absolute home paths', 
     ['/', 'Users', 'person', 'file'].join('/').replace('//', '/'), ['/', 'home', 'person', 'file'].join('/').replace('//', '/'),
   ];
   for (const value of material) {
-    const altered = structuredClone(records); altered[0].summary = value; assertClosed(manifest, receipts, altered);
+    assertClosedWith(['private-material'], ...rebound((record) => { record.summary = value; }));
   }
 });
 test('does not mistake decimal fragments, percentages, or versions for private IPv4', () => {
@@ -64,16 +89,17 @@ test('does not mistake decimal fragments, percentages, or versions for private I
     assert.equal(gate(alteredManifest, alteredReceipts, altered).publishable.length, 1);
   }
 });
-test('fails closed for a caller-supplied denied workspace identifier', () => { assertClosed(manifest, receipts, records, { denied: ['synthetic-claim-001'] }); });
+test('fails closed for a caller-supplied denied workspace identifier', () => { assertClosedWith(['private-material'], manifest, receipts, records, { denied: ['synthetic-claim-001'] }); });
 test('fails closed for private-only fields in public records', () => {
   for (const field of ['reviews', 'workspace', 'unresolvedReferences']) {
-    const altered = structuredClone(records); altered[0][field] = 'private'; assertClosed(manifest, receipts, altered);
+    // Records are a strict schema, so an unknown private-only field is rejected at the schema boundary.
+    const altered = structuredClone(records); altered[0][field] = 'private'; assertClosedWith(['schema-invalid'], manifest, receipts, altered);
   }
 });
 test('fails closed when a supplied private release-sidecar digest differs', () => {
   const sidecarDigest = `sha256:${'a'.repeat(64)}`;
   const sidecarManifest = { ...manifest, releaseSidecarDigest: sidecarDigest };
-  assertClosed(sidecarManifest, receipts, records);
-  assertClosed(sidecarManifest, receipts, records, { releaseSidecarDigest: `sha256:${'b'.repeat(64)}` });
+  assertClosedWith(['release-sidecar-mismatch'], sidecarManifest, receipts, records);
+  assertClosedWith(['release-sidecar-mismatch'], sidecarManifest, receipts, records, { releaseSidecarDigest: `sha256:${'b'.repeat(64)}` });
   assert.equal(gate(sidecarManifest, receipts, records, { releaseSidecarDigest: sidecarDigest }).publishable.length, 1);
 });
