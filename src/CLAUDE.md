@@ -69,7 +69,10 @@ React components in `components/interactive/` mount with `client:idle` or `clien
 
 ```ts
 import { getCollection, render } from 'astro:content';
-const posts = await getCollection('posts');
+import { isPublishable } from '../lib/publication.mjs';
+// posts/stories: ALWAYS filter through the shared publication gate
+// (tests/m0/publication-eligibility.test.mjs enforces this).
+const posts = await getCollection('posts', isPublishable);
 const { Content } = await render(entry);
 // entry.id = slug derived from filename
 // entry.data = validated frontmatter

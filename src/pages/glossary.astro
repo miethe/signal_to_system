@@ -3,12 +3,13 @@ import HubLayout from '../layouts/templates/HubLayout.astro';
 import CollectionPanel from '../components/family/CollectionPanel.astro';
 import StateNotice from '../components/primitives/StateNotice.astro';
 import { getCollection } from 'astro:content';
+import { isPublishable } from '../lib/publication.mjs';
 import { GLOSSARY } from '../data/glossary';
-const posts = await getCollection('posts');
+const posts = await getCollection('posts', isPublishable);
 const postsById = new Map(posts.map((post) => [post.id, post]));
 const entries = Object.entries(GLOSSARY).map(([id, entry]) => {
   const post = entry.definedIn ? postsById.get(entry.definedIn) : undefined;
-  return { id, term: entry.term, definition: entry.definition, postTitle: post?.data.title, href: post && post.data.status !== 'draft' ? `/essays/${post.id}/` : undefined };
+  return { id, term: entry.term, definition: entry.definition, postTitle: post?.data.title, href: post ? `/essays/${post.id}/` : undefined };
 }).sort((a, b) => a.term.localeCompare(b.term));
 ---
 <HubLayout title="Glossary" description="Definitions for terms used across Signal to System essays." heading="Glossary" eyebrow={['Reference']} lede={`${entries.length} terms defined across Signal to System essays.`}>

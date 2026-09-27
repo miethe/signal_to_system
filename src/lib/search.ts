@@ -1,4 +1,5 @@
 import type { CollectionEntry } from "astro:content";
+import { isPublishable } from "./publication.mjs";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -30,7 +31,7 @@ export function generateSearchIndex(
   series: CollectionEntry<"series">[]
 ): SearchIndexEntry[] {
   const postEntries: SearchIndexEntry[] = posts
-    .filter((p) => p.data.status !== "draft")
+    .filter((p) => isPublishable(p))
     .map((p) => ({
       title: p.data.title,
       excerpt: p.data.excerpt,

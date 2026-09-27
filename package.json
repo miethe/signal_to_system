@@ -12,6 +12,7 @@
     "astro": "astro",
     "check": "astro check",
     "test:m0": "node --test tests/m0/*.test.mjs",
+    "test:publication-gate": "node scripts/probe-publication-gate.mjs",
     "test:labs": "node --test tests/labs/*.test.mjs",
     "check:labs": "node scripts/check-labs-production.mjs",
     "test:projection": "node --test tests/projection/*.test.mjs",

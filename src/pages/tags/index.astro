@@ -5,6 +5,7 @@
  */
 import StateNotice from '../../components/primitives/StateNotice.astro';
 import { getCollection } from 'astro:content';
+import { isPublishable } from '../../lib/publication.mjs';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHero from '../../components/primitives/PageHero.astro';
 import Card from '../../components/primitives/Card.astro';
@@ -17,15 +18,14 @@ import { slugify } from '../../lib/utils';
 // Build tag frequency map across posts + projects + stories
 // ---------------------------------------------------------------------------
 
-const allPosts = await getCollection('posts');
+const allPosts = await getCollection('posts', isPublishable);
 const allProjects = await getCollection('projects');
-const allStories = await getCollection('stories');
+const allStories = await getCollection('stories', isPublishable);
 
 const tagCounts = new Map<string, number>();
 let totalPieces = 0;
 
 for (const post of allPosts) {
-  if (post.data.status === 'draft') continue;
   totalPieces += 1;
   for (const tag of post.data.tags ?? []) {
     const slug = slugify(tag);
@@ -42,7 +42,6 @@ for (const project of allProjects) {
 }
 
 for (const story of allStories) {
-  if (story.data.status === 'draft') continue;
   totalPieces += 1;
   for (const tag of story.data.tags ?? []) {
     const slug = slugify(tag);

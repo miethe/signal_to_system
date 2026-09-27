@@ -1,13 +1,13 @@
 import { getCollection } from 'astro:content';
+import { isPublishable } from '../lib/publication.mjs';
 
 export async function GET() {
-  const posts = await getCollection('posts');
+  const posts = await getCollection('posts', isPublishable);
   const projects = await getCollection('projects');
-  const stories = await getCollection('stories');
+  const stories = await getCollection('stories', isPublishable);
 
   const index = [
     ...posts
-      .filter((p) => p.data.status !== 'draft')
       .map((p) => ({
         title: p.data.title,
         excerpt: p.data.excerpt,
@@ -33,7 +33,6 @@ export async function GET() {
       featured: p.data.featured ?? false,
     })),
     ...stories
-      .filter((s) => s.data.status !== 'draft')
       .map((s) => ({
         title: s.data.title,
         excerpt: s.data.excerpt,
