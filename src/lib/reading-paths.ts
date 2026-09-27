@@ -1,5 +1,6 @@
 import type { CollectionEntry } from "astro:content";
 import { inSeries } from "./series.mjs";
+import { isPublishable } from "./publication.mjs";
 import { TOPIC_HUBS } from "../data/taxonomy";
 
 // ---------------------------------------------------------------------------
@@ -43,7 +44,7 @@ export function getSeriesNav(
   const seriesEntries = allEntries
     .filter(
       (e) =>
-        inSeries(e, seriesSlug) && e.data.status !== "draft"
+        inSeries(e, seriesSlug) && isPublishable(e)
     )
     .sort((a, b) => {
       const orderA = a.data.seriesOrder ?? Infinity;
@@ -90,7 +91,7 @@ export function getTopicPosts(topic: string, posts: Post[]): Post[] {
   return posts
     .filter(
       (p) =>
-        p.data.status !== "draft" &&
+        isPublishable(p) &&
         p.data.category === categoryToMatch
     )
     .sort(

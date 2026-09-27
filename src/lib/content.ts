@@ -1,5 +1,6 @@
 import { inSeries, seriesKey } from './series.mjs';
 import { getCollection, type CollectionEntry } from "astro:content";
+import { isPublishable } from './publication.mjs';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -32,11 +33,9 @@ export function hrefFor(entry: Article): string {
 // Posts
 // ---------------------------------------------------------------------------
 
-/** All posts that are not in draft status, sorted newest first. */
+/** All publishable posts (see publication.mjs), sorted newest first. */
 export async function getPublishedPosts(): Promise<Post[]> {
-  const posts = await getCollection("posts", ({ data }) => {
-    return data.status !== "draft";
-  });
+  const posts = await getCollection("posts", isPublishable);
   return posts.sort(
     (a, b) =>
       new Date(b.data.date).getTime() - new Date(a.data.date).getTime()
@@ -155,9 +154,9 @@ export async function getAllTags(): Promise<TagCount[]> {
 // Stories (Dev Stories)
 // ---------------------------------------------------------------------------
 
-/** All stories not in draft status, sorted newest first. */
+/** All publishable stories (see publication.mjs), sorted newest first. */
 export async function getPublishedStories(): Promise<Story[]> {
-  const stories = await getCollection("stories", ({ data }) => data.status !== "draft");
+  const stories = await getCollection("stories", isPublishable);
   return stories.sort(
     (a, b) => new Date(b.data.date).getTime() - new Date(a.data.date).getTime(),
   );

@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
+import { isPublishable } from '../../lib/publication.mjs';
 import { GLOSSARY } from '../../data/glossary';
 
 // ---------------------------------------------------------------------------
@@ -31,9 +32,9 @@ const normalize = (path: string) => path.replace(/\/+$/, '');
 
 let readMoreHref: string | undefined;
 if (entry.definedIn) {
-  const posts = await getCollection('posts');
+  const posts = await getCollection('posts', isPublishable);
   const definingPost = posts.find((p) => p.id === entry.definedIn);
-  if (definingPost && definingPost.data.status !== 'draft') {
+  if (definingPost) {
     const href = `/essays/${definingPost.id}/`;
     if (normalize(href) !== normalize(Astro.url.pathname)) {
       readMoreHref = href;

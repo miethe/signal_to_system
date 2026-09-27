@@ -22,6 +22,7 @@
  */
 import { seriesKey } from '../../lib/series.mjs';
 import { getCollection } from 'astro:content';
+import { isPublishable } from '../../lib/publication.mjs';
 import pathsData from '../../data/reading-paths.json';
 
 interface Props {
@@ -80,10 +81,15 @@ let miniSeries: {
 if (series) {
   const key = normalize(series);
 
+  // The entry being rendered always counts itself (a dev preview of an
+  // ineligible entry must not claim "Part 5 of 5" while sitting outside
+  // the 5); every other sibling must pass the shared publication gate.
+  const eligibleOrSelf = (entry: { collection: string; id: string; data: { status?: string; isFixture?: boolean } }) =>
+    isPublishable(entry) || (entry.collection === collection && entry.id === slug);
   const [allSeries, allPosts, allStories] = await Promise.all([
     getCollection('series'),
-    getCollection('posts'),
-    getCollection('stories'),
+    getCollection('posts', eligibleOrSelf),
+    getCollection('stories', eligibleOrSelf),
   ]);
 
   // The series page, if one exists. Match on id first (how /series/[...slug]
@@ -92,16 +98,9 @@ if (series) {
     allSeries.find((entry) => normalize(entry.id) === key) ??
     allSeries.find((entry) => normalize(entry.data.title) === key);
 
-  // Siblings: every published post/story in the same series, in reading order.
-  // The entry being rendered always counts itself, even when it is a draft —
-  // otherwise a draft preview claims "Part 5 of 5" while sitting outside the 5.
+  // Siblings: every publishable post/story in the same series, in reading order.
   const siblings = [...allPosts, ...allStories]
     .filter((entry) => entry.data.series && normalize(entry.data.series) === key)
-    .filter(
-      (entry) =>
-        entry.data.status !== 'draft' ||
-        (entry.collection === collection && entry.id === slug),
-    )
     .sort((a, b) => (a.data.seriesOrder ?? Infinity) - (b.data.seriesOrder ?? Infinity));
 
   const index = siblings.findIndex(

@@ -71,6 +71,9 @@ const posts = defineCollection({
     leaderTakeaway: z.string().optional(),
     disclaimer: z.string().optional(),
     draftNotes: z.string().optional(),
+    // Synthetic/fixture record: never emitted by a production build
+    // (see src/lib/publication.mjs isPublishable).
+    isFixture: z.boolean().optional(),
   }),
 });
 
@@ -223,6 +226,9 @@ const stories = defineCollection({
     leaderTakeaway: z.string().optional(),
     disclaimer: z.string().optional(),
     draftNotes: z.string().optional(),
+    // Synthetic/fixture record: never emitted by a production build
+    // (see src/lib/publication.mjs isPublishable).
+    isFixture: z.boolean().optional(),
   }),
 });
 

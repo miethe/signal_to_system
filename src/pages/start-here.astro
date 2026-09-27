@@ -1,6 +1,7 @@
 ---
 import { inSeries } from '../lib/series.mjs';
 import { getCollection } from 'astro:content';
+import { isPublishable } from '../lib/publication.mjs';
 import PageLayout from '../layouts/PageLayout.astro';
 import EssayCard from '../components/cards/EssayCard.astro';
 import SeriesCard from '../components/cards/SeriesCard.astro';
@@ -11,11 +12,10 @@ import { TOPIC_HUBS } from '../data/taxonomy';
 // Data
 // ---------------------------------------------------------------------------
 
-const allPosts = await getCollection('posts');
+const allPosts = await getCollection('posts', isPublishable);
 const allSeries = await getCollection('series');
 
 const published = allPosts
-  .filter((p) => p.data.status !== 'draft')
   .sort((a, b) => b.data.date.getTime() - a.data.date.getTime());
 
 const flagship = published.filter((p) => p.data.featured).slice(0, 4);

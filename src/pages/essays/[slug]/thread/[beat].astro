@@ -7,13 +7,14 @@
  * there is never a second hand-written explanation for a beat.
  */
 import { getCollection } from 'astro:content';
+import { isPublishable } from '../../../../lib/publication.mjs';
 import BaseLayout from '../../../../layouts/BaseLayout.astro';
 import ThreadFocus from '../../../../components/content/ThreadFocus.astro';
 import { threads } from '../../../../data/threads';
 import { buildCanonicalUrl } from '../../../../lib/seo';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('posts');
+  const posts = await getCollection('posts', isPublishable);
   const paths: Array<{ params: { slug: string; beat: string }; props: { postTitle: string } }> = [];
 
   for (const post of posts) {

@@ -12,6 +12,7 @@
  * enum, precisely so a second essay's thread can reuse a record here).
  */
 import { getCollection } from 'astro:content';
+import { isPublishable } from '../../../../lib/publication.mjs';
 import BaseLayout from '../../../../layouts/BaseLayout.astro';
 import EvidenceFocus from '../../../../components/content/EvidenceFocus.astro';
 import { threads } from '../../../../data/threads';
@@ -19,7 +20,7 @@ import { evidence } from '../../../../data/evidence';
 import { buildCanonicalUrl } from '../../../../lib/seo';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('posts');
+  const posts = await getCollection('posts', isPublishable);
   const paths: Array<{ params: { slug: string }; props: { postTitle: string } }> = [];
 
   for (const post of posts) {
