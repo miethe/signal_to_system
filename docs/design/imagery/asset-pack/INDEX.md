@@ -2,6 +2,8 @@
 
 Copied reference material for external image designers and generators. This is a handoff snapshot, not a runtime asset directory.
 
+> **Distribution entry point:** use the two-recipient [S2S imagery handoff guide](../HANDOFF-GUIDE.md). It separates design-language decisions (Pack A) from final image generation (Pack B) and defines the required return contracts.
+
 ## Use order
 
 1. Registry Wave raster plates and hero are the essay-image style authority.
