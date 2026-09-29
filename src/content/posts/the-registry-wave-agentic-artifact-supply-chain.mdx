@@ -31,9 +31,11 @@ draftNotes: |
   September 2026 edition, full rewrite after external reviews
 ---
 import Figure from '../../components/content/Figure.astro';
+import Callout from '../../components/content/Callout.astro';
 import Term from '../../components/content/Term.astro';
 import WhereThisSits from '../../components/content/WhereThisSits.astro';
 import ThreadScene from '../../components/content/ThreadScene.astro';
+import ThreadBeat from '../../components/content/ThreadBeat.astro';
 import RevisionNote from '../../components/content/RevisionNote.astro';
 import ExecutiveSignal from '../../components/content/ExecutiveSignal.astro';
 import PullQuote from '../../components/content/PullQuote.astro';
@@ -389,15 +391,7 @@ I want to measure accepted outcomes with evidence. For this reviewer, that means
 
 A known source can supply a harmful artifact. Permitted work can still be wrong. A run using a skill does not establish that the skill caused its result. Fixed dependencies do not make probabilistic reasoning deterministic. The next essay considers the <Term id="deterministic-envelope">deterministic envelope</Term>, an existing way of describing constraints around probabilistic systems. My emphasis will be on controls outside model judgment and evidence that they mediate execution, alongside related work such as RAILS.[^envelope] Repeated successful reasoning can suggest a candidate for automation. It doesn't establish authority to promote it, or tell me when to withdraw it. Those remain questions to test.
 
-### Where the system lied to us
-
-
 Keeping those assurances separate is easy on a page; I only learned they don't stay separate in practice because my own tooling kept reporting one of them and letting me read it as another.
-
-The drift-gate receipt records why the check was written at all: “the fix exists” had stood in for “the projects received the fix,” and my own artifact-management workflow let that substitution pass.[^drift]
-
-The next essay considers the <Term id="deterministic-envelope">deterministic envelope</Term>, an existing way of describing constraints around probabilistic systems. My emphasis will be on controls outside model judgment and evidence that they mediate execution, alongside related work such as RAILS.[^envelope] Repeated successful reasoning can suggest a candidate for automation. It doesn't establish authority to promote it, or tell me when to withdraw it. Those remain questions to test.
-</Callout>
 
 ## Where the system lied to us
 
@@ -491,7 +485,7 @@ These are dated implementation records, summarized as methods. The August commit
 
 <Evidence kind="proposed" /> Those repairs support the managed-variation architecture in this essay. They don't establish a complete identity-to-outcome chain. I still need evidence for when a local improvement should become shared policy, when an automated fast path should return to judgment, and how an independent acceptance decision changes results. The three-project comparison is illustrative. No promotion, demotion or acceptance-by-assertion incident is being claimed from these receipts.
 
-<ClaimBadge kind="external" /> The four vendor descriptions and the related architecture research are outside sources. Their product boundaries and contribution claims remain distinct from my implementation records. In particular, no external benchmark result is reported here as a benefit measured in the lab.
+<Evidence kind="external" /> The four vendor descriptions and the related architecture research are outside sources. Their product boundaries and contribution claims remain distinct from my implementation records. In particular, no external benchmark result is reported here as a benefit measured in the lab.
 
 This essay reports no measured outcome improvement.
 
