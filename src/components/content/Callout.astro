@@ -62,21 +62,16 @@ const displayTitle = title ?? LABEL[kind];
     gap: 12px;
     margin: 20px 0;
     padding: 1rem;
-    border: 1px solid var(--tone-border);
+    border: 1px solid color-mix(in srgb, var(--tone) 28%, var(--s2s-rule));
     border-radius: 0.75rem;
-    background: var(--tone-bg);
+    background: color-mix(in srgb, var(--tone) 7%, var(--s2s-surface));
     color: var(--s2s-ink-muted);
   }
-  .callout-v2--info { --tone-border: #bfdbfe; --tone-bg: #eff6ff; --tone: #2563eb; }
-  .callout-v2--warning { --tone-border: #fde68a; --tone-bg: #fffbeb; --tone: #d97706; }
-  .callout-v2--leader-takeaway { --tone-border: #ddd6fe; --tone-bg: #f5f3ff; --tone: #7c3aed; }
-  .callout-v2--why-it-matters { --tone-border: #a7f3d0; --tone-bg: #ecfdf5; --tone: #059669; }
-  .callout-v2--story { --tone-border: #cbd5e1; --tone-bg: #f8fafc; --tone: #64748b; }
-  .dark .callout-v2--info { --tone-border: #1e40af; --tone-bg: rgb(23 37 84 / 0.3); --tone: #60a5fa; }
-  .dark .callout-v2--warning { --tone-border: #92400e; --tone-bg: rgb(69 26 3 / 0.3); --tone: #fbbf24; }
-  .dark .callout-v2--leader-takeaway { --tone-border: #5b21b6; --tone-bg: rgb(46 16 101 / 0.3); --tone: #c4b5fd; }
-  .dark .callout-v2--why-it-matters { --tone-border: #065f46; --tone-bg: rgb(2 44 34 / 0.3); --tone: #6ee7b7; }
-  .dark .callout-v2--story { --tone-border: #334155; --tone-bg: rgb(15 23 42 / 0.3); --tone: #cbd5e1; }
+  .callout-v2--info { --tone: var(--s2s-status-info); }
+  .callout-v2--warning { --tone: var(--s2s-status-warn); }
+  .callout-v2--leader-takeaway { --tone: var(--s2s-accent); }
+  .callout-v2--why-it-matters { --tone: var(--s2s-status-ok); }
+  .callout-v2--story { --tone: var(--s2s-ink-subtle); }
 
   .callout-v2__icon { flex-shrink: 0; margin-top: 1px; color: var(--tone); }
   .callout-v2__body { min-width: 0; flex: 1; }
