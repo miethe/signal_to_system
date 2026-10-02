@@ -14,7 +14,7 @@ The example begins with an intent to reduce checkout-timeout errors for a specif
 
 ### `criteria-make-done-inspectable` — Criteria make done inspectable
 
-The example lists four acceptance criteria: reproduce the failure boundary, retain test coverage, trace the fix to a root cause, and document rollback. Each criterion states a condition that could be inspected before acceptance.
+The example lists four acceptance criteria: show the failure doesn't recur under the documented reproduction conditions, retain test coverage, trace the fix to a root cause, and document rollback. Each criterion states a condition that could be inspected before acceptance.
 
 - **Establishes:** The sample contract separates acceptance criteria from its broad intent.
 - **Does not establish:** That these are sufficient criteria for a real checkout system or that any test was run.

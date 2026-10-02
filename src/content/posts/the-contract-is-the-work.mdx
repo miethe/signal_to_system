@@ -66,7 +66,7 @@ What, exactly, was each of those steps accountable to?
 
 The problem here isn't weak generation: it's broken continuity. That doesn't mean <Term id="contract-as-spec">**contract-as-spec**</Term> solves every failure mode. Bad evidence, mistaken reasoning, and a blind spot shared across a chain of verifiers stay real risks, and a contract doesn't remove them by itself.
 
-<Term id="agentic-systems-engineering">Agentic Systems Engineering</Term> needs a method for preserving that continuity. Contract-as-spec is that method. It makes a <Term id="feature-contract">**Feature Contract**</Term>, not a prompt, ticket, plan, or final summary, the binding document for the work. The contract states the intended outcome, defines what completion means, and names the evidence required to support it, plus who can accept the result. Specialists can interpret and execute the contract, but they don't silently redefine it.
+Contract-as-spec is a method for preserving that continuity, and it's my approach within <Term id="agentic-systems-engineering">Agentic Systems Engineering</Term>. It makes a <Term id="feature-contract">**Feature Contract**</Term>, not a prompt, ticket, plan, or final summary, the binding document for the work. The contract states the intended outcome, defines what completion means, and names the evidence required to support it, plus who can accept the result. Specialists can interpret and execute the contract, but they don't silently redefine it.
 
 The contract is not documentation produced after the work; it's the work's source of authority.
 
@@ -188,7 +188,7 @@ At this stage, the organization is no longer reusing only prompts or outputs. It
 
 <ClaimBadge kind="observed" /> Stages four through six are still frontier territory at organizational scale, but they aren't imaginary. As of August 25, 2026, I run a small version at home every day: three different LLM vendors and deterministic scripts operate under one contract boundary, with durable daily run records showing the handoffs. That's lived practice at modest scale, not evidence that the institutional problem is solved.
 
-<ClaimBadge kind="observed" /> In a review of 41 current open-source agent-tooling sources, I didn't identify a direct equivalent to the complete source-to-claim-to-verification-to-decision-authority model. Individual stages are well represented. The uncommon part is preserving their relationships as one durable lifecycle. That isn't proof that no equivalent exists anywhere, and if a competing system preserves that complete chain, I'd like to see the counterexample and test this taxonomy against it.
+<ClaimBadge kind="observed" /> In a [review of 41 current open-source agent-tooling sources](#sources), I didn't identify a direct equivalent to the complete source-to-claim-to-verification-to-decision-authority model. Individual stages are well represented. The uncommon part is preserving their relationships as one durable lifecycle. That isn't proof that no equivalent exists anywhere, and if a competing system preserves that complete chain, I'd like to see the counterexample and test this taxonomy against it.
 
 ### Integration completeness beats primitive novelty
 
@@ -246,7 +246,7 @@ Without those answers, an artifact library becomes a prompt folder with better s
 
 ## Heterogeneous teams need a shared boundary, not a shared tool.
 
-<ClaimBadge kind="observed" /> In my AOS, work crosses three LLM vendors and deterministic scripts every day. The tools have different context limits, prices, strengths, failure modes, and interfaces. The shared contract is what lets one executor stop and another resume without treating the previous agent's prose as authority. The dated operating receipts describe a heterogeneous home operation held together by a common boundary, not a common platform.
+<ClaimBadge kind="observed" /> Through August 25, 2026, work in my AOS crossed three LLM vendors and deterministic scripts every day, the same daily run records cited above. The tools have different context limits, prices, strengths, failure modes, and interfaces. The shared contract was what let one executor stop and another resume without treating the previous agent's prose as authority. The dated operating receipts describe a heterogeneous home operation held together by a common boundary, not a common platform.
 
 That isn't only a story about my house. Contract-as-spec scales because the contract sits above the execution environment.
 
