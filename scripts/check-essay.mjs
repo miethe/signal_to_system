@@ -157,6 +157,17 @@ function isEssay(path) {
 const targets = (files.length ? files.map((f) => join(ROOT, f)) : readdirSync(POSTS).filter((f) => /\.mdx?$/.test(f)).map((f) => join(POSTS, f)))
   .filter((p) => existsSync(p) && (files.length || isEssay(p)));
 const results = targets.map(checkFile);
+
+// M1: the file must parse as MDX (a leg sandbox cannot run the Astro build; this catches e.g. an
+// apostrophe inside a single-quoted JSX attribute string). Uses the repo's own @mdx-js/mdx; when it
+// is not installed (a fresh worktree without node_modules) the check is reported as skipped.
+let mdx = null;
+try { mdx = await import("@mdx-js/mdx"); } catch { mdx = null; }
+for (const r of results) {
+  if (!mdx) { r.warnings.push({ id: "M1", msg: "MDX parse check skipped (@mdx-js/mdx not installed; run npm ci)" }); continue; }
+  try { await mdx.compile(readFileSync(join(ROOT, r.file), "utf8"), { jsx: true }); }
+  catch (e) { r.errors.push({ id: "M1", msg: `MDX does not parse: ${String(e.message || e).split("\n")[0]}` }); }
+}
 if (JSON_OUT) {
   process.stdout.write(JSON.stringify(results, null, 2) + "\n");
 } else {

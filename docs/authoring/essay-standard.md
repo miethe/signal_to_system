@@ -115,6 +115,7 @@ effort to wire. It does not add `ThreadScene` tags without images.
 
 - Exemplar-derived profile with quoted evidence: `docs/authoring/essay-voice-profile.md`.
 - Hand-edit-derived rules (higher authority): `docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/voice/nick-voice-rules.md` and `nick-hunks.md`.
+- Asides (Nick, 2026-10-02): keep his parenthetical and conversational asides; restore any a smoothing pass removed. His hand-edit register beats smoothed text (voice profile section 6).
 - Hard constraints: zero em-dashes in posts/series (`npm run check:prose`); contractions in body
   prose; first person singular for own work; parentheticals, colons, semicolons are his
   punctuation; corrective connectives ("Rather," "But,"); hedge once, never twice.
