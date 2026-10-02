@@ -35,3 +35,7 @@ These carry the E1 premise hold. Their meaning is unchanged in this pass, and no
 | L68 | "Google's internal studies suggest AI tools save measurable time" | No citation. The rail already records it as a source gap. | needs-Nick |
 | L155 | "a relatively new attack vector called \"slopsquatting\"" | No dedicated source. | needs-Nick |
 | L153 | "Roughly 40% of organizations already have Shadow AI in active use." | No clear support in the IBM governance link. | needs-Nick (source check) |
+
+## Premise decision (Nick, 2026-10-02)
+
+Nick chose to **narrow the claims**: the infrastructure is fragmented and incomplete (not absent), and gates are insufficient on their own (not useless). The absence and gates-cannot-work passages, and anything downstream that depends on their absolute form, are re-argued in a dedicated fix leg (ICA Opus edit, Codex Sol check against E3/E4). Lead fix round 2: RR01 restored to "This essay supplies no benchmark..." (no assertion about evidence Nick may hold).
