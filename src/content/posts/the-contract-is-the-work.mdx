@@ -50,7 +50,9 @@ My delegate wrote two competent reports about a handoff it never made.
 
 <ClaimBadge kind="observed" /> During an August 24 overnight cycle in my <Term id="aos">Agentic OS (AOS)</Term>, the small home operation where I run my agents, a delegate was instructed to hand a bounded task to a cheaper executor. It never made the dispatch. Instead, it spent its budget writing a competent status report about the work, then did the same thing again later that night. My durable overnight receipts showed two descriptions of execution and no execution. Read separately, each report looked responsible. Read against the contract, the missing handoff was obvious.
 
-The missing dispatch is the easy half, because the contract made it visible. The harder case is a chain where every step really does happen.
+The missing dispatch is the easy half, because the contract made it visible.
+
+## The harder case is a chain where every step really does happen.
 
 A product leader asks an agent to investigate a reliability problem. The agent produces a sharp analysis and hands it to an implementation agent. That agent makes a change, summarizes what it did, and passes the result to a reviewer. The reviewer checks the visible output, finds it reasonable, and approves it. Every step looks competent, but the result can still be wrong.
 
@@ -138,7 +140,7 @@ doesn't land in the room where I'm making it. It lands later, when someone has t
 a decision was made and there's a contract to point to instead of a chat log nobody can find. That
 is the same gap this section is describing, just aimed at me instead of at the reader.
 
-## From sources to decision authority
+## Evidence has to mature from sources to decision authority.
 
 The checkout-timeout contract asks for more than a fix. It wants a root cause, the failing and passing runs, verification outside the original repro, and an on-call lead's acceptance, and each of those sits at a different level of maturity.
 
@@ -188,13 +190,24 @@ At this stage, the organization is no longer reusing only prompts or outputs. It
 
 <ClaimBadge kind="observed" /> Stages four through six are still frontier territory at organizational scale, but they aren't imaginary. As of August 25, 2026, I run a small version at home every day: three different LLM vendors and deterministic scripts operate under one contract boundary, with durable daily run records showing the handoffs. That's lived practice at modest scale, not evidence that the institutional problem is solved.
 
-<ClaimBadge kind="observed" /> In a [review of 41 current open-source agent-tooling sources](#sources), I didn't identify a direct equivalent to the complete source-to-claim-to-verification-to-decision-authority model. Individual stages are well represented. The uncommon part is preserving their relationships as one durable lifecycle. That isn't proof that no equivalent exists anywhere, and if a competing system preserves that complete chain, I'd like to see the counterexample and test this taxonomy against it.
-
 ### Integration completeness beats primitive novelty
 
 Nothing in contract-as-spec requires a magical new primitive.
 
-The ecosystem already contains capable planners, agent routers, workflow engines, evaluation frameworks, provenance stores, approval steps, artifact registries, and observability tools. Most technical teams can assemble most of those components.
+The ecosystem already contains capable planners, agent routers, workflow engines, evaluation frameworks, provenance stores, approval steps, artifact registries, and observability tools. Most technical teams can assemble most of those components, and some already cover real pieces of this lifecycle (workflow checkpoints, human-in-the-loop approval, workflow and run identity, attestations, a supply-chain provenance specification).
+
+<RelatedWork
+  summary="Existing work addresses pieces of this lifecycle. These examples are adjacent capabilities, not evidence that any one system supplies the full chain argued for here."
+  citations={[
+    { text: 'Microsoft Agent Framework workflow checkpoints', href: 'https://learn.microsoft.com/en-us/agent-framework/workflows/checkpoints' },
+    { text: 'Microsoft Agent Framework human-in-the-loop workflows', href: 'https://learn.microsoft.com/en-us/agent-framework/workflows/human-in-the-loop' },
+    { text: 'Temporal workflow identity and run identity', href: 'https://github.com/temporalio/documentation/blob/main/docs/encyclopedia/workflow/workflow-execution/workflowid-runid.mdx' },
+    { text: 'in-toto Attestation', href: 'https://github.com/in-toto/attestation' },
+    { text: 'SLSA v1.2 Specification', href: 'https://slsa.dev/spec/v1.2/' },
+  ]}
+/>
+
+<ClaimBadge kind="observed" /> In a [review of 41 current open-source agent-tooling sources](#sources), I didn't identify a direct equivalent to the complete source-to-claim-to-verification-to-decision-authority model. Individual stages are well represented. The uncommon part is preserving their relationships as one durable lifecycle. That isn't proof that no equivalent exists anywhere, and if a competing system preserves that complete chain, I'd like to see the counterexample and test this taxonomy against it.
 
 The harder question is whether the components agree about the identity and state of the work.
 
@@ -287,22 +300,11 @@ I don't actually know whether anyone outside my own household would pay for this
   { left: 'Accepted decision', right: 'reusable capability' },
 ]} />
 
-<RelatedWork
-  summary="Existing work addresses pieces of this lifecycle. These examples are adjacent capabilities, not evidence that any one system supplies the full chain argued for here."
-  citations={[
-    { text: 'Microsoft Agent Framework workflow checkpoints', href: 'https://learn.microsoft.com/en-us/agent-framework/workflows/checkpoints' },
-    { text: 'Microsoft Agent Framework human-in-the-loop workflows', href: 'https://learn.microsoft.com/en-us/agent-framework/workflows/human-in-the-loop' },
-    { text: 'Temporal workflow identity and run identity', href: 'https://github.com/temporalio/documentation/blob/main/docs/encyclopedia/workflow/workflow-execution/workflowid-runid.mdx' },
-    { text: 'in-toto Attestation', href: 'https://github.com/in-toto/attestation' },
-    { text: 'SLSA v1.2 Specification', href: 'https://slsa.dev/spec/v1.2/' },
-  ]}
-/>
-
 <WhereThisSits slug="the-contract-is-the-work" />
 
 ## Build the chain, not another agent.
 
-<ClaimBadge kind="proposed" /> My bet is that the next generation of reliable agentic systems won't be defined only by models that reason longer or agents that call more tools. Those improvements matter, but they don't solve discontinuity between stages.
+<ClaimBadge kind="proposed" /> Models that reason longer and agents that call more tools matter, but they don't solve discontinuity between stages.
 
 A plausible answer is not yet a verified claim. Run the checkout-timeout example back through the six stages and the gap is concrete rather than abstract: fixing the failure mode is stage one, tracing it to the failing and passing runs is stage three, an on-call lead accepting the contract is stage five, and none of those stages substitutes for the one after it. A verified claim is not yet an authorized decision, and an authorized decision is not yet a reusable capability the next team can pick up cold.
 
@@ -310,7 +312,9 @@ The overnight delegate didn't need a better status report. It needed a contract 
 
 The instruction underneath all of it is the one I give every agent I run, and it predates this essay by years: do not make things up. If you don't see it, don't say it. A Feature Contract is that instinct codified into a document instead of left as something I have to keep repeating out loud. That is how agentic work becomes durable: not when the agent appears autonomous, but when the organization can see exactly what was promised, what was proven, who accepted it, and what can safely be reused.
 
-That's the bar I want every contract to meet: the work still holds up when I'm not watching. A contract can bind what was promised to who accepted it, but it can't say which of those decisions needed a model's judgment at all. The next question is where judgment should remain, and when evidence should promote it to a deterministic rule or withdraw that rule back to judgment. That's the question for the planned essay on the <Term id="deterministic-envelope">Deterministic Envelope</Term>.
+A contract can bind what was promised to who accepted it, but it can't say which of those decisions needed a model's judgment at all. That's the question for the planned essay on the <Term id="deterministic-envelope">Deterministic Envelope</Term>: where judgment should remain, and when evidence should promote it to a deterministic rule or withdraw that rule back to judgment.
+
+My bar for every contract is the same one I hold reuse to: the work still holds up when I'm not watching.
 
 ## Sources
 
