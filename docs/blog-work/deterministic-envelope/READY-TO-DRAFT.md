@@ -10,8 +10,8 @@
 
 | Open choice | Options from plan | Recommendation | Reason |
 |---|---|---|---|
-| Sustained example | Enterprise data-contract frame; lab leg-dispatch pipeline; both sequenced | Lab pipeline as the sole running thread; optional brief generic enterprise translation | Dated usable receipts; one example can carry the mechanism without implying an enterprise deployment |
-| Display title | Full working title; The Envelope, Not the Agent; Make the Model Guess Less, Not the System Trust More; What Should Stop Requiring a Model? | What Should Stop Requiring a Model? | Matches the revised promotion/withdrawal question rather than promising a deterministic enterprise |
+| Sustained example | Enterprise data-contract frame; lab leg-dispatch pipeline; both sequenced | **DECIDED by Nick 2026-10-02:** lab leg-dispatch pipeline as the sole running thread; optional brief generic enterprise translation | Dated usable receipts; one example can carry the mechanism without implying an enterprise deployment |
+| Display title (PROPOSAL, not decided) | Full working title; The Envelope, Not the Agent; Make the Model Guess Less, Not the System Trust More; What Should Stop Requiring a Model? | What Should Stop Requiring a Model? | Matches the revised promotion/withdrawal question rather than promising a deterministic enterprise |
 | Subtitle | September proposed subtitle; no subtitle | Optional: Deterministic envelopes, validated exceptions and the return to automation | Preserves the mechanism's vocabulary without making it the opening question |
 | Publication window | September 22/29 proposals; new window | Choose a new window after receipt/source checks | September proposals are not publication commitments; leave date unset |
 | Sandbox receipt | Confirm subsequent merge; retain historical unmerged caveat; use backup drift example | Retain September 15 unmerged caveat unless independently updated | A probe can support bounded observations without implying production coverage |
@@ -20,7 +20,7 @@
 | Optional fourth graphic | Commission learning-loop figure; inline sequence | Inline sequence | Three existing image hooks already cover structure and state |
 | Series metadata | Reading-path membership alone; assign an existing series | Reading path alone pending explicit series decision | Arc order is not series numbering; E1 and E2 belong to different series |
 
-- Drafting dependency: Nick's sustained-example decision remains open; beat plan below conditional on the recommended lab option.
+- Drafting dependency: resolved. Nick chose the lab leg-dispatch pipeline (2026-10-02), so the beat plan below is the plan of record. The display title remains a proposal.
 - Reconciliation decisions: demotion/withdrawal belongs in the mechanism; promotion requires independent acceptance; no automatic promotion merely because a resolution repeats.
 - Reconciliation decisions: prefer `BoundaryGrid`, `ReceiptDisclosure`, `ClaimBadge`, `RelatedWork`, `ImplementationStatus`, and `ExecutiveSignal` over the older blanket Callout plan.
 - Reconciliation decisions: `## Sources` plus footnotes required; glossary usage is first use, never first coinage.

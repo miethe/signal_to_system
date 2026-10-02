@@ -245,9 +245,13 @@ Answer yes or no. Any "no" on 1-6 means revise. Any "no" on 7-12 is a flag for t
 12. (Close only) Does it return to the opening object, state what it needed, include the harder
     problem, and end on a first-person bar, succinctly?
 
-## 6. Open tension (for the lead, not settled here)
+## 6. Asides: decided
 
-- The published final removed several of Nick's own plus-side lines (the H917:L16 signpost, the
-  H917:L30 joke, the H917:L95 wording, and H917:L26 "My usage"). Under the authority order, his
-  versions win on voice and accuracy edits win on fact. Re-edits of other Theses essays should
-  keep his conversational asides, not inherit the final's smoothing by default.
+**Nick, 2026-10-02: "Keep my asides."** His parenthetical and conversational asides (the self-deprecating
+aside, the inside joke, the lived complication, the naming parenthetical) are voice, not noise. Editors
+preserve them, and restore any that a smoothing pass removed. Where his own hand edits and a later
+smoothed text disagree on register, his hand edits win (sections 2.13 and 3). Accuracy edits still win
+on fact.
+
+The history that prompted this: the published Registry Wave final removed several of his 2026-09-17
+plus-side lines (the H917:L16 signpost, the H917:L30 joke, the H917:L95 wording, H917:L26 "My usage").
