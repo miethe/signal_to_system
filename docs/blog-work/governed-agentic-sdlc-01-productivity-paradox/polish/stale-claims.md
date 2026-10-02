@@ -4,6 +4,8 @@ Line numbers refer to `src/content/posts/governed-agentic-sdlc-01-productivity-p
 
 ## Premise decisions for Nick
 
+> Quotes in P1-P4 are the pre-narrowing snapshot. Nick decided 2026-10-02 to narrow both premises; the premise leg plus lead fixes (premise-check PC01-PC04) applied it. P5 ("correct by construction") is pre-existing and stays open for Nick.
+
 These carry the E1 premise hold. Their meaning is unchanged in this pass, and no BoundaryGrid or ImplementationStatus row takes a position on them.
 
 | # | Line | Quote (under 15 words) | Why it may be stale | Recommendation |
