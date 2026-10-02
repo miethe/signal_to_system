@@ -6,7 +6,7 @@ updated: 2026-10-02
 exemplar: src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx (as published on main, PR #145 + M2 reader #155)
 gate: scripts/check-essay.mjs (npm run check:essay)
 skill: .claude/skills/s2s-essay/SKILL.md
-voice: docs/editorial/essay-voice-profile.md (exemplar-derived) + docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/voice/nick-voice-rules.md (hand-edit-derived)
+voice: docs/authoring/essay-voice-profile.md (exemplar-derived) + docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/voice/nick-voice-rules.md (hand-edit-derived)
 itt: node_01M3YVPJGXRM50C2F8K27GC5TG (A1) under work package node_01M3YVN500E2YZXWVNTDC82Y4F
 ---
 
@@ -113,7 +113,7 @@ effort to wire. It does not add `ThreadScene` tags without images.
 
 ## 4. Voice (pointers; detail lives elsewhere)
 
-- Exemplar-derived profile with quoted evidence: `docs/editorial/essay-voice-profile.md`.
+- Exemplar-derived profile with quoted evidence: `docs/authoring/essay-voice-profile.md`.
 - Hand-edit-derived rules (higher authority): `docs/blog-work/the-registry-wave-agentic-artifact-supply-chain/voice/nick-voice-rules.md` and `nick-hunks.md`.
 - Hard constraints: zero em-dashes in posts/series (`npm run check:prose`); contractions in body
   prose; first person singular for own work; parentheticals, colons, semicolons are his

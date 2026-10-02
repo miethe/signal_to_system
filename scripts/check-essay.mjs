@@ -2,7 +2,7 @@
 /**
  * check-essay.mjs
  *
- * Machine checklist for the S2S essay standard (docs/editorial/essay-standard.md §6).
+ * Machine checklist for the S2S essay standard (docs/authoring/essay-standard.md §6).
  * Scans every post with `contentType: essay` (or the files given on the command line)
  * and reports errors (exit 1) and warnings (advisory). Zero dependencies, zero network.
  *

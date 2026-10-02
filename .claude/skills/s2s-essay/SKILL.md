@@ -35,7 +35,7 @@ end-to-end post workflow and publication prep. It never restates their content.
 
 ## Overview
 
-The standard is `docs/editorial/essay-standard.md`, derived from the published Registry Wave.
+The standard is `docs/authoring/essay-standard.md`, derived from the published Registry Wave.
 It is a content contract: the reader shell already renders the Registry Wave composition for
 every essay. The gate is `scripts/check-essay.mjs` (errors fail, warnings advise); it proves
 structure and hygiene, never voice or accuracy.
@@ -61,7 +61,7 @@ INTENT                                    ACTION
    evidence records, `## Sources`, `WhereThisSits`; write the running-thread beat manifest to
    `docs/blog-work/<slug>/thread-beats.md` instead of adding image-less `ThreadScene` tags.
    `node scripts/check-essay.mjs <file>` must report no errors.
-3. **Editorial re-pass** (taste lane, ICA Opus): voice against `docs/editorial/essay-voice-profile.md`
+3. **Editorial re-pass** (taste lane, ICA Opus): voice against `docs/authoring/essay-voice-profile.md`
    and the hand-edit voice rules. Preserve meaning, claims, numbers, receipts. Stale-looking
    claims go to `docs/blog-work/<slug>/polish/stale-claims.md`, not into silent rewrites.
 4. **Cross-family review** (Codex frontier): checklist + voice + arc obligations → findings file
@@ -96,7 +96,7 @@ forward, what this one must pay off), receipts it can cite, open research asks. 
 
 ## Key References
 
-- /Users/miethe/dev/homelab/development/signal_to_system/docs/editorial/essay-standard.md
+- /Users/miethe/dev/homelab/development/signal_to_system/docs/authoring/essay-standard.md
 - /Users/miethe/dev/homelab/development/signal_to_system/scripts/check-essay.mjs
 - /Users/miethe/dev/homelab/development/signal_to_system/src/content/posts/the-registry-wave-agentic-artifact-supply-chain.mdx
 - /Users/miethe/dev/homelab/development/signal_to_system/.claude/skills/voice-writer/SKILL.md
