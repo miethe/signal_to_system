@@ -68,3 +68,13 @@ artifacts:
     scope: null
     version: null
     note: "upstream edit point: .claude/skills/dev-story-editor/ (this repo); registered in SkillMeat enterprise from origin/main@2adbbaa (PR #130)"
+
+  - name: s2s-essay
+    type: skill
+    lifecycle: permanent
+    status: active
+    source: project-local
+    tuned: false
+    scope: null
+    version: null
+    note: "upstream edit point: .claude/skills/s2s-essay/ (this repo); composes voice-writer + blog-drafter; enterprise registration pending merge to main (same pattern as PR #130)"

@@ -288,6 +288,7 @@ Post N/
 
 ## Integration with Other Skills
 
+- **`/s2s-essay`** — for any `contentType: essay`: the essay standard (`docs/editorial/essay-standard.md`, Registry Wave anatomy) and its gate (`npm run check:essay`) supersede this skill's structural guidance for essays. Run it before Phase 6 on every essay.
 - **`/voice-writer`** — use for voice-calibrated drafting in Phase 4. Hand over spec and voice spec; receive publication-ready draft focused on matching Nick's authentic voice.
 - **`/humanizer`** — use for final naturalness pass in Phase 6. Reduces AI-detectable patterns and increases idiomatic smoothness after drafting is complete.
 - **`/notebooklm`** — use for research grounding in Phase 3–4. Pass source documents; get source-grounded summaries and Q&A for spec and draft.
