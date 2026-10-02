@@ -21,6 +21,7 @@
     "check:links": "node scripts/check-internal-links.mjs",
     "verify": "npm run build && npm run check && npm run test:m0 && npm run test:labs && npm run check:labs && npm run test:routes && npm run check:links && npm run check:palette",
     "check:prose": "node scripts/check-prose.mjs",
+    "check:essay": "node scripts/check-essay.mjs",
     "check:palette": "node scripts/check-palette-literals.mjs",
     "demo:doctor": "node demo/tools/demo-foundry.mjs doctor",
     "demo:capture": "playwright test demo/demos/**/*.spec.ts",

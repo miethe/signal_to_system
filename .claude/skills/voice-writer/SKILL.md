@@ -226,6 +226,9 @@ When given a draft to edit for voice:
 
 ## Integration with Other Skills
 
+- `/s2s-essay`: for essays, calibrate against the published Registry Wave exemplar and
+  `docs/authoring/essay-voice-profile.md` in addition to the sources above; the essay standard
+  owns structure and components, this skill owns voice.
 - `/blog-drafter`: handles research, competitive context, and structural outlining.
   Use that skill first when the topic needs significant research before writing. Then
   hand the outline to this skill for voice-calibrated drafting.
