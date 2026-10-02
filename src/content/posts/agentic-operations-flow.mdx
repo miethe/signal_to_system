@@ -105,7 +105,7 @@ The final output matters, but without the first artifact, every step after it is
 
 The transcript is useful as an interaction surface, but it's a terrible source of truth.
 
-It has no native notion of ownership, dependency, review intensity, or completion evidence. Nothing in the scrollback can tell the next agent that a feasibility question should stop before implementation, or that a high-risk migration should trigger a hard boundary before edits. It can't separate the facts worth reusing from the scaffolding of one run, which is exactly the line the lost discovery needed someone to draw.
+It has no native notion of ownership, dependency, review intensity, or completion evidence. A rule can be mentioned in the scrollback, but the transcript doesn't carry it as state that routes the next agent: that a feasibility question should stop before implementation, or that a high-risk migration should trigger a hard boundary before edits. It can't separate the facts worth reusing from the scaffolding of one run, which is exactly the line the lost discovery needed someone to draw.
 
 The <Term id="artifact-graph">**artifact graph**</Term> is the opposite: a typed set of durable objects that the workflow can resume from and reviewers can validate against. In my current system, that graph includes exploration charters, feasibility briefs, feature contracts, PRDs, implementation plans, decision blocks, progress files, validation records, run evidence, and knowledge handoffs.
 
@@ -216,7 +216,7 @@ ExecutionGraph
 
 This matters because "use more agents" isn't a strategy. Parallelism without ownership rules creates cleanup work. The execution graph is how I get useful parallelism without turning the main thread into a merge-conflict coordinator, though this essay shows the design, not a collision test.
 
-Every task in that graph also lands on a reusable agent or skill (the validator in the tier table is one), and the graph quietly assumes each is the version it thinks it is. Keeping that assumption true across projects is a problem for the next essay.
+When a task in that graph leans on a reusable agent or skill (the validator in the tier table is one), the graph is assuming that capability is still what it was when the task was planned. Keeping that assumption true across projects is a problem for the next essay.
 
 <Figure
   src="/assets/posts/agentic-operations-flow/deck/slide-17-execution-graph.jpg"
@@ -227,7 +227,7 @@ Every task in that graph also lands on a reusable agent or skill (the validator 
 
 ## Review has distinct boundaries.
 
-A validator checking a Tier 1 feature and a council stopping a production migration both get called review, but they aren't the same action.
+A validator checking a Tier 1 feature and a review council looking at a production migration both get called review, but they aren't the same action.
 
 Review isn't a vibe.
 
@@ -245,7 +245,7 @@ In the storyboard, review intensity is a routing field:
 
 That may feel slower. It's supposed to.
 
-For auth, payments, destructive deletion, secret rotation, production migration, and core infrastructure changes, the storyboard calls for stopping the workflow before edits. Asking an implementation agent to "be careful" isn't the same control. But the storyboard requirement doesn't establish an enforced stop, either: it says where the brake belongs, not that it fires.
+For auth, payments, destructive deletion, secret rotation, production migration, and core infrastructure changes, the safer move is to stop the workflow before edits. Asking an implementation agent to "be careful" isn't the same control. But that recommendation doesn't establish an enforced stop, either: it says where the brake belongs, not that it fires.
 
 <Figure
   src="/assets/posts/agentic-operations-flow/deck/slide-25-mode-d-boundary.jpg"
@@ -306,7 +306,7 @@ This is one of the reasons artifact-first routing helps: it forces the cost ques
 
 ## A graph can compound only what it retains.
 
-Run the opening session through the graph one more time. It would have kept the discovery, the intent behind the fix, and the evidence that it passed, but keeping them isn't the same as being right about them.
+Run the opening session through the graph one more time. It's meant to keep the discovery, the intent behind the fix, and whatever verification evidence exists, but keeping them isn't the same as being right about them.
 
 A transcript decays; a graph compounds. An artifact graph lets human intent become reviewable, agent execution become resumable, and evidence become part of the deliverable rather than a screenshot pasted into a status update. The operating system isn't the model stack. Rather, it's the artifact path: intake, route, draft, execute, review, persist. Once that path exists, better models help; without it, better models mostly produce faster decay.
 
@@ -336,7 +336,7 @@ These summaries describe the essay's existing design sources and conceptual exam
 
 <ClaimBadge kind="proposed" /> **Routing and first-artifact choices.** The storyboard's decision paths and the essay's five routing lenses describe how uncertainty is intended to select an initial durable artifact. No comparative run establishes that every downstream task otherwise guesses.
 
-<ClaimBadge kind="observed" /> **The lost-discovery example.** The essay describes a conceptual session that fixes something locally and loses the discovery when the session closes. It illustrates the state-retention problem; it isn't a recorded incident or a persisted run.
+<ClaimBadge kind="proposed" /> **The lost-discovery example.** The essay describes a conceptual session that fixes something locally and loses the discovery when the session closes. It illustrates the state-retention problem; it isn't a recorded incident or a persisted run.
 
 <ClaimBadge kind="proposed" /> **Risk, graph and review requirements.** The tier table, execution graph and typed review paths state design requirements. The essay supplies no classification, collision test, reviewer invocation, or refusal receipt.
 
@@ -344,7 +344,7 @@ These summaries describe the essay's existing design sources and conceptual exam
 
 <WhereThisSits slug="agentic-operations-flow" />
 
-I place this essay within <Term id="agentic-systems-engineering">Agentic Systems Engineering</Term>, a discipline already named in academic and enterprise work. My <Term id="aos">Agentic OS (AOS)</Term> is the personal lab context for this documented operating model.
+I place this essay within <Term id="agentic-systems-engineering">Agentic Systems Engineering</Term>, a discipline already named in academic and enterprise work.[^ase] My <Term id="aos">Agentic OS (AOS)</Term> is the personal lab context for this documented operating model.
 
 The session that found the fix didn't need a better model or a longer transcript. It needed its discovery written where the next agent would look first, and its intent recorded before the diff had to speak for it. It needed evidence a reviewer could check without reconstructing the run, and a plan that could tell a deferral from a rejection. It also needed the right first artifact for the uncertainty it hit, which is the part no amount of saving solves. That's the bar I want the graph to meet when I'm not the one opening the next session.
 
@@ -355,3 +355,5 @@ But a graph leans on reusable pieces: the validator, the agents, the skills each
 This essay draws on a non-public internal operating-model deck and its v3 planning/execution storyboard; they support the documented design, not claims of live enforcement or coverage.[^design]
 
 [^design]: Internal agentic operations deck and `agentic-planning-execution-storyboard-v3.md`, identified in the essay's existing provenance. The deck and storyboard describe the curated model; no runtime or outcome receipt is supplied.
+
+[^ase]: Sun et al., [Robust, Observable, and Evolvable Agentic Systems Engineering](https://arxiv.org/abs/2509.20729), and [OutSystems' Agentic Systems Engineering announcement](https://www.outsystems.com/de-de/news/outsystems-agentic-systems-engineering-announcement). These establish existing usage of the term; this essay makes no claim to it.
