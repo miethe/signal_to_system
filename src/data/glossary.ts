@@ -18,6 +18,11 @@ export interface GlossaryEntry {
 }
 
 export const GLOSSARY: Record<string, GlossaryEntry> = {
+  "ccdash": {
+    term: "CCDash",
+    definition:
+      "One of my own lab projects: a dashboard for observing agentic development sessions. Named here as an implementation in progress, not as a measured result.",
+  },
   "contract-as-spec": {
     term: "contract-as-spec",
     definition:

@@ -7,3 +7,4 @@
 - [ ] Set `reviewed: true` (plus `reviewedAt: YYYY-MM-DD`) on a Dev Story only when a human review happened; do not infer review. Only recorded reviews show the Reviewed pill.
 - [ ] Run `npm run test:m0`.
 - [ ] Run `npm run verify` to run the eligibility gate and the full publication checks.
+- [ ] For an essay (`contentType: essay`), run `npm run check:essay` and meet `docs/authoring/essay-standard.md`.
