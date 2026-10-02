@@ -53,9 +53,9 @@ Each fix was correct, but none of the sessions knew the others had already been 
 
 That's this whole essay at the size of a single bug: every session did its local job well, and the work still didn't add up.
 
-I've been running AI coding agents across my own projects and teams for over a year now. Claude Code, Gemini, Codex, Copilot, and others. Here's what I'm actually seeing: the velocity gains at the individual task level are significant and repeatable. I can scaffold a new service in minutes that used to take days. Boilerplate evaporates. Test generation that used to be a Friday afternoon chore happens inline. Documentation that nobody wanted to write gets drafted before the PR is even open.
+I've been running AI coding agents across my own projects and teams for over a year now. Claude Code, Gemini, Codex, Copilot, and others. Let me be direct about what I'm actually seeing: the velocity gains at the individual task level are significant and repeatable. I can scaffold a new service in minutes that used to take days. Boilerplate evaporates. Test generation that used to be a Friday afternoon chore happens inline. Documentation that nobody wanted to write gets drafted before the PR is even open.
 
-On specific, well-scoped tasks, I'm consistently seeing 5-10x+ speedups. If someone tells me AI coding tools don't deliver real productivity gains, my bet is they haven't used them seriously (at least not in the last 6 months), or haven't been honest about what the data shows at the task level.
+On specific, well-scoped tasks, I'm consistently seeing 5-10x+ speedups (my own read across that work, not a timed benchmark). Anyone who tells you AI coding tools don't deliver real productivity gains hasn't used them seriously (at least not in the last 6 months), or hasn't been honest about what the data shows at the task level.
 
 And yet, when I look at the aggregate output across teams, the numbers tell a different story. Features shipped. Defects resolved. Time-to-production for meaningful work. Those metrics don't match the task-level gains. Not even close.
 
@@ -77,7 +77,7 @@ That's the paradox, and it's not a tooling problem.
 
 Scaffolding a new service in minutes and fixing one bug across three sessions are both AI-assisted work, but they don't land in the same place.
 
-Before I diagnose the structural issue, a clarification on what AI coding tools actually deliver right now. The productivity tiers below describe **current state**: what you get without governance, without structured context injection, without the framework this series proposes. Think of them as a map of where the problems concentrate when teams adopt tools without adapting the system around them.
+Before I diagnose the structural issue, a clarification on what AI coding tools actually deliver right now. The productivity tiers below describe **current state**: what you get without governance, without structured context injection, without the framework this series proposes. Think of them as a map of where the problems concentrate when teams adopt tools without adapting the system around them. The tiers and their multipliers are my classifications, not a benchmark.
 
 | Impact tier | Where it lands | Typical tasks |
 | --- | --- | --- |
@@ -91,11 +91,13 @@ These tiers aren't fixed. With proper governance (context injection, structured 
 
 McKinsey's 2023 developer productivity research (the source of the "up to 50% faster" headline) breaks this down in the fine print: the largest gains were on code generation and documentation, while design, testing strategy, and cross-team coordination showed minimal improvement.[^mckinsey] DORA's 2025 *State of AI-Assisted Software Development* report is consistent: elite performers separate from the pack not on raw coding speed, but on deployment frequency, lead time, change failure rate, and recovery time: system-level metrics, not individual ones.[^dora] AI tools, as currently deployed, mostly target the individual layer.
 
+That points at an easy fix: tighten the spec, and the work moves up a tier. But the FastAPI bug was about as well-scoped as work gets (a 204 response with no body, and a `response.json()` call that throws on it), and each of the three sessions fixed it correctly. Clarity wasn't what they were missing; knowing it had already been fixed was.
+
 ## The harder problem: the gains don't compound.
 
-Faster tasks are the easy half.
+A service scaffolded in minutes is the easy half.
 
-The harder problem is why they don't compound into team-level outcomes when the task-level gains are real. The short answer: the system surrounding the tools wasn't designed to absorb the speed.
+The harder problem is why faster tasks don't compound into team-level outcomes when the task-level gains are real. The short answer: the system surrounding the tools wasn't designed to absorb the speed.
 
 Call it productivity theater: visible, measurable output that *looks* like progress but doesn't correlate with delivery. Lines of code written. Pull requests opened. Tickets closed. These metrics were already suspect before AI entered the picture; now they're actively misleading. When an agent can generate 400 lines of plausible-looking code in 30 seconds, "lines written per day" stops being a proxy for anything.
 
@@ -114,7 +116,7 @@ There are four failure modes I keep seeing. Each one looks like a tooling proble
 
 ### 1. The Volume Trap
 
-The most common failure, and the most insidious. The team adopts AI tools, individual output increases, more code enters the pipeline, but review capacity, test infrastructure, and deployment processes were sized for the old throughput. Larger PRs. Longer review queues. More integration conflicts. Eventually *slower* delivery, even though everyone feels busier. Adding AI to a team with existing process bottlenecks is like hooking a band up to an amplifier; it doesn't make the music better, it just makes the existing problems louder.
+Those 400 plausible-looking lines have to land somewhere. This is the most common failure, and the most insidious. The team adopts AI tools, individual output increases, more code enters the pipeline, but review capacity, test infrastructure, and deployment processes were sized for the old throughput. Larger PRs. Longer review queues. More integration conflicts. Eventually *slower* delivery, even though everyone feels busier. Adding AI to a team with existing process bottlenecks is like hooking a band up to an amplifier; it doesn't make the music better, it just makes the existing problems louder.
 
 **What it looks like:** PR size creeps up 2-3x. Faros AI's Q4 2025 Engineering Impact Report, which analyzed 50,000+ pull requests, found review cycle times jumped roughly 91% in AI-heavy teams, nearly double the pre-AI baseline.[^faros] Merge conflicts spike. DORA's 2025 research statistically correlated AI adoption levels with delivery instability: a 7.2% increase in instability for every 25% bump in adoption, which compounds fast.[^dora] The team ships the same number of features per sprint but each one takes more rework.
 
@@ -138,7 +140,7 @@ Multiply that across five teams with five agents operating from different implic
 
 ### 3. The Accountability Gap
 
-Who owns AI-generated code? In theory: the developer who prompted the agent. In practice: the accountability model dissolves fast. Developers rubber-stamp output they don't fully understand. Reviewers defer to "well, the AI wrote it and the tests pass." When something breaks in production, the post-mortem reveals that nobody actually *decided* the code should work that way; it was generated, accepted, merged, and deployed through a process that assumed human authorship at every step.
+Take a PR where the AI wrote the code and the tests pass. Who owns it? In theory: the developer who prompted the agent. In practice: the accountability model dissolves fast. Developers rubber-stamp output they don't fully understand. Reviewers defer to "well, the AI wrote it and the tests pass." When something breaks in production, the post-mortem reveals that nobody actually *decided* the code should work that way; it was generated, accepted, merged, and deployed through a process that assumed human authorship at every step.
 
 **What it looks like:** Post-mortems trace root causes to AI-generated code that nobody meaningfully reviewed. Rewire.it's 2026 *Case for Formal Verification in the Agentic Era* found at least 62% of AI-generated code contains security vulnerabilities (OWASP Top 10 exposure throughout, substantially worse than human baselines), and most of it sails through review unchallenged.[^rewire] Developers can't explain why their own PRs work. Knowledge of the codebase becomes shallow because understanding wasn't required to produce the code.
 
@@ -152,11 +154,11 @@ The failure mode nobody puts on a slide deck. Your developers are already using 
 
 The security implications are concrete. Proprietary source code and API credentials leak to public model providers with unclear data retention policies. There's a relatively new attack vector called "slopsquatting," where bad actors register package names that AI models commonly hallucinate, turning AI-generated dependency lists into malware delivery mechanisms. IBM's 2025 *Cost of a Data Breach* report makes the cost explicit: 20% of data breaches are now classified as Shadow AI incidents, running roughly $670K more expensive per incident than traditional breaches.[^ibm-breach] We're looking at more than just a rounding error; it's what prohibition as a strategy actually costs you.
 
-The uncomfortable part: banning AI makes this worse, not better. Developers reach for ungoverned tools because the official alternatives are slow, restrictive, or missing entirely. Locking down access won't reduce the risk; it just hides it. The only intervention that actually shifts the behavior is offering governed alternatives that are *better* than the ungoverned ones. Not equivalent. Better.
+The uncomfortable part: banning AI makes this worse, not better. Developers reach for ungoverned tools because the official alternatives are slow, restrictive, or missing entirely. Locking down access won't reduce the risk; it just hides it. I can't point to a study for this, but the only intervention that actually shifts the behavior is offering governed alternatives that are *better* than the ungoverned ones. Not equivalent. Better.
 
 ## The infrastructure gap is the common root.
 
-These four failure modes share a common root: existing SDLC governance was designed for a world where the bottleneck was code production. Every process artifact (sprint planning, code review, QA gates, change advisory boards) assumes code arrives at a roughly human pace, authored by people who understand it, in quantities that reviewers can meaningfully assess.
+A bug fixed three times by sessions that didn't know about each other and a `.claude/` directory full of "don't do this again" notices look like separate problems, but they aren't. Rather, all four failure modes share a common root: existing SDLC governance was designed for a world where the bottleneck was code production. Every process artifact (sprint planning, code review, QA gates, change advisory boards) assumes code arrives at a roughly human pace, authored by people who understand it, in quantities that reviewers can meaningfully assess.
 
 Those assumptions are wrong. And they're getting more wrong every quarter.
 
@@ -164,9 +166,7 @@ A useful lens for why this is happening now: software engineering has gone throu
 
 Then we moved from distributed apps to distributed infrastructure, and learned the same lesson again. Kubernetes, Terraform, Platform Engineering, and the whole IDP movement emerged because you can't manage distributed infrastructure with the same tooling you used for a server room.
 
-We're now in the middle of a third transition:
-
-<PullQuote>From distributed infrastructure to distributed intelligence.</PullQuote>
+We're now in the middle of a third transition: from distributed infrastructure to distributed intelligence.
 
 <Figure
   src="/assets/posts/governed-agentic-sdlc-01/diagram-transitions.jpeg"
@@ -202,7 +202,7 @@ What's needed isn't more or faster gates. It's governance that's *proactive*, em
 
 ## Governed agentic treats agents as participants, not accelerators.
 
-Go back to those three FastAPI sessions. Each agent did real work, and none of them knew the fix already existed somewhere else in the codebase. Here's the core idea, stated plainly:
+Go back to those three FastAPI sessions. Each agent did real work, and none of them knew the fix already existed somewhere else in the codebase. I'll lay out the full framework across this series, but the core idea deserves to be stated plainly up front:
 
 Governed agentic development treats AI agents as first-class participants in the SDLC, with explicit roles, constraints, and accountability boundaries, rather than treating them as invisible accelerators behind a human interface.
 
@@ -236,6 +236,8 @@ If you want to see what an ungoverned run actually looks like (the artifact-free
 
 ## What I can prove today.
 
+What I can actually put on the table is small and specific: three commits for one FastAPI bug, one fix commit for DiffViewer, and a file count from my own `.claude/` directory. The research below frames the problem around them; it doesn't prove my lab observations.
+
 <RelatedWork
   summary="METR, DORA, and the Agent Development Lifecycle describe task-level productivity limits, delivery-system measures, and an emerging lifecycle for work with agents. They provide adjacent evidence and framing, not proof of this essay's lab observations."
   citations={[
@@ -255,44 +257,46 @@ If you want to see what an ungoverned run actually looks like (the artifact-free
 
 <ImplementationStatus
   rows={[
-    { label: 'Cross-session shared context in the described workflow', status: 'TO TEST', detail: 'The FastAPI incident records repeated fixes across sessions; this essay supplies no current coverage receipt.' },
-    { label: 'DiffViewer observability', status: 'TO TEST', detail: "The essay reports a fix and a CCDash effort, but doesn't establish present coverage or measured render-cost and token-burn outcomes." }
+    { label: 'Cross-session shared context in the described workflow', status: 'TO TEST', detail: "The FastAPI incident records repeated fixes across sessions; I don't supply a current coverage receipt here." },
+    { label: 'DiffViewer observability', status: 'TO TEST', detail: "I report a fix and a CCDash effort, but I don't establish present coverage or measured render-cost and token-burn outcomes." }
   ]}
 />
 
 ### Evidence boundaries
 
-The firsthand observations I cite aren't controlled measurements. This manuscript supplies no controlled lab comparison of task speed versus delivery, no measured reduction in the described failures, and no token-burn measurement for DiffViewer.
+My firsthand observations here aren't controlled measurements. I don't offer a controlled lab comparison of task speed versus delivery, a measured reduction in the described failures, or a token-burn measurement for DiffViewer.
 
-<ClaimBadge kind="observed" /> **Task and delivery observations.** The opening section compares author-reported task-level speedups with an observation that aggregate team output didn't match them. No timed runs, denominator, or team delivery dataset is supplied.
+<ClaimBadge kind="observed" /> **Task and delivery observations (dates unstated).** I compare my own task-level speedups with what I saw in aggregate team output, across "over a year" of use. I don't supply timed runs, a denominator, or a team delivery dataset.
 
-<ClaimBadge kind="external" /> **External productivity studies.** The essay summarizes GitClear, METR, McKinsey, DORA, Faros, Qiao, Rewire, and IBM findings in the scopes described in their citations. The Google microtask/team-gain figures and PR-size multiplier lack dedicated support in this manuscript; they're source gaps, not findings established by adjacent citations.
+<ClaimBadge kind="external" /> **Cited studies (2023-2026).** I summarize GitClear, METR, McKinsey, DORA, Faros, Qiao, Rewire, and IBM findings; each footnote gives the source's own year and scope, and none of them measured my projects.
 
-<ClaimBadge kind="proposed" /> **Task tiers and governance interventions.** The tier table and proposed interventions are the author's classifications and recommendations. This essay supplies no benchmark validating the table's multipliers or cross-team study proving the interventions change behavior.
+<ClaimBadge kind="external" /> **Figures without dedicated support here.** A few figures don't have a citation of their own: the Google microtask and team-gain figures, the 2-3x PR-size creep, the roughly 40% Shadow AI adoption share, the slopsquatting description, and the claim that vulnerable AI-generated code mostly sails through review. They're unresolved sourcing gaps, not findings the adjacent citations establish.
 
-<ClaimBadge kind="observed" /> **November instruction sprawl.** The essay recounts fragmented project directories, a batch script that worked for about two weeks, and an inventory count. It provides no linked inventory snapshot, so the exact file and directory counts are author-reported, not independently measured here.
+<ClaimBadge kind="proposed" /> **Task tiers and governance interventions.** The tier table and the interventions are my classifications and recommendations. I don't have a benchmark validating the table's multipliers, or a cross-team study showing the interventions change behavior.
 
-<ClaimBadge kind="observed" /> **Repeated FastAPI fix.** The essay recounts a 204 response issue addressed at API, web, and test layers across three sessions between February and March 2026. The cited method note identifies existing implementation commits; this edition hasn't independently re-inspected them.
+<ClaimBadge kind="observed" /> **Instruction sprawl, November 2025.** The fragmented project directories date to late November 2025; the batch script's dates and the inventory count's as-of date are unstated. I don't link an inventory snapshot, so the file and directory counts are my own report, not an independent measurement.
 
-<ClaimBadge kind="observed" /> **DiffViewer and CCDash.** The essay reports repeated DiffViewer parsing, user reports of lag, a small fix, and subsequent CCDash work. No profiler capture, token-cost record, or coverage receipt is supplied.
+<ClaimBadge kind="observed" /> **Repeated FastAPI fix, February-March 2026.** Three sessions addressed the same 204 response issue at the API, web, and test layers. The method note in Sources lists the three commits; it doesn't establish which session came first.
+
+<ClaimBadge kind="observed" /> **DiffViewer and CCDash (dates unstated).** DiffViewer re-parsed every diff for three months before users reported lag and I made a small fix; neither that window nor the CCDash work is dated here. I don't supply a profiler capture, a token-cost record, or a coverage receipt.
 
 <WhereThisSits slug="governed-agentic-sdlc-01-productivity-paradox" />
 
-Those three FastAPI sessions didn't need a faster model; each one found the bug and fixed it correctly. They needed a record that the fix already existed. They needed the context to recognize where that fix applied. And they needed someone who owned knowing it had been done, rather than three agents each owning one layer. That's the bar I want for my own agent work: the next session inherits what the last one learned, instead of rediscovering it somewhere else. This essay documents the repeated work, not a working shared-memory remedy. The structural problem is real, and I've watched it break teams that were otherwise doing everything right.
+Those three FastAPI sessions didn't need a faster model; each one found the bug and fixed it correctly. They needed a record that the fix already existed, and the context to recognize where it applied. The harder need was an owner: someone who owned knowing it had been done, rather than three agents each owning one layer. What I've documented here is the repeated work, not a working shared-memory remedy. The structural problem is real, and I've watched it break teams that were otherwise doing everything right. That's the bar I want for my own agent work: the next session inherits what the last one learned, instead of rediscovering it somewhere else.
 
 So what has to survive a session, and in what shape, for the next one to route and resume the work? That's where [Agentic Operations Flow](/essays/agentic-operations-flow/) picks up.
 
 ## Sources
 
-External sources provide the scoped findings cited above; method notes describe lab observations reported by this essay and don't independently verify them.
+External sources provide the scoped findings cited above; method notes describe my own lab observations and don't independently verify them.
 
 *This is Post 1 of the [Governed Agentic SDLC](/series/governed-agentic-sdlc) series. Follow along as we build from diagnosis to implementation.*
 
-[^fastapi-fix]: Lab implementation receipt, February-March 2026: three existing commits (`a29acda2`, `74f49e3f`, `669cda07`) associated with API, web, and test-layer fixes for the FastAPI 204 response issue. This is a method summary, not an independent inspection by this migration.
+[^fastapi-fix]: Lab implementation receipt, February-March 2026: three existing commits (`a29acda2`, `74f49e3f`, `669cda07`) associated with API, web, and test-layer fixes for the FastAPI 204 response issue. This is a method summary of the commits, not an independent re-check of them.
 
-[^diffviewer-fix]: Lab implementation receipt, date not stated in the essay: the fix commit for DiffViewer repeated parsing is `7c0b2dda`. No profiler capture or token-cost measurement is supplied.
+[^diffviewer-fix]: Lab implementation receipt, date unstated: the fix commit for DiffViewer repeated parsing is `7c0b2dda`. No profiler capture or token-cost measurement is supplied.
 
-[^ccdash]: Lab project reference, date and coverage not stated in the essay: CCDash is named as subsequent work addressing an observability gap; this note does not establish implementation scope or outcomes.
+[^ccdash]: Lab project reference, date and coverage unstated: CCDash is named as subsequent work addressing an observability gap; this note does not establish implementation scope or outcomes.
 
 [^ase]: Sun et al., [Robust, Observable, and Evolvable Agentic Systems Engineering](https://arxiv.org/abs/2509.20729), and [OutSystems' Agentic Systems Engineering announcement](https://www.outsystems.com/de-de/news/outsystems-agentic-systems-engineering-announcement). These establish existing usage of the term; this essay makes no claim to it.
 
