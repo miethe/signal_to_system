@@ -9,6 +9,9 @@ set -m
 set -a; . "$HOME/.config/aos/secrets.env"; set +a
 export PATH="$HOME/.pyenv/shims:$PATH"
 [ -s "$HOME/.nvm/nvm.sh" ] && . "$HOME/.nvm/nvm.sh" >/dev/null 2>&1 && nvm use 22 >/dev/null 2>&1
+# nvm puts an older npm-installed `claude` (no --bare) ahead on PATH; the ICA isolation gate probes
+# the PATH-resolved binary and refuses. Keep the current install first.
+export PATH="$HOME/.local/bin:$PATH"
 AMD=/Users/miethe/dev/homelab/development/agentic_meta_dev
 W=/Users/miethe/dev/homelab/development/.wt
 L=$W/s2s-essay-standard/docs/project_plans/essay-standard/legs
@@ -40,9 +43,9 @@ run_stage() { # $1 essay $2 stage
   case $s in
     1-migrate) export AOS_MANIFEST_REF=$L/packs/codex/execution-manifest.yaml AOS_CONTEXT_BUNDLE_PATH=$L/packs/codex/pack.md
                args=(--lane codex --model gpt-6-luna --effort medium) ;;
-    2-voice)   export AOS_MANIFEST_REF=$L/packs/ica/execution-manifest.yaml AOS_CONTEXT_BUNDLE_PATH=$L/packs/ica/pack.md
+    2-voice|4-voice2) export AOS_MANIFEST_REF=$L/packs/ica/execution-manifest.yaml AOS_CONTEXT_BUNDLE_PATH=$L/packs/ica/pack.md
                args=(--lane ica --model 'claude-opus-5-5[1m]' --effort medium --ica-authorized-repo "$wt" --ica-authorized-path "$L/packs/ica/pack.md") ;;
-    3-review)  export AOS_MANIFEST_REF=$L/packs/codex/execution-manifest.yaml AOS_CONTEXT_BUNDLE_PATH=$L/packs/codex/pack.md
+    3-review|5-review2) export AOS_MANIFEST_REF=$L/packs/codex/execution-manifest.yaml AOS_CONTEXT_BUNDLE_PATH=$L/packs/codex/pack.md
                args=(--lane codex --model gpt-6.1-sol --effort medium) ;;
   esac
   "$LEG" "${args[@]}" --task-class write --node "$(node_of $e)" --cwd "$wt" \
@@ -56,7 +59,7 @@ run_stage() { # $1 essay $2 stage
 
 chain() { # $1 essay
   local e=$1
-  for s in 1-migrate 2-voice 3-review; do
+  for s in ${STAGES:-1-migrate 2-voice 3-review}; do
     if ! run_stage "$e" "$s"; then log "$e STOPPED at $s (non-zero exit and no output); later stages skipped"; return; fi
   done
 }
@@ -70,10 +73,11 @@ for e in e1 e2 e4; do
   slug=$(slug_of $e); wt=$W/s2s-polish-$e
   for f in "docs/blog-work/$slug/thread-beats.md" "docs/blog-work/$slug/polish/migration-notes.md" \
            "docs/blog-work/$slug/polish/voice-notes.md" "docs/blog-work/$slug/polish/stale-claims.md" \
-           "docs/blog-work/$slug/polish/review.md"; do
+           "docs/blog-work/$slug/polish/review.md" "docs/blog-work/$slug/polish/voice2-notes.md" \
+           "docs/blog-work/$slug/polish/review2.md"; do
     if [ -f "$wt/$f" ]; then log "$e $f bytes=$(wc -c < "$wt/$f" | tr -d ' ')"; else log "$e $f bytes=MISSING"; fi
   done
-  log "$e essay diffstat: $(git -C "$wt" diff --shortstat 45e7274 -- "src/content/posts/$slug.mdx")"
+  log "$e essay diffstat vs 45e7274: $(git -C "$wt" diff --shortstat 45e7274 -- "src/content/posts/$slug.mdx")"
   log "$e uncommitted: $(git -C "$wt" status --short | wc -l | tr -d ' ') path(s)"
 done
 log "PHASE-B-DONE $(date -u +%FT%TZ)"

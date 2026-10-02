@@ -8,7 +8,7 @@ description: >-
   "bring this essay to the standard", "essay standard", "check:essay", "Registry Wave structure",
   "essay packet", "Theses arc essay". Do NOT use for: field notes, companions, dev stories, or
   imagery/illustration work.
-version: 0.1
+version: 0.2
 app_version: "2026-10-02"
 updated: 2026-10-02
 ---
@@ -76,6 +76,11 @@ and §5 arc obligations: outline in anatomy order, the arc throughline (what eac
 forward, what this one must pay off), receipts it can cite, open research asks. No prose.
 
 ## Guardrails
+
+- Leg dispatch facts (measured 2026-10-02): fire scripts live in `docs/project_plans/essay-standard/legs/`
+  (`fire-phase-*.sh`, one background call each). After `nvm use 22`, put `$HOME/.local/bin` first on
+  PATH: nvm ships an older `claude` without `--bare`, and the ICA isolation gate refuses it. Codex legs
+  may not be able to commit in linked worktrees; the fire script commits each stage by pathspec.
 
 - Zero em-dashes, verified by the gate, never self-reported.
 - No tracker ids, PR numbers, SHAs, or schema field names in body prose.
