@@ -175,7 +175,7 @@ We're now in the middle of a third transition:
   caption="Three infrastructure transitions: monolith, distributed services, distributed infrastructure, and now distributed intelligence."
 />
 
-It took me embarrassingly long to see the pattern for what it was. Multiple agents, running in parallel, making decisions and generating artifacts across a codebase simultaneously, and I was racking my brain trying to govern it with tooling designed for the second transition. I wasn't alone in that (assuming a given company even made it that far). IBM and Arthur AI have started calling this emerging model the <Term id="adlc">**Agent Development Lifecycle (ADLC)**</Term>: the premise being that developing *with* agents requires different processes than developing *for* AI features.[^adlc] I agree with the diagnosis. What this series offers is the operator's version of the same shift: less framework branding, more of the specific patterns that have held up under real workloads. I place that work within the broader discipline of <Term id="agentic-systems-engineering">Agentic Systems Engineering</Term>, a name already in use in academic and enterprise work.
+It took me embarrassingly long to see the pattern for what it was. Multiple agents, running in parallel, making decisions and generating artifacts across a codebase simultaneously, and I was racking my brain trying to govern it with tooling designed for the second transition. I wasn't alone in that (assuming a given company even made it that far). IBM and Arthur AI have started calling this emerging model the <Term id="adlc">**Agent Development Lifecycle (ADLC)**</Term>: the premise being that developing *with* agents requires different processes than developing *for* AI features.[^adlc] I agree with the diagnosis. What this series offers is the operator's version of the same shift: less framework branding, more of the specific patterns that have held up under real workloads. I place that work within the broader discipline of <Term id="agentic-systems-engineering">Agentic Systems Engineering</Term>, a name already in use in academic and enterprise work.[^ase]
 
 We have Git for code, CI/CD for delivery, and Backstage for services. We have **zero** Platform Engineering for our cognitive infrastructure. No versioned context management. No agent observability. No trust tiers for AI-generated artifacts. No memory that persists across sessions. We have built elaborate infrastructure for everything except the thing we're now asking to generate the infrastructure.
 
@@ -202,7 +202,7 @@ What's needed isn't more or faster gates. It's governance that's *proactive*, em
 
 ## Governed agentic treats agents as participants, not accelerators.
 
-Go back to those three FastAPI sessions. Each agent did real work, and none of them had a defined place in the process that would have let its fix count for the next one. Here's the core idea, stated plainly:
+Go back to those three FastAPI sessions. Each agent did real work, and none of them knew the fix already existed somewhere else in the codebase. Here's the core idea, stated plainly:
 
 Governed agentic development treats AI agents as first-class participants in the SDLC, with explicit roles, constraints, and accountability boundaries, rather than treating them as invisible accelerators behind a human interface.
 
@@ -216,7 +216,7 @@ That leaves the question the next essay in this path picks up: what has to survi
 
 And that's just the memory side. The observability gap is worse, because you don't find out you're bleeding until someone happens to complain. In SkillMeat, a component called DiffViewer was silently re-parsing every diff on every render. For three months! Tests passed. The feature worked. I only caught it when users started complaining about UI lag on large syncs. The fix itself was a few lines (documented in a method note in Sources[^diffviewer-fix]), but nothing in the process would have surfaced the problem on its own. "Tests passed" was the only signal I had, and tests don't measure render cost or token burn. That's not a model failure. It's what happens when agent-generated code ships into production with no observability layer underneath it.
 
-I've since built CCDash to address an observability gap. The scope and coverage of that work aren't established here.[^ccdash]
+I've since addressed this observability gap with another project, <Term id="ccdash">**CCDash**</Term>, which I'll post about in the future. Its scope and coverage aren't established here.[^ccdash]
 
 In a governed agentic world, the reframe is structural: **human intent becomes the new source code, and agent sessions become the runtime.** The question stops being "how do we review AI-generated code faster" and starts being "how do we express intent precisely enough that the generated code is correct by construction." Context (the architectural decisions, coding conventions, security boundaries, and domain knowledge that shape correct generation) becomes the environment the runtime executes in. And like any runtime environment, it needs to be versioned, tested, and deployed.
 
@@ -256,7 +256,6 @@ If you want to see what an ungoverned run actually looks like (the artifact-free
 <ImplementationStatus
   rows={[
     { label: 'Cross-session shared context in the described workflow', status: 'TO TEST', detail: 'The FastAPI incident records repeated fixes across sessions; this essay supplies no current coverage receipt.' },
-    { label: 'Persistent memory across sessions', status: 'PROPOSED', detail: 'The essay argues for capturing, versioning, and re-injecting knowledge; it supplies no implementation receipt.' },
     { label: 'DiffViewer observability', status: 'TO TEST', detail: 'The essay reports a fix and a CCDash effort, but doesn't establish present coverage or measured render-cost and token-burn outcomes.' }
   ]}
 />
@@ -279,7 +278,7 @@ The firsthand observations I cite aren't controlled measurements. This manuscrip
 
 <WhereThisSits slug="governed-agentic-sdlc-01-productivity-paradox" />
 
-Those three FastAPI sessions didn't need a faster model; each one found the bug and fixed it correctly. They needed a record that the fix already existed. They needed the context to recognize where that fix applied. And they needed someone who owned knowing it had been done, rather than three agents each owning one layer. That's the bar I want for my own agent work: the next session inherits what the last one learned, instead of rediscovering it somewhere else. This essay documents the repeated work, not a working shared-memory remedy.
+Those three FastAPI sessions didn't need a faster model; each one found the bug and fixed it correctly. They needed a record that the fix already existed. They needed the context to recognize where that fix applied. And they needed someone who owned knowing it had been done, rather than three agents each owning one layer. That's the bar I want for my own agent work: the next session inherits what the last one learned, instead of rediscovering it somewhere else. This essay documents the repeated work, not a working shared-memory remedy. The structural problem is real, and I've watched it break teams that were otherwise doing everything right.
 
 So what has to survive a session, and in what shape, for the next one to route and resume the work? That's where [Agentic Operations Flow](/essays/agentic-operations-flow/) picks up.
 
@@ -289,11 +288,13 @@ External sources provide the scoped findings cited above; method notes describe 
 
 *This is Post 1 of the [Governed Agentic SDLC](/series/governed-agentic-sdlc) series. Follow along as we build from diagnosis to implementation.*
 
-[^fastapi-fix]: Lab implementation receipt, February-March 2026: the essay identifies three existing commits associated with API, web, and test-layer fixes for the FastAPI 204 response issue. This is a method summary, not an independent inspection by this migration.
+[^fastapi-fix]: Lab implementation receipt, February-March 2026: three existing commits (`a29acda2`, `74f49e3f`, `669cda07`) associated with API, web, and test-layer fixes for the FastAPI 204 response issue. This is a method summary, not an independent inspection by this migration.
 
-[^diffviewer-fix]: Lab implementation receipt, date not stated in the essay: the essay identifies an existing fix commit for DiffViewer repeated parsing. No profiler capture or token-cost measurement is supplied.
+[^diffviewer-fix]: Lab implementation receipt, date not stated in the essay: the fix commit for DiffViewer repeated parsing is `7c0b2dda`. No profiler capture or token-cost measurement is supplied.
 
 [^ccdash]: Lab project reference, date and coverage not stated in the essay: CCDash is named as subsequent work addressing an observability gap; this note does not establish implementation scope or outcomes.
+
+[^ase]: Sun et al., [Robust, Observable, and Evolvable Agentic Systems Engineering](https://arxiv.org/abs/2509.20729), and [OutSystems' Agentic Systems Engineering announcement](https://www.outsystems.com/de-de/news/outsystems-agentic-systems-engineering-announcement). These establish existing usage of the term; this essay makes no claim to it.
 
 [^gitclear]: GitClear (2024). [*Coding on Copilot: Data Shows AI's Downward Pressure on Code Quality*](https://www.gitclear.com/coding_on_copilot_data_shows_ais_downward_pressure_on_code_quality). Analysis of 153 million lines of code changed between 2023 and 2024.
 
