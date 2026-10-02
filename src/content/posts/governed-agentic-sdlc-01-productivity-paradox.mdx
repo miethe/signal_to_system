@@ -20,7 +20,7 @@ featured: true
 heroImage: "/assets/posts/governed-agentic-sdlc-01/hero-02-missing-layer.jpeg"
 heroAlt: "Networked AI agent nodes meet a gap in the infrastructure connecting local work to delivery."
 heroPlacement: frontispiece
-whyItMatters: "Most organizations are adopting AI agents at the task level without any infrastructure for managing them at the system level. The result is productivity theater: fast locally, broken at scale."
+whyItMatters: "Most organizations are adopting AI agents at the task level with only fragments of the infrastructure needed to manage them at the system level. The result is productivity theater: fast locally, broken at scale."
 leaderTakeaway: "Govern context, verification, and ownership across agent work. Do not equate task speed with delivery."
 relatedSlugs:
   - "agentic-operations-flow"
@@ -28,7 +28,7 @@ relatedSlugs:
   - "the-contract-is-the-work"
 seoTitle: "The AI Productivity Paradox: From Task Speed to Delivery"
 seoDescription: "Why local AI coding speed does not automatically improve team delivery, and what governance, persistent context, and verification need to connect."
-draftNotes: "Post 1 of 5 in the Governed Agentic SDLC series. Voice, humanizer, and formatting pass complete (2026-04-07). Citations integrated, final review revisions applied, second humanizer pass complete (2026-04-08). Second humanizing pass with Skillmeat anecdotes (CLAUDE.md explosion, FastAPI 204 bug, DiffViewer silent burn) and ChatGPT humanizing-review integration (2026-04-08). Final Opus voice pass on top: de-smoothed remaining LLM-polish phrases, sharpened ADLC and What's Next transitions, tightened Shadow AI closer and DiffViewer anecdote opener (2026-04-08). Essay-standard editorial re-pass (2026-10-02): FastAPI incident opens and closes the essay, harder-problem turn, arc handoff to Agentic Operations Flow; premise and stale claims held for author decision (see polish/stale-claims.md)."
+draftNotes: "Post 1 of 5 in the Governed Agentic SDLC series. Voice, humanizer, and formatting pass complete (2026-04-07). Citations integrated, final review revisions applied, second humanizer pass complete (2026-04-08). Second humanizing pass with Skillmeat anecdotes (CLAUDE.md explosion, FastAPI 204 bug, DiffViewer silent burn) and ChatGPT humanizing-review integration (2026-04-08). Final Opus voice pass on top: de-smoothed remaining LLM-polish phrases, sharpened ADLC and What's Next transitions, tightened Shadow AI closer and DiffViewer anecdote opener (2026-04-08). Essay-standard editorial re-pass (2026-10-02): FastAPI incident opens and closes the essay, harder-problem turn, arc handoff to Agentic Operations Flow; stale claims held for author decision (see polish/stale-claims.md). Premise narrowing per Nick's decision (2026-10-02): infrastructure fragmented, not absent; gates insufficient alone, not useless (see polish/premise-notes.md)."
 ---
 import ExecutiveSignal from '../../components/content/ExecutiveSignal.astro';
 import PullQuote from '../../components/content/PullQuote.astro';
@@ -41,7 +41,7 @@ import Term from '../../components/content/Term.astro';
 import WhereThisSits from '../../components/content/WhereThisSits.astro';
 
 <ExecutiveSignal
-  whyItMatters="Most organizations are adopting AI agents at the task level without any infrastructure for managing them at the system level. The result is productivity theater: fast locally, broken at scale."
+  whyItMatters="Most organizations are adopting AI agents at the task level with only fragments of the infrastructure needed to manage them at the system level. The result is productivity theater: fast locally, broken at scale."
   takeaway="Govern context, verification, and ownership across agent work. Do not equate task speed with delivery."
 />
 
@@ -134,7 +134,7 @@ I've watched this accumulate in real time in my own work on SkillMeat. By late N
 
 And by the time I noticed, the `.claude/` directory had grown to 1,703 markdown files across 50+ subdirectories. Every rule in `.claude/rules/memory.md`, `debugging.md`, `progress-cli-only.md` is a prohibition added because the mistake had already happened. That's Cognitive Debt made visible: not abstract drift, but a directory full of "don't do this again" notices.
 
-Multiply that across five teams with five agents operating from different implicit assumptions, and you get a distributed coherence problem that no amount of after-the-fact code review can adequately catch.
+Multiply that across five teams with five agents operating from different implicit assumptions, and you get a distributed coherence problem that after-the-fact code review alone can't adequately catch.
 
 **What to do instead:** Make implicit context explicit: ADRs agents can reference, coding standards that are machine-readable, context injection pipelines that feed constraints before generation. And accept that some work shouldn't be delegated yet, not because the tools can't do it, but because the context cost is too high.
 
@@ -177,7 +177,7 @@ We're now in the middle of a third transition: from distributed infrastructure t
 
 It took me embarrassingly long to see the pattern for what it was. Multiple agents, running in parallel, making decisions and generating artifacts across a codebase simultaneously, and I was racking my brain trying to govern it with tooling designed for the second transition. I wasn't alone in that (assuming a given company even made it that far). IBM and Arthur AI have started calling this emerging model the <Term id="adlc">**Agent Development Lifecycle (ADLC)**</Term>: the premise being that developing *with* agents requires different processes than developing *for* AI features.[^adlc] I agree with the diagnosis. What this series offers is the operator's version of the same shift: less framework branding, more of the specific patterns that have held up under real workloads. I place that work within the broader discipline of <Term id="agentic-systems-engineering">Agentic Systems Engineering</Term>, a name already in use in academic and enterprise work.[^ase]
 
-We have Git for code, CI/CD for delivery, and Backstage for services. We have **zero** Platform Engineering for our cognitive infrastructure. No versioned context management. No agent observability. No trust tiers for AI-generated artifacts. No memory that persists across sessions. We have built elaborate infrastructure for everything except the thing we're now asking to generate the infrastructure.
+We have Git for code, CI/CD for delivery, and Backstage for services. For our cognitive infrastructure, we have pieces: context files like CLAUDE.md, some agent observability, some memory that carries across sessions. But nothing joins them. Context files sit in each project instead of being versioned and deployed like the rest of the stack. Observability stops at the edge of one tool. AI-generated artifacts rarely get trust tiers. Memory survives only where a given tool happens to keep it. The pieces exist; the Platform Engineering that would make them infrastructure doesn't. We've built joined-up infrastructure for everything except the thing we're now asking to generate the infrastructure.
 
 Consider what a typical gate-based governance model actually does: it creates synchronization points where human judgment is applied to human-produced artifacts. Code review gates assume the reviewer can hold the full context of a PR in their head. QA gates assume test coverage reflects intentional design decisions. Release gates assume that if the prior gates passed, the aggregate risk is managed.
 
@@ -189,7 +189,7 @@ Each of these assumptions degrades when AI tools enter the picture:
 
 - **Release gates** break when the velocity of merged code outpaces the ability to assess cumulative risk. Each individual change looked fine; the aggregate introduced a subtle regression nobody caught.
 
-Gate-based governance is *reactive*: it inspects artifacts after they're produced. That worked when production was slow enough for inspection to keep up. It doesn't work when an agent can produce in an afternoon what used to take a sprint.
+Gate-based governance is *reactive*: it inspects artifacts after they're produced. That worked when production was slow enough for inspection to keep up. Gates still catch things at agent speed; a failing test or a rejected PR is still a save. But a model where the gates do all the governing breaks when an agent can produce in an afternoon what used to take a sprint.
 
 <Figure
   src="/assets/posts/governed-agentic-sdlc-01/hero-03-swarm-gate.jpeg"
@@ -198,7 +198,7 @@ Gate-based governance is *reactive*: it inspects artifacts after they're produce
   caption="Agent swarms outrun a single inspection gate. Reactive governance was sized for human-pace production."
 />
 
-What's needed isn't more or faster gates. It's governance that's *proactive*, embedded into the generation process itself, constraining what gets generated rather than scrambling to inspect what was generated.
+So the answer isn't more or faster gates. Rather, it's governance that's *proactive* as well: embedded into the generation process itself, constraining what gets generated before anything reaches a gate. The gates stay, and they have to test something meaningful: [The Registry Wave](/essays/the-registry-wave-agentic-artifact-supply-chain/) automates comparison checks at promotion and use boundaries, and [The Contract Is the Work](/essays/the-contract-is-the-work/) puts acceptance gates at the transitions that matter. Upstream constraints don't replace those gates. They shrink what the gates have to catch.
 
 ## Governed agentic treats agents as participants, not accelerators.
 
@@ -210,7 +210,7 @@ Let me be direct about what this series is *not*: it's not about <Term id="vibe-
 
 Something has to decide what context an agent receives, what constraints it operates under, how its output gets verified, and how what it learned persists past the session. That layer is the central concept here, and it's what I call the <Term id="harness-engineering-control-plane">**Harness Engineering Control Plane**</Term> for agentic development. Just as Kubernetes introduced a control plane to manage distributed workloads, separating the "what should run" from the "how it runs," a governed agentic SDLC needs a layer that manages cognitive workloads.
 
-The <Term id="agent-amnesia">**Agent Amnesia**</Term> problem illustrates exactly why this matters. When an AI agent finally figures out a complex legacy business rule (the specific edge case in your payment service, the subtle constraint in your data model), that knowledge dies the second the session closes. The next developer starts from zero. This isn't a model problem; models don't have persistent memory by design. It's an infrastructure problem: we have no mechanism for capturing, versioning, and re-injecting what agents learn.
+The <Term id="agent-amnesia">**Agent Amnesia**</Term> problem illustrates exactly why this matters. When an AI agent finally figures out a complex legacy business rule (the specific edge case in your payment service, the subtle constraint in your data model), that knowledge dies the second the session closes. The next developer starts from zero. This isn't a model problem; models don't have persistent memory by design. It's an infrastructure problem. Some tools now keep memory files or session notes, but there's no governed mechanism for capturing, versioning, and re-injecting what agents learn across tools and sessions.
 
 That leaves the question the next essay in this path picks up: what has to survive a session, and in what shape, for the next one to act on it?
 
@@ -218,7 +218,7 @@ And that's just the memory side. The observability gap is worse, because you don
 
 I've since addressed this observability gap with another project, <Term id="ccdash">**CCDash**</Term>, which I'll post about in the future. Its scope and coverage aren't established here.[^ccdash]
 
-In a governed agentic world, the reframe is structural: **human intent becomes the new source code, and agent sessions become the runtime.** The question stops being "how do we review AI-generated code faster" and starts being "how do we express intent precisely enough that the generated code is correct by construction." Context (the architectural decisions, coding conventions, security boundaries, and domain knowledge that shape correct generation) becomes the environment the runtime executes in. And like any runtime environment, it needs to be versioned, tested, and deployed.
+In a governed agentic world, the reframe is structural: **human intent becomes the new source code, and agent sessions become the runtime.** The question stops being only "how do we review AI-generated code faster" and starts being "how do we express intent precisely enough that the generated code is correct by construction." Context (the architectural decisions, coding conventions, security boundaries, and domain knowledge that shape correct generation) becomes the environment the runtime executes in. And like any runtime environment, it needs to be versioned, tested, and deployed.
 
 In practice, this means:
 
@@ -226,7 +226,7 @@ In practice, this means:
 
 - **Verification is proportional to trust**, not uniform. AI-generated boilerplate gets lightweight automated checks. AI-generated business logic gets human review with comprehension requirements. AI-generated security-sensitive code gets the same scrutiny as human-authored code in that path (which is to say, a lot). And these tiers shift upward as governance matures.
 
-- **Governance is embedded, not appended.** Rather than reviewing AI output after the fact, constraints are injected into the generation context. The agent knows the rules before it writes, rather than a reviewer catching violations afterward.
+- **Governance is embedded upstream, and the gates stay.** Constraints are injected into the generation context, so the agent knows the rules before it writes. Review and verification still happen afterward, but they check for what slipped through instead of carrying the whole load.
 
 - **Context is a first-class artifact.** The CLAUDE.md files, architectural specs, ADRs, and coding standards that shape agent behavior are versioned, governed, and deployed like any other infrastructure component, not scattered across local directories and wiki pages.
 
