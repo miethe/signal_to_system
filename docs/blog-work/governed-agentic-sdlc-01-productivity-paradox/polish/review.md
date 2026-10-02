@@ -1,0 +1,67 @@
+# Verdict: FIX-THEN-SHIP
+
+Independent review of the net change from `45e7274`, against the essay standard, voice profile, hand-edit voice rules, published Registry Wave exemplar, E1 gap matrix, arc table, polish notes, and thread manifest. Line references below use the current essay unless a sidecar is named. Structural checks pass, but preservation and premise-hold findings prevent editorial acceptance. This review does not resolve Nick's premise decisions or freshly verify outside sources.
+
+| id | severity | line | finding | suggested fix |
+| --- | --- | --- | --- | --- |
+| R01 | blocker | L145, L217, L276, L292-294; thread-beats.md L31-33 | The four original implementation references were deleted rather than moved into Sources: FastAPI `a29acda2`, `74f49e3f`, `669cda07`; DiffViewer `7c0b2dda`. The new notes say the essay identifies existing commits but identify none. This loses the supplied receipts and makes the reference claim inaccurate. | Retain the exact existing references in the method-summary footnotes, outside body prose. Do not invent URLs or inspection results. Update the manifest's reference claim to match the resulting notes. |
+| R02 | blocker | L219; stale-claims.md L3, L27 | Base prose says "I've since addressed this observability gap" with CCDash. New prose says "built CCDash to address an observability gap": an outcome assertion becomes an intent assertion, and the particular gap becomes unspecified. The added coverage limit is reasonable, but doesn't authorize changing the original claim. The sidecar's assertion that none of these claims was rewritten is consequently false. | Restore the original outcome claim with a separate evidence boundary, or obtain Nick's approval for the substantive rescope. Keep the coverage question in the sidecar; correct its description of what changed. |
+| R03 | blocker | L205 | The new incident framing says none of the three agents "had a defined place in the process." The base account establishes independently repeated fixes and absent shared memory, not the absence of defined roles or a process position. This adds an unsupported retrospective fact about the sessions. | Refer only to the repeated fixes and missing cross-session knowledge. Frame role/ownership requirements as proposed remedies, as the close does, rather than newly observed history. |
+| R04 | blocker | L259; stale-claims.md L7, L13 | The status chip labels unqualified "Persistent memory across sessions" PROPOSED. A reader sees a present implementation posture, not merely an evidence limit. That takes a position in the neighborhood of the held absence premise at L180/L213 despite the sidecar saying no status row does so. The detail's lack-of-receipt disclaimer doesn't establish that the capability is only proposed. | Remove this premise-bearing row during the hold, or narrowly label the specific proposed inheritance obligation without assigning a status to persistent memory generally. Preserve the held prose and leave the premise to Nick. |
+| R05 | blocker | L282-284, replacing base closing section L211 | The base close's firsthand claim that Nick watched the structural problem "break teams that were otherwise doing everything right" has disappeared. It is an empirical observation, not just a series announcement, and isn't preserved in the new rail. | Preserve that author-reported observation somewhere appropriate without strengthening it, or obtain explicit approval to remove it. Keep the new FastAPI return and E2 handoff. |
+| R06 | major | L178 | The new academic/enterprise attribution of Agentic Systems Engineering is safe in wording but has no footnote. The glossary entry contains descriptive attribution, not a source citation. The standard requires external claims to be footnoted; the gap matrix specifically points to E3's supplied Sun/OutSystems basis. | Reuse the already supplied E3 attribution sources explicitly and narrowly. No new source or novelty claim is needed. |
+| R07 | major | L219; glossary.ts lacks `ccdash` | CCDash survives as an own-system name without a first-use Term. Its short purpose introduction is present, but the standard/gap matrix requires a glossary-backed introduction if the aside survives. | Add an attribution-safe glossary entry and first-use Term in the authorized correction stage. Do not claim implementation scope or invent an origin date. |
+| R08 | major | L237-278 | Anatomy row 13 calls for dated method summaries. The task/delivery and DiffViewer rows have no stated observation date; the November row omits its known 2025 year, and the FastAPI row omits its known February-March 2026 window. The external rail also groups materially different scopes under a blanket assertion that citations establish their scope, while known source gaps remain. | Carry known dates into the relevant rail rows; explicitly mark unknown observation dates as unstated. Distinguish externally sourced clusters and their unresolved support without inventing measurements. |
+| R09 | major | L76-98, L157-161, L237-278 | Several movements still fail the profile's required Q1-6 audit. The second H2 presents gains by spec clarity, while the named harder-problem turn waits until the third H2. Infrastructure opens on a generalized diagnosis; the receipts movement opens on external framing. Strong claims often receive their limits only in the distant rail. | Make the second movement explicitly complicate the easy fix, ground infrastructure and receipts openings in existing concrete objects, and place non-held claim limits locally. Leave the held categorical passages untouched pending Nick. See the audit below. |
+| R10 | minor | L169 | "From distributed infrastructure to distributed intelligence" is a fragment, and it appears only inside the PullQuote. Unlike L62/L106, it is not a sentence also doing argument work in body prose. This misses the standard's PullQuote rule despite passing the checker. | Keep the original transition meaning in body prose and either remove the display wrapper or pair a supported complete sentence with its body occurrence. |
+| R11 | minor | thread-beats.md L43 | The final `beside` text is presented as a quotation, but "What must survive so the next session can act on it?" is not present verbatim in the current essay. It is a faithful paraphrase, not an invented incident; the manifest's other quoted anchors resolve. | Replace it with the exact current question at L215 or L284, or explicitly mark it as a paraphrase. |
+| R12 | minor | L268-278, L282 | The rail repeatedly starts "The essay" and "This manuscript," distancing Nick from his own observations. "This edition hasn't independently re-inspected them" leaks the editorial workflow into reader prose. The close repeats "They needed" three times and adds a manuscript-status sentence after the first-person bar. These are remaining machine-sounding seams, not grounds to erase his anecdotes. | Own the observations in first person; state evidentiary limits directly. Tighten the close while keeping its record/context/ownership needs and E2 question. Preserve the amplifier comparison, embarrassment, "For three months!", and other personal asides. |
+
+## Editor's audit, per section
+
+Columns correspond exactly to the voice profile's twelve questions: concrete opening; dual-reader mechanism; nearby limit; corrective; cadence; contractions; earned beat; owned work; dates; supported PullQuote; hygiene/tells; incident-return close. Y = yes, N = no, A = condition not applicable. Q12 applies only to the close; dates and display quotes are assessed when present or needed. N on Q1-6 requires editorial attention. Held-premise failures are recorded, not permission to rewrite them. Nick's higher-authority hand-edit rules protect deliberate fragments and asides from mechanical smoothing.
+
+| Section / lines | Q1 | Q2 | Q3 | Q4 | Q5 | Q6 | Q7 | Q8 | Q9 | Q10 | Q11 | Q12 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Opening, L48-74 | Y | Y | N | Y | N | Y | Y | Y | N | Y | Y | A |
+| Gains by task, L76-92 | Y | Y | N | Y | Y | Y | N | A | N | A | Y | A |
+| Harder-problem setup, L94-113 | N | Y | N | Y | Y | Y | Y | Y | A | Y | Y | A |
+| Volume Trap, L115-121 | N | Y | N | Y | Y | Y | N | A | Y | A | Y | A |
+| Context Collapse, L123-137 | Y | Y | N | Y | Y | Y | Y | Y | N | A | Y | A |
+| Accountability Gap, L139-147 | N | Y | N | Y | Y | Y | Y | Y | Y | A | Y | A |
+| Shadow AI, L149-155 | Y | Y | N | Y | Y | Y | N | A | Y | A | Y | A |
+| Infrastructure, L157-201 | N | Y | N | Y | N | N | Y | Y | A | N | Y | A |
+| Governed participants, L203-235 | Y | Y | N | Y | N | Y | Y | Y | N | A | Y | A |
+| Proof movement/components, L237-262 | N | Y | Y | Y | Y | Y | N | N | N | A | Y | A |
+| Evidence boundaries/rail, L264-278 | N | Y | Y | Y | Y | Y | Y | N | N | A | Y | A |
+| Close, L280-284 | Y | Y | Y | Y | Y | Y | Y | Y | A | A | Y | Y |
+| Sources, L286-316 | A | Y | Y | Y | Y | Y | A | A | Y | A | Y | A |
+
+Specific audit evidence: the opening's statistics paragraph L68 still stacks distinct claims and has floating "over a year"/"last 6 months" windows. Tiers L80-90 calls classifications current without an as-of date or nearby validation boundary. Volume L117 begins with an abstract superlative. Accountability L141 opens with a generic ownership question before the concrete incident. Shadow AI L155's "only intervention" remains unbounded. Infrastructure L161 is a flat corrective; L180 retains "We have built" and the categorical held claims. The personal-origin paragraph L178 carries several turns and introduces the umbrella without a citation. Governed participants L209/L211/L221 combine definition, analogy, and broad assurances before local limits. Those inherited or held issues should not be misreported as new invented facts.
+
+No new first-person memory was found in the dated FastAPI opening or the November/DiffViewer anecdotes. The changed first-person infrastructure sentence at L178 localizes an experience already described in the base paragraph. R03 is a new retrospective assertion about the agents, not a fabricated first-person memory. The old Post 2/Posts 3-5 preview was replaced with the explicitly requested core-path handoff; that authorized navigation change is distinct from the lost firsthand observation in R05. The current base supplies no provenance proving each E1 sentence was Nick's own hand edit, so this review identifies lost author testimony without claiming hand-edit authorship.
+
+## Standard, hygiene, sidecars, and thread disposition
+
+Frontmatter is complete; updatedDate is bumped; ExecutiveSignal strings match it. There is exactly one early thesis marker and a following plain question. Six H2s meet the count guidance and use claim headings with terminal periods. The November 2025 origin survives; SkillMeat has a first-use Term and human introduction. Two mechanism H2 movements carry the four failure modes and proposed intervention. The running FastAPI example now opens, recurs, and closes with a proposed inheritance obligation, not a claimed successful repair. Boundaries, status, receipts rail, WhereThisSits, exact Sources heading, and the E2 body handoff are present. E1's prior question is the arc-entry motivation, not an invented prior essay. Remaining anatomy exceptions are R07-10.
+
+All three original Figure blocks are byte-identical to the base; heroImage is unchanged. No ThreadScene or RevisionNote was added. The ten original external footnote definitions are byte-identical, including their numbers, dates, titles, and URLs. Glossary data has no net change. All used Term ids resolve, footnote references pair, imports/components pass, and no body identifiers or U+2014 characters were detected. The E2 target, governed series, workflow-showcase route, and `stage-1` data exist locally; the essay introduces no fragment-anchor links. No broken internal target was found by source inspection. Astro rendering/build is reserved for the lead, so these are source checks, not rendered verification.
+
+The stale-claims sidecar includes all eight gap-matrix candidates, each with a recommendation, plus the absence/gates/memory/correctness decisions under the required heading. Its coverage passes; its claims about unchanged text and neutral status rows require correction under R02/R04. Existing Google/PR-size, Rewire, slopsquatting, IBM, inventory, and token-burn support gaps remain disclosed rather than silently repaired. These disclosures do not establish the underlying claims.
+
+The five thread beats are grounded in the supplied incident or a proposed future obligation. They explicitly withhold layer order, independent reproduction, and a successful inherited-state outcome. No new session chronology or remediation result was invented. Reference retention and the final quoted anchor need R01/R11.
+
+## Verification
+
+Both required commands ran to completion in the foreground with exit 0:
+
+```text
+node scripts/check-essay.mjs src/content/posts/governed-agentic-sdlc-01-productivity-paradox.mdx
+PASS src/content/posts/governed-agentic-sdlc-01-productivity-paradox.mdx  (0 errors, 0 warnings)
+```
+
+`node scripts/check-prose.mjs` reported OK, scanning eight files with zero em dashes. Structural green does not settle the editorial findings or Nick's premise decisions. No Astro build, browser capture, commit, push, essay edit, or glossary edit was performed. The inbound inbox check returned exit 3 (nothing waiting).
+
+```json
+{"assumptions":[]}
+```
