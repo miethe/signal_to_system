@@ -48,17 +48,21 @@ import '../../styles/agentic-operations-flow.css';
 
 ## A discovery dies when the session closes.
 
-The example is simple: a session makes a correct discovery, fixes something locally, and then the discovery dies when the session closes. The next agent repeats the reasoning; the next reviewer has to reconstruct intent from the diff.
+The failure I keep designing against is small. A session makes a correct discovery, fixes something locally, and closes, and the discovery closes with it.
+
+The fix survived, but the reason for it didn't.
+
+The next agent repeats the reasoning. The next reviewer has to reconstruct intent from the diff. Nothing crashed; my system just forgot. That's a conceptual example, not a recorded incident, and I'll keep it labeled that way: it's the shape the failure keeps taking in agentic work.
 
 <PullQuote variant="thesis-marker">The workflow state is outside the chat.</PullQuote>
 
 What has to survive so the next person can continue?
 
-A single chat window gets asked to ideate, research, plan, execute, review, remember, and audit. The transcript feels productive while it is open. Then the assumptions vanish into scrollback, the next session starts from partial memory, and review has nothing stable to compare against.
+[The AI Productivity Paradox](/essays/governed-agentic-sdlc-01-productivity-paradox/) asked why faster tasks don't always add up to faster delivery, and its answer kept landing on the same gap: no mechanism for one session's fix to survive into the next. This essay is about the operating model I documented to close that gap.
 
-That isn't a workflow. It is a storage bin with a conversation attached.
+A single chat window gets asked to ideate, research, plan, execute, review, remember, and audit. The transcript feels productive while it's open. Then the assumptions vanish into scrollback, the next session starts from partial memory, and review has nothing stable to compare against.
 
-The better question is not "which model is best?" It is: **what is the first artifact this task needs to become legible?** Once that artifact exists, the rest of the workflow has something to inherit.
+That isn't a workflow. It's a storage bin with a conversation attached.
 
 <Figure
   src="/assets/posts/agentic-operations-flow/deck/slide-04-work-is-a-graph.jpg"
@@ -69,13 +73,19 @@ The better question is not "which model is best?" It is: **what is the first art
 
 <AgenticOperationsFlow client:visible />
 
-The interactive is a curated operating model, not live telemetry.
+The interactive is a curated operating model, not live telemetry: it walks the June model as documented, not a recording of it running.
 
-## Uncertainty chooses the first artifact.
+## The harder problem: the first artifact depends on the uncertainty.
 
-I have started thinking about AI work less as a tool choice and more as a routing problem.
+Saving the discovery is the easy half. Write it down somewhere durable and the next session can at least find it.
 
-The common pattern is to start with a preferred interface: ChatGPT, Claude, Gemini, Perplexity, Codex, NotebookLM, whatever happens to be open. That feels efficient because there is no ceremony. It also hides the most important decision: what shape should this work take before any agent starts expanding it?
+The harder problem is that one place to write things down isn't enough, because different work needs a different first artifact. A research question, a half-formed product idea, and an already-planned phase each lose something different when the session closes.
+
+The better question isn't "which model is best?" Rather, it's this: **what is the first artifact this task needs to become legible?** Once that artifact exists, the rest of the workflow has something to inherit.
+
+I've started thinking about AI work less as a tool choice and more as a routing problem.
+
+The common pattern is to start with a preferred interface: ChatGPT, Claude, Gemini, Perplexity, Codex, NotebookLM, whatever happens to be open. That feels efficient because there's no ceremony, but it also hides the most important decision: what shape should this work take before any agent starts expanding it?
 
 For me, the first pass usually comes down to five lenses:
 
@@ -89,19 +99,19 @@ For me, the first pass usually comes down to five lenses:
 
 The important move is routing to the system strongest at producing the first durable artifact, not the final deliverable. A research question may start in a search-heavy tool because the first artifact is a memo. A software idea may start as voice notes, move into a PRD, then into a local coding agent. A deck may start as a text storyboard before any image generation happens.
 
-The final output matters. But without the first artifact, every step after it is guessing.
+The final output matters, but without the first artifact, every step after it is guessing.
 
 ## Intent becomes durable state.
 
-The transcript is useful as an interaction surface. It is a terrible source of truth.
+The transcript is useful as an interaction surface, but it's a terrible source of truth.
 
-It has no native notion of ownership, dependency, review intensity, or completion evidence. It doesn't know that a feasibility question should stop before implementation. It doesn't know that a high-risk migration should trigger a hard boundary before edits. It doesn't know which facts should become reusable context and which are just scaffolding from the current run.
+It has no native notion of ownership, dependency, review intensity, or completion evidence. Nothing in the scrollback can tell the next agent that a feasibility question should stop before implementation, or that a high-risk migration should trigger a hard boundary before edits. It can't separate the facts worth reusing from the scaffolding of one run, which is exactly the line the lost discovery needed someone to draw.
 
 The <Term id="artifact-graph">**artifact graph**</Term> is the opposite: a typed set of durable objects that the workflow can resume from and reviewers can validate against. In my current system, that graph includes exploration charters, feasibility briefs, feature contracts, PRDs, implementation plans, decision blocks, progress files, validation records, run evidence, and knowledge handoffs.
 
-That can sound like process overhead until you watch the alternative happen a few times. A session makes a correct discovery, fixes something locally, and then the discovery dies when the session closes. The next agent repeats the same reasoning. The next reviewer has to reconstruct intent from diff shape. The next planning pass cannot tell what was deferred and what was deliberately rejected.
+That can sound like process overhead until you watch the alternative happen a few times. The opening session is the alternative, and it has one more cost I haven't named yet: the next planning pass can't tell what was deferred from what was deliberately rejected.
 
-Not a model failure. An operating-state failure.
+It's an operating-state failure, not a model failure.
 
 <Figure
   src="/assets/posts/agentic-operations-flow/deck/slide-05-operating-loop.jpg"
@@ -112,9 +122,9 @@ Not a model failure. An operating-state failure.
 
 ### Triage before commitment
 
-The first orchestration question is not "which files should I edit?"
+The first orchestration question isn't "which files should I edit?"
 
-It is "what kind of uncertainty is this?"
+Rather, it's "what kind of uncertainty is this?"
 
 That distinction matters because different uncertainty needs different artifacts. An ambiguous product idea needs exploration. A technical feasibility question needs a SPIKE. A known feature needs tier classification and a <Term id="feature-contract">Feature Contract</Term> or PRD. An already-planned phase needs execution from progress state, not another round of brainstorming.
 
@@ -127,7 +137,7 @@ In the storyboard behind this post, the flow is explicit:
 | Known feature needing planning | `/plan:plan-feature` | Feature Contract or PRD |
 | Already planned phase execution | `/dev:execute-phase` | Updated progress and evidence |
 
-Exploration is not a side quest. It is a gate. It lets the system reduce uncertainty before it commits to a contract, a PRD, or an execution graph.
+Exploration is not a side quest. It's a gate: it lets the system reduce uncertainty before it commits to a contract, a PRD, or an execution graph.
 
 <Figure
   src="/assets/posts/agentic-operations-flow/deck/slide-10-triage-decision.jpg"
@@ -138,11 +148,9 @@ Exploration is not a side quest. It is a gate. It lets the system reduce uncerta
 
 ### Artifacts operate the work
 
-I don't treat these artifacts as documentation in the usual sense. Documentation explains work after the fact. These artifacts operate the work while it is happening.
+I don't treat these artifacts as documentation in the usual sense. Documentation explains work after the fact; these artifacts operate the work while it's happening.
 
-An Exploration Charter frames what needs to be learned. A FeasibilityBrief captures whether a path is viable and with what confidence. A <Term id="feature-contract">Feature Contract</Term> gives a bounded autonomous sprint enough structure to execute. A PRD describes behavior and intent. An Implementation Plan turns that intent into phases, dependencies, and gates. A Progress File records the run state.
-
-The important part isn't the names. The important part is that each artifact has a job:
+A FeasibilityBrief captures whether a path is viable and with what confidence. A Feature Contract gives a bounded autonomous sprint enough structure to execute. A Progress File records the run state. The names matter less than the jobs, though, and each artifact has one:
 
 | Artifact | Job |
 | --- | --- |
@@ -153,15 +161,17 @@ The important part isn't the names. The important part is that each artifact has
 | Implementation Plan | Sequence phases, tasks, dependencies, and verification. |
 | Progress File | Store current execution state and evidence. |
 
-This is where AI workflows start to compound. The next session does not need to infer what the previous one discovered. The reviewer does not need to guess which acceptance criteria mattered. The orchestrator does not need to hold every dependency in chat context.
+Put the lost discovery back into that table and the failure gets specific. Its run state never reached a Progress File, so the next session couldn't see it, and its reasoning never reached a plan or PRD, so the reviewer had only the diff.
 
-The workflow state is outside the chat. That is the whole point.
+This is where AI workflows start to compound. The next session doesn't need to infer what the previous one discovered. The reviewer doesn't need to guess which acceptance criteria mattered, and the orchestrator doesn't need to hold every dependency in chat context. That's the design intent, not a measured gain.
+
+The workflow state is outside the chat. That's the whole point.
 
 ## Risk determines the graph and its review.
 
-Autonomy is not binary. It is progressive.
+A typo fix, a UI polish pass, an API contract migration, a permission boundary, and a production database change don't deserve the same autonomy.
 
-Small, clear work should not require a 20-page plan. Risky work should not get the same autonomy as a copy edit. The operating model needs to move fast where the blast radius is low and slow down where uncertainty, file movement, data risk, or core-path changes make mistakes expensive.
+Autonomy isn't binary; it's progressive. Small, clear work shouldn't require a 20-page plan, and risky work shouldn't get the same autonomy as a copy edit. The operating model needs to move fast where the blast radius is low and slow down where uncertainty, file movement, data risk, or core-path changes make mistakes expensive.
 
 The tiering model I use is intentionally simple:
 
@@ -172,7 +182,11 @@ The tiering model I use is intentionally simple:
 | Tier 2 | Coordinated work | PRD plus Implementation Plan | Per-phase validation |
 | Tier 3 | High-risk work | SPIKE, PRD, plan, milestone gates | Higher-risk reviewer or council |
 
-This is also why I don't like "autonomous agent" as a blanket phrase. Autonomous relative to what? A typo fix, a UI polish pass, an API contract migration, a permission boundary, and a production database change do not deserve the same autonomy.
+The table is the documented mapping, not a log: it says which review each tier calls for, and this essay doesn't show a real classification or reviewer invocation.
+
+This is also why I don't like "autonomous agent" as a blanket phrase.
+
+Autonomous relative to what?
 
 <Figure
   src="/assets/posts/agentic-operations-flow/deck/slide-13-tiered-autonomy.jpg"
@@ -183,9 +197,12 @@ This is also why I don't like "autonomous agent" as a blanket phrase. Autonomous
 
 ### Execution is a graph
 
-For Tier 2 and Tier 3 work, a linear task list is not enough.
+For Tier 2 and Tier 3 work, a linear task list isn't enough.
 
-The shape I use is an <Term id="executiongraph">**ExecutionGraph**</Term>:
+The shape I use is an <Term id="executiongraph">**ExecutionGraph**</Term>, and it's deliberately boring. It gives the orchestrator a way to parallelize without pretending all work is independent. Waves serialize major dependency boundaries, and the phases inside a wave can run in parallel when it's safe. Batches keep file ownership from colliding. Tasks map to bounded agents and review expectations.
+
+<details>
+<summary>Inside my lab: the ExecutionGraph shape</summary>
 
 ```text
 ExecutionGraph
@@ -195,9 +212,11 @@ ExecutionGraph
         tasks[] assigned to agents with model/provider hints
 ```
 
-That structure is deliberately boring. It gives the orchestrator a way to parallelize without pretending all work is independent. Waves serialize major dependency boundaries. Phases can run in parallel when safe. Batches keep file ownership from colliding. Tasks map to bounded agents and review expectations.
+</details>
 
-This matters because "use more agents" is not a strategy. Parallelism without ownership rules creates cleanup work. The execution graph is how I get useful parallelism without turning the main thread into a merge-conflict coordinator.
+This matters because "use more agents" isn't a strategy. Parallelism without ownership rules creates cleanup work. The execution graph is how I get useful parallelism without turning the main thread into a merge-conflict coordinator, though this essay shows the design, not a collision test.
+
+Every task in that graph also lands on a reusable agent or skill (the validator in the tier table is one), and the graph quietly assumes each is the version it thinks it is. Keeping that assumption true across projects is a problem for the next essay.
 
 <Figure
   src="/assets/posts/agentic-operations-flow/deck/slide-17-execution-graph.jpg"
@@ -208,9 +227,11 @@ This matters because "use more agents" is not a strategy. Parallelism without ow
 
 ## Review has distinct boundaries.
 
-Review is not a vibe.
+A validator checking a Tier 1 feature and a council stopping a production migration both get called review, but they aren't the same action.
 
-The system has to know whether it is doing normal validation, higher-risk validation, adversarial review, or a hard stop before edits. Those are different actions with different permissions.
+Review isn't a vibe.
+
+The system has to know whether it's doing normal validation, higher-risk validation, adversarial review, or a hard stop before edits. Those are different actions with different permissions.
 
 In the storyboard, review intensity is a routing field:
 
@@ -220,11 +241,11 @@ In the storyboard, review intensity is a routing field:
 | `tier3` | Higher-risk validator | High-risk phase, milestone, or broad behavior change. |
 | `council` | Review council | Auth, payments, deletion, API contracts, migrations, core paths. |
 
-<Term id="mode-d">Mode D</Term> is the one worth calling out because it is easy to get wrong. <Term id="mode-d">Mode D</Term> is not "be careful." It is a brake. The workflow stops before edits when the work crosses a high-risk boundary and needs explicit signoff.
+<Term id="mode-d">Mode D</Term> is the one worth calling out because it's easy to get wrong. Mode D isn't "be careful." It's a brake: the workflow stops before edits when the work crosses a high-risk boundary and needs explicit signoff.
 
-That may feel slower. It is supposed to.
+That may feel slower. It's supposed to.
 
-For auth, payments, destructive deletion, secret rotation, production migration, and core infrastructure changes, the storyboard calls for stopping the workflow before edits. Asking an implementation agent to "be careful" is not the same control. The storyboard requirement does not establish an enforced stop.
+For auth, payments, destructive deletion, secret rotation, production migration, and core infrastructure changes, the storyboard calls for stopping the workflow before edits. Asking an implementation agent to "be careful" isn't the same control. But the storyboard requirement doesn't establish an enforced stop, either: it says where the brake belongs, not that it fires.
 
 <Figure
   src="/assets/posts/agentic-operations-flow/deck/slide-25-mode-d-boundary.jpg"
@@ -235,9 +256,9 @@ For auth, payments, destructive deletion, secret rotation, production migration,
 
 ## Evidence and cost are part of the deliverable.
 
-The work is not done when code changes.
+The lost discovery had a code change. What it didn't have was anything else.
 
-It is done when the system can explain what happened, why it happened, what passed, what failed, what remains, and what should be reusable. That's why progress and evidence are not cleanup. They are the product of the run.
+The work isn't done when code changes. It's done when the system can explain what happened, why it happened, what passed, what failed, what remains, and what should be reusable. That's why progress and evidence aren't cleanup. Rather, they're the product of the run.
 
 For my workflows, the evidence stack looks like this:
 
@@ -249,7 +270,7 @@ For my workflows, the evidence stack looks like this:
 | Human capsule | Readable summary for stakeholders and future operators. |
 | Knowledge surface | Decisions, reusable patterns, deferred items, source links. |
 
-That is where adjacent systems such as <Term id="ccdash">CCDash</Term>, <Term id="meatywiki">MeatyWiki</Term>, <Term id="intenttree">IntentTree</Term>, HTML Capsules, and <Term id="skillmeat">SkillMeat</Term> become interesting. Not because every post needs to explain each one. Because they are surfaces for the same operating-state problem: how do you make agent work inspectable, reusable, and recoverable after the session ends?
+That's where adjacent systems become interesting: <Term id="ccdash">CCDash</Term>, a dashboard for inspecting agent sessions and workflow outcomes; <Term id="meatywiki">MeatyWiki</Term>, a durable knowledge store built on a markdown vault; <Term id="intenttree">IntentTree</Term>, the task graph that tracks intents, dependencies, and completion state; HTML Capsules, readable summaries for stakeholders; and <Term id="skillmeat">SkillMeat</Term>, my registry for reusable agent capabilities. Not because every post needs to explain each one, but because they're surfaces for the same operating-state problem: how do you make agent work inspectable, reusable, and recoverable after the session ends? I'm not claiming they cover that stack evenly, and this essay doesn't measure which layers actually get written.
 
 <Figure
   src="/assets/posts/agentic-operations-flow/evidence-stack.jpg"
@@ -260,7 +281,7 @@ That is where adjacent systems such as <Term id="ccdash">CCDash</Term>, <Term id
 
 ### Tool choice follows the artifact
 
-Tool choice still matters. It just comes later than most people think.
+Tool choice still matters; it just comes later than most people think.
 
 The practical rule is to choose the tool that best produces the first artifact:
 
@@ -271,9 +292,9 @@ The practical rule is to choose the tool that best produces the first artifact:
 | Presentations | Text storyboard | Lock narrative before generating visual scaffolds. |
 | Cost governance | Routing decision | Start with low marginal cost, escalate only when value is explicit. |
 
-Specific tools change. The roles are more durable.
+Specific tools change, but the roles are more durable.
 
-That's why I try to avoid tool-first language even when I am talking about tools I use constantly. The point isn't that a particular product is always the answer. The point is that research, planning, execution, review, and retention are different jobs. Collapsing them into one chat window makes every tool look worse than it is.
+That's why I try to avoid tool-first language even when I'm talking about tools I use constantly. The point isn't that a particular product is always the answer. Rather, it's that research, planning, execution, review, and retention are different jobs, and collapsing them into one chat window makes every tool look worse than it is.
 
 ### Cost is a gate too
 
@@ -281,17 +302,15 @@ Metered automation is not maturity by itself.
 
 A swarm is justified when the extra rigor, repeatability, or parallel execution changes the outcome. It isn't justified because the task feels more serious when more agents are involved. If a subscription UI can produce the first artifact at the required fidelity, I use that. If exact parameters, repeatability, visual control, or multi-agent analysis actually matter, then I escalate.
 
-This is one of the reasons artifact-first routing helps. It forces the cost question into the open. What are we buying with the escalation? Faster exploration? Better verification? Reusable output? Stronger visual fidelity? If the answer is vague, the workflow is probably using cost to avoid making a routing decision.
+This is one of the reasons artifact-first routing helps: it forces the cost question into the open. What are we buying with the escalation? Faster exploration? Better verification? Reusable output? Stronger visual fidelity? If the answer is vague, the workflow is probably using cost to avoid making a routing decision.
 
 ## A graph can compound only what it retains.
 
-A transcript decays. A graph compounds.
+Run the opening session through the graph one more time. It would have kept the discovery, the intent behind the fix, and the evidence that it passed, but keeping them isn't the same as being right about them.
 
-That is the simplest version of the argument. A transcript can be useful during the moment of work, but it is weak operating state. It doesn't naturally preserve decisions, dependencies, artifacts, review intensity, evidence, or reusable knowledge.
+A transcript decays; a graph compounds. An artifact graph lets human intent become reviewable, agent execution become resumable, and evidence become part of the deliverable rather than a screenshot pasted into a status update. The operating system isn't the model stack. Rather, it's the artifact path: intake, route, draft, execute, review, persist. Once that path exists, better models help; without it, better models mostly produce faster decay.
 
-An artifact graph does. It lets human intent become reviewable, agent execution become resumable, and evidence become part of the deliverable rather than a screenshot pasted into a status update.
-
-The operating system is not the model stack. It is the artifact path: intake, route, draft, execute, review, persist. Once that path exists, better models help. Without it, better models mostly produce faster decay.
+Each of those is a weaker assurance than it sounds, so here's where the lines sit:
 
 <BoundaryGrid
   items={[
@@ -317,7 +336,7 @@ These summaries describe the essay's existing design sources and conceptual exam
 
 <ClaimBadge kind="proposed" /> **Routing and first-artifact choices.** The storyboard's decision paths and the essay's five routing lenses describe how uncertainty is intended to select an initial durable artifact. No comparative run establishes that every downstream task otherwise guesses.
 
-<ClaimBadge kind="observed" /> **The lost-discovery example.** The essay describes a conceptual session that fixes something locally and loses the discovery when the session closes. It illustrates the state-retention problem; it is not a recorded incident or a persisted run.
+<ClaimBadge kind="observed" /> **The lost-discovery example.** The essay describes a conceptual session that fixes something locally and loses the discovery when the session closes. It illustrates the state-retention problem; it isn't a recorded incident or a persisted run.
 
 <ClaimBadge kind="proposed" /> **Risk, graph and review requirements.** The tier table, execution graph and typed review paths state design requirements. The essay supplies no classification, collision test, reviewer invocation, or refusal receipt.
 
@@ -325,9 +344,11 @@ These summaries describe the essay's existing design sources and conceptual exam
 
 <WhereThisSits slug="agentic-operations-flow" />
 
-This essay sits within <Term id="agentic-systems-engineering">Agentic Systems Engineering</Term>, a discipline named in academic and enterprise work. My <Term id="aos">Agentic OS (AOS)</Term> is the personal lab context for this documented operating model.
+I place this essay within <Term id="agentic-systems-engineering">Agentic Systems Engineering</Term>, a discipline already named in academic and enterprise work. My <Term id="aos">Agentic OS (AOS)</Term> is the personal lab context for this documented operating model.
 
-The session that found and fixed something locally needed its discovery, intent, and evidence to survive the close. That is what the artifact graph is meant to carry. The next essay asks how a graph can depend on reusable capabilities while preserving their lineage, deployment bindings, and differences across handoffs. [The Registry Wave Is Here](/essays/the-registry-wave-agentic-artifact-supply-chain/) takes up that question.
+The session that found the fix didn't need a better model or a longer transcript. It needed its discovery written where the next agent would look first, and its intent recorded before the diff had to speak for it. It needed evidence a reviewer could check without reconstructing the run, and a plan that could tell a deferral from a rejection. It also needed the right first artifact for the uncertainty it hit, which is the part no amount of saving solves. That's the bar I want the graph to meet when I'm not the one opening the next session.
+
+But a graph leans on reusable pieces: the validator, the agents, the skills each task lands on. Whether those are still what the graph thinks they are, after they've been copied, deployed, and changed for good local reasons, is where [The Registry Wave Is Here](/essays/the-registry-wave-agentic-artifact-supply-chain/) picks up.
 
 ## Sources
 
