@@ -21,8 +21,7 @@ export const GLOSSARY: Record<string, GlossaryEntry> = {
   "ccdash": {
     term: "CCDash",
     definition:
-      "A dashboard for inspecting agent sessions and workflow outcomes. In this essay it is named only as a potential surface for making work inspectable; no integration or evidence coverage is established.",
-    definedIn: "agentic-operations-flow",
+      "One of my own lab projects: a dashboard for observing agentic development sessions. Named here as an implementation in progress, not as a measured result.",
   },
   "contract-as-spec": {
     term: "contract-as-spec",
