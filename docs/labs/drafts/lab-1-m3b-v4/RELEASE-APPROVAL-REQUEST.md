@@ -1,64 +1,28 @@
-# Lab #1 M3b v4 release approval request
+# Lab #1 M3b v4 release approval record
 
-**Status:** candidate prepared; no approval has been recorded.
+**Status:** approved and exported.
 
 - Release id: `lab-m3b-v4-20261009`
 - Destination: `/labs/lab-m3b-v4/`
-- Candidate bundle: `candidate/lab-m3b-v4-20261009/`
+- Export: `src/data/labs/releases/lab-m3b-v4-20261009/`
+- Approver: `human:nick`
+- Approved at: `2026-10-09T23:37:56Z`
 
-## Candidate records
+Nick's approval was recorded verbatim as “Approve both (Recommended)” and “Pre-approve a lifecycle-only change (Recommended)”.
 
-| publicId | kind | version | sha256 digest | sourceRefs |
-|---|---|---|---|---|
-| lab-m3b-v4 | lab-investigation | 1.0.0 | sha256:5aeada9ea756d736730140601ab1ab9f0af84cfe834c0df2955550f661970992 | rf:lab:m3b-v4-preregistration@1, rf:lab:m3b-v4-deviations@1, rf:lab:m3b-v4-verdicts@1, rf:lab:m3b-v4-aggregate-score@1 |
-| lab-m3b-v4-report | lab-report | 1.0.0 | sha256:0f065751d6befb5a03f4692ec9efb7e3fdf07cff9ab53304393d33b22e4e85dd | rf:lab:m3b-v4-preregistration@1, rf:lab:m3b-v4-deviations@1, rf:lab:m3b-v4-verdicts@1, rf:lab:m3b-v4-aggregate-score@1 |
+## Candidate-to-approved digest proof
+
+The approval step checked each candidate digest against its record, re-minted the record with `lifecycle: approved`, recomputed its digest, and mechanically diffed semantic fields. Both records changed only at `/lifecycle`.
+
+| publicId | approved candidate digest | approved record digest | changed paths |
+|---|---|---|---|
+| lab-m3b-v4 | sha256:5aeada9ea756d736730140601ab1ab9f0af84cfe834c0df2955550f661970992 | sha256:345d10bb3a2a2e43c2d0b72715e213c4dba02c42a4d4c95d3629e4b7cb928778 | `/lifecycle` |
+| lab-m3b-v4-report | sha256:0f065751d6befb5a03f4692ec9efb7e3fdf07cff9ab53304393d33b22e4e85dd | sha256:70f8aaaed5cf9f2c11fd19d35819f5a35110dbad13df7e2a38b8701ddc763d96 | `/lifecycle` |
+
+The private release sidecar keeps both digests, approver, timestamp, quotes, and the field-diff proof. The exported gate receipts bind the approved record digests.
 
 ## Projection gate result (verbatim)
 
 ```json
-{"publishable":[],"errors":["not-approved:lab-m3b-v4","unapproved:lab-m3b-v4","not-approved:lab-m3b-v4-report","unapproved:lab-m3b-v4-report"]}
-```
-
-The gate reports these records as non-publishable because no approval receipts have been supplied.
-
-## Receipt JSON for Nick to complete
-
-Each object below is a receipt template bound to the exact candidate record. Replace only `approvedAt` after Nick decides; no receipt is present in the candidate bundle.
-
-```json
-{
-  "schemaVersion": "1",
-  "action": "release",
-  "publicId": "lab-m3b-v4",
-  "kind": "lab-investigation",
-  "version": "1.0.0",
-  "digest": "sha256:5aeada9ea756d736730140601ab1ab9f0af84cfe834c0df2955550f661970992",
-  "approver": "human:nick",
-  "approvedAt": "<Nick supplies an ISO 8601 timestamp>",
-  "sourceRefs": [
-    "rf:lab:m3b-v4-preregistration@1",
-    "rf:lab:m3b-v4-deviations@1",
-    "rf:lab:m3b-v4-verdicts@1",
-    "rf:lab:m3b-v4-aggregate-score@1"
-  ]
-}
-```
-
-```json
-{
-  "schemaVersion": "1",
-  "action": "release",
-  "publicId": "lab-m3b-v4-report",
-  "kind": "lab-report",
-  "version": "1.0.0",
-  "digest": "sha256:0f065751d6befb5a03f4692ec9efb7e3fdf07cff9ab53304393d33b22e4e85dd",
-  "approver": "human:nick",
-  "approvedAt": "<Nick supplies an ISO 8601 timestamp>",
-  "sourceRefs": [
-    "rf:lab:m3b-v4-preregistration@1",
-    "rf:lab:m3b-v4-deviations@1",
-    "rf:lab:m3b-v4-verdicts@1",
-    "rf:lab:m3b-v4-aggregate-score@1"
-  ]
-}
+{"publishable":[{"publicId":"lab-m3b-v4-report","kind":"lab-report","version":"1.0.0","digest":"sha256:70f8aaaed5cf9f2c11fd19d35819f5a35110dbad13df7e2a38b8701ddc763d96","lifecycle":"approved","sourceRefs":["rf:lab:m3b-v4-preregistration@1","rf:lab:m3b-v4-deviations@1","rf:lab:m3b-v4-verdicts@1","rf:lab:m3b-v4-aggregate-score@1"],"dependencies":["lab-m3b-v4"],"destinations":[],"summary":"H1, H2 and H3 are inconclusive; no layering effect is established."},{"publicId":"lab-m3b-v4","kind":"lab-investigation","version":"1.0.0","digest":"sha256:345d10bb3a2a2e43c2d0b72715e213c4dba02c42a4d4c95d3629e4b7cb928778","lifecycle":"approved","sourceRefs":["rf:lab:m3b-v4-preregistration@1","rf:lab:m3b-v4-deviations@1","rf:lab:m3b-v4-verdicts@1","rf:lab:m3b-v4-aggregate-score@1"],"dependencies":[],"destinations":[],"summary":"Preregistered M3b v4 investigation; public aggregate outputs only."}],"errors":[]}
 ```
