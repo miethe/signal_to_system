@@ -24,10 +24,11 @@ test('fixture payloads parse and contain no private identifiers', () => {
 
 test('fixture catalog preserves Labs, tombstone, and rejected release', async () => {
   const catalog = await loadLabCatalog({ includeFixtures: true });
-  assert.deepEqual(catalog.labs.map((lab) => lab.investigation.publicId), ['synthetic-queue-latency', 'synthetic-annotation-guidelines']);
+  assert.deepEqual(catalog.labs.filter((lab) => lab.synthetic).map((lab) => lab.investigation.publicId), ['synthetic-queue-latency', 'synthetic-annotation-guidelines']);
+  assert.ok(catalog.labs.some((lab) => lab.investigation.publicId === 'lab-m3b-v4' && !lab.synthetic));
   assert.deepEqual(catalog.tombstones.map((item) => item.publicId), ['synthetic-withdrawn-example']);
   assert.deepEqual(catalog.rejected.map((item) => item.releaseId), ['synthetic-gate-rejected-r1']);
-  const lab = catalog.labs[0];
+  const lab = catalog.labs.find((item) => item.investigation.publicId === 'synthetic-queue-latency');
   assert.deepEqual(lab.claims.map((item) => item.status), ['supported-within-scope', 'mixed', 'contradicted', 'unresolved', 'unreviewed']);
   assert.deepEqual(lab.claims.map((item) => item.type), ['run-claim', 'run-claim', 'source-assertion', 'inference', 'speculation']);
   assert.equal(lab.claims[3].receipts.length, 0);
