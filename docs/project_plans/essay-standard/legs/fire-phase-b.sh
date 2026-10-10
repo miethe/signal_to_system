@@ -43,9 +43,9 @@ run_stage() { # $1 essay $2 stage
   case $s in
     1-migrate) export AOS_MANIFEST_REF=$L/packs/codex/execution-manifest.yaml AOS_CONTEXT_BUNDLE_PATH=$L/packs/codex/pack.md
                args=(--lane codex --model gpt-6-luna --effort medium) ;;
-    2-voice|4-voice2) export AOS_MANIFEST_REF=$L/packs/ica/execution-manifest.yaml AOS_CONTEXT_BUNDLE_PATH=$L/packs/ica/pack.md
+    2-voice|4-voice2|6-premise) export AOS_MANIFEST_REF=$L/packs/ica/execution-manifest.yaml AOS_CONTEXT_BUNDLE_PATH=$L/packs/ica/pack.md
                args=(--lane ica --model 'claude-opus-5-5[1m]' --effort medium --ica-authorized-repo "$wt" --ica-authorized-path "$L/packs/ica/pack.md") ;;
-    3-review|5-review2) export AOS_MANIFEST_REF=$L/packs/codex/execution-manifest.yaml AOS_CONTEXT_BUNDLE_PATH=$L/packs/codex/pack.md
+    3-review|5-review2|7-premisecheck) export AOS_MANIFEST_REF=$L/packs/codex/execution-manifest.yaml AOS_CONTEXT_BUNDLE_PATH=$L/packs/codex/pack.md
                args=(--lane codex --model gpt-6.1-sol --effort medium) ;;
   esac
   "$LEG" "${args[@]}" --task-class write --node "$(node_of $e)" --cwd "$wt" \
@@ -65,16 +65,15 @@ chain() { # $1 essay
 }
 
 log "PHASE-B-START $(date -u +%FT%TZ)"
-chain e1 &
-chain e2 &
-chain e4 &
+for e in ${ESSAYS:-e1 e2 e4}; do chain "$e" & done
 wait
-for e in e1 e2 e4; do
+for e in ${ESSAYS:-e1 e2 e4}; do
   slug=$(slug_of $e); wt=$W/s2s-polish-$e
   for f in "docs/blog-work/$slug/thread-beats.md" "docs/blog-work/$slug/polish/migration-notes.md" \
            "docs/blog-work/$slug/polish/voice-notes.md" "docs/blog-work/$slug/polish/stale-claims.md" \
            "docs/blog-work/$slug/polish/review.md" "docs/blog-work/$slug/polish/voice2-notes.md" \
-           "docs/blog-work/$slug/polish/review2.md"; do
+           "docs/blog-work/$slug/polish/review2.md" "docs/blog-work/$slug/polish/premise-notes.md" \
+           "docs/blog-work/$slug/polish/premise-check.md"; do
     if [ -f "$wt/$f" ]; then log "$e $f bytes=$(wc -c < "$wt/$f" | tr -d ' ')"; else log "$e $f bytes=MISSING"; fi
   done
   log "$e essay diffstat vs 45e7274: $(git -C "$wt" diff --shortstat 45e7274 -- "src/content/posts/$slug.mdx")"
