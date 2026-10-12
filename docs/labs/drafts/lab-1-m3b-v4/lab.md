@@ -2,9 +2,9 @@
 
 <aside aria-label="Bounded conclusion">
 
-**Bounded conclusion.** H1, H2 and H3 are all **INCONCLUSIVE** at panel level. Sonnet reached the preregistered 12-of-48 refusal stop; its incomplete lane prevents the planned panel conclusions. There was no rerun. The completed lanes show no descriptive recovery gain, but this run establishes neither benefit nor harm from layering.
+**Bounded conclusion.** H1, H2 and H3 are all **INCONCLUSIVE** at panel level. Sonnet reached the preregistered refusal stop; its incomplete lane prevents the planned panel conclusions. There was no rerun. The completed lanes show no descriptive recovery gain, but this run establishes neither benefit nor harm from layering. [VERDICTS](https://osf.io/53ymt)
 
-**History.** This was the fourth protocol on the same design and materials. Its source-ID ordering rule changed after ordering failures closed the preceding readiness screen. That choice was outcome-informed; preregistration does not erase it.
+**History.** This continued the same design and materials. Its source-ID ordering rule changed after ordering failures closed the preceding readiness screen. That choice was outcome-informed; preregistration does not erase it. [Registration](https://osf.io/pw95u)
 
 **Uncertainty.** The incomplete panel cannot settle recovery, authority discrimination or confidence calibration. The cause of refusal is unresolved.
 
@@ -26,9 +26,9 @@ There is an earlier judgment to keep visible, too. The v4 validator stopped reje
 
 The public verdict document gives a different completeness reason for each hypothesis. H1 is inconclusive because a scheduled lane is incomplete. H2 is inconclusive because Sonnet missed the required paired-observation floors, leaving full-panel point estimates undefined; the conservative missing-arm bounds include zero. H3 is inconclusive because Sonnet supplied only 36 valid observations from 384 scheduled primary T2/T3 observations, about 9.4 percent, below the 50 percent coverage floor. Those are task observations, not counts of sent calls. [MAIN-VERDICTS](https://osf.io/53ymt).
 
-The stop itself is documented in V4-DEV-0003. Explicit provider refusals reached 12 within the first 48 scheduled primary cells. At stopping, Sonnet had sent 32 cells, with 20 valid and 12 refusals; 184 cells remained unsent. The disposition accepted the stop as preregistered, with no rerun, replacement or schedule change.
+The stop itself is documented in V4-DEV-0003. Explicit provider refusals triggered the preregistered stopping rule. Collection ended with scheduled work incomplete; the disposition accepted the stop, with no rerun, replacement or schedule change. [VERDICTS](https://osf.io/53ymt) [DEVIATIONS](https://osf.io/65zb8)
 
-The refusal split needs an open correction. V4-DEV-0003 originally reported 6 layered / 6 copies. **That was a transcription error. The corrected split is 7 layered / 5 copies.** V4-DEV-0005 supersedes that field. The posting receipt confirms the correction reached the public deviations file, despite the local correction entry retaining a pending-posting field. The total, stop decision and scored quantities did not change. [DEVIATIONS](https://osf.io/65zb8).
+The refusal split is **7 layered / 5 copies**. V4-DEV-0003 originally reported 6 layered / 6 copies, a transcription error superseded by V4-DEV-0005. The posting receipt confirms the correction reached the public deviations file, despite the local correction entry retaining a pending-posting field. The stop decision and scored quantities did not change. [DEVIATIONS](https://osf.io/65zb8).
 
 The completed lanes provide narrower descriptive context:
 
@@ -46,7 +46,7 @@ Confidence also needs a careful boundary. The public score reports a panel Brier
 
 This was a preregistered computational experiment with a fixed convenience panel: Claude Haiku and Sonnet through Amazon Bedrock, Gemini through Google, and GPT Luna through the OpenAI API. The frozen configurations differed in output mode and budget, which limits comparisons between models. Calls were fresh and tool-less, and actions were simulated. The experiment did not grant authority to act on a real project.
 
-The committed schedule comprised 768 primary calls and 96 decoy-only control calls, for 864 scheduled calls overall. Each lane had 216 scheduled cells. Primary observations supported the scientific comparisons; decoy-only controls did not enter the primary hypothesis estimates. Multiple seeds represented isomorphic presentations within a world, not independent worlds. [PREREG-v4, design and schedule](https://osf.io/pw95u).
+The registered schedule separated primary observations from decoy-only controls. Only primary observations entered the hypothesis estimates. Seeded presentations represented isomorphic variants, not independent worlds. [PREREG-v4, design and schedule](https://osf.io/pw95u).
 
 Recovery, R, measured substantive exact-claim correctness at T2/T3. Source-set and uncertainty accuracy were separate secondary measurements; confidence did not enter R. A structurally valid response could still be semantically wrong. Operational scoring retained failed and unsent scheduled opportunities with R=0; conditional recovery used complete strict-valid design pairs. This keeps availability and content failure in the operational denominator without pretending to know an unobserved answer.
 
@@ -78,7 +78,7 @@ The panel is fixed and small, with configuration and budget confounding. World a
 
 The refusal record establishes that the stop fired. It does not explain why Sonnet refused or show that the model lacks the underlying capability. Likewise, the aggregate confidence comparison does not identify a cause of poor calibration.
 
-All four held-out worlds remain held out. The public release-timing extension superseded the earlier promise that deferral would end at v4 closure, retaining the materials for a possible v5 addendum. Closure released none of them. This report discloses no world content, stimuli, keys or expected answers.
+All held-out worlds remain held out. The public release-timing extension superseded the earlier promise that deferral would end at v4 closure, retaining the materials for a possible later addendum. Closure released none of them. This report discloses no world content, stimuli, keys or expected answers.
 
 ## What this licenses / does not license
 
@@ -86,6 +86,6 @@ This licenses a bounded report of an unsuccessful confirmatory comparison, the d
 
 It does not license a claim that layering works, fails or is equivalent. It does not license a model ranking, a general account of refusal behavior, or a lane-specific calibration claim absent from the public package. Preregistration makes the interpretation accountable to declared rules; it does not make an incomplete panel conclusive.
 
-Next: the public record leaves room for a possible v5 addendum. PREREG-v4 section 8.6 says a new protocol would have to disclose a fifth attempt at protocol design. Any refusal-as-outcome proposal belongs to that next design discussion, not to the findings here; no v5 preregistration or posting is established by these sources.
+Next: the public record leaves room for a possible later addendum. PREREG-v4 section 8.6 says a new protocol would have to disclose its place in this design's history. Any refusal-as-outcome proposal belongs to that next design discussion, not to the findings here; no later preregistration or posting is established by these sources.
 
 An honest negative report earns its place by preserving the boundary between what happened and what can be concluded. Here, that boundary is the result worth keeping.

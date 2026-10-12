@@ -179,6 +179,12 @@ export const GLOSSARY: Record<string, GlossaryEntry> = {
       "An earlier prompt-management experiment that preceded SkillMeat: a first attempt at giving reusable prompts a durable home instead of leaving them in one-off chat transcripts.",
     definedIn: "the-registry-wave-agentic-artifact-supply-chain",
   },
+  "mode-d": {
+    term: "Mode D",
+    definition:
+      "A storyboard-defined high-risk boundary that stops work before edits and calls for explicit signoff. The documented requirement does not establish runtime enforcement.",
+    definedIn: "agentic-operations-flow",
+  },
   "intenttree": {
     term: "IntentTree",
     definition:

@@ -5,9 +5,8 @@ All source paths below are relative to `_sources/`. Repeated claims share a row.
 | Numeric claim in lab.md | Source file | Field or section |
 |---|---|---|
 | H1, H2 and H3 all INCONCLUSIVE | `main__osf-results__SCORE.json` | `confirmatory.{H1,H2,H3}.verdict`; corroborated by `main__osf-results__VERDICTS.md`, Confirmatory outcomes |
-| Fourth protocol on the same design and materials | `PREREG-v4.md` | Section 0, History and disclosures, opening paragraph |
-| Sonnet refusal stop: 12 within first 48 scheduled primary cells; no rerun, replacement or schedule change | `DEVIATIONS.md` | V4-DEV-0003, `protocol_ref`, `description`, `disposition` |
-| Sonnet: 32 sent, 20 valid, 12 refusals, 184 unsent | `DEVIATIONS.md` | V4-DEV-0003, `description`; V4-DEV-0005, `description` confirms totals unchanged |
+| Continuation of the same design and materials | `PREREG-v4.md` | Section 0, History and disclosures, opening paragraph |
+| Sonnet refusal stop; no rerun, replacement or schedule change | `DEVIATIONS.md` | V4-DEV-0003, `protocol_ref`, `description`, `disposition`; public verdicts summarize the panel outcome |
 | Incorrect earlier split: 6 layered / 6 copies; correct split: 7 layered / 5 copies | `DEVIATIONS.md` | V4-DEV-0003, `description`, superseded by V4-DEV-0005, `description` and `disposition` |
 | Correction was posted | `main__OSF-RECEIPT-2026-09-30.md` | Addendum: V4-DEV-0005 correction; confirms posted corrected split despite `DEVIATIONS.md` V4-DEV-0005 `public_osf_ref` still pending |
 | Sonnet: 36 valid of 384 scheduled primary T2/T3 observations; about 9.4 percent | `main__osf-results__SCORE.json` | `all_lane_H3_coverage.claude-sonnet-5.{valid,scheduled,rate}`; rate 0.09375 rounded to 9.4 percent; corroborated by VERDICTS Confirmatory outcomes |
@@ -18,9 +17,9 @@ All source paths below are relative to `_sources/`. Repeated claims share a row.
 | No descriptive recovery gain in completed lanes | `main__osf-results__SCORE.json` | Same three lane delta fields: each is nonpositive; descriptive only |
 | H2 missing-arm bounds include zero | `main__osf-results__SCORE.json` | `confirmatory.H2.{A_missing_arm_bounds,B_missing_arm_bounds}.{lower,upper}`; corroborated by VERDICTS Confirmatory outcomes |
 | Panel Brier approximately 0.3225, constant baseline approximately 0.2421; panel worse | `main__osf-results__SCORE.json` | `confirmatory.H3.panel_brier` = 0.3224928075396825; `constant_baseline_brier` = 0.24212301587301588; rounded to four decimal places; direct comparison |
-| Schedule: 768 primary + 96 decoy-only = 864 calls; 216 per lane | `PREREG-v4.md` | Sections 3 and 7, schedule totals; DEVIATIONS V4-DEV-0003 confirms lane schedule |
+| Registered separation of primary observations and decoy-only controls | `PREREG-v4.md` | Sections 3 and 7, schedule and analysis rules |
 | Failed and unsent opportunities assigned operational R=0 | `PREREG-v4.md` | Section 4, Missingness, inference and analysis; DEVIATIONS V4-DEV-0003 `analysis_impact` |
-| Four held-out worlds remain held out; closure released none | `DEVIATIONS.md` | Release-timing extension record, `decision`, `supersedes`, `exposure_state`; receipt Notes corroborates extension |
-| A new protocol would disclose a fifth attempt at protocol design | `PREREG-v4.md` | Section 8.6, FINAL-ATTEMPT paragraph; conditional, not a claim that v5 exists |
+| Held-out materials remain held out; closure released none | `DEVIATIONS.md` | Release-timing extension record, `decision`, `supersedes`, `exposure_state`; receipt Notes corroborates extension |
+| A later protocol must disclose its place in design history | `PREREG-v4.md` | Section 8.6, FINAL-ATTEMPT paragraph; conditional, not a claim that a later protocol exists |
 
 Source boundary: the supplied public SCORE has only panel Brier and baseline values. Neither it nor VERDICTS supplies per-lane Brier comparisons. The requested assertion that every completed lane is worse than its constant baseline is therefore unverified and omitted. The refusal-as-outcome direction is mentioned only as a conditional next-design proposal, with no v5 design detail asserted as a finding or posted fact.

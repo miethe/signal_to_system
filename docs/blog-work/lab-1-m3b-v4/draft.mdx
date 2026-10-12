@@ -1,0 +1,51 @@
+---
+title: "Our Automated Research Lab's First Real Result Was Nothing, and That Is the Point"
+excerpt: "A preregistered agent study stopped before its panel could answer the question, and the right response was to publish the inconclusive result."
+date: 2026-10-09
+readTime: "7 min"
+contentType: essay
+category: "AI Agents"
+tags: ["evaluation", "human-ai-workflow", "governance", "artifact-first"]
+status: draft
+---
+
+The first real result from an automated research lab can be a stop, not an answer.
+
+In M3b v4, a preregistered run reached its refusal stopping rule before the planned panel was complete. The completed lanes could still be described, but they could not stand in for the missing lane. The panel verdicts were **INCONCLUSIVE** across all three hypotheses. [^verdicts] [^deviations]
+
+That is a frustrating result if the goal is a clean comparison. It is a useful result if the goal is to know what the process permits us to say.
+
+## A result can be real without being decisive
+
+The study asked whether layered handoffs preserve recoverable project identity and state as context erodes, compared with copies. It also asked about unauthorized simulated action and confidence calibration. Those questions need different observations. A run that cannot complete its registered panel cannot answer them by quietly dropping the lane that stopped.
+
+The preregistered stop fired after explicit refusals reached the rule's threshold. There was no rerun or replacement. The report keeps that stop visible, along with the correction to the refusal breakdown. The earlier split was wrong, and the public deviations record carries the correction. [^deviations]
+
+This is what makes a registered null different from a statistical null result. The word “null” here means that this report has no confirmatory support for the proposed comparison. It does not establish equivalence, and it does not show that layering helps or hurts. The panel verdict is inconclusive because the registered completeness conditions were not met. [^verdicts]
+
+## The completed lanes stay in their lane
+
+The completed-lane recovery summaries show no descriptive gain for layering: two are zero and one is slightly below zero. Those summaries are useful context, but they are not a substitute panel. They cannot support a general decision for layered handoffs or copies. [^score]
+
+The aggregate confidence comparison points in the same direction of restraint. The panel Brier score is about 0.3225 against a constant-confidence baseline of about 0.2421, where lower is better. That is a descriptive panel comparison alongside an **INCONCLUSIVE** H3 verdict. The public score does not give the per-lane Brier comparisons, so it cannot support a claim that every completed lane was worse than its own baseline. [^score] [^verdicts]
+
+For a technical leader, the practical answer is plain: this run supplies no confirmatory basis for choosing one handoff design over the other. It also does not say the designs are equivalent. That distinction matters when the next decision is whether to change a workflow, not whether a chart looks tidy.
+
+## Why publish the incomplete result?
+
+The protocol and its history belong beside the result. This was a continuation of an existing design, including a disclosed validation change after the earlier readiness screen failed on ordering. Publishing the report now keeps that history attached to the evidence instead of letting a later protocol redefine what this run meant. [^registration]
+
+The held-out materials remain held out. The public report uses the aggregate package and says what it cannot reproduce: readers can inspect how the aggregates and verdicts reconcile, but the package does not permit a private scorer rerun or an independent replication. [^registration] [^score] [^verdicts]
+
+There is no clever way to turn an incomplete panel into a completed one after the fact. There is only the choice to preserve the boundary, or blur it.
+
+## What the lab learned
+
+The result does not tell us whether layered handoffs work. It tells us the run stopped under a rule written in advance, the panel could not answer its registered questions, and the remaining summaries have narrower use.
+
+That is enough to publish. A later protocol can ask a revised question and disclose its place in the design's history. It cannot make this run more conclusive than it was.
+
+[^verdicts]: [M3b v4 public verdicts](https://osf.io/53ymt).
+[^score]: [M3b v4 aggregate score](https://osf.io/kyg9w).
+[^deviations]: [M3b v4 public deviations log](https://osf.io/65zb8).
+[^registration]: [M3b v4 registration](https://osf.io/pw95u).
