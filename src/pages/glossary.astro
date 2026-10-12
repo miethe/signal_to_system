@@ -5,6 +5,10 @@ import StateNotice from '../components/primitives/StateNotice.astro';
 import { getCollection } from 'astro:content';
 import { isPublishable } from '../lib/publication.mjs';
 import { GLOSSARY } from '../data/glossary';
+
+// /glossary — index of every defined term, its definition, and (when
+// available) a link to the published post that defines it.
+
 const posts = await getCollection('posts', isPublishable);
 const postsById = new Map(posts.map((post) => [post.id, post]));
 const entries = Object.entries(GLOSSARY).map(([id, entry]) => {
@@ -13,7 +17,7 @@ const entries = Object.entries(GLOSSARY).map(([id, entry]) => {
 }).sort((a, b) => a.term.localeCompare(b.term));
 ---
 <HubLayout title="Glossary" description="Definitions for terms used across Signal to System essays." heading="Glossary" eyebrow={['Reference']} lede={`${entries.length} terms defined across Signal to System essays.`}>
-  <CollectionPanel class="s2s-span-major" title="Terms" icon="guides" count={entries.length} description="Definitions and their first published context.">
+  <CollectionPanel class="s2s-span-major" title="Terms" icon="guides" count={entries.length} description="Definitions for terms used across Signal to System essays, with their first published context.">
     {entries.length ? <dl class="glossary-list">{entries.map((entry) => <div id={entry.id}><dt>{entry.term}</dt><dd>{entry.definition}</dd>{entry.href && <a href={entry.href}>Read in “{entry.postTitle}” <span aria-hidden="true">→</span></a>}</div>)}</dl> : <StateNotice kind="empty" compact title="No terms yet" body="Defined terms will appear here as they are published." />}
   </CollectionPanel>
 </HubLayout>

@@ -87,7 +87,7 @@ export const threads: Record<string, Thread> = {
         label: "Deployment",
         kind: "historical",
         recap:
-          "A file copy is a separate object from its source. Updating the source or registering a new revision doesn't update an already-deployed copy, and a clean registration says nothing about what a given project actually has on disk.",
+          "A file copy is a separate object from its source. Updating the source or registering a new revision doesn't update an already-deployed copy, and a clean registration says nothing about what a given project actually has on disk. Every other project keeps loading an old deployed copy: same name, different instructions.",
         establishes:
           "Source revision, registry record, and deployed project copy are three separate objects; closing the gap needs a recorded deployment path, not a symlink or a manual copy.",
         doesNotEstablish:
