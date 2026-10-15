@@ -41,7 +41,7 @@ const displayTitle = title ?? LABEL[kind];
 
 <aside class:list={['callout-v2', `callout-v2--${kind}`, 'lift-hover']} role="note">
   <span class="callout-v2__icon" aria-hidden="true">
-    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       {kind === 'info' && (<><circle cx="12" cy="12" r="10" /><path d="M12 16v-4" /><path d="M12 8h.01" /></>)}
       {kind === 'warning' && (<><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z" /><path d="M12 9v4" /><path d="M12 17h.01" /></>)}
       {kind === 'leader-takeaway' && <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />}
@@ -51,7 +51,7 @@ const displayTitle = title ?? LABEL[kind];
   </span>
   <div class="callout-v2__body">
     <p class="callout-v2__title">{displayTitle}</p>
-    <div class="callout-v2__content"><slot /></div>
+    <div class="callout-v2__content"><slot /></div>>>>>>>> daf9f9b (feat(content): shared hover lift + soft shadow for boxed in-body components)
   </div>
 </aside>
 
@@ -59,15 +59,15 @@ const displayTitle = title ?? LABEL[kind];
   .callout-v2 {
     --tone: var(--s2s-status-info);
     display: flex;
-    gap: 14px;
-    margin: 28px 0;
-    padding: 16px 18px 16px 16px;
+    gap: 12px;
+    margin: 20px 0;
+    padding: 1rem;
     border: 1px solid color-mix(in srgb, var(--tone) 28%, var(--s2s-rule));
-    border-left: 3px solid var(--tone);
-    border-radius: var(--s2s-radius-card);
+    border-radius: 0.75rem;
     background: color-mix(in srgb, var(--tone) 7%, var(--s2s-surface));
     color: var(--s2s-ink-muted);
   }
+  .callout-v2--info { --tone: var(--s2s-status-info); }
   .callout-v2--warning { --tone: var(--s2s-status-warn); }
   .callout-v2--leader-takeaway { --tone: var(--s2s-accent); }
   .callout-v2--why-it-matters { --tone: var(--s2s-status-ok); }
@@ -76,13 +76,13 @@ const displayTitle = title ?? LABEL[kind];
   .callout-v2__icon { flex-shrink: 0; margin-top: 1px; color: var(--tone); }
   .callout-v2__body { min-width: 0; flex: 1; }
   .callout-v2__title {
-    margin: 0 0 6px;
+    margin: 0 0 2px;
     font: 600 var(--type-ui) / 1.4 var(--font-sans);
     letter-spacing: 0.02em;
     color: var(--tone);
   }
   .callout-v2__content {
-    font: 400 0.9688rem / 1.62 var(--font-sans);
+    font: 400 0.9375rem / 1.62 var(--font-sans);
     color: var(--s2s-ink-muted);
   }
   .callout-v2__content :global(p) { margin: 0 0 10px; color: inherit; font: inherit; }
