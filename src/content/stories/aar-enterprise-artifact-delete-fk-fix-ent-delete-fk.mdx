@@ -1,0 +1,145 @@
+---
+title: "AAR \u2014 Enterprise artifact DELETE FK fix (ent-delete-fk)"
+excerpt: A field note from the Agentic OS build loop.
+date: '2026-08-03'
+readTime: 6 min read
+status: draft
+storyType: after-action
+tags:
+- agent-ready-repos
+- human-ai-workflow
+- artifact-first
+automated: true
+whyItMatters: The work shows how agentic systems turn operational evidence into reusable
+  practice.
+leaderTakeaway: Treat after-action reports as publication-ready raw material, but
+  keep the safety gate explicit.
+sourceAar: "AAR \u2014 Enterprise artifact DELETE FK fix (ent-delete-fk)"
+---
+
+## AAR — Enterprise artifact DELETE broken by FK, no detach path
+
+## What shipped
+
+`993aead68` on `development`. `DELETE /api/v1/artifacts/{id}` returned HTTP 500 with raw psycopg2
+text for any enterprise artifact with collection-version history. Measured blast radius: **587 of
+621 enterprise artifacts (94.5%)** were undeletable. Now: mapped 409 naming the blocker, `?force=true`
+to cascade, new `DELETE /artifacts/{id}/collection-links` as the two-step remedy, bare-UUID accepted
+on DELETE, and 9 real-PostgreSQL FK regression tests.
+
+**One acceptance criterion remains open (AC8)** — the closing live deletion. See "Deploy seam" below.
+
+## Lessons
+
+### L1 — Cross-family adversarial review caught a data-loss class that same-family review could not
+
+Four Codex `gpt-5.6` passes (BLOCK → BLOCK → BLOCK(1 finding) → 4-of-5 clean). The two findings that
+justified the entire apparatus were invisible to self-review and to the implementing agent:
+
+1. `?force=true` would have **silently destroyed bundle commit history** — clearing
+   `bundle_commit_members` by `version_id` deletes another entity's historical snapshot, not the
+   artifact's own metadata.
+2. The 409 body could **disclose a foreign tenant's `bundle_commit_id`**, because blocker detection is
+   (correctly) tenant-blind while the response was not filtered.
+
+**Apply:** for any deletion/cascade path, budget an independent cross-family review pass. Treat
+"my tests pass" as orthogonal to "this can't destroy someone else's data."
+
+### L2 — Two of the review findings were caused by my own contract wording, not implementation error
+
+- I wrote "clear the blocking rows" for three tables without distinguishing *per-artifact join rows*
+  (safe to clear) from *another entity's historical record* (never safe). That produced the
+  bundle-history bug.
+- I wrote "wrap the commit so IntegrityError triggers rollback." Exactly `commit()` got wrapped — so
+  the force-clear DELETEs preceding it were unguarded, which is the exact failure mode the guard
+  existed to prevent.
+
+**Apply:** in a contract, name the *invariant* ("no row belonging to another entity may be deleted";
+"no IntegrityError may escape without rollback"), not the *mechanism* ("clear these tables"; "wrap the
+commit"). A delegate implements the mechanism literally and correctly.
+
+### L3 — A filtered schema query is not an existence proof
+
+I queried `pg_constraint` with `WHERE tgt.relname IN ('artifacts','artifact_versions')`, saw no FK on
+`artifact_collection_versions.artifact_id`, and asserted to a delegate **as fact** that the FK "does
+not exist in the live database." It exists and targets `enterprise_artifacts` — structurally invisible
+to my filter. I had the delegate write my wrong claim into a code comment before it was caught.
+
+The delegate caught it by hitting a real `ForeignKeyViolation` building a fixture, and **pushed back
+with the driver error rather than complying**. That pushback was the highest-value moment of the run.
+
+**Apply:** before claiming a constraint/index/column does not exist, filter on the child side only or
+not at all. State scope ("no FK *targeting X*" ≠ "no FK *on column Y*"). When a delegate contradicts
+you with live driver output, the driver wins.
+
+### L4 — Mock-only tests can pass with the fix deleted outright; prove it by mutation
+
+Every pre-existing enterprise-delete test drove a `MagicMock` session, so none exercised a real
+constraint. Two mutations against real Postgres proved the new suite is genuinely load-bearing:
+neutralising the guard fails the blocked-path tests, and removing the force cleanup **reproduces the
+original `ForeignKeyViolation` verbatim**.
+
+**Apply:** when a bug is a database-constraint violation, a mocked test proves nothing. Mutation-test
+the new suite; if removing the fix doesn't fail a test, the test is decoration.
+
+### L5 — Safe empirical proof on production: the rolled-back transaction
+
+The force-path delete order was validated against the **live** instance inside `BEGIN` … `ROLLBACK`.
+The previously-500ing statement succeeded; pre-state was restored exactly; nothing persisted.
+
+**Apply:** a write-transaction-then-rollback is a legitimate, non-destructive way to prove DDL/FK
+ordering against real production schema when a scratch DB can't reproduce the exact shape.
+
+### L6 — Verification hygiene failures I hit (all self-caught except L3)
+
+- Misread `git status` output as a diffstat and concluded files were committed when they weren't.
+- Regenerated `openapi.json` against the **main checkout** because `python /tmp/script.py` puts `/tmp`
+  on `sys.path`, so `import skillmeat` resolved via the editable install — produced a false
+  "route missing" result I nearly logged as a defect. `python -m` (cwd first) or `PYTHONPATH=$PWD`.
+- My mutation-testing edit **raced a delegate's file read**; it saw a stray `MUTATED` line and flagged
+  it. Announce destructive local experiments to concurrent agents, or do them in a separate worktree.
+- Ran flake8 over a whole directory and hit 10 pre-existing F821s in an untouched file; had to
+  baseline-diff to attribute them. Scope linters to changed files.
+- A failing integration run left DB rows behind and poisoned the next run, so correct code appeared
+  broken. Fixed by hermetic `try/finally` fixtures — a failing test must not poison its successor.
+
+### L7 — Codex `exec` needs stdin closed and an anti-verbosity contract
+
+Three attempts to get one usable verdict: attempt 1 hung on `Reading additional input from stdin...`
+(backgrounded without `< /dev/null`); attempt 2 was killed after 12k lines of file-dumping without
+ever reaching a verdict. Attempt 3 worked only with explicit output rules: no file echoing, ≤3 files,
+≤400 words, exactly one `VERDICT:` line.
+
+**Apply:** always `< /dev/null`; always cap files/words and demand a single terminal verdict token;
+always take the **last** verdict (the prompt's own rubric lines match a naive grep).
+
+### L8 — Generated-file merge conflicts are resolved by regenerating, not merging
+
+A concurrent session held an uncommitted `openapi.json`, blocking `git merge --squash`. Rather than
+stash their work, I diffed it: their copy was **stale** — missing the `orchestration` descriptions from
+the commit they had just landed. Regenerating from the merged tree produced a spec containing both
+their change and mine.
+
+**Apply:** never hand-merge a generated artifact, and never stash a concurrent session's work to
+unblock yourself. Diff it first — "conflicting" often means "theirs is stale."
+
+### L9 — Deploy seam: `/redeploy` (AOS services) ≠ the SkillMeat enterprise stack
+
+AC8 was reported deployed and was not. The nuc's SkillMeat checkout sat on `development` at
+`bfa732ad1`, had never fetched `993aead68`, and its API container dated from 2026-07-31. Every
+behavioural probe confirmed old code: 500 with raw driver text, 400 on bare UUID, **405** on the new
+route. The AOS-services redeploy does not touch the SkillMeat compose stack (separate image build);
+`/deploy:demo-upgrade` is the correct path.
+
+**Apply:** never accept "deployed" as a state — probe a **behavioural** signal unique to the new code
+(a new route returning anything but 405) before closing a live-verification AC. A passing health gate
+does not mean new code.
+
+## Open items
+
+- **AC8** — `skill:d1-ac5-verify-skill` / `9d10c4a4-390f-4a70-91e7-7bf67d9ce169` still present on the
+  nuc; needs the SkillMeat stack upgraded to `993aead68`, then detach-or-`?force=true`.
+- Three secondary ITT defects deliberately unfixed (no AC): `GET /artifacts/{uuid}` null fields,
+  `/versions` count 0, `total_count: null`.
+- `.github/readme/data/features.json` `stats.apiEndpoints` is 490 vs actual 503 — pre-existing drift,
+  left alone per the router rule's 10-unit-boundary condition.
