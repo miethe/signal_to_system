@@ -1,0 +1,207 @@
+---
+title: "AAR \u2014 Primary Pattern Reader M4 execution run"
+excerpt: A field note from the Agentic OS build loop.
+date: '2026-08-02'
+readTime: 6 min read
+status: draft
+storyType: after-action
+tags:
+- agent-ready-repos
+- human-ai-workflow
+- artifact-first
+automated: true
+whyItMatters: The work shows how agentic systems turn operational evidence into reusable
+  practice.
+leaderTakeaway: Treat after-action reports as publication-ready raw material, but
+  keep the safety gate explicit.
+sourceAar: "AAR \u2014 Primary Pattern Reader M4 execution run"
+---
+
+## AAR — M4 execution (enrichment, telemetry, a11y — shipped DARK)
+
+**Scope**: milestone M4 of the Tier 3 Primary Pattern Reader plan, run in git worktree
+`.claude/worktrees/ppr-m4` (branch `worktree-ppr-m4`, base `1618ba6`). Orchestrator in-session on the
+Opus 5 [1m] spine; one Fable 5 design leg (B0); implementation legs offloaded to ICA
+(`claude-opus-5[1m]` / `claude-sonnet-5[1m]`) per the operator's cost-offload directive for this run;
+gates `[security, validator, karen-final-tree-only]` per plan frontmatter
+(`.claude/worknotes/primary-pattern-reader/m4-gate-plan-and-routing.md`).
+
+**Outcome**: **shipped DARK.** `patternReaderEnabled` stays **OFF**. Waves A–D landed
+(`f7941a7` counter parity + undo window · `f02a141` §9.5 enriched expansion + note/media sheets +
+add-counter · `f2b1626` §22 telemetry + redaction proof, §20 lazy rendering, §19 a11y · `1a607b4`
+undo window under VoiceOver · `6148d3e` CHANGELOG/docs · `f75e111` + `92dd832` G1 security fixes ·
+`87a3645` wrap-up + D10 redirect spec). The flag flip (TASK-M4.D2) is **blocked**: the on-device
+check FAILED on scroll stability, and operator directive **D10** (rail = scrollbar only; step jump
+only on explicit circle tap; supersedes D5/D6) redirects the rail interaction to a **rail-scroll-v2**
+round — spec at `docs/project_plans/design-specs/primary-pattern-reader-rail-scroll-v2.md`.
+
+---
+
+## The headline — the device check belongs at the START of a round, not the end
+
+Simulator-side structural tests certified Reader scrolling **twice** — at M3 and again at M4 — and
+hardware failed it **both times**. The M4 device pass (flag-ON build of `92dd832`, throwaway worktree,
+flip never committed) terminated early on a blocking defect: *"the text jumps around as scrolling, it
+jumps back to the top frequently or gets hung"* (D10 verbatim,
+`.claude/worknotes/primary-pattern-reader/user-directives.md` §D10). The remaining checklist items
+(counters, sheets, a11y) were **not executed** — not recorded, not assumed.
+
+Two costs, and the second is the expensive one. First, a milestone's worth of enrichment work was
+built on top of an interaction that does not hold on device. Second, the *product* answer changed at
+the device pass — D10 supersedes the D5/D6 joystick-scrub model the rail was designed around — so
+this was never a bug that a fix leg could close; it was a design premise that hardware falsified.
+
+**Change, now encoded in the v2 spec**: rail-scroll-v2 mandates a **device session at round START**,
+before implementation, not as the final gate. A structural test can prove a scroll *contract*; it
+cannot prove scrolling *feels right*, and on this surface the felt behaviour **is** the requirement.
+Evidence: `m4-gate-plan-and-routing.md` §"On-device check — 2026-08-02 — FAILED".
+
+---
+
+## What worked
+
+### 1. The same-class stop rule fired correctly at G1 round 2
+
+G1 (security lens, R6 redaction, codex `gpt-5.6-terra`) ran two rounds. Round 1 returned 3 findings,
+all accepted, all real — defect class *redaction-boundary enforcement gaps* (`reader_session_id` not
+UUID-validated; the allowlist bypassable via public `TelemetryService.record`; a DEBUG
+`ImportCorpusExporter` time-window path sweeping `reader_*` events into a shareable bundle). Round 2
+(re-pass 1 of the 2-re-pass budget) over `f75e111` found the synthesized `Codable init(from:)`
+bypassing the scrub — **the same defect class one hop further out**.
+
+The stop rule says: same class twice → close with a **design change**, not a third adversarial round.
+So `TASK-M4.G1-fix2` made the scrubbing designated initializer the *only* materialization funnel
+(custom `init(from:)` delegating into it), verified in-session by
+`TelemetryEventDecodeScrubTests` (7/7 green), and G1 closed. One documented residual: valid-UUID bytes
+as a covert channel — **REJECTED as threat-model overreach**, accepted as a residual, and the contract
+prose softened in both tiers so they cannot disagree about what is being claimed
+(`ReaderTelemetryPayloadContract.ValueKind.identifier` / `ReaderTelemetryValueKind.identifier`).
+
+Worth naming: the rule saved a review round *and* produced the better artifact. A third round would
+have found a fourth bypass; the funnel closes the class.
+
+### 2. Every ICA leg delivered — the M3 AAR's preamble fix held
+
+All implementation legs were routed to ICA and **all of them returned real work this run**, against
+M3's pattern of silent no-ops. The M3 AAR's remedy — open every ICA prompt with *"YOU ARE THE
+EXECUTOR; your final message is the deliverable"* — was applied to every leg
+(`m4-gate-plan-and-routing.md` §"Leg reliability preflight") and the failure mode did not recur. The
+companion discipline still ran: `git status --porcelain` checked on disk after every leg, a leg's own
+report never trusted.
+
+### 3. Legs reported the deviations they could not resolve, instead of inventing scope
+
+B1 hit G16's *Segmented*-tier enrichment row and found it unreachable: §9.5 detail lines gate on
+`.enrichedStepExpansion`, which M1 grants only for `tier >= .structuredPattern` **and**
+`signals.hasEnrichedStep` — and `HeuristicPatternStructurer` output satisfies neither. Lighting it up
+would have meant changing the **M1 capability matrix**, against the task's own instruction ("bind to
+the M1 capability model — do not invent a parallel one"). The leg shipped what was honest at that tier
+(the Stitch Info entry point, deliberately not expansion-gated) and escalated the rest as an operator
+decision. Same posture on C2: six real a11y gaps fixed at their own surfaces, five more **filed, not
+fixed**, each with the reason it was out of scope (cross-feature surface, or new behaviour rather than
+an a11y adaptation).
+
+---
+
+## What went wrong
+
+### 1. The full-suite green claim was pinned to the wrong commit
+
+The recorded pre-flip evidence — **3,192 tests green** — was taken *before* the two G1 fix commits
+(`f75e111`, `92dd832`). After those landed, only a **targeted** run happened (the decode-scrub suite
+plus adjacent telemetry suites, 14 + 62 tests, and `-only-testing:LNDomainTests` at 725). So for a
+stretch of this run the artifact of record said "full suite green" while the tree under review was two
+commits ahead of that log. The close-out session re-ran the full suite **at HEAD** before the
+validator gate (`/Users/miethe/.claude/jobs/5b20d934/tmp/full-suite-at-head.log`); notable in that
+re-run, `LNDomainTests` came back **725/725 with zero failures** — the two `StructuringTextWindowTests`
+B-19 environment flakes carried through the whole milestone did **not** reproduce.
+
+**Lesson**: a "full suite green" claim is not a property of a milestone, it is a property of a
+**commit**. State the SHA it ran at, or it decays silently the moment the next fix lands. A targeted
+re-run after a fix proves the fix; it does not re-prove the suite.
+
+### 2. The G1 fix leg recompressed two unrelated binary evidence files
+
+`f75e111` carries `Bin 37749 -> 37825 bytes` and `Bin 37699 -> 37807 bytes` on
+`p5-t2-action-entitled.png` / `p5-t2-upsell-unentitled.png` — **premium-server-offload** evidence
+assets with nothing to do with the telemetry redaction boundary. Reverted in the wrap-up commit
+(`87a3645`). No content was lost, but a security-fix diff carrying byte churn in another feature's
+evidence is exactly the noise that makes a reviewer's job harder, and it survived a codex re-pass
+because the lens reads the source change, not the asset bytes.
+
+**Change**: add a checklist line at fix-leg dispatch — *no binary files in a fix diff*; if
+`--stat` shows `Bin`, revert those paths before commit.
+
+### 3. `op context pack` returned a node-side path on this Mac
+
+At M4 dispatch, `op context pack` emitted `/home/miethe/...` (a **[REDACTED]** path) that does not
+exist locally, so the per-leg delegation-context bundle was skipped for the whole milestone; legs got
+path-pointer prompts instead (M3 precedent). Non-blocking here, but it is a **launchpad bug** —
+`op context pack` appears to resolve its run dir against the remote host when the op run store is
+node-backed. Logged at `implementation-notes.md` §"2026-08-01 — M4 orchestration notes"; worth a fix
+upstream rather than a third milestone of workaround.
+
+### 4. A grep exit code read as a test failure
+
+`grep -c` over a test log returned **0 matches and therefore exit status 1**, which read as a failed
+check and briefly presented a **green** suite as a failing one. Cost was minutes, not a decision, but
+it is the mirror image of the standing rule (*read the `** TEST SUCCEEDED **` verdict line, never grep
+✘ counts*): a counting grep's exit code carries no information about the suite, only about whether the
+pattern matched.
+
+---
+
+## Gate outcomes (close-out)
+
+| Gate | Lens | Route | Verdict |
+|---|---|---|---|
+| G1 | security (R6 redaction) | codex `gpt-5.6-terra`, 2 rounds | **CLOSED** — 3 findings R1 + 1 accepted R2, closed by design change (`92dd832`); 1 documented residual (UUID-format covert channel, accepted) |
+| G2 | validator | `task-completion-validator`, Fable 5, fresh context, 2 rounds | **APPROVED (round 2)** — round 1 REJECTED on one blocking docs-honesty defect: `docs/dev/reader.md` asserted the flag **ON** as current fact (drafted at D3 anticipating the flip, never reconciled after the failed device check; defect class *doc-drafted-parallel-never-reconciled*, same class as the W5 watch-guide finding). Fix `97697fb` (docs-only); delta re-pass approved. Everything else — code, tests, flag-OFF safety, record honesty — verified genuine in round 1. Fresh full suite at HEAD read first-hand: `** TEST SUCCEEDED **`, 3,213 tests / 0 failures |
+| G3 | karen final-tree + §23 checklist | `karen`, Fable 5, fresh context, 1 round | **GO** — §23 tally over 34 items: 24 VERIFIED-IN-TREE, 8 SIM-VERIFIED-ONLY, 2 DEVICE/FLAG-DEFERRED (honest), **0 MISSING/DISHONEST**. Flag-OFF safety airtight (2 production readers, routing-to-legacy test-asserted); M1→M4 composition coherent, no silent regression; G1 closure verified in source. Advisories: commit progress delta before squash; never close the phase against the unmet flag-ON criterion without an explicit deferral note; re-baseline §23.2 for the D10 model in v2 |
+
+Note: the prior session's G2 validator died with its session and left no verdict on disk, which is
+why close-out re-dispatched it fresh rather than resuming. The close-out G2 also caught what three
+green gates and the wrap-up commit missed — the reconciliation sweep at outcome-change time
+(CHANGELOG ✓, worknotes ✓, `docs/dev/reader.md` ✗) needs a doc inventory, not memory.
+
+---
+
+## Numbers
+
+| | M2 | M3 | M4 |
+|---|---|---|---|
+| Tests (full suite) | 2,912 | 3,021 | **3,213** (at close-out HEAD; 3,192 in the pre-fix log — see §What went wrong 1) |
+| Gate rounds after a green suite | 3 | 3 | 2 G1 + 2 G2 + 1 G3 |
+| Real defects found after a green suite | 9 | — | 5 (4 accepted at G1 + 1 docs-honesty at G2) |
+| Device checks run | 0 | 1 (scroll certified sim-side) | **1 — FAILED** |
+| Flag state at merge | OFF | OFF | **OFF** (3rd consecutive dark ship) |
+
+The uncomfortable line across M3→M4: **the sim can certify the contract and still be wrong about the
+product.** Two milestones of scroll work passed structural review; hardware rejected it twice.
+
+---
+
+## Follow-ups (itt nodes)
+
+To capture as IntentTree nodes at close-out (per operator: "capture any deferrals/etc as itt nodes"):
+
+1. **rail-scroll-v2 round — P0, blocks the flag flip.** D10 redirect: rail drag = plain scrollbar,
+   step jump only on explicit circle tap, never from drag/hold. Spec:
+   `docs/project_plans/design-specs/primary-pattern-reader-rail-scroll-v2.md`. Mandates a device
+   session at round START.
+2. **B1's G16 segmented-tier enrichment deviation.** §9.5 expansion is unreachable at
+   `HeuristicPatternStructurer` tier; lighting it up is an **M1 capability-model change**
+   (`tier` floor + `hasEnrichedStep` signal), left as an operator decision.
+3. **C2 filed-not-fixed a11y items.** `SourceImageViewer` has no intrinsic accessibility label
+   (worked around at the Reader call site; the source-document viewer has the same gap);
+   `ReaderMediaSheet`'s context menu is not a real copy affordance (needs clipboard behaviour — B3
+   follow-on); cross-feature banner/sheet audit (`PersistenceErrorBanner`, `AddCounterSheet` — both
+   shared with Focus Mode).
+4. **`ReaderTelemetryScrubAudit` not wired into `DiagnosticsSnapshot`** — deliberate deferral recorded
+   at `implementation-notes.md:3576`.
+5. **UUID-format residual** — documented and accepted (deliberate first-party encoding into valid-UUID
+   bytes is outside R6's threat model, whose surface is a device-local `events.jsonl` with no egress).
+   Tracked so it is a known accepted risk, not a forgotten one.
+6. **Remaining §19.5 + §23 on-device verification items** — the device session ended early on the
+   scroll defect, so counters/sheets/a11y checklist items were never executed. Includes the most
+   substantive open §19.5 concern: the ~5 s undo window under VoiceOver.
