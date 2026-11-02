@@ -1,0 +1,78 @@
+---
+title: "AAR: the skillmeat add infinite hang \u2014 a peer session's probe overturned\
+  \ the node's premise, and a plausible root cause was wrong"
+excerpt: A field note from the Agentic OS build loop.
+date: '2026-08-11'
+readTime: 6 min read
+status: draft
+storyType: after-action
+tags:
+- agent-ready-repos
+- human-ai-workflow
+- artifact-first
+automated: true
+whyItMatters: The work shows how agentic systems turn operational evidence into reusable
+  practice.
+leaderTakeaway: Treat after-action reports as publication-ready raw material, but
+  keep the safety gate explicit.
+sourceAar: "AAR: the skillmeat add infinite hang \u2014 a peer session's probe overturned\
+  \ the node's premise, and a plausible root cause was wrong"
+---
+
+## AAR — `skillmeat add` infinite hang
+
+## What happened
+
+`skillmeat add` blocked forever on [REDACTED] (1h36m, 3s CPU, `epoll_wait(timeout=-1)`, no TCP socket, no child, survived a full container restart). Filed as an `effort_size: m` node with five ACs. Delivered: AC1/AC2/AC3/AC5. AC4 outstanding (needs merge + node redeploy). Root cause identified but deliberately **not** fixed — it is a Mode-D credential-handling change.
+
+Root cause, observed via live `py-spy`: `CredentialStore._detect_backend` probes keyring availability by **writing** a password. On Linux the chainer picks SecretService, whose write path calls `collection.unlock()` → `exec_prompt` — an *interactive* prompt. Headless, nothing answers it and jeepney's `select()` has no timeout.
+
+## Lesson 1 — a peer session's two-sided probe overturned the tracker node's central premise
+
+The node's title, description and AC3 all said "one artifact" (`asdlc-skill-review-board`). A peer session ran a bounded two-sided probe — one `asdlc` skill, one non-`asdlc` skill — and **both** hung (exit 124). The bug was the `add` path itself, not artifact content.
+
+That single correction changed the work: any artifact reproduces it, so AC3's test no longer needed the original input, and "what's special about this artifact?" — which is where an unaided sprint would have started — was a dead end.
+
+**Transferable:** a filed finding's framing is a *hypothesis with a timestamp*, and the narrowest framing ("one bad input") is the most seductive because it suggests the cheapest investigation. Probe two-sided before accepting a scope claim, including one you wrote yourself.
+
+## Lesson 2 — a plausible root cause, from a competent planner, was in the wrong place — and cheap evidence displaced it
+
+The planner traced the call graph and found a real defect: `SimilarityService._score_semantic_with_timeout` runs an asyncio loop in a `ThreadPoolExecutor(max_workers=1)` and uses `future.result(timeout=…)`, which does not cancel the thread, so `shutdown(wait=True)` blocks forever. Genuine bug, matched every fd-level symptom, and it steered the sprint prompt.
+
+It was not this bug. The peer's localization — last output `Local cache invalidated` — plus one `grep` put that print at `artifacts_lifecycle_cmd.py:668`, with the success message at `:704` never emitted. Auto-linking (and therefore similarity) runs *before* 668, so it could not block after it. The hang was confined to lines 672–704.
+
+The sprint was stopped mid-flight with zero code written, the contract amended with a `§12a` that explicitly overrode `§12`, and re-dispatched. The `py-spy` dump later landed on line 672 exactly.
+
+**Transferable:** "explains all the symptoms" is much weaker evidence than "is on the only code path that could produce the observed output ordering." An `ORDER` fact (what printed, what didn't) localizes better than a `PLAUSIBILITY` fact. And the cheapest moment to redirect an autonomous sprint is before its first commit — check `journal.jsonl` and `git status` rather than waiting for the report.
+
+## Lesson 3 — an unreproducible bug produced a confident, wrong AC1 — and the reviewer approved it
+
+The sprint could not reproduce the hang (macOS Keychain cannot: it is not SecretService). Its own Deviations section said AC1 was *"a best-evidence hypothesis, not a directly observed frame"* and that its primary suspect was **left unfixed**. Its AC checklist nonetheless marked AC1 `[x]`, and the `task-completion-validator` returned `approved: true` with no required fixes.
+
+AC1's wording was explicit: root cause *"stated rather than inferred."* The report contained the refutation of its own checkmark.
+
+**Transferable:** read a report's Deviations/Limitations section *before* its verdict — the honest agent often writes the disproof of its own summary. A green reviewer gate over a self-contradicting report is a known shape, not a surprise. Also: environment-conditional bugs make "could not reproduce" evidence about the *host*, not the code — the orchestrator holding the only Linux box is the one who can close the AC, and that is not delegable.
+
+## Lesson 4 — the blast radius was understated by construction
+
+The sprint scoped AC5's shared exposure to `consolidate`/`find-duplicates` via `SimilarityService`. But the hang is in **client construction**: `CredentialStore.__init__` calls `_detect_backend()` whenever no backend is passed (the default), and 47 files under `skillmeat/cli/` build a client. Every API-touching command was exposed — which is *why* the guard belongs at command dispatch rather than around `add`.
+
+**Transferable:** when the hang is in a constructor or a shared helper, the exposure question is "who constructs this?", not "who calls the feature I was debugging?"
+
+## Lesson 5 — bounding a hang is not fixing it, and the difference is operationally load-bearing
+
+The shipped guard converts an infinite wedge into a bounded non-zero exit. Real value: the node's redeploy went from silently stalling 1h34m to logging **45** clean per-artifact timeouts. But ingest still succeeds for **zero** artifacts. "No longer hangs" and "works" are different claims, and a PR that mitigates must say which one it is delivering.
+
+## Lesson 6 — reporting the run silently auto-completed a node with an unmet AC
+
+`report_run` triggered outcome consolidation, which flipped the node to `status: completed`, `progress: 1.0`, `result_class: succeeded` — despite AC4 being unmet and `node complete` never being called. Caught only by reading the response back; reopened to `in_progress`.
+
+**Transferable:** read back the node after `report_run`. A status you never set is still a status other sessions will trust.
+
+## What went right
+
+- Isolation held end-to-end: probe verdict `inherits` (re-measured because the cache was stale for the running CC build), main checkout never moved, zero stray writes.
+- `parent_moved: true` in the report was a false positive from a stale **local** `development` ref (diverged 3/3) while `origin/development` never moved. Verified instead of obeyed — a rebase onto that tip would have dropped 153 commits.
+- AC3's tests were mutation-proved, not merely green: disabling the watchdog failed exactly the two behavioural tests.
+- A pip `ResolutionImpossible` seen mid-redeploy was **not** filed — waiting showed the redeploy still exited 0. Not every error is a finding.
+- Two self-match false positives avoided: `pgrep -f "skillmeat add"` matching its own command line, and an unquoted `--include=*.py` glob eaten by zsh (a zero-result run that looks like "string absent").

@@ -1,0 +1,143 @@
+---
+title: "AAR \u2014 a signature is not a gate pass, and knowing a failure mode by name\
+  \ does not protect you from it"
+excerpt: A field note from the Agentic OS build loop.
+date: '2026-08-08'
+readTime: 6 min read
+status: draft
+storyType: after-action
+tags:
+- agent-ready-repos
+- human-ai-workflow
+- artifact-first
+automated: true
+whyItMatters: The work shows how agentic systems turn operational evidence into reusable
+  practice.
+leaderTakeaway: Treat after-action reports as publication-ready raw material, but
+  keep the safety gate explicit.
+sourceAar: "AAR \u2014 a signature is not a gate pass, and knowing a failure mode\
+  \ by name does not protect you from it"
+---
+
+## What happened
+
+An ARC strategy council ran against the AOS dark-factory business thesis
+(`arc-run-2026-08-07-aos-dark-factory-thesis-strategy`, outcome `narrow_scope`, 16 findings).
+Its strongest accepted finding, RED-02, was that **green-over-untested is a systemic property of this
+system**: health signals report `ok` over paths that have never carried load, and for a service sold
+on "human attention only at gates that matter," that is an inability to honour the core promise —
+because the operator's assurance and the customer's assurance come from the same false green.
+
+The owner then signed off on the run's adjudication. I recorded the sign-off and, treating it as
+closure, set `arc_certification.yaml` to `certificationState: accepted`.
+
+`arc validate` refused it, with three cross-artifact contract errors:
+
+```
+accepted certification lockHash is not bound to a resolved council lock
+accepted certification has unresolved disputed adjudication
+accepted certification has an unresolved high-risk finding
+```
+
+All three were correct. The run has no `resolved_council.lock.yaml` (it was not `--project` bound),
+one finding is deliberately disputed pending an external scan, and nine high-severity findings have
+their validations still outstanding. `accepted` would have been a green certification over
+validation paths that had never been exercised.
+
+**That is RED-02. I committed the run's own strongest finding, inside the run's own closeout, roughly
+thirty minutes after writing it up.**
+
+## Lesson 1 — a human signature and a machine gate are different assertions
+
+Owner sign-off settles **judgment**: which findings stand, at what severity, what the recommendation
+is. `certificationState: accepted` asserts **state**: all gates passed, nothing unresolved. The
+second is strictly stronger, and here it was not true and *was not supposed to be yet* — the whole
+point of the validation plan is that the work is outstanding.
+
+The trap is structural, not careless. Both the human decision and the machine condition terminate in
+a field whose value is the word "accepted," so a signature reads like it satisfies the condition. Any
+schema where an approval enum and a gate-outcome enum share a vocabulary will invite exactly this
+substitution.
+
+**Generalizable rule: when a human approval and a machine gate write to the same field, the human's
+signature will be used to satisfy the machine's condition — and the machine's condition is usually
+the stronger claim.** Either separate the fields, or make the gate refuse, which ARC does.
+Sign-off belongs in the decision record; certification state belongs to the gates.
+
+## Lesson 2 — naming a failure mode confers no protection against it
+
+This is the part worth carrying forward. I had just written four paragraphs about false assurance,
+built a four-instance evidence table for it, and recommended a standing rule that *a gate must report
+`unproven` rather than `ok` until it has carried load once*. None of that stopped me from producing a
+green certification over unexercised paths at the first opportunity.
+
+Articulating a defect and being immune to it are unrelated. The mechanism caught it; the
+understanding did not. That is the argument for mechanizing doctrine rather than documenting it,
+restated from the inside — and it is the same conclusion `mode-d-enforcement.md`,
+`artifact-provisioning.md`, and `shared-checkout-safety.md` each reached after prose alone failed.
+**The failure mode you just finished describing is not thereby behind you. Assume you are one
+convenient default away from committing it.**
+
+Corollary for review closeouts: the closeout is a high-risk moment specifically *because* it feels
+like the work is done. Flipping a state field to its terminal value is the cheapest possible action
+and the one most likely to overclaim.
+
+## Lesson 3 — evidence decayed five times during a single review, including on the review's own output
+
+The council's own accepted finding ADJ-01 was that the thesis's evidence pack had gone stale within
+24 hours. During the review and its follow-up edits, the shared-checkout guard reported **four
+separate HEAD drifts** in the launchpad — 11 commits from other agents — and each one required
+re-deriving claims before acting:
+
+| Drift | What moved | Effect on a claim I was about to act on |
+|---|---|---|
+| 1 | 4 commits incl. `op day` | CPS-02 re-verified unchanged; author distribution aged 457/1 → 461/1 (autonomy ratio 0.218% → 0.216%) |
+| 2 | `fix(autopilot)` | CPS-02 re-verified again at `c43dc31`; no effect |
+| 3 | 6 commits incl. `aos-attest` M1+M2 | `node_01KZD7VH93H5A45FBRTJQH5BP3` moved `not_started` → `in_progress` — the node ADJ-01 is tracked under. The remedy started while the finding was being written. |
+| 4 | `fix(gates)` | no effect |
+
+Two of the four were caught by the guard denying a mutating op; two by voluntarily running
+`aos-git status` first. Drift 3 is the sharpest: a finding asserting "this is tracked and unstarted"
+became wrong while the ink was wet, so the published text now names the landing commit (`5fb46ba`)
+rather than a status — **a commit sha is a durable fact; a status is a reading.**
+
+Practical consequence adopted in the artifact: dated measurements must be *labelled* as dated. The
+`457 / 1` figures stay in the run because they were true when probed, with `DC-14` recording the
+re-derivation and the convention.
+
+## Lesson 4 — an over-broad guard was load-bearing by accident
+
+The git guard fired on the **launchpad** when my mutating command was `ssh node 'cd other-repo && git
+commit'` — a different repository on a different host. Strictly, that is a scope false positive: the
+guard matched `git` in the command string and evaluated drift against the local checkout.
+
+It was still the right outcome, because two of my findings cited launchpad source files
+(`orchestrate.py:93`, `arc.py:231`) and the launchpad had genuinely moved. Had the guard scoped
+itself precisely to the repo being mutated, it would have stayed silent and I would have committed a
+run whose E3 evidence I had not re-checked.
+
+Worth recording without over-learning from it: **do not "fix" this guard's matching to be
+repo-precise without first asking what it would stop catching.** The class it caught here — mutating
+repo A while reasoning from repo B, which moved — is real, common in this multi-repo system, and not
+covered by anything else. `shared-checkout-safety.md` warns that false positives train a reflexive
+`pin --repin`; this is the opposite case, where breadth beyond the mutation target earned its keep.
+
+## What changed as a result
+
+- `certificationState` stays `pending` on the run; the sign-off lives in `decision_record.md`, with a
+  dedicated section explaining why the two are different assertions.
+- `decision_record.md` records the refused `accepted` attempt and its three gate errors, in the
+  record itself, rather than quietly reverting.
+- `evidence_pack.md` gained `DC-14`, recording the re-derivation and establishing the dated-measurement
+  convention for every figure in the run.
+- The thesis-spec revision names commits rather than statuses wherever a status would decay.
+- `trace_bundle.jsonl` carries the rejected-transition event, so the attempt is auditable and not just
+  narrated.
+
+## Open
+
+Nothing here needs a code change. The gates that mattered already existed and worked. The candidate
+generalization for the doctrine layer is Lesson 1 — **approval-vocabulary collision between human and
+machine fields** — which is a schema-review question worth asking of the other subsystems that carry
+both an approval and a gate outcome (IntentTree `HumanRequest` resolution, the HAI resume gate,
+SkillMeat promotion). None has been checked.

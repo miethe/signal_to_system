@@ -1,0 +1,108 @@
+---
+title: "AAR \u2014 a correct rule in the wrong file reads as a missing rule"
+excerpt: A field note from the Agentic OS build loop.
+date: '2026-08-07'
+readTime: 6 min read
+status: draft
+storyType: after-action
+tags:
+- agent-ready-repos
+- human-ai-workflow
+- artifact-first
+automated: true
+whyItMatters: The work shows how agentic systems turn operational evidence into reusable
+  practice.
+leaderTakeaway: Treat after-action reports as publication-ready raw material, but
+  keep the safety gate explicit.
+sourceAar: "AAR \u2014 a correct rule in the wrong file reads as a missing rule"
+---
+
+## What happened
+
+A CCDash agent scoping ICA for embedded agentic work reported three findings, one framed as a
+**correction to our doctrine**: *"`[1m]` ids don't work on this lane — the tracker node and my
+global CLAUDE.md both assert ICA serves `claude-*[1m]`; against the raw Messages endpoint all
+three 403."*
+
+The finding was true. The framing was wrong. That exact caveat was **already documented, in
+three places** — `ica-lanes.md`'s `[1m]` suffix rule, `ica-models.md`'s Known Limitations (a
+dedicated row, with the verbatim 403 string), and `MODEL-ROUTING.md` §3. The delegate did not
+contradict the doctrine; it re-discovered it, at the cost of a debugging cycle.
+
+## Why it was missable — placement, not content
+
+`ica-delegate/SKILL.md` is the **entry point**. It carried a section titled *"Prefer `[1m]` for
+Opus, Sonnet, and Gemini — **Always**"* and contained **zero** mention of the transport caveat.
+The exception lived only in a `references/` file (progressive disclosure — loaded on a deeper
+read) and in the router's playbook route (loaded on the resolver path). Neither is on the path of
+someone building an SDK/HTTP adapter, who reads the entry point, sees an unconditional "Always",
+and ships `[1m]` to `/v1/messages`.
+
+**The lesson generalizes past ICA:** progressive disclosure is a summarization boundary, and an
+*unconditional* claim in a summary layer is not a shorter version of a conditional rule — it is a
+different, wrong rule. When a rule has an exception that flips the outcome, the exception belongs
+with the claim, not one layer down. "Always X" and "Always X except on path P" are not the same
+sentence abbreviated.
+
+Corollary for reading delegate reports: **a delegate reporting a doctrine correction is evidence
+about the doctrine's discoverability, not necessarily its accuracy.** Check whether the rule
+exists before accepting the correction — and if it exists, fix the placement rather than
+re-asserting the content.
+
+## What we verified rather than accepted
+
+Probed the gateway directly instead of trusting the report. Two of the delegate's claims were
+speculation and turned out **wrong**:
+
+- It inferred a "Bedrock feature mask" (no Batches/Files/Models API/prompt caching) from the
+  `msg_bdrk_` id prefix. **Explicit prompt caching works** (`cache_read_input_tokens=5502` on a
+  second identical call) and **the Models API works** (22 ids). It had correctly cautioned "don't
+  design on a feature you haven't probed there" — and then reasoned from the unprobed analogy
+  anyway. Reasoning from an inferred backend's usual gaps is not probing.
+- Its field-tolerance finding was real but under-scoped. It tested an *invented* field
+  (`ccdash_unknown_probe`). The actual hazard is a **typo in a real field**: `max_tokenz`,
+  `temperatur`, `tool_choise` all return 200 and are silently ignored, so the call runs at
+  defaults while looking correct. And validation is **asymmetric** — nested fields *are* strict
+  (`messages[0].bogus_nested` → 400), which is exactly what makes the envelope laxity easy to
+  miss.
+
+One probe trap worth keeping: the first caching probe showed `cache_creation=0` and looked like a
+mask. It was the **minimum-cacheable-prefix floor**. Below the floor, caching is a silent no-op
+indistinguishable from absence — so probe caching with two identical calls above the floor and
+read `cache_read_input_tokens` back. A single call cannot tell those apart.
+
+## Second-order finding
+
+Chasing the upstream surfaced a registry defect: `ARTIFACT-UPSTREAM-REGISTRY` line 110 named
+`MeatySkills/skills/ica-delegate/` as the upstream, contradicting its own line 64. The live
+upstream is `skillmeat/.claude/skills/ica-delegate/` (v2.8, byte-identical to the deployed
+`~/.claude` symlink target); MeatySkills held a **stale v2.7 duplicate** missing an entire
+section marked MANDATORY. An editor following the registry would have edited a file that
+propagates nowhere.
+
+I also briefly concluded "the deployed copy is ahead of upstream — deploying would clobber it."
+That was wrong, and wrong in an instructive way: I had diffed against the repo the registry
+*claimed* was upstream. **When a drift check disagrees with expectations, validate which side you
+believe is the source before believing the drift.**
+
+## Actions taken
+
+- `SKILL.md`: retitled to scope the rule to the Claude Code path; added a call-path matrix at the
+  top of the section, with an explicit note that app/SDK adapters are the bottom row.
+- Documented `GET /v1/models` as the free, zero-token catalog probe. It replaces per-id probing
+  and yields **positive proof** for `[1m]`: 22 served ids, none containing the suffix. Also
+  settles that `gpt-5.6-sol` is not ICA-served.
+- Added "ICA is not a validation lane" to `SKILL.md`, `ica-models.md`, `ica-lanes.md` (beside the
+  fallback-masking gotcha — same family: an ICA success that lies to you), and promoted it to
+  `MODEL-ROUTING` §3a with a routing consequence: **a leg whose deliverable is "this payload is
+  correct" does not belong on ICA at any price.**
+- Corrected the registry row; synced the stale duplicate to parity rather than deleting it (a
+  delete can break a bundle member path).
+
+## Open
+
+- Batches API, Files API, implicit caching, server-side web search/fetch, code execution remain
+  **unprobed** on ICA. Recorded as unprobed rather than absent — that distinction is the whole
+  point of this AAR.
+- Probes used the default `CC1` key only; a named `ICA_KEY` block may be scoped to a different
+  model group.

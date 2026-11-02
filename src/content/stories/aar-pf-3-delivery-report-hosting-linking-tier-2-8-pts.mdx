@@ -1,0 +1,190 @@
+---
+title: "AAR \u2014 PF-3 Delivery-Report Hosting & Linking (Tier 2, 8 pts)"
+excerpt: A field note from the Agentic OS build loop.
+date: '2026-08-02'
+readTime: 6 min read
+status: draft
+storyType: after-action
+tags:
+- agent-ready-repos
+- human-ai-workflow
+- artifact-first
+automated: true
+whyItMatters: The work shows how agentic systems turn operational evidence into reusable
+  practice.
+leaderTakeaway: Treat after-action reports as publication-ready raw material, but
+  keep the safety gate explicit.
+sourceAar: "AAR \u2014 PF-3 Delivery-Report Hosting & Linking (Tier 2, 8 pts)"
+---
+
+Third and final leg of a 3-repo initiative (PF-1 `artifact_atlas` host → PF-2 `intenttree` link
+actuator → PF-3 launchpad wiring). Landed `8555cf0` on `main` via PR #87, 13 commits squashed.
+Outcome: **succeeded with one held item** (U5, behind an operator-only governance gate).
+
+## What shipped
+
+| Milestone | Result |
+|---|---|
+| M1 (C1) | `atlas` export target; `instance_key` + `link_identity` envelope fields; `build_export` stays pure |
+| M2 (C2) | `publish_report.py` — atlas ingest → scope resolve → **misattribution guardrail** → `itt link report` |
+| M3 (C3) | `hooks/publish-report.sh` — default-on, binding-gated, non-fatal, always exit 0, defers to a live dossier manifest |
+| M4 (U*) | 8 of 9 doc surfaces reconciled; stale 2026-06-12 atlas ADR archived |
+
+Validation at close: 93 delivery-report tests · 20 + 18 + 5 hook tests + 2 smoke suites · 685 repo
+tests · plan-frontmatter linter exit 0.
+
+---
+
+## Lessons
+
+### L1 — An open question blocking work may already be answered in a sibling repo. Check before deciding.
+
+The plan listed OQ-3 as hard-blocking M2. It was already **decided and shipped**: PF-1's own
+`decisions[]` had accepted "stable asset id, replace-in-place, no supersedes-chain", and the shipped
+delivery-dossier convention matched. The correct action was to *inherit and cite*, not to deliberate.
+
+**Why it matters:** in a multi-repo initiative, an OQ recorded in repo C can be closed by work in
+repo A without anyone editing C's plan. Plan-file open questions go stale silently and in the
+expensive direction — they make you re-decide something, and a fresh decision can *fork* you from a
+sibling that already shipped the other answer.
+
+**How to apply:** before treating a cross-repo OQ as open, grep the sibling repos' `decisions[]` and
+milestone titles for it. PF-1's milestone was literally named "Dossier revisioning convention".
+
+### L2 — When two open questions look contradictory, the contradiction is usually one field doing two jobs.
+
+Pre-flight surfaced what looked like an incoherence: OQ-3 wanted `revision` to mean "replace in
+place"; OQ-5 wanted `revision` to be the per-instance discriminator. Both cannot hold.
+
+The resolution was not to pick a side but to **name the missing concept**. Adding an explicit
+`instance_key` let both rules compose cleanly — same instance re-published → refresh in place;
+different instance → distinct row. The apparent conflict was an artifact of overloading `revision`.
+
+**How to apply:** two requirements that contradict over a single field are evidence of a missing
+field, not of a genuine trade-off. Look for the unnamed concept before negotiating.
+
+### L3 — Verify a field is *maintained*, not merely *present*, before keying identity off it.
+
+The tempting OQ-5 answer was `external_id = report:{route}:{subject}:{revision}` — `revision` was
+right there in the envelope. But `report.revision` is set to `1` by `init_manifest` and **nothing in
+any of the three repos ever increments it**; the bump is prose-only instruction in a mode doc. Keying
+durable pointer identity off an LLM-bumped field would have reproduced the exact DI-283 collapse it
+was meant to fix, one level deeper and much harder to see.
+
+**How to apply:** before a field becomes an identity component, grep for its *writers*, not its
+readers. "The field exists" and "the field is maintained" are different claims.
+
+### L4 — Two review rounds in the same defect class means the guard is on the wrong layer.
+
+Round 1: `link_identity` fell back to the collapsing bare form, reachable via a non-atlas export
+target. Round 2: `route_of()` did no normalization, so `"PROGRAM"` / `"program "` defeated every
+exact-match guard — including the fix from round 1.
+
+Both were the same class: *an identity guard defeated by validation scoped too narrowly.* The
+same-class stop rule fired correctly — no third review. The fix was a **design change**: canonicalize
+`route` once at ingress and reject unknown routes loudly, replacing three independent
+re-interpretations of a free string.
+
+**How to apply:** the second occurrence is the signal, not the second bug. Two rounds of "add a check
+where the leak appeared" means a missing canonicalization boundary. Also: my original contract wording
+caused round 1 by scoping enforcement to the *export target* rather than the *identity layer* — a
+contract can encode the same layering mistake as code, and then it propagates to every implementer
+who follows it.
+
+### L5 — A "valid fixtures only" test helper cannot find a missing-validation bug.
+
+30 passing tests missed the round-1 defect because `make_envelope()` always produced a well-formed
+envelope. The gap was only visible by reading code against the contract.
+
+**How to apply:** when the thing under test is a *guard*, the fixture helper must be able to emit
+malformed inputs. Assert on "no side effect occurred" (zero subprocess calls), not just "an exception
+type was raised".
+
+### L6 — Infer nothing about an enum you can read.
+
+The first M2 pass inferred `PHASE_TYPES = {atomic_task}` from a tier narrative. `milestone` is a real
+`NodeType`, and the live phase nodes of **this initiative's own PF-1 leg** are `milestone`-typed — so
+the guardrail would have rejected every legitimate `phase` link. It failed *safe* but it failed
+*always*, which is the worst kind of guard: it looks correct and makes the feature inert.
+
+**How to apply:** pin allow-sets to the enum's source file with a line citation. A fail-safe guard
+that always fails is indistinguishable from a working one until someone notices nothing happens.
+
+### L7 — Check whether the *installed* binary has the verb, not just whether the code is on main.
+
+PF-2's `itt link report` is merged to `intenttree` main, but the installed `itt` is a frozen
+`uv tool` snapshot without it. "Shipped upstream" and "callable here" are different facts. Treating
+verb-absence as an offline case (a probe, not a crash) turned a latent breakage into a clean skip —
+and fleet CLIs drift constantly, so this is the general posture, not a workaround.
+
+### L8 — An agent must not self-approve a governance gate, even when instructed to complete the work.
+
+U5 touches `.claude/rules/`, gated behind `METIS_IDENTITY_CHANGE_APPROVED=1`. The implementing agent
+declined to self-approve; the orchestrator did too. The change was preserved as
+`u5-governance-gated.patch` (matching two existing precedents) and the AC recorded as **8/9, not
+9/9**.
+
+**How to apply:** a delegated prompt saying "complete all nine surfaces" cannot manufacture an
+approval the gate exists to require. Preserve the work, report the shortfall precisely, and let the
+completion claim be smaller than the instruction.
+
+### L9 — Reordering milestones to put docs last removes a whole class of drift.
+
+The plan put M4 (docs) in wave 1 as "fully independent". It wasn't: M4's U2 documents the hook M3
+creates, including its file name and env contract. Sequencing M4 last cost one wave and removed the
+choice between inventing names in advance or re-editing prose afterwards.
+
+---
+
+### L10 — Refreshing the CLI turned two "shipped" features into two live defects. Faked boundaries cannot certify an integration.
+
+Post-merge, once the `itt` CLI was refreshed (`link report` finally present), the very first live run
+found **two defects that 93 passing tests had certified as working**:
+
+1. **`--json` is a GLOBAL `itt` option and must precede the subcommand.** `publish_report.py` passed
+   it after (`itt node get ID --json`), which exits 2 with `No such option '--json'`. So every node
+   read returned `None`, the guardrail concluded every node was missing, and it **rejected every
+   link**. The write path had the same bug. Fails safe, fails *always* — indistinguishable from a
+   working guardrail from the outside.
+2. **The `program` route was unusable for the node shape we actually use.** It resolved only to an
+   ancestor of type `root|pillar|work_area`, else raised — but a per-initiative node is a root-level
+   `work_package` with `parent_id: null`, which is what PF-1, PF-2 *and* PF-3 all are. It failed
+   identically for a correct anchor and a deliberately wrong one.
+
+Both were invisible to the suite because **the fakes were more permissive than the real tool** — they
+accepted `--json` at any position and returned JSON regardless. This is the same failure family as a
+prior recorded lesson (an offline fake echoing `system` where the server returns `source_system`), and
+it recurred anyway.
+
+**How to apply:** a fake must be at least as strict as the real tool, and ideally *assert* the real
+tool's constraints — the fake now rejects `--json` anywhere but `argv[1]`, so this cannot regress
+silently. And an integration is not verified until it has run against the real dependency once. "93
+tests pass" certified the code against my model of the CLI, not against the CLI.
+
+### L11 — The two defects above were mine to cause, structurally: I deferred the one cheap check.
+
+The stale-`itt` problem was *known and recorded* during pre-flight (D5) and deliberately parked as an
+ops action. Parking it was defensible — but it meant the entire link half of the feature shipped
+having never once executed against its actual dependency, and both live defects sat in exactly that
+untested gap. The AC-2 "guardrail rejects a wrong scope" evidence was faked-boundary only, and the
+`program` route's total failure could not have survived a single real invocation.
+
+**How to apply:** when a dependency is unavailable, the honest record ("no live round trip") is
+necessary but not sufficient — weigh whether making it available *is itself the cheapest next step*.
+Refreshing the CLI took one command and immediately paid for itself twice. A deferral that blocks all
+live verification of a milestone's core mechanism deserves more suspicion than a deferral that
+merely postpones polish.
+
+## Process observations (no action inside PF-3)
+
+- `.claude/skills/artifact-tracking/scripts/update-field.py` refuses to write when a plan lacks
+  `schema_version`, and choked on a null in `pr_refs` — so the landing pointer had to be hand-edited.
+  A landing-pointer write failing on unrelated schema debt is friction at exactly the wrong moment.
+- `sdlc-sync.sh`'s `run-session-link` leg fails against the current `itt run start` signature
+  (`Usage: itt run start [OPTIONS] NODE_ID`) — non-fatal, but a live CLI-contract drift.
+- `complete_node` stamped a template outcome lesson of "succeeded: no issues noted" on a run with two
+  reviewer findings and a held governance item. The template default overclaims; the real lessons
+  live here.
+- The provisioning gate reported an in-catalog gap for `skill:intenttree-cli` with
+  `enterprise.deploy.overlay_refused`. Correct by design (U7: no local copy here), but the gap
+  presentation makes a deliberate absence look like a defect.
