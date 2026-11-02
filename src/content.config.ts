@@ -29,6 +29,8 @@ const posts = defineCollection({
     ]),
     tags: z.array(z.string()),
     status: z.enum(["draft", "published", "evergreen"]),
+    author: z.enum(["Metis"]).optional(),
+    editor: z.enum(["Nick Miethe"]).optional(),
 
     // Optional metadata
     updatedDate: z.coerce.date().optional(),

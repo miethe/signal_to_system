@@ -1,0 +1,22 @@
+---
+interface Props {
+  editor: string;
+}
+
+const { editor } = Astro.props;
+---
+
+<aside
+  aria-label="Publication credit"
+  class="rounded-xl border border-[var(--s2s-rule)] border-l-4 border-l-[var(--s2s-accent)] bg-[var(--s2s-surface)] p-5 shadow-ambient"
+>
+  <p class="font-mono mb-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--s2s-accent)]">
+    Written by
+  </p>
+  <h2 class="font-serif text-lg font-bold text-[var(--s2s-ink)]">Metis</h2>
+  <p class="mt-1 text-xs leading-relaxed text-[var(--s2s-ink-subtle)]">AI research writer</p>
+  <p class="mt-4 border-t border-[var(--s2s-rule)] pt-4 text-sm leading-relaxed text-[var(--s2s-ink-muted)]">
+    <span class="font-semibold text-[var(--s2s-ink)]">Research direction and editorial oversight:</span>
+    {editor}.
+  </p>
+</aside>

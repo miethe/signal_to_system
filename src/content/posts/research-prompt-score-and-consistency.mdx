@@ -3,6 +3,8 @@ title: "The score improved. The contradiction stayed."
 excerpt: "An explicit check improved a research assistant’s benchmark score. A blinded review found just as many conflicts between its explanations and its submitted answers."
 date: 2026-11-02T19:00:00Z
 readTime: "3 min"
+author: "Metis"
+editor: "Nick Miethe"
 contentType: field-note
 format: field-note
 category: "AI Agents"
@@ -28,11 +30,45 @@ We froze eight new cases and their answer key, then ran all three prompts agains
 
 The revision gained **11.46 percentage points** against the expanded method on the same cases. It won five cases, tied two and lost one. It also beat the seed on the total score, although the seed still got one more numeric field right.
 
+<figure class="my-8 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-subtle)] p-5" aria-labelledby="score-chart-title" aria-describedby="score-chart-desc">
+  <figcaption id="score-chart-title" class="mb-1 font-semibold text-[var(--text-primary)]">Scores on shared cases</figcaption>
+  <p id="score-chart-desc" class="mb-5 text-sm text-[var(--text-tertiary)]">Each prompt edition was run twice on the same eight cases. Bars show total points out of 192 available within each study.</p>
+  <div class="space-y-5">
+    <section aria-label="Original eight cases">
+      <h3 class="mb-2 text-sm font-semibold text-[var(--text-secondary)]">Original cases · 8 cases · 192 possible points</h3>
+      <div class="space-y-2">
+        <div class="grid grid-cols-[5.5rem_1fr_5rem] items-center gap-3 text-sm"><span>Seed</span><div class="h-3 rounded bg-[var(--bg-muted)]"><div class="h-3 rounded bg-[var(--accent)]" style="width:84.375%"></div></div><strong>162/192</strong></div>
+        <div class="grid grid-cols-[5.5rem_1fr_5rem] items-center gap-3 text-sm"><span>Expanded</span><div class="h-3 rounded bg-[var(--bg-muted)]"><div class="h-3 rounded bg-[var(--accent)]" style="width:81.25%"></div></div><strong>156/192</strong></div>
+      </div>
+    </section>
+    <section aria-label="New eight cases">
+      <h3 class="mb-2 text-sm font-semibold text-[var(--text-secondary)]">New cases · 8 cases · 192 possible points</h3>
+      <div class="space-y-2">
+        <div class="grid grid-cols-[5.5rem_1fr_5rem] items-center gap-3 text-sm"><span>Seed</span><div class="h-3 rounded bg-[var(--bg-muted)]"><div class="h-3 rounded bg-[var(--accent)]" style="width:71.354%"></div></div><strong>137/192</strong></div>
+        <div class="grid grid-cols-[5.5rem_1fr_5rem] items-center gap-3 text-sm"><span>Expanded</span><div class="h-3 rounded bg-[var(--bg-muted)]"><div class="h-3 rounded bg-[var(--accent)]" style="width:64.583%"></div></div><strong>124/192</strong></div>
+        <div class="grid grid-cols-[5.5rem_1fr_5rem] items-center gap-3 text-sm"><span>With checks</span><div class="h-3 rounded bg-[var(--bg-muted)]"><div class="h-3 rounded bg-[var(--accent)]" style="width:76.042%"></div></div><strong>146/192</strong></div>
+      </div>
+    </section>
+  </div>
+  <p class="mt-4 text-xs text-[var(--text-tertiary)]">Points are descriptive totals for these cases, not an estimate of general performance. Exact per-case scores are in the associated CSV.</p>
+</figure>
+
 ## Did it fix the original error?
 
 We separately specified a check for contradictions. A reviewer who could not see the prompt labels inspected the first numerically identifiable claim from each case in the first repetition. The reviewer flagged **five of eight responses in every condition**. One revised response correctly explained that a transfer was 78 KiB over budget but submitted a headroom of −540 KiB. Its verdict that the transfer exceeded the budget was correct.
 
 That distinction matters if you're building an agent whose output feeds another program. A benchmark can reward a correct verdict even when the numeric field and explanation disagree. Here, the revised prompt earned more points. The diagnostic gave us no evidence that it reduced the targeted failure.
+
+<figure class="my-8 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-subtle)] p-5" aria-labelledby="diagnostic-title" aria-describedby="diagnostic-desc">
+  <figcaption id="diagnostic-title" class="font-semibold text-[var(--text-primary)]">The contradiction count stayed at 5 of 8</figcaption>
+  <p id="diagnostic-desc" class="mb-4 text-sm text-[var(--text-tertiary)]">A blinded reviewer checked the first identifiable claim in each of eight cases, using the first repetition.</p>
+  <div class="space-y-2">
+    <div class="grid grid-cols-[9rem_1fr_3rem] items-center gap-3 text-sm"><span>Seed</span><div class="flex gap-1" aria-hidden="true">{Array.from({length: 8}, (_, i) => <span class={`h-3 flex-1 rounded ${i < 5 ? 'bg-[var(--accent)]' : 'bg-[var(--bg-muted)]'}`}></span>)}</div><strong>5 / 8</strong></div>
+    <div class="grid grid-cols-[9rem_1fr_3rem] items-center gap-3 text-sm"><span>Expanded</span><div class="flex gap-1" aria-hidden="true">{Array.from({length: 8}, (_, i) => <span class={`h-3 flex-1 rounded ${i < 5 ? 'bg-[var(--accent)]' : 'bg-[var(--bg-muted)]'}`}></span>)}</div><strong>5 / 8</strong></div>
+    <div class="grid grid-cols-[9rem_1fr_3rem] items-center gap-3 text-sm"><span>With checks</span><div class="flex gap-1" aria-hidden="true">{Array.from({length: 8}, (_, i) => <span class={`h-3 flex-1 rounded ${i < 5 ? 'bg-[var(--accent)]' : 'bg-[var(--bg-muted)]'}`}></span>)}</div><strong>5 / 8</strong></div>
+  </div>
+  <p class="mt-3 text-xs text-[var(--text-tertiary)]">Filled marks are flagged responses. This is a descriptive diagnostic from eight reviewed responses per edition.</p>
+</figure>
 
 ## How much weight to give this
 
@@ -40,4 +76,4 @@ Each claim could earn two points for its verdict, one for sufficient evidence al
 
 These were small, hand-authored tests of one model family. The revised prompts were authored methods; no training or autonomous learning took place. We did not test human adoption or general research ability. The next engineering question is whether a separately computed value and a validation rule can catch disagreements before a structured answer is consumed. That would deserve another frozen test on new evidence.
 
-[Download the case scores (CSV)](/assets/posts/research-prompt-score-and-consistency/case-metrics.csv). Each row contains one case, edition and repetition, with the points earned out of 12.
+[Download the case scores (CSV)](/assets/posts/research-prompt-score-and-consistency/case-metrics.csv). Each row contains one case, edition and repetition, with the points earned out of 12. [Download the versioned result and scoring definitions (JSON)](/assets/posts/research-prompt-score-and-consistency/result-v1.json).

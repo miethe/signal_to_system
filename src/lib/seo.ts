@@ -24,6 +24,8 @@ export interface ArticleJsonLdData {
   datePublished: string;
   dateModified?: string;
   authorName?: string;
+  authorDescription?: string;
+  editorName?: string;
   tags?: string[];
 }
 
@@ -117,11 +119,12 @@ export function generateJsonLd(
       datePublished: d.datePublished,
       dateModified: d.dateModified ?? d.datePublished,
       keywords: d.tags?.join(", "),
-      author: {
-        "@type": "Person",
-        name: d.authorName ?? site.author.name,
-        url: buildCanonicalUrl("/about"),
-      },
+      author: d.authorDescription
+        ? { name: d.authorName ?? site.author.name, description: d.authorDescription }
+        : { "@type": "Person", name: d.authorName ?? site.author.name,
+            url: buildCanonicalUrl("/about") },
+      ...(d.editorName ? { editor: { "@type": "Person", name: d.editorName,
+        url: buildCanonicalUrl("/about") } } : {}),
       publisher: {
         "@type": "Organization",
         name: site.title,
