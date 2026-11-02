@@ -62,6 +62,13 @@
       "target": "/aos/research/"
     },
     {
+      "path": "/assets/posts/research-prompt-score-and-consistency/result-v1.json",
+      "output": "assets/posts/research-prompt-score-and-consistency/result-v1.json",
+      "family": "site",
+      "action": "preserve",
+      "target": "/assets/posts/research-prompt-score-and-consistency/result-v1.json"
+    },
+    {
       "path": "/dev-stories/aar-the-opm-1-g-gate-loop-mutation-verify-in-the-fix-step-not-the-next-review-ro/",
       "output": "dev-stories/aar-the-opm-1-g-gate-loop-mutation-verify-in-the-fix-step-not-the-next-review-ro/index.html",
       "family": "dev-stories",
