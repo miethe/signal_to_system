@@ -5,20 +5,15 @@ interface Props {
   variant?: 'featured' | 'sidebar' | 'compact';
   headingLevel?: 'h2' | 'h3';
   showSocials?: boolean;
-  authorName?: string;
-  authorRole?: string;
-  authorBio?: string;
-  showPortrait?: boolean;
 }
 
-const { variant = 'compact', headingLevel: Heading = 'h2', showSocials, authorName = site.author.name, authorRole = site.author.role, authorBio, showPortrait = true } = Astro.props;
-const isSiteAuthor = authorName === site.author.name;
+const { variant = 'compact', headingLevel: Heading = 'h2', showSocials } = Astro.props;
 const isFeatured = variant === 'featured';
 const isSidebar = variant === 'sidebar';
 const shouldShowSocials = showSocials ?? isFeatured;
 const normalizePath = (path: string) => path.replace(/\/+$/, '') || '/';
 const currentPath = normalizePath(Astro.url.pathname);
-const profileLinks = isSiteAuthor ? site.author.profileLinks.filter((link) => normalizePath(link.href) !== currentPath) : [];
+const profileLinks = site.author.profileLinks.filter((link) => normalizePath(link.href) !== currentPath);
 const socialLinks = [
   { label: 'GitHub', href: site.author.social.github },
   { label: 'LinkedIn', href: site.author.social.linkedin },
@@ -27,7 +22,7 @@ const socialLinks = [
 ---
 
 <aside
-  aria-label={`About the author, ${authorName}`}
+  aria-label={`About the author, ${site.author.name}`}
   class:list={[
     'author-profile relative overflow-hidden border border-[var(--s2s-rule)] bg-[var(--s2s-surface)] shadow-ambient',
     isFeatured && 'rounded-2xl p-6 sm:p-7',
@@ -35,7 +30,7 @@ const socialLinks = [
     variant === 'compact' && 'rounded-xl p-5 sm:p-6',
   ]}
 >
-  {isFeatured && showPortrait && (
+  {isFeatured && (
     <div
       class="pointer-events-none absolute -right-10 -top-14 h-36 w-36 rounded-full bg-[var(--s2s-accent-soft)] opacity-60 blur-2xl"
       aria-hidden="true"
@@ -44,7 +39,7 @@ const socialLinks = [
 
   <div class:list={['relative', variant === 'compact' && 'sm:flex sm:items-center sm:gap-5']}>
     <div class:list={['flex items-center gap-4', variant === 'compact' && 'sm:min-w-64']}>
-      {showPortrait && <img
+      <img
         src={site.author.avatar.src}
         alt=""
         width={site.author.avatar.width}
@@ -55,22 +50,22 @@ const socialLinks = [
           'shrink-0 rounded-full border border-[var(--s2s-rule-strong)] bg-[var(--s2s-chip)] object-cover object-top ring-2 ring-[var(--s2s-surface)]',
           isFeatured ? '!m-0 !h-20 !w-20 !rounded-full' : isSidebar ? '!m-0 !h-[38px] !w-[38px] !rounded-full' : '!m-0 !h-14 !w-14 !rounded-full',
         ]}
-      />}
+      />
       <div class="min-w-0">
         <p class="font-mono mb-1 text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--s2s-accent)]">
-          {isSidebar || !isSiteAuthor ? 'Written by' : 'The author'}
+          {isSidebar ? 'Written by' : 'The author'}
         </p>
         <Heading class:list={['font-serif font-bold text-[var(--s2s-ink)]', isFeatured ? 'text-2xl' : 'text-lg']}>
-          {authorName}
+          {site.author.name}
         </Heading>
-        <p class="author-profile__role mt-1 text-xs leading-relaxed text-[var(--s2s-ink-subtle)]">{authorRole}</p>
+        <p class="author-profile__role mt-1 text-xs leading-relaxed text-[var(--s2s-ink-subtle)]">{site.author.role}</p>
       </div>
     </div>
 
     <div class:list={['author-profile__extra border-[var(--s2s-rule)]', variant === 'compact' ? 'mt-5 border-t pt-5 sm:mt-0 sm:border-l sm:border-t-0 sm:pl-5 sm:pt-0' : 'mt-5 border-t pt-5']}>
       <div class="author-profile__extra-inner">
       <p class:list={['leading-relaxed text-[var(--s2s-ink-muted)]', isSidebar ? 'text-sm' : 'text-sm sm:text-[15px]']}>
-        {authorBio ?? (isFeatured ? site.author.bioLong : site.author.bioShort)}
+        {isFeatured ? site.author.bioLong : site.author.bioShort}
       </p>
 
       {profileLinks.length > 0 && (
@@ -92,7 +87,7 @@ const socialLinks = [
       </nav>
       )}
 
-      {shouldShowSocials && isSiteAuthor && (
+      {shouldShowSocials && (
         <nav aria-label="Author social profiles" class:list={['flex flex-wrap items-center gap-1', profileLinks.length > 0 ? 'border-t border-[var(--s2s-rule)] pt-1' : 'mt-4']}>
           {socialLinks.map((link) => (
             <a
