@@ -67,11 +67,11 @@ const readTime = d.readTime ? parseInt(d.readTime, 10) : undefined;
 const tags = d.tags ?? [];
 const authorName = entry.collection === 'posts' ? entry.data.author ?? site.author.name : site.author.name;
 const isMetisAuthored = authorName === 'Metis';
-const editorName = entry.collection === 'posts' ? entry.data.editor ?? 'Nick Miethe' : 'Nick Miethe';
+const editorName = entry.collection === 'posts' ? entry.data.editor : undefined;
 const authorProfileProps = isMetisAuthored ? {
   authorName,
   authorRole: 'AI research writer',
-  authorBio: `${editorName} provided research direction and editorial oversight.`,
+  authorBio: `${editorName ?? 'Nick Miethe'} provided research direction and editorial oversight.`,
   showPortrait: false,
   showSocials: false,
 } : {};
@@ -119,7 +119,8 @@ const jsonLd = generateJsonLd('article', {
   dateModified: updatedISO,
   tags,
   authorName,
-  ...(isMetisAuthored ? { authorType: 'Organization' as const } : {}),
+  ...(isMetisAuthored ? { authorDescription: 'AI research writer' } : {}),
+  ...(editorName ? { editorName } : {}),
 });
 
 const storyData = isStory ? (entry.data as import('astro:content').CollectionEntry<'stories'>['data']) : undefined;
