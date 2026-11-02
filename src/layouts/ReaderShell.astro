@@ -65,6 +65,16 @@ const title = d.title;
 const excerpt = d.excerpt;
 const readTime = d.readTime ? parseInt(d.readTime, 10) : undefined;
 const tags = d.tags ?? [];
+const authorName = entry.collection === 'posts' ? entry.data.author ?? site.author.name : site.author.name;
+const isMetisAuthored = authorName === 'Metis';
+const editorName = entry.collection === 'posts' ? entry.data.editor ?? 'Nick Miethe' : 'Nick Miethe';
+const authorProfileProps = isMetisAuthored ? {
+  authorName,
+  authorRole: 'AI research writer',
+  authorBio: `${editorName} provided research direction and editorial oversight.`,
+  showPortrait: false,
+  showSocials: false,
+} : {};
 const heroImage = d.heroImage;
 const heroAlt = 'heroAlt' in d ? d.heroAlt : undefined;
 const whyItMatters = d.whyItMatters;
@@ -108,6 +118,8 @@ const jsonLd = generateJsonLd('article', {
   datePublished: publishedISO,
   dateModified: updatedISO,
   tags,
+  authorName,
+  ...(isMetisAuthored ? { authorType: 'Organization' as const } : {}),
 });
 
 const storyData = isStory ? (entry.data as import('astro:content').CollectionEntry<'stories'>['data']) : undefined;
@@ -189,7 +201,7 @@ const storyData = isStory ? (entry.data as import('astro:content').CollectionEnt
          the sticky ReadingCompanion (outline + ThreadDock + notes). -->
     <div class="reader-rail hidden xl:col-start-2 xl:row-span-3 xl:row-start-1 xl:block xl:self-stretch" data-reader-rail="true">
       <div class="mb-4">
-        <AuthorProfile variant="sidebar" headingLevel="h2" />
+        <AuthorProfile variant="sidebar" headingLevel="h2" {...authorProfileProps} />
       </div>
       {
         whyItMatters && (
@@ -205,7 +217,7 @@ const storyData = isStory ? (entry.data as import('astro:content').CollectionEnt
 
     <div class:list={['min-w-0 xl:col-start-1', isFrontispiece ? 'xl:row-start-3' : 'xl:row-start-2']}>
       <div class="mb-10 xl:hidden">
-        <AuthorProfile variant="compact" headingLevel="h2" />
+        <AuthorProfile variant="compact" headingLevel="h2" {...authorProfileProps} />
       </div>
 
       {

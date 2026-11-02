@@ -1,0 +1,137 @@
+{
+  "schema_version": "1.0.0",
+  "result_id": "research-prompt-score-and-consistency-v1",
+  "title": "The score improved. The contradiction stayed.",
+  "edition_date": "2026-11-02",
+  "authorship": {
+    "writer": "Metis",
+    "research_direction_and_editorial_oversight": "Nick Miethe"
+  },
+  "scope": {
+    "benchmark": "Small synthetic arithmetic and evidence benchmark; fictional cases only.",
+    "model": "GPT-6 Luna",
+    "effort": "medium",
+    "tools": false,
+    "sessions": "Fresh session for every run.",
+    "generalization": "Descriptive results for these authored cases; not an estimate of general model performance.",
+    "independence_note": "The comparison unit is the case. Repetitions are repeated runs on each case, not additional independent cases."
+  },
+  "association": {
+    "case_level_csv": "case-metrics.csv",
+    "csv_grain": "One row per study, case, prompt edition, and repetition.",
+    "csv_relative_to_json": true
+  },
+  "definitions": {
+    "study": {
+      "original": "Eight cases used in the initial seed-versus-expanded comparison.",
+      "new_cases": "Eight newly frozen cases used to compare seed, expanded, and expanded-with-checks editions."
+    },
+    "case": "One authored scenario containing three claims.",
+    "repetition": "One run of a prompt edition on a case; each edition was run twice per case.",
+    "score": "For each of three claims: 2 points for a correct verdict; 1 point for sufficient evidence when the verdict is correct; and 1 point for a correct numeric answer or an appropriate null. Maximum 4 points per claim and 12 per case run.",
+    "possible_points_per_edition": "8 cases × 2 repetitions × 12 points = 192.",
+    "correct_numeric_or_null": "Count of claims whose numeric field was correct or whose null was justified.",
+    "contradiction_diagnostic": "Blinded review of the first numerically identifiable claim from each case in repetition 1; a response was flagged when its explanation and submitted answer conflicted."
+  },
+  "scores": [
+    {
+      "study": "original",
+      "edition": "seed",
+      "points": 162,
+      "possible": 192,
+      "percent": 84.375,
+      "correct_verdicts": 41,
+      "sufficient_citations": 40,
+      "correct_numeric_or_null": 40,
+      "csv_edition_value": "seed"
+    },
+    {
+      "study": "original",
+      "edition": "expanded",
+      "points": 156,
+      "possible": 192,
+      "percent": 81.25,
+      "correct_verdicts": 40,
+      "sufficient_citations": 37,
+      "correct_numeric_or_null": 39,
+      "csv_edition_value": "grown"
+    },
+    {
+      "study": "new_cases",
+      "edition": "seed",
+      "points": 137,
+      "possible": 192,
+      "percent": 71.3541666667,
+      "correct_verdicts": 34,
+      "sufficient_citations": 34,
+      "correct_numeric_or_null": 35,
+      "csv_edition_value": "seed"
+    },
+    {
+      "study": "new_cases",
+      "edition": "expanded",
+      "points": 124,
+      "possible": 192,
+      "percent": 64.5833333333,
+      "correct_verdicts": 31,
+      "sufficient_citations": 31,
+      "correct_numeric_or_null": 31,
+      "csv_edition_value": "grown"
+    },
+    {
+      "study": "new_cases",
+      "edition": "expanded_with_checks",
+      "csv_edition_value": "checked",
+      "points": 146,
+      "possible": 192,
+      "percent": 76.0416666667,
+      "correct_verdicts": 38,
+      "sufficient_citations": 36,
+      "correct_numeric_or_null": 34
+    }
+  ],
+  "same_case_comparisons": [
+    {
+      "study": "original",
+      "subject_edition": "expanded",
+      "subject_csv_edition_value": "grown",
+      "comparator_edition": "seed",
+      "comparator_csv_edition_value": "seed",
+      "wins": 1,
+      "ties": 3,
+      "losses": 4,
+      "win_loss_interpretation": "Counts describe the subject edition relative to the comparator edition."
+    },
+    {
+      "study": "new_cases",
+      "subject_edition": "expanded_with_checks",
+      "subject_csv_edition_value": "checked",
+      "comparator_edition": "expanded",
+      "comparator_csv_edition_value": "grown",
+      "wins": 5,
+      "ties": 2,
+      "losses": 1,
+      "win_loss_interpretation": "Counts describe the subject edition relative to the comparator edition."
+    }
+  ],
+  "contradiction_diagnostic": [
+    {
+      "study": "new_cases",
+      "edition": "seed",
+      "flagged": 5,
+      "reviewed": 8
+    },
+    {
+      "study": "new_cases",
+      "edition": "expanded",
+      "flagged": 5,
+      "reviewed": 8
+    },
+    {
+      "study": "new_cases",
+      "edition": "expanded_with_checks",
+      "flagged": 5,
+      "reviewed": 8
+    }
+  ]
+}
