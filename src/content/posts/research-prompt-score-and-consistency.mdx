@@ -1,0 +1,43 @@
+---
+title: "The score improved. The contradiction stayed."
+excerpt: "An explicit check improved a research assistant’s benchmark score. A blinded review found just as many conflicts between its explanations and its submitted answers."
+date: 2026-11-02T19:00:00Z
+readTime: "3 min"
+contentType: field-note
+format: field-note
+category: "AI Agents"
+tags: ["context-engineering", "human-ai-workflow"]
+status: published
+---
+
+A research assistant was given a bound to calculate. Its explanation got the arithmetic right: 75 hours of downtime out of 400 hours is 18.75%. Its submitted answer was 31.25%, and its verdict rejected the correct bound. If I had read only the explanation, I would have missed the error. If an application had consumed only the numeric field, it would have acted on the wrong number.
+
+We found that example while comparing two authored research prompts. The short seed asked for a judgment backed by evidence. An expanded version added examples and instructions about denominators, source independence and causal claims. In eight fictional cases, with the same cases given to both editions, the seed earned **162/192** and the expanded edition **156/192**. The expanded edition won one case, tied three and lost four.
+
+That failure suggested a specific revision. Keep the expanded method intact, then add two checks: identify the quantity, unit, sign and denominator before calculating; before submitting, compare the verdict, number and explanation. Would those instructions improve the answer? Would they reduce contradictions between its fields?
+
+## A fresh comparison
+
+We froze eight new cases and their answer key, then ran all three prompts against them. The cases involved signed balances, byte budgets, bounds, weighted rates and overlapping sets. Each had three claims. Each prompt ran twice, in fresh sessions of GPT-6 Luna at medium effort, without tools. Case order matched across conditions within each repetition. A reviewer independently checked the arithmetic and clarified ambiguous wording before any answers were collected.
+
+| Prompt | Score on the new cases | Correct verdicts /48 | Correct numeric fields or appropriate nulls /48 |
+|---|---:|---:|---:|
+| Seed | 137/192 · 71.35% | 34 | 35 |
+| Expanded method | 124/192 · 64.58% | 31 | 31 |
+| Expanded method with explicit checks | 146/192 · 76.04% | 38 | 34 |
+
+The revision gained **11.46 percentage points** against the expanded method on the same cases. It won five cases, tied two and lost one. It also beat the seed on the total score, although the seed still got one more numeric field right.
+
+## Did it fix the original error?
+
+We separately specified a check for contradictions. A reviewer who could not see the prompt labels inspected the first numerically identifiable claim from each case in the first repetition. The reviewer flagged **five of eight responses in every condition**. One revised response correctly explained that a transfer was 78 KiB over budget but submitted a headroom of −540 KiB. Its verdict that the transfer exceeded the budget was correct.
+
+That distinction matters if you're building an agent whose output feeds another program. A benchmark can reward a correct verdict even when the numeric field and explanation disagree. Here, the revised prompt earned more points. The diagnostic gave us no evidence that it reduced the targeted failure.
+
+## How much weight to give this
+
+Each claim could earn two points for its verdict, one for sufficient evidence alongside a correct verdict, and one for its numeric answer or a justified null. The comparison unit is the **case**. Two repetitions do not turn eight cases into sixteen independent tasks. The attached data give every case score by prompt and repetition, including losses. The two studies used different cases, so compare prompts *within* each study.
+
+These were small, hand-authored tests of one model family. The revised prompts were authored methods; no training or autonomous learning took place. We did not test human adoption or general research ability. The next engineering question is whether a separately computed value and a validation rule can catch disagreements before a structured answer is consumed. That would deserve another frozen test on new evidence.
+
+[Download the case scores (CSV)](/assets/posts/research-prompt-score-and-consistency/case-metrics.csv). Each row contains one case, edition and repetition, with the points earned out of 12.

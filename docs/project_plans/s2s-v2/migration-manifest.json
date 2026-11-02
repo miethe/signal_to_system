@@ -119,6 +119,14 @@
       "milestone": "M2"
     },
     {
+      "path": "/feeds/field-note.xml",
+      "output": "feeds/field-note.xml",
+      "family": "feeds",
+      "action": "add",
+      "target": "/feeds/field-note.xml",
+      "milestone": "M2"
+    },
+    {
       "path": "/feeds/essay.xml",
       "output": "feeds/essay.xml",
       "family": "feeds",
@@ -153,6 +161,13 @@
       "family": "essay-reader",
       "action": "preserve",
       "target": "/essays/"
+    },
+    {
+      "path": "/essays/research-prompt-score-and-consistency/",
+      "output": "essays/research-prompt-score-and-consistency/index.html",
+      "family": "essay-reader",
+      "action": "preserve",
+      "target": "/essays/research-prompt-score-and-consistency/"
     },
     {
       "path": "/essays/the-contract-is-the-work/",
