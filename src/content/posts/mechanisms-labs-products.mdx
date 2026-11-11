@@ -1,0 +1,37 @@
+---
+title: "Mechanisms, labs, and products"
+excerpt: "A guide to the tools, experiments, and applications behind this work."
+date: 2026-11-10T12:00:00Z
+readTime: "3 min"
+contentType: field-note
+format: field-note
+category: "Projects"
+tags: ["tools", "research", "projects"]
+status: draft
+---
+
+Some projects start as small tools for a specific problem. Others are places to investigate a question or applications that put an idea in someone's hands. This guide groups the public work by what it is for.
+
+## Mechanisms
+
+Mechanisms are focused tools for a particular job. [Agent Context Budget](https://github.com/miethe/agent-mechanisms/tree/2738c2eafd056aa7f320eb56a1d6304997d87290/agent-context-budget) measures instruction files against a configurable byte budget and reports where a chain exceeds it. It is a way to inspect files, not a promise about what every agent will read.
+
+For keeping documents and copies aligned, [Agent Document Consistency](https://github.com/miethe/agent-mechanisms/tree/2738c2eafd056aa7f320eb56a1d6304997d87290/agent-document-consistency) compares selected facts in a canonical document with a mirror; it does not check semantic equivalence. [Artifact Drift Check](https://github.com/miethe/agent-mechanisms/tree/2738c2eafd056aa7f320eb56a1d6304997d87290/artifact-drift-check) compares files or directories with deployed copies, reporting differences without changing them. It does not infer history or exempt generated regions.
+
+For local coordination, [Local Maildir](https://github.com/miethe/agent-mechanisms/tree/2738c2eafd056aa7f320eb56a1d6304997d87290/local-maildir) provides experimental filesystem primitives for delivering and claiming messages. [Worker Inbox and Hazards](https://github.com/miethe/agent-mechanisms/tree/2738c2eafd056aa7f320eb56a1d6304997d87290/worker-inbox-and-hazards) builds on mailbox primitives for cooperating consumers and provides a helper for matching and transitioning hazards. Callers must persist hazard events themselves. Neither makes a claim and its downstream effects transactional.
+
+[Small Hook Pack](https://github.com/miethe/agent-mechanisms/tree/2738c2eafd056aa7f320eb56a1d6304997d87290/small-hook-pack) provides text primitives for detecting added handoff links and stripping quoted or fenced text before a separate classifier runs. The stripping is heuristic, and the primitives do not integrate with an agent runtime on their own.
+
+Three further entries are designs rather than runnable code: [Absence and Recurrence](https://github.com/miethe/agent-mechanisms/tree/2738c2eafd056aa7f320eb56a1d6304997d87290/absence-and-recurrence) outlines monitoring for missing artifacts and recurring hazards; [Session Continuity](https://github.com/miethe/agent-mechanisms/tree/2738c2eafd056aa7f320eb56a1d6304997d87290/session-continuity) outlines pointer-based handoffs across context compaction; and [Execution Boundaries](https://github.com/miethe/agent-mechanisms/tree/2738c2eafd056aa7f320eb56a1d6304997d87290/execution-boundaries) outlines scoped execution and independent result checks. These designs need local implementation and review; a handoff receipt alone does not prove context was restored.
+
+The nine entries at this revision are licensed Apache-2.0. Versions of Agent Context Budget published before November 10, 2026 remain under the MIT License.
+
+## Labs
+
+Labs are spaces for experiments. [Aural Geometry Lab](https://github.com/miethe/aural-geometry-lab) explores mathematical ideas through sound, while [MagnaMath Lab](https://github.com/miethe/magnamath-lab) explores polyhedra, nets, and folding. Research notes on this site document questions, methods, and limits alongside results.
+
+## Products
+
+Products bring a set of capabilities together for repeated use. [MeatyCapture](https://github.com/miethe/meatycapture) is a task management tool with command-line, web, and desktop interfaces. [CCDash](https://github.com/miethe/CCDash) is a dashboard for agentic AI sessions.
+
+The [portfolio](/portfolio/) collects more projects, and [writing](/writing/) follows the ideas and decisions behind them. This guide can grow as more work is reviewed and made public.
