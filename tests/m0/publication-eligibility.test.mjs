@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { existsSync, readFileSync, readdirSync, statSync } from 'node:fs';
 import path from 'node:path';
-import { isPublishable } from '../../src/lib/publication.mjs';
+import { isPublishable, isRoutable } from '../../src/lib/publication.mjs';
 
 const root = path.resolve(import.meta.dirname, '../..');
 const dist = path.join(root, 'dist');
@@ -18,6 +18,19 @@ test('draft posts are ineligible for static emission', () => {
 test('published and evergreen posts remain eligible', () => {
   assert.equal(isPublishable({ data: { status: 'published' } }), true);
   assert.equal(isPublishable({ data: { status: 'evergreen' } }), true);
+});
+
+test('date and status boundaries apply to discovery and routes', () => {
+  const entry = (status, date) => ({ data: { status, date } });
+  assert.equal(isPublishable(entry('published', '2999-01-01')), false);
+  assert.equal(isPublishable(entry('published', '2000-01-01')), true);
+  assert.equal(isPublishable(entry('published', 'invalid')), false);
+  for (const status of ['private', 'withdrawn', 'unlisted']) {
+    assert.equal(isPublishable(entry(status, '2000-01-01')), false);
+  }
+  assert.equal(isRoutable(entry('unlisted', '2000-01-01')), true);
+  assert.equal(isRoutable(entry('unlisted', '2999-01-01')), false);
+  assert.equal(isRoutable(entry('private', '2000-01-01')), false);
 });
 
 test('unknown or missing status fails closed', () => {
@@ -58,6 +71,8 @@ test('an Array#filter index in the options slot is ignored', () => {
 const DERIVED_PREDICATES = new Map([
   // Counts the entry being rendered even in a dev preview; see the component.
   ['src/components/content/SeriesWayfinding.astro', new Set(['eligibleOrSelf'])],
+  ['src/pages/essays/[...slug].astro', new Set(['isRoutable'])],
+  ['src/pages/dev-stories/[...slug].astro', new Set(['isRoutable'])],
 ]);
 
 function sourceFiles(dir) {
@@ -80,7 +95,7 @@ test('every getCollection("posts"|"stories") call in src/ filters through isPubl
   for (const file of sourceFiles(path.join(root, 'src'))) {
     const source = readFileSync(file, 'utf8');
     const rel = path.relative(root, file).split(path.sep).join('/');
-    const imported = /import\s*\{[^}]*\bisPublishable\b[^}]*\}\s*from\s*['"][^'"]*publication\.mjs['"]/.test(source);
+    const imported = /import\s*\{[^}]*\b(?:isPublishable|isRoutable)\b[^}]*\}\s*from\s*['"][^'"]*publication\.mjs['"]/.test(source);
     for (const match of source.matchAll(/getCollection\(\s*(['"])(posts|stories)\1\s*(?:,\s*([^)]*?))?\s*\)/g)) {
       calls += 1;
       const predicate = (match[3] ?? '').trim();
@@ -121,7 +136,8 @@ function ineligibleEntries() {
       const status = fm.match(/^status:\s*['"]?([\w-]+)/m)?.[1];
       const isFixture = /^isFixture:\s*true\s*$/m.test(fm);
       const id = (fm.match(/^slug:\s*['"]?([^'"\n]+)/m)?.[1]?.trim() ?? name.replace(/\.mdx?$/, '')).toLowerCase();
-      if (!['published', 'evergreen'].includes(status) || isFixture) {
+      const date = fm.match(/^date:\s*['"]?([^'"\s]+)/m)?.[1];
+      if (!['published', 'evergreen', 'unlisted'].includes(status) || isFixture || (date && new Date(date) > new Date())) {
         entries.push({ collection, id, url: `/${base}/${id}/` });
       }
     }
@@ -161,5 +177,18 @@ test('ineligible entries produce no HTML, feed item, search row, sitemap entry o
   // The aggregate artifacts the gate covers exist, so absence above means something.
   for (const artifact of ['rss.xml', 'search.json', 'sitemap-0.xml']) {
     assert.ok(existsSync(path.join(dist, artifact)), `dist/${artifact} missing`);
+  }
+});
+
+
+test('unlisted probe has a noindex route and no discovery references', { skip: !existsSync(path.join(root, 'src/content/posts/zz-publication-gate-probe-unlisted.mdx')) }, () => {
+  const id = 'zz-publication-gate-probe-unlisted';
+  const url = `/essays/${id}/`;
+  const page = path.join(dist, 'essays', id, 'index.html');
+  assert.ok(existsSync(page), 'unlisted route missing');
+  assert.match(readFileSync(page, 'utf8'), /name="robots" content="noindex, nofollow"/);
+  for (const file of distFiles(dist)) {
+    if (file === page) continue;
+    assert.ok(!readFileSync(file, 'utf8').includes(url), `unlisted reference in ${path.relative(root, file)}`);
   }
 });
