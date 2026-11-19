@@ -28,7 +28,7 @@ const posts = defineCollection({
       "Projects",
     ]),
     tags: z.array(z.string()),
-    status: z.enum(["draft", "published", "evergreen"]),
+    status: z.enum(["draft", "published", "evergreen", "private", "withdrawn", "unlisted"]),
     author: z.enum(["Metis"]).optional(),
     editor: z.enum(["Nick Miethe"]).optional(),
 
@@ -172,7 +172,7 @@ const stories = defineCollection({
     excerpt: z.string(),
     date: z.coerce.date(),
     readTime: z.string(),
-    status: z.enum(["draft", "published", "evergreen"]),
+    status: z.enum(["draft", "published", "evergreen", "private", "withdrawn", "unlisted"]),
 
     // Classification
     storyType: z.enum(["after-action", "feature-story", "build-note"]),

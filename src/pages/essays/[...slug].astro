@@ -2,10 +2,10 @@
 import { getCollection, render } from 'astro:content';
 import ReaderShell from '../../layouts/ReaderShell.astro';
 import { getRelatedArticles } from '../../lib/content';
-import { isPublishable } from '../../lib/publication.mjs';
+import { isRoutable } from '../../lib/publication.mjs';
 
 export async function getStaticPaths() {
-  const posts = await getCollection('posts', isPublishable);
+  const posts = await getCollection('posts', isRoutable);
   return posts.map((post) => ({
     params: { slug: post.id },
     props: { post },

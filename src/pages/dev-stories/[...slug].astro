@@ -1,11 +1,11 @@
 ---
 import { getCollection, render } from 'astro:content';
 import ReaderShell from '../../layouts/ReaderShell.astro';
-import { isPublishable } from '../../lib/publication.mjs';
+import { isRoutable } from '../../lib/publication.mjs';
 import { getRelatedArticles } from '../../lib/content';
 
 export async function getStaticPaths() {
-  const stories = await getCollection('stories', isPublishable);
+  const stories = await getCollection('stories', isRoutable);
   return stories.map((story) => ({
     params: { slug: story.id },
     props: { story },

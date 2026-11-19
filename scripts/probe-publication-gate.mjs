@@ -2,8 +2,8 @@
 /**
  * Publication-gate probe (node_01M35CKM3JKBQNKDX6YWV4KRQE).
  *
- * Injects two synthetic posts into src/content/posts/ (a `status: draft`
- * post and a `status: published` post marked `isFixture: true`), runs a
+ * Injects synthetic future, private, withdrawn, unlisted, draft and fixture
+ * posts into src/content/posts/, runs a
  * production `astro build`, then runs tests/m0/publication-eligibility.test.mjs
  * against that dist/. The probe files are always removed afterwards.
  *
@@ -33,6 +33,10 @@ Synthetic probe body.
 `;
 
 const probes = [
+  { file: 'zz-publication-gate-probe-future.mdx', body: frontmatter('status: published').replace('date: 2026-01-01', 'date: 2999-01-01') },
+  { file: 'zz-publication-gate-probe-private.mdx', body: frontmatter('status: private') },
+  { file: 'zz-publication-gate-probe-withdrawn.mdx', body: frontmatter('status: withdrawn') },
+  { file: 'zz-publication-gate-probe-unlisted.mdx', body: frontmatter('status: unlisted') },
   { file: 'zz-publication-gate-probe-draft.mdx', body: frontmatter('status: draft') },
   { file: 'zz-publication-gate-probe-fixture.mdx', body: frontmatter('status: published\nisFixture: true') },
 ];

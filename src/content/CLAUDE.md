@@ -24,7 +24,7 @@ readTime: "8 min"
 contentType: essay  # or field-note
 category: "Agentic SDLC"  # one of 7 categories
 tags: ["agent-ready repos", "context engineering"]  # 3-6 from registry
-status: published  # draft | published | evergreen
+status: published  # draft | published | evergreen | private | withdrawn | unlisted
 ---
 ```
 
@@ -42,7 +42,7 @@ title: "Story Title"
 excerpt: "One-line description"
 date: 2026-07-28
 readTime: "6 min"
-status: published  # draft | published | evergreen
+status: published  # draft | published | evergreen | private | withdrawn | unlisted
 storyType: after-action  # after-action | feature-story | build-note
 tags: ["agentic-sdlc", "context-engineering"]
 automated: true  # default true; set false only for hand-curated edits
@@ -106,3 +106,5 @@ When writing content, use the `/voice-writer` skill to match Nick's voice. Use `
 Post planning template available at `docs/templates/post-planning.md`.
 
 Before publishing, complete the [pre-publish review checklist](../../docs/authoring/review-checklist.md).
+
+Unlisted entries have a direct noindex route but are omitted from discovery surfaces. Future-dated entries are not emitted until their date. Private and withdrawn entries are not emitted.

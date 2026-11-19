@@ -4,7 +4,8 @@ import react from '@astrojs/react';
 import tailwindcss from '@tailwindcss/vite';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { staticRedirects } from './scripts/redirects.mjs';
 
 const site = 'https://nickmiethe.com';
@@ -31,7 +32,9 @@ export default defineConfig({
       // /studio/* preview pages (brand, primitives, templates) are noindex.
       filter: (page) => {
         const path = new URL(page).pathname;
-        return !redirectSources.has(path)
+        const html = fileURLToPath(new URL(`./dist${path.endsWith('/') ? path : `${path}/`}index.html`, import.meta.url));
+        const noindex = existsSync(html) && /<meta name="robots" content="noindex, nofollow"/.test(readFileSync(html, 'utf8'));
+        return !noindex && !redirectSources.has(path)
           && !path.includes('/workflow-showcase')
           && !path.includes('/studio/');
       },

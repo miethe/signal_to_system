@@ -122,6 +122,7 @@ const storyData = isStory ? (entry.data as import('astro:content').CollectionEnt
 
 <BaseLayout
   reader
+  noindex={entry.data.status === 'unlisted'}
   title={title}
   description={pageDescription}
   ogImage={ogImage}
